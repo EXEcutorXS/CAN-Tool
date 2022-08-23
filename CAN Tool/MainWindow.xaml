@@ -1,0 +1,78 @@
+﻿<Window x:Class="CAN_Tool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CAN_Tool"
+        mc:Ignorable="d"
+        Title="Advers CAN Tool" Height="450" Width="800" Loaded="Window_Loaded">
+    <Grid>
+        <TabControl Margin="0,50,0,0" Grid.ColumnSpan="2">
+            <TabItem Header="CAN">
+                <Grid Background="#FFE5E5E5">
+                    <TextBox x:Name="CanIdField" Text="ID" Height="20" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5 5 5 5"></TextBox>
+                    <CheckBox x:Name="CanIdeField" Content="IDE" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100 7 5 5"></CheckBox>
+                    <CheckBox x:Name="CanRtrField" Content="RTR" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150 7 5 5"></CheckBox>
+                    <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210 5 5 5"></TextBox>
+                    <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="5 40 5 5" FontFamily = "Courier New">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Path = IdAsText}"  Header="ID" IsReadOnly="True">
+                            </DataGridTextColumn>
+                            <DataGridCheckBoxColumn Binding="{Binding Path = IDE}" Header="IDE"  IsReadOnly="True">
+                            </DataGridCheckBoxColumn>
+                            <DataGridCheckBoxColumn Binding= "{Binding Path = RTR}" Header="RTR"  IsReadOnly="True">
+                            </DataGridCheckBoxColumn>
+                            <DataGridTextColumn Binding= "{Binding Path = DataAsText}" Header="DATA"  IsReadOnly="True">
+                            </DataGridTextColumn>
+
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Advers">
+                <TabControl Margin="3" Grid.ColumnSpan="2">
+                    <TabItem Header="Messages">
+                        <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False" Margin="5 40 400 5" FontFamily = "Courier New">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Path = IdAsText}"  Header="ID" IsReadOnly="True">
+                                </DataGridTextColumn>
+                                <DataGridCheckBoxColumn Binding="{Binding Path = IDE}" Header="IDE"  IsReadOnly="True">
+                                </DataGridCheckBoxColumn>
+                                <DataGridCheckBoxColumn Binding= "{Binding Path = RTR}" Header="RTR"  IsReadOnly="True">
+                                </DataGridCheckBoxColumn>
+                                <DataGridTextColumn Binding= "{Binding Path = DataAsText}" Header="DATA"  IsReadOnly="True">
+                                </DataGridTextColumn>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <TabItem Header="Control">
+                    </TabItem>
+                    <TabItem Header="Config">
+                    </TabItem>
+                    <TabItem Header="Graph">
+                    </TabItem>
+                    <TabItem Header="Black Box">
+                    </TabItem>
+                    <TabItem Header="Firmware">
+                    </TabItem>
+                </TabControl>
+                    
+                    
+            </TabItem>
+            <TabItem Header="RV-C">
+                <Grid Background="#FFE5E5E5">
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button  Content="Refresh" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="70" Margin="15" Click="Button_Click"/>
+        <ComboBox x:Name="PortNameList" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="100 15 15 15" SelectionChanged="PortNameList_SelectionChanged"/>
+        <Button x:Name="PortOpenButton" Content="Open" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="200 15 15 15" Click="Button_Click_1"/>
+        <ComboBox x:Name="CanBitrateField" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="300 15 15 15"/>
+        <Button Content="Normal" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="400 15 15 15" Click="Button_Click_2"/>
+        <Button Content="Listen" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="500 15 15 15" Click="Button_Click_3"/>
+        <Button Content="Close" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="600 15 15 15" Click="Button_Click_4"/>
+
+
+    </Grid>
+</Window>
