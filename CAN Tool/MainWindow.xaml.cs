@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -23,7 +22,7 @@ namespace CAN_Tool
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    
+
     public partial class MainWindow : Window
     {
         int[] Bitrates = new int[] { 20, 50, 125, 250, 500, 800, 1000 };
@@ -31,17 +30,28 @@ namespace CAN_Tool
         {
             CanMessage msg = (args as GotMessageEventArgs).receivedMessage;
 
-            CanMessage targetMessage = messages.FirstOrDefault<CanMessage>(m => m.ID == msg.ID);
+            CanMessage targetMessage = canMessages.FirstOrDefault<CanMessage>(m => m.IDE == msg.IDE && m.RTR == msg.RTR && m.ID == msg.ID);
             if (targetMessage != null)
             {
                 Dispatcher.Invoke(new Action(() => targetMessage.Update(msg)));
             }
             else
-                Dispatcher.Invoke(new Action(() => messages.Add(msg)));
+                Dispatcher.Invoke(new Action(() => canMessages.Add(msg)));
+            AC2Pmessage foundAC2PMessage = AC2Pmessages.FirstOrDefault(m => m.Similiar(new AC2Pmessage(msg)));
+            if (foundAC2PMessage != null)
+                Dispatcher.Invoke(new Action(() =>
+                foundAC2PMessage.Update(new AC2Pmessage(msg))));
+            else
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    AC2Pmessages.Add(new AC2Pmessage(msg));
+                }));
+            Dispatcher.Invoke(() => AC2P.ParseCanMessage(msg));
 
         }
         public CanAdapter canAdapter = new CanAdapter();
-        public BindingList<CanMessage> messages = new BindingList<CanMessage>();
+        public BindingList<CanMessage> canMessages = new BindingList<CanMessage>();
+        public BindingList<AC2Pmessage> AC2Pmessages = new BindingList<AC2Pmessage>();
 
 
         public MainWindow()
@@ -51,11 +61,15 @@ namespace CAN_Tool
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
-            canAdapter.GotNewMessage += new EventHandler(GotCanMessage);
-            CanMessageList.ItemsSource = messages;
+            AC2P.canAdapter = canAdapter;
             AC2P.ParseParamsname();
+
+            canAdapter.GotNewMessage += new EventHandler(GotCanMessage);
+            AC2P.progressBarUpdated += new EventHandler(ProgressChanged);
+            CanMessageList.ItemsSource = canMessages;
+            AC2PMessageList.ItemsSource = AC2Pmessages;
             CanBitrateField.ItemsSource = Bitrates;
+            CurrentDeviceSelectorField.ItemsSource = AC2P.connectedDevices;
         }
 
 
@@ -83,6 +97,12 @@ namespace CAN_Tool
             }
         }
 
+        private void ProgressChanged(object sender, EventArgs e)
+        {
+            ConfigProgressBar.Value = AC2P.Progress;
+            ProgressText.Text = AC2P.Progress.ToString();
+        }
+
         private void PortNameList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             canAdapter.PortName = (sender as ComboBox).SelectedItem.ToString();
@@ -107,5 +127,34 @@ namespace CAN_Tool
         {
             canAdapter.Stop();
         }
+
+        private void AC2PMessageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            AC2PVerboseInfoField.Text = (AC2PMessageList.CurrentItem as AC2Pmessage)?.VerboseInfo().Replace(';','\n');
+        }
+
+        private void CurrentDeviceSelectorField_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ConfigParameterField.ItemsSource = (CurrentDeviceSelectorField.SelectedItem as ConnectedDevice)?.readedParameters;
+        }
+
+        private void readParametersButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentDeviceSelectorField.SelectedItem == null) return;
+            AC2P.connectedDevices.FirstOrDefault(d => d.ID.Equals((CurrentDeviceSelectorField.SelectedItem as ConnectedDevice).ID))?.readedParameters.Clear();
+            AC2P.ReadAllParameters((CurrentDeviceSelectorField?.SelectedItem as ConnectedDevice).ID);
+        }
+
+        private void saveParametersButton_Click(object sender, RoutedEventArgs e)
+        {
+            AC2P.SaveParameters((CurrentDeviceSelectorField?.SelectedItem as ConnectedDevice).ID);
+        }
+
+        private void eraseParametersButton_Click(object sender, RoutedEventArgs e)
+        {
+            AC2P.connectedDevices.FirstOrDefault(d => d.ID.Equals((CurrentDeviceSelectorField.SelectedItem as ConnectedDevice).ID)).readedParameters.Clear();
+            AC2P.EraseParameters((CurrentDeviceSelectorField?.SelectedItem as ConnectedDevice).ID);
+        }
     }
+    
 }

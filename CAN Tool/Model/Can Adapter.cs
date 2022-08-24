@@ -14,7 +14,7 @@ namespace Can_Adapter
         public CanMessage receivedMessage;
     }
 
-    public class CanMessage : INotifyPropertyChanged
+    public partial class CanMessage : INotifyPropertyChanged
     {
         private bool ide;
         
@@ -192,7 +192,6 @@ namespace Can_Adapter
             ID = msg.ID;
         }
     }
-    public enum CanAdapterMode { Normal, Silent, Loopback, SilentLoopback }
     public class CanAdapter
     {
 
@@ -288,10 +287,10 @@ namespace Can_Adapter
                     GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = new CanMessage(new string(currentBuf)) });
                     break;
                 case 'Z':
-                    TransmissionSuccess.Invoke(this, new EventArgs());
+                    TransmissionSuccess?.Invoke(this, new EventArgs());
                     break;
                 case '\a':
-                    ErrorReported.Invoke(this, new EventArgs());
+                    ErrorReported?.Invoke(this, new EventArgs());
                     break;
                 default:
                     break;
