@@ -8,13 +8,14 @@
         Title="Advers CAN Tool" Height="700" Width="1200" Loaded="Window_Loaded">
     <Grid>
         <TabControl Margin="0,50,0,0" Grid.ColumnSpan="2">
-            <TabItem Header="CAN">
+            <TabItem Header="Basic CAN">
                 <Grid Background="#FFE5E5E5">
-                    <TextBox x:Name="CanIdField" Text="ID" Height="20" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5 5 5 5"></TextBox>
-                    <CheckBox x:Name="CanIdeField" Content="IDE" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100 7 5 5"></CheckBox>
-                    <CheckBox x:Name="CanRtrField" Content="RTR" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150 7 5 5"></CheckBox>
-                    <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210 5 5 5"></TextBox>
-                    <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="5 40 5 5" FontFamily = "Courier New">
+                    <TextBox x:Name="CanIdField" Text="ID" Height="20" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8 8 8 8"></TextBox>
+                    <CheckBox x:Name="CanIdeField" Content="IDE" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100 8 8 8"></CheckBox>
+                    <CheckBox x:Name="CanRtrField" Content="RTR" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150 8 8 8"></CheckBox>
+                    <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200 8 8 8"></TextBox>
+                    <Button Content="Send" VerticalAlignment="Top" HorizontalAlignment="Left" Height="20" Width="100" Margin="320 8 8 8"></Button>
+                    <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="5 40 5 5" FontFamily = "Courier New" AlternatingRowBackground="#FF81FF7D" SelectionMode="Single" GridLinesVisibility="All">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Path = IdAsText}"  Header="ID" IsReadOnly="True">
                             </DataGridTextColumn>
@@ -33,10 +34,6 @@
                 <TabControl Margin="3" Grid.ColumnSpan="2" >
                     <TabItem Header="Messages">
                         <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="71*"/>
-                                <ColumnDefinition Width="520*"/>
-                            </Grid.ColumnDefinitions>
                             <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 50 400 5"  FontFamily = "Courier New" SelectionChanged="AC2PMessageList_SelectionChanged" AlternatingRowBackground="#FFA4EC84" SelectionMode="Single" Grid.ColumnSpan="2">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding Path = PGN}"  Header="PGN" IsReadOnly="True">
@@ -54,7 +51,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
 
-                            <TextBlock x:Name="AC2PVerboseInfoField"  HorizontalAlignment="Left" Width="390" TextWrapping="Wrap" Grid.Column="1" Margin="650,0,0,0" ></TextBlock>
+                            <TextBlock x:Name="AC2PVerboseInfoField"  HorizontalAlignment="Left" Width="390" TextWrapping="Wrap" Grid.Column="1" Margin="511,0,0,0" ></TextBlock>
                         </Grid>
 
                     </TabItem>
@@ -64,13 +61,13 @@
                     </TabItem>
                     <TabItem Header="Config">
                         <Grid>
-                            <ProgressBar x:Name="ConfigProgressBar"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="570 7,0,0" Height="20" Maximum="100" Minimum="0" Value="00" Width="210" />
+                            <ProgressBar x:Name="ConfigProgressBar"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="630,7,0,0" Height="20" Maximum="100" Minimum="0" Value="00" Width="210" />
                             <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="7,7,0,0" Grid.ColumnSpan="2" SelectionChanged="CurrentDeviceSelectorField_SelectionChanged"></ComboBox>
-                            <Button x:Name="readParametersButton"  Content="Read" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="338,7,0,0" Grid.Column="1" Click="readParametersButton_Click"></Button>
-                            <Button x:Name="saveParametersButton" Content="Save" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="418,7,0,0" Grid.Column="1" Click="saveParametersButton_Click"></Button>
-                            <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="490,7,0,0" Grid.Column="1" Click="eraseParametersButton_Click"></Button>
-                            <TextBox x:Name="ProgressText" Text="" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="800,7,0,0" Grid.Column="1"></TextBox>
-                            
+                            <Button x:Name="readParametersButton"  Content="Read" Width="65" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="414,7,0,0" Click="readParametersButton_Click"/>
+                            <Button x:Name="saveParametersButton" Content="Save" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="487,7,0,0" Click="saveParametersButton_Click"/>
+                            <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="558,7,0,0" Click="eraseParametersButton_Click"/>
+                            <TextBox x:Name="ProgressText" Text="" Width="42" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="714,7,0,0"/>
+
                             <DataGrid x:Name = "ConfigParameterField" Margin = "5 40 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding Path = Id}"  Header="ID" IsReadOnly="True">
@@ -83,12 +80,12 @@
                                     </DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
-                            
+
 
                         </Grid>
                     </TabItem>
                     <TabItem Header="Graph">
-                        
+
                     </TabItem>
                     <TabItem Header="Black Box">
                     </TabItem>

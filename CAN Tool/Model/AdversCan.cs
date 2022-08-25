@@ -9,6 +9,7 @@ using System.ComponentModel;
 using Can_Adapter;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
+using System.Data;
 
 namespace AdversCan
 {
@@ -33,6 +34,7 @@ namespace AdversCan
         //value = rawData*a+b
         public string OutputFormat = "";
         public Dictionary<int, string> meanings = new Dictionary<int, string>();
+        public Func<int, string> GetMeaning;
         public string Tip = "";
         public int PackNumber;
 
@@ -186,6 +188,7 @@ namespace AdversCan
             StringBuilder retString = new StringBuilder();
             int rawValue;
             retString.Append(p.Name + ": ");
+
             switch (p.BitLength)
             {
                 case 1: rawValue = Data[p.StartByte] >> p.StartBit & 0b1; break;
@@ -198,6 +201,8 @@ namespace AdversCan
                 case 32: rawValue = Data[p.StartByte] * 16777216 + Data[p.StartByte + 1] * 65536 + Data[p.StartByte + 2] * 256 + Data[p.StartByte + 3]; break;
                 default: throw new Exception("Bad parameter size");
             }
+            if (p.GetMeaning != null)
+                return p.GetMeaning(rawValue);
             if (p.meanings != null && p.meanings.ContainsKey(rawValue))
                 retString.Append(rawValue.ToString() + " - " + p.meanings[rawValue]);
             else
@@ -325,9 +330,9 @@ namespace AdversCan
         }
 
 
-        public string idString => AC2P.configParameters[Id]?.idString;
-        public string rusName => AC2P.configParameters[Id]?.nameRu;
-        public string enName => AC2P.configParameters[Id]?.nameEn;
+        public string idString => AC2P.configParameters[Id]?.StringId;
+        public string rusName => AC2P.configParameters[Id]?.NameRu;
+        public string enName => AC2P.configParameters[Id]?.NameEn;
 
     }
     public class ConnectedDevice
@@ -387,16 +392,49 @@ namespace AdversCan
     }
     public class configParameter
     {
-        public int id;
-        public string idString;
-        public string nameRu;
-        public string nameEn;
+        public int Id;
+        public string StringId;
+        public string NameRu;
+        public string NameEn;
+        public override string ToString()
+        {
+            return $"{Id} - {StringId}: {NameRu}";
+        }
+    }
 
+    public class Variable
+    {
+        public int Id;
+        public string StringId;
+        public string VarType;
+        public string Description;
+        public string Formula;
+        public string Format;
+        public string ShortName;
+
+        public override string ToString()
+        {
+            return $"{Id} - {StringId}: {Description}";
+        }
+    }
+
+    public class BbParameter
+    {
+        public int Id;
+        public string StringId;
+        public string Description;
+
+        public override string ToString()
+        {
+            return $"{Id} - {StringId}:{Description}";
+        }
     }
     static class AC2P
     {
-        static readonly Dictionary<int, string> defMeaningsYesNo = new Dictionary<int, string>() { [0] = "Нет", [1] = "Да", [2] = "Нет данных", [3] = "Нет данных" };
-        static readonly Dictionary<int, string> defMeaningsOnOff = new Dictionary<int, string>() { [0] = "Выкл", [1] = "Вкл", [2] = "Нет данных", [3] = "Нет данных" };
+        static readonly Dictionary<int, string> defMeaningsYesNo = new Dictionary<int, string>() { { 0, "Нет" }, { 1, "Да" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
+        static readonly Dictionary<int, string> defMeaningsOnOff = new Dictionary<int, string>() { { 0, "Выкл" }, { 1, "Вкл" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
+        static readonly Dictionary<int, string> defMeaningsAllow = new Dictionary<int, string>() { { 0, "Разрешено" }, { 1, "Запрещёно" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
+        static readonly Dictionary<int, string> Stages = new Dictionary<int, string>() { { 0, "STAGE_Z" }, { 1, "STAGE_P" }, { 2, "STAGE_H" }, { 3, "STAGE_W" }, { 4, "STAGE_F" }, { 5, "STAGE_T" }, { 6, "STAGE_M" } };
 
         public static Dictionary<int, PGN> PGNs = new Dictionary<int, PGN>();
 
@@ -405,8 +443,12 @@ namespace AdversCan
         public static BindingList<ConnectedDevice> connectedDevices = new BindingList<ConnectedDevice>();
 
         public static Dictionary<int, configParameter> configParameters = new Dictionary<int, configParameter>();
+        public static Dictionary<int, Variable> Variables = new Dictionary<int, Variable>();
+        public static Dictionary<int, BbParameter> BbParameters = new Dictionary<int, BbParameter>();
 
-        public static Dictionary<int, string> paramtersNames = new Dictionary<int, string>();
+        public static Dictionary<int, string> ParamtersNames = new Dictionary<int, string>();
+        public static Dictionary<int, string> VariablesNames = new Dictionary<int, string>();
+        public static Dictionary<int, string> BbParameterNames = new Dictionary<int, string>();
 
         public static CanAdapter canAdapter;
 
@@ -450,32 +492,61 @@ namespace AdversCan
         public static void ParseParamsname(string filePath = "paramsname.h")
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            StreamReader sr = new StreamReader(filePath, System.Text.Encoding.GetEncoding(1251));
+            StreamReader sr = new StreamReader(filePath, Encoding.GetEncoding(1251));
             while (!sr.EndOfStream)
             {
                 string tempString = sr.ReadLine();
                 List<string> tempList = new List<string>();
-                int ParamNumber;
-                string CodeName;
-                string englishDescription;
-                string russianDescription;
-
 
                 if (tempString.StartsWith("#define PAR"))
                 {
+                    var p = new configParameter();
                     tempString = tempString.Remove(0, 8);
-                    englishDescription = tempString.Substring(tempString.LastIndexOf('@') + 1);
-                    russianDescription = tempString.Substring(tempString.LastIndexOf("//") + 2, tempString.LastIndexOf('@') - tempString.LastIndexOf("//") - 2);
+                    p.NameEn = tempString.Substring(tempString.LastIndexOf('@') + 1);
+                    p.NameRu = tempString.Substring(tempString.LastIndexOf("//") + 2, tempString.LastIndexOf('@') - tempString.LastIndexOf("//") - 2);
                     tempString = tempString.Remove(tempString.IndexOf('/'));
                     tempList = tempString.Split(' ').ToList();
-                    CodeName = tempList[0];
-                    ParamNumber = int.Parse(tempList.Last());
-                    tempString = "";
-                    configParameters.Add(ParamNumber, new configParameter() { id = ParamNumber, idString = CodeName, nameRu = russianDescription, nameEn = englishDescription });
+                    p.StringId = tempList[0];
+                    p.Id = int.Parse(tempList.Last());
+                    configParameters.Add(p.Id, p);
+                    ParamtersNames.Add(p.Id, p.StringId);
+                }
+
+                if (tempString.StartsWith("#define VAR"))
+                {
+
+                    Variable v = new Variable();
+                    tempString = tempString.Remove(0, 8);
+
+                    if (tempString.Split("//")[0].Split(' ').Last().ToUpper().StartsWith("0X"))
+                        v.Id = Convert.ToInt32(tempString.Split("//")[0].Split(' ').Last(), 16);
+                    else
+                        v.Id = Convert.ToInt32(tempString.Split("//")[0].Split(' ').Last(), 10);
+                    v.StringId = tempString.Split("//")[0].Split(' ')[0];
+                    tempString = tempString.Split("//")[1];
+                    var parts = tempString.Split(';');
+                    v.VarType = parts[0].Trim();
+                    v.Description = parts[1]?.Trim();
+                    if (parts.Length > 2) v.Formula = parts[2]?.Trim();
+                    if (parts.Length > 3) v.Format = parts[3]?.Trim();
+                    if (parts.Length > 4) v.ShortName = parts[4]?.Trim();
+                    Variables.Add(v.Id, v);
+                    VariablesNames.Add(v.Id, v.ShortName);
+                }
+
+                if (tempString.StartsWith("#define BB"))
+                {
+
+                    var b = new BbParameter();
+                    tempString = tempString.Remove(0, 8);
+
+                    b.Id = Convert.ToInt32(tempString.Split("//")[0].Split(' ').Last(), 10);
+                    b.StringId = tempString.Split("//")[0].Split(' ')[0];
+                    b.Description = tempString.Split("//")[1].Trim();
+                    BbParameters.Add(b.Id, b);
+                    BbParameterNames.Add(b.Id, b.Description);
                 }
             }
-            foreach (var p in configParameters)
-                paramtersNames.Add(p.Key, p.Value.idString);
         }
 
         public static async void ReadAllParameters(DeviceId id)
@@ -659,15 +730,163 @@ namespace AdversCan
             commands.Add(new CommandId(0, 67), new AC2Pcommand() { firstByte = 0, secondByte = 67, name = "вход/выход в стадию M (ручное управление) или T (тестирование блока управления)" });
             commands.Add(new CommandId(0, 68), new AC2Pcommand() { firstByte = 0, secondByte = 68, name = "задание параметров устройств в стадии M (ручное управление)" });
             commands.Add(new CommandId(0, 69), new AC2Pcommand() { firstByte = 0, secondByte = 69, name = "управление устройствами" });
+            commands.Add(new CommandId(0, 70), new AC2Pcommand() { firstByte = 0, secondByte = 69, name = "Включение/Выключение устройств" });
             #endregion
 
+            commands[new CommandId(0, 0)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, GetMeaning = i => ("Устройство: " + Devices[i].Name + ";") });
+            commands[new CommandId(0, 0)].parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 8, meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } } });
+            commands[new CommandId(0, 0)].parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 8, Name = "Верия ПО" });
+            commands[new CommandId(0, 0)].parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 8, Name = "Модификация ПО" });
+
+            commands[new CommandId(0, 1)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+
+            commands[new CommandId(0, 4)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+
+            commands[new CommandId(0, 6)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+            commands[new CommandId(0, 6)].parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 4, Name = "Режим работы", meanings = { { 0, "обычный" }, { 1, "экономичный" }, { 2, "догреватель" }, { 3, "отопление" }, { 4, "отопительные системы" } } });
+            commands[new CommandId(0, 6)].parameters.Add(new AC2PParameter() { StartByte = 4, StartBit = 4, BitLength = 4, Name = "Режим догрева", meanings = { { 0, "отключен" }, { 1, "автоматический" }, { 2, "ручной" } } });
+            commands[new CommandId(0, 6)].parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 16, Name = "Уставка температуры", Unit = "°С" });
+            commands[new CommandId(0, 6)].parameters.Add(new AC2PParameter() { StartByte = 7, BitLength = 2, Name = "Работы помпы в ждущем режиме", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 6)].parameters.Add(new AC2PParameter() { StartByte = 7, BitLength = 2, StartBit = 2, Name = "Работы помпы при заведённом двигателе", meanings = defMeaningsOnOff });
+
+            commands[new CommandId(0, 7)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, Name = "Номер мощности" });
+
+            commands[new CommandId(0, 7)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, Name = "Номер мощности" });
+            commands[new CommandId(0, 7)].parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 16, Name = "Температура перехода на большую мощность" });
+            commands[new CommandId(0, 7)].parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 16, Name = "Температура перехода на меньшую мощность" });
+
+            commands[new CommandId(0, 8)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 2, StartBit = 0, Name = "Состояние клапана 1", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 8)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 2, StartBit = 2, Name = "Состояние клапана 1", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 8)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 2, StartBit = 4, Name = "Состояние клапана 1", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 8)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 2, StartBit = 6, Name = "Состояние клапана 1", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 8)].parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 2, StartBit = 0, Name = "Состояние клапана 1", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 8)].parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 2, StartBit = 2, Name = "Состояние клапана 1", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 8)].parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 2, StartBit = 4, Name = "Состояние клапана 1", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 8)].parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 2, StartBit = 6, Name = "Состояние клапана 1", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 8)].parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 1, StartBit = 0, meanings = { { 0, "Сбросить неисправности" } } });
+
+            commands[new CommandId(0, 9)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+            commands[new CommandId(0, 9)].parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 4, Name = "Режим работы", meanings = { { 0, "не используется" }, { 1, "работа по температуре платы" }, { 2, "работа по температуре пульта" }, { 3, "работа по температуре выносного датчика" }, { 4, "работа по мощности" } } });
+            commands[new CommandId(0, 9)].parameters.Add(new AC2PParameter() { StartByte = 4, StartBit = 4, BitLength = 2, Name = "Разрешение/запрещение ждущего режима (при работе по датчику температуры)", meanings = defMeaningsAllow });
+            commands[new CommandId(0, 9)].parameters.Add(new AC2PParameter() { StartByte = 4, StartBit = 6, BitLength = 2, Name = "Разрешение вращения нагнетателя воздуха на ждущем режиме", meanings = defMeaningsAllow });
+            commands[new CommandId(0, 9)].parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 16, Name = "Уставка температуры помещения", Unit = "°С" });
+            commands[new CommandId(0, 9)].parameters.Add(new AC2PParameter() { StartByte = 7, BitLength = 4, Name = "Заданное значение мощности" });
+
+            commands[new CommandId(0, 10)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+
+            commands[new CommandId(0, 20)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Калибровочное значение термопары 1" });
+            commands[new CommandId(0, 20)].parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 16, Name = "Калибровочное значение термопары 2" });
+
+            commands[new CommandId(0, 21)].parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, Name = "Предделитель" });
+            commands[new CommandId(0, 21)].parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 8, Name = "Период ШИМ" });
+            commands[new CommandId(0, 21)].parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 8, Name = "Требуемая частота", Unit = "Гц" });
+
+            commands[new CommandId(0, 22)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "Действие после перезагрузки", meanings = { { 0, "Остаться в загрузчике" }, { 1, "Переход в основную программу без зедержки" } } });
+
+            commands[new CommandId(0, 45)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Игнорирование всех неисправностей", meanings = defMeaningsYesNo });
+            commands[new CommandId(0, 45)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "Игнорирование неисправностей ТН", meanings = defMeaningsYesNo });
+            commands[new CommandId(0, 45)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 4, BitLength = 2, Name = "Игнорирование срывов пламени ", meanings = defMeaningsYesNo });
+            commands[new CommandId(0, 45)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 6, BitLength = 2, Name = "Игнорирование неисправностей свечи", meanings = defMeaningsYesNo });
+            commands[new CommandId(0, 45)].parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 0, BitLength = 2, Name = "Игнорирование неисправностей НВ", meanings = defMeaningsYesNo });
+            commands[new CommandId(0, 45)].parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 2, BitLength = 2, Name = "Игнорирование неисправностей датчиков", meanings = defMeaningsYesNo });
+            commands[new CommandId(0, 45)].parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 4, BitLength = 2, Name = "Игнорирование неисправностей помпы", meanings = defMeaningsYesNo });
+            commands[new CommandId(0, 45)].parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 6, BitLength = 2, Name = "Игнорирование перегревов", meanings = defMeaningsYesNo });
+
+            commands[new CommandId(0, 65)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "", meanings = { { 7, "Температура жидкости" }, { 10, "Температура перегрева" }, { 12, "Температура пламени" }, { 13, "Температура корпуса" }, { 27, "Температура воздуха" } } });
+            commands[new CommandId(0, 65)].parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 16, Name = "Значение температуры", Unit = "°C" });
+
+            commands[new CommandId(0, 66)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "", meanings = { { 0, "Выход из режима М" }, { 1, "Вход в режим М" } } });
+            commands[new CommandId(0, 66)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "", meanings = { { 0, "Выход из режима Т" }, { 1, "Вход в режим Т" } } });
+
+            commands[new CommandId(0, 68)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Состояние помпы", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 68)].parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 0, BitLength = 8, Name = "Обороты нагнетателя", Unit = "об/с" });
+            commands[new CommandId(0, 68)].parameters.Add(new AC2PParameter() { StartByte = 4, StartBit = 0, BitLength = 8, Name = "Мощность свечи", Unit = "%" });
+            commands[new CommandId(0, 68)].parameters.Add(new AC2PParameter() { StartByte = 5, StartBit = 0, BitLength = 8, Name = "Частота ТН", a = 0.01, Unit = "Гц" });
+
+            commands[new CommandId(0, 68)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "Тип устройства", meanings = { { 0, "ТН, Гц*10" }, { 1, "Реле(0/1)" }, { 2, "Свеча, %" }, { 3, "Помпа,%" }, { 4, "Шим НВ,%" }, { 23, "Обороты НВ, об/с" } } });
+            commands[new CommandId(0, 68)].parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 0, BitLength = 16, Name = "Значение" });
+
+            commands[new CommandId(0, 70)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Состояние ТН", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 70)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "Состояние реле", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 70)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 4, BitLength = 2, Name = "Состояние свечи", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 70)].parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 6, BitLength = 2, Name = "Состояние помпы", meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 70)].parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 0, BitLength = 2, Name = "Состояние НВ", meanings = defMeaningsOnOff });
+
+
             #region PGN parameters initialise
-            PGNs[3].parameters.Add(new AC2PParameter() { Name = "SPN", BitLength = 16, StartBit = 0, StartByte = 0 });
+
+            PGNs[3].parameters.Add(new AC2PParameter() { Name = "SPN", BitLength = 16, StartByte = 0 });
+
+            PGNs[4].parameters.Add(new AC2PParameter() { Name = "SPN", BitLength = 16, StartByte = 0 });
+            PGNs[4].parameters.Add(new AC2PParameter() { Name = "Значение", BitLength = 32, StartBit = 0, StartByte = 2 });
+
+            PGNs[5].parameters.Add(new AC2PParameter() { Name = "SPN", BitLength = 16, StartByte = 0 });
+            PGNs[5].parameters.Add(new AC2PParameter() { Name = "Значение", BitLength = 32, StartBit = 0, StartByte = 2 });
+
+            PGNs[6].parameters.Add(new AC2PParameter() { Name = "PGN", BitLength = 16, StartByte = 0, GetMeaning = x => PGNs[x].name });
 
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 8, StartBit = 0, StartByte = 0, meanings = { { 0, "Стереть конфигурацию" }, { 1, "Запись параметра в ОЗУ" }, { 2, "Запись всех параметров во Flash" }, { 3, "Чтение параметра по номеру" }, { 4, "Успешный ответ на запрос" }, { 5, "Невозможно выполнить" } } });
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Запрошенная команда", BitLength = 8, StartBit = 0, StartByte = 1, meanings = { { 0, "Стереть конфигурацию" }, { 1, "Запись параметра в ОЗУ" }, { 2, "Запись всех параметров во Flash" }, { 3, "Чтение параметра по номеру" }, { 255, "" } } });
-            PGNs[7].parameters.Add(new AC2PParameter() { Name = "Параметр", BitLength = 16, StartBit = 0, StartByte = 2, meanings = AC2P.paramtersNames });
+            PGNs[7].parameters.Add(new AC2PParameter() { Name = "Параметр", BitLength = 16, StartBit = 0, StartByte = 2, GetMeaning = x => configParameters[x].NameRu });
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Value", BitLength = 32, StartBit = 0, StartByte = 4 });
+
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 4, StartBit = 0, StartByte = 0, meanings = { { 0, "Стереть ЧЯ" }, { 3, "Чтение ЧЯ" }, { 6, "Чтение параметра (из paramsname.h)" } } });
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 2, StartBit = 4, StartByte = 0, meanings = { { 0, "Общие данные" }, { 1, "Неисправности" } } });
+
+            PGNs[10].parameters.Add(new AC2PParameter() { Name = "Стадия", BitLength = 8, StartByte = 0, meanings = Stages });
+            PGNs[10].parameters.Add(new AC2PParameter() { Name = "Режим", BitLength = 8, StartByte = 1 });
+            PGNs[10].parameters.Add(new AC2PParameter() { Name = "Код неисправности", BitLength = 8, StartByte = 2 });
+            PGNs[10].parameters.Add(new AC2PParameter() { Name = "Помпа неисправна", BitLength = 2, StartByte = 3, meanings = defMeaningsYesNo });
+            PGNs[10].parameters.Add(new AC2PParameter() { Name = "Код предупреждения", BitLength = 8, StartByte = 4 });
+            PGNs[10].parameters.Add(new AC2PParameter() { Name = "Количество морганий", BitLength = 8, StartByte = 5 });
+
+            PGNs[11].parameters.Add(new AC2PParameter() { Name = "Напряжение питания", BitLength = 16, StartByte = 0, a = 0.1, Unit = "В" });
+            PGNs[11].parameters.Add(new AC2PParameter() { Name = "Атмосферное давление", BitLength = 8, StartByte = 2, Unit = "кПа" });
+            PGNs[11].parameters.Add(new AC2PParameter() { Name = "Ток двигателя, значения АЦП", BitLength = 16, StartByte = 3 });
+
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Заданные обороты нагнетателя воздуха", BitLength = 8, StartByte = 0, Unit = "об/с" });
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Измеренные обороты нагнетателя воздуха,", BitLength = 8, StartByte = 1, Unit = "об/с" });
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Заданная частота ТН", BitLength = 16, StartByte = 2, a = 0.01, Unit = "Гц" });
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Реализованная частота ТН", BitLength = 16, StartByte = 4, a = 0.01, Unit = "Гц" });
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Мощность свечи", BitLength = 8, StartByte = 6, Unit = "%" });
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Состояние помпы", BitLength = 2, StartByte = 7, meanings = defMeaningsOnOff });
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Состояние реле печки кабины", BitLength = 2, StartByte = 7, StartBit = 2, meanings = defMeaningsOnOff });
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Состояние состояние канала сигнализации", BitLength = 2, StartByte = 7, StartBit = 4, meanings = defMeaningsOnOff });
+
+            PGNs[13].parameters.Add(new AC2PParameter() { Name = "Температура ИП", BitLength = 16, StartByte = 0, Unit = "°C" });
+            PGNs[13].parameters.Add(new AC2PParameter() { Name = "Температура платы/процессора", BitLength = 8, StartByte = 2, b = -75, Unit = "°C" });
+            PGNs[13].parameters.Add(new AC2PParameter() { Name = "Температура жидкости", BitLength = 8, StartByte = 3, b = -75, Unit = "°C" });
+            PGNs[13].parameters.Add(new AC2PParameter() { Name = "Температура температура перегрева", BitLength = 8, StartByte = 4, b = -75, Unit = "°C" });
+
+            PGNs[14].parameters.Add(new AC2PParameter() { Name = "Минимальная температура пламени перед розжигом", BitLength = 16, StartByte = 0, Unit = "°C" });
+            PGNs[14].parameters.Add(new AC2PParameter() { Name = "Граница срыва пламени", BitLength = 16, StartByte = 2, Unit = "°C" });
+            PGNs[14].parameters.Add(new AC2PParameter() { Name = "граница срыва пламени на прогреве", BitLength = 16, StartByte = 4, Unit = "°C" });
+            PGNs[14].parameters.Add(new AC2PParameter() { Name = "Скорость изменения температуры ИП", BitLength = 16, StartByte = 6, Unit = "°C" });
+
+
+            PGNs[15].parameters.Add(new AC2PParameter() { Name = "0 канал АЦП ", BitLength = 16, StartByte = 0 });
+            PGNs[15].parameters.Add(new AC2PParameter() { Name = "1 канал АЦП ", BitLength = 16, StartByte = 2 });
+            PGNs[15].parameters.Add(new AC2PParameter() { Name = "2 канал АЦП ", BitLength = 16, StartByte = 4 });
+            PGNs[15].parameters.Add(new AC2PParameter() { Name = "3 канал АЦП ", BitLength = 16, StartByte = 6 });
+
+            PGNs[16].parameters.Add(new AC2PParameter() { Name = "4 канал АЦП ", BitLength = 16, StartByte = 0 });
+            PGNs[16].parameters.Add(new AC2PParameter() { Name = "5 канал АЦП ", BitLength = 16, StartByte = 2 });
+            PGNs[16].parameters.Add(new AC2PParameter() { Name = "6 канал АЦП ", BitLength = 16, StartByte = 4 });
+            PGNs[16].parameters.Add(new AC2PParameter() { Name = "7 канал АЦП ", BitLength = 16, StartByte = 6 });
+
+            PGNs[17].parameters.Add(new AC2PParameter() { Name = "8 канал АЦП ", BitLength = 16, StartByte = 0 });
+            PGNs[17].parameters.Add(new AC2PParameter() { Name = "9 канал АЦП ", BitLength = 16, StartByte = 2 });
+            PGNs[17].parameters.Add(new AC2PParameter() { Name = "10 канал АЦП ", BitLength = 16, StartByte = 4 });
+            PGNs[17].parameters.Add(new AC2PParameter() { Name = "11 канал АЦП ", BitLength = 16, StartByte = 6 });
+
+            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Вид изделия", BitLength = 8, StartByte = 0, GetMeaning = i => Devices[i].Name });
+            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Напряжение питания", BitLength = 8, StartByte = 1, GetMeaning = i => Devices[i].Name, meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } } });
+            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Версия ПО", BitLength = 8, StartByte = 2 });
+            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Модификация ПО", BitLength = 8, StartByte = 3 });
+            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Дата релиза", BitLength = 24, StartByte = 5, GetMeaning = v => $"{v >> 16}.{(v >> 8) & 0xF}.{v & 0xFF}" });
+            //PGNs[18].parameters.Add(new AC2PParameter() { Name = "День ", BitLength = 8, StartByte = 5 });    Не красиво выглядит...луше одной строкой
+            //PGNs[18].parameters.Add(new AC2PParameter() { Name = "Месяц", BitLength = 8, StartByte = 6 });
+            //PGNs[18].parameters.Add(new AC2PParameter() { Name = "Год", BitLength = 8, StartByte = 7 });
 
             PGNs[19].parameters.Add(new AC2PParameter() { Name = "Подогреватель", BitLength = 2, StartBit = 0, StartByte = 1, PackNumber = 1, meanings = defMeaningsOnOff });
             PGNs[19].parameters.Add(new AC2PParameter() { Name = "Помпы", BitLength = 2, StartBit = 2, StartByte = 1, PackNumber = 1, meanings = defMeaningsOnOff });
@@ -683,6 +902,15 @@ namespace AdversCan
             PGNs[19].parameters.Add(new AC2PParameter() { Name = "Уставка температуры бака для перехода в ждущий.", BitLength = 8, StartByte = 4, b = -75, PackNumber = 2 });
             PGNs[19].parameters.Add(new AC2PParameter() { Name = "Уставка температуры бака для выхода из ждущего.", BitLength = 8, StartByte = 5, b = -75, PackNumber = 2 });
             PGNs[19].parameters.Add(new AC2PParameter() { Name = "Уставка температуры бака для выхода из ждущего при разборе воды.", BitLength = 8, StartByte = 6, b = -75, PackNumber = 2 });
+
+            PGNs[20].parameters.Add(new AC2PParameter() { Name = "Код неисправности", BitLength = 8, StartByte = 0 });
+            PGNs[20].parameters.Add(new AC2PParameter() { Name = "Количество морганий", BitLength = 8, StartByte = 1 });
+            PGNs[20].parameters.Add(new AC2PParameter() { Name = "Байт неисправностей 1", BitLength = 8, StartByte = 2 });
+            PGNs[20].parameters.Add(new AC2PParameter() { Name = "Байт неисправностей 2", BitLength = 8, StartByte = 3 });
+            PGNs[20].parameters.Add(new AC2PParameter() { Name = "Байт неисправностей 3", BitLength = 8, StartByte = 4 });
+            PGNs[20].parameters.Add(new AC2PParameter() { Name = "Байт неисправностей 4", BitLength = 8, StartByte = 5 });
+            PGNs[20].parameters.Add(new AC2PParameter() { Name = "Байт неисправностей 5", BitLength = 8, StartByte = 6 });
+            PGNs[20].parameters.Add(new AC2PParameter() { Name = "Байт неисправностей 6", BitLength = 8, StartByte = 7 });
 
             PGNs[29].parameters.Add(new AC2PParameter() { Name = "Атмосферное давление", BitLength = 8, StartByte = 1, Unit = "кПа", PackNumber = 1 });
             PGNs[29].parameters.Add(new AC2PParameter() { Name = "Среднее максимальное значение давления", BitLength = 24, StartByte = 2, Unit = "кПа", a = 0.001, PackNumber = 1 });
