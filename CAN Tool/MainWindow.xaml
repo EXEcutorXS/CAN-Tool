@@ -31,79 +31,88 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Advers">
-                <TabControl Margin="3" Grid.ColumnSpan="2" >
-                    <TabItem Header="Messages">
-                        <Grid>
-                            <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 50 400 5"  FontFamily = "Courier New" SelectionChanged="AC2PMessageList_SelectionChanged" AlternatingRowBackground="#FFA4EC84" SelectionMode="Single" Grid.ColumnSpan="2">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding Path = PGN}"  Header="PGN" IsReadOnly="True">
-                                    </DataGridTextColumn>
-                                    <DataGridCheckBoxColumn Binding="{Binding Path = TransmitterType}" Header="FROM"  IsReadOnly="True">
-                                    </DataGridCheckBoxColumn>
-                                    <DataGridCheckBoxColumn Binding="{Binding Path = TransmitterAdress}" Header="ADR"  IsReadOnly="True">
-                                    </DataGridCheckBoxColumn>
-                                    <DataGridCheckBoxColumn Binding= "{Binding Path = ReceiverType}" Header="TO"  IsReadOnly="True">
-                                    </DataGridCheckBoxColumn>
-                                    <DataGridCheckBoxColumn Binding="{Binding Path = ReceiverAdress}" Header="ADR"  IsReadOnly="True">
-                                    </DataGridCheckBoxColumn>
-                                    <DataGridTextColumn Binding= "{Binding Path = DataAsText}" Header="DATA"  IsReadOnly="True">
-                                    </DataGridTextColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                <Grid>
+                    <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" SelectionChanged="CurrentDeviceSelectorField_SelectionChanged" Margin="8"/>
+                    <TabControl Margin="3 35 3 3"  >
+                        <TabItem Header="Messages">
+                            <Grid>
+                                <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 50 400 5"  FontFamily = "Courier New" SelectionChanged="AC2PMessageList_SelectionChanged" AlternatingRowBackground="#FFA4EC84" SelectionMode="Single" Grid.ColumnSpan="2">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Binding="{Binding Path = PGN}"  Header="PGN" IsReadOnly="True">
+                                        </DataGridTextColumn>
+                                        <DataGridCheckBoxColumn Binding="{Binding Path = TransmitterType}" Header="FROM"  IsReadOnly="True">
+                                        </DataGridCheckBoxColumn>
+                                        <DataGridCheckBoxColumn Binding="{Binding Path = TransmitterAdress}" Header="ADR"  IsReadOnly="True">
+                                        </DataGridCheckBoxColumn>
+                                        <DataGridCheckBoxColumn Binding= "{Binding Path = ReceiverType}" Header="TO"  IsReadOnly="True">
+                                        </DataGridCheckBoxColumn>
+                                        <DataGridCheckBoxColumn Binding="{Binding Path = ReceiverAdress}" Header="ADR"  IsReadOnly="True">
+                                        </DataGridCheckBoxColumn>
+                                        <DataGridTextColumn Binding= "{Binding Path = DataAsText}" Header="DATA"  IsReadOnly="True">
+                                        </DataGridTextColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
 
-                            <TextBlock x:Name="AC2PVerboseInfoField"  HorizontalAlignment="Left" Width="390" TextWrapping="Wrap" Grid.Column="1" Margin="511,0,0,0" ></TextBlock>
-                        </Grid>
+                                <TextBlock x:Name="AC2PVerboseInfoField"  HorizontalAlignment="Left" Width="390" TextWrapping="Wrap" Grid.Column="1" Margin="511,0,0,0" ></TextBlock>
+                            </Grid>
 
-                    </TabItem>
+                        </TabItem>
 
-                    <TabItem Header="Control">
+                        <TabItem Header="Control">
+                            <Grid x:Name="ControlTabGrid">
+                                <Button x:Name="StartButton" Content="Старт" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8" Click="StartButton_Click"></Button>
+                                <Button x:Name="StopButton" Content="Стоп" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="60 8 8 8"></Button>
+                                <Button x:Name="CalibrateButton" Content="Калибровка термопар" Width="150" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="115 8 8 8"></Button>
+                                <ComboBox x:Name="CommandSelectorField"  Width="500" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8 38 8 8" SelectionChanged="CommandSelectorField_SelectionChanged"></ComboBox>
+                            </Grid>
 
-                    </TabItem>
-                    <TabItem Header="Config">
-                        <Grid>
-                            <ProgressBar x:Name="ConfigProgressBar"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="630,7,0,0" Height="20" Maximum="100" Minimum="0" Value="00" Width="210" />
-                            <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="7,7,0,0" Grid.ColumnSpan="2" SelectionChanged="CurrentDeviceSelectorField_SelectionChanged"></ComboBox>
-                            <Button x:Name="readParametersButton"  Content="Read" Width="65" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="414,7,0,0" Click="readParametersButton_Click"/>
-                            <Button x:Name="saveParametersButton" Content="Save" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="487,7,0,0" Click="saveParametersButton_Click"/>
-                            <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="558,7,0,0" Click="eraseParametersButton_Click"/>
-                            <TextBox x:Name="ProgressText" Text="" Width="42" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="714,7,0,0"/>
+                        </TabItem>
+                        <TabItem Header="Config">
+                            <Grid>
 
-                            <DataGrid x:Name = "ConfigParameterField" Margin = "5 40 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding Path = Id}"  Header="ID" IsReadOnly="True">
-                                    </DataGridTextColumn>
-                                    <DataGridTextColumn Binding="{Binding Path = idString}" Header="CODENAME"  IsReadOnly="True">
-                                    </DataGridTextColumn>
-                                    <DataGridTextColumn Binding="{Binding Path = Value}" Header="VAVUE">
-                                    </DataGridTextColumn>
-                                    <DataGridTextColumn Binding= "{Binding Path = rusName}" Header="DESCRIPTION"  IsReadOnly="True">
-                                    </DataGridTextColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                                <Button x:Name="readParametersButton"  Content="Read" Width="65" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="414,7,0,0" Click="readParametersButton_Click"/>
+                                <Button x:Name="saveParametersButton" Content="Save" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="487,7,0,0" Click="saveParametersButton_Click"/>
+                                <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="558,7,0,0" Click="eraseParametersButton_Click"/>
+                                <ProgressBar x:Name="ConfigProgressBar"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="630,7,0,0" Height="20" Maximum="100" Minimum="0" Value="00" Width="210" />
+                                <TextBox x:Name="ProgressText" Text="" Width="42" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="714,7,0,0"/>
+
+                                <DataGrid x:Name = "ConfigParameterField" Margin = "5 40 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Binding="{Binding Path = Id}"  Header="ID" IsReadOnly="True">
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Binding="{Binding Path = idString}" Header="CODENAME"  IsReadOnly="True">
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Binding="{Binding Path = Value}" Header="VAVUE">
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Binding= "{Binding Path = rusName}" Header="DESCRIPTION"  IsReadOnly="True">
+                                        </DataGridTextColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
 
 
-                        </Grid>
-                    </TabItem>
-                    <TabItem Header="Graph">
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Graph">
 
-                    </TabItem>
-                    <TabItem Header="Black Box">
-                    </TabItem>
-                    <TabItem Header="Firmware">
-                    </TabItem>
-                </TabControl>
-
+                        </TabItem>
+                        <TabItem Header="Black Box">
+                        </TabItem>
+                        <TabItem Header="Firmware">
+                        </TabItem>
+                    </TabControl>
+                </Grid>
 
             </TabItem>
             <TabItem Header="RV-C">
                 <Grid Background="#FFE5E5E5">
                 </Grid>
             </TabItem>
+            
         </TabControl>
         <Button  Content="Refresh" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="70" Margin="15" Click="Button_Click"/>
         <ComboBox x:Name="PortNameList" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="100 15 15 15" SelectionChanged="PortNameList_SelectionChanged"/>
         <Button x:Name="PortOpenButton" Content="Open" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="200 15 15 15" Click="Button_Click_1"/>
-        <ComboBox x:Name="CanBitrateField" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="300 15 15 15"/>
+        <ComboBox x:Name="CanBitrateField" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="300 15 15 15" SelectionChanged="CanBitrateField_SelectionChanged"/>
         <Button Content="Normal" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="400 15 15 15" Click="Button_Click_2"/>
         <Button Content="Listen" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="500 15 15 15" Click="Button_Click_3"/>
         <Button Content="Close" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="600 15 15 15" Click="Button_Click_4"/>

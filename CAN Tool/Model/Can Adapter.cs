@@ -17,13 +17,17 @@ namespace Can_Adapter
     public partial class CanMessage : INotifyPropertyChanged
     {
         private bool ide;
-        
-        public bool IDE { set { 
-            if (ide == value) return;
-            ide = value;
+
+        public bool IDE
+        {
+            set
+            {
+                if (ide == value) return;
+                ide = value;
                 PropChanged("IDE");
             }
-            get { return ide; } }
+            get { return ide; }
+        }
 
         private int id;
         public int ID
@@ -80,7 +84,7 @@ namespace Can_Adapter
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public string DataAsText => GetDataInTextFormat(""," ");
+        public string DataAsText => GetDataInTextFormat("", " ");
 
         public string GetDataInTextFormat(string beforeString = "", string afterString = "")
         {
@@ -110,8 +114,8 @@ namespace Can_Adapter
         }
 
         public CanMessage()
-        { 
-        
+        {
+
         }
         public CanMessage(string str)
         {
@@ -253,7 +257,8 @@ namespace Can_Adapter
 
         public void SetBitrate(int bitrate)
         {
-            serialPort.Write($"S{bitrate}\r");
+            if (PortOpened)
+                serialPort.Write($"S{bitrate}\r");
         }
 
         public void Transmit(CanMessage msg)

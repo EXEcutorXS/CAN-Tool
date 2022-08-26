@@ -55,6 +55,11 @@ namespace AdversCan
         public byte secondByte;
         public string name = "";
         public List<AC2PParameter> parameters = new List<AC2PParameter>();
+
+        public override string ToString()
+        {
+            return name;
+        }
     }
     public class AC2Pmessage : CanMessage
     {
@@ -338,7 +343,7 @@ namespace AdversCan
     public class ConnectedDevice
     {
         public DeviceId ID;
-        public Dictionary<DateTime, DeviceStatus> Statuses = new Dictionary<DateTime, DeviceStatus>();
+        public ObservableCollection<Variable> Variables = new ObservableCollection<Variable>();
         public ObservableCollection<ReadedParameter> readedParameters = new ObservableCollection<ReadedParameter>();
         public override string ToString()
         {
@@ -367,7 +372,10 @@ namespace AdversCan
             CommandId com = (CommandId)obj;
             return firstByte == com.firstByte && secondByte == com.secondByte;
         }
-
+        public override string ToString()
+        {
+            return $"{firstByte:D2},{secondByte:D2}]";
+        }
 
     }
     public struct DeviceId
@@ -622,6 +630,25 @@ namespace AdversCan
             canAdapter.Transmit(msg);
         }
 
+        public static void SendCommand(CommandId com, DeviceId dev, byte[] data = null)
+        {
+            AC2Pmessage message = new AC2Pmessage();
+            message.PGN = 1;
+            message.TransmitterAddress = 6;
+            message.TransmitterType = 126;
+            message.ReceiverAddress = dev.Address;
+            message.ReceiverType = dev.Type;
+            message.Command = com;
+            for (int i = 0; i < 6; i++)
+            {
+                if (data != null)
+                    message.Data[i + 2] = data[i];
+                else
+                    message.Data[i + 2] = 0xFF;
+            }
+            canAdapter.Transmit(message);
+        }
+
         public static Dictionary<int, Device> Devices;
 
         static AC2P()
@@ -663,7 +690,8 @@ namespace AdversCan
             { 34, new Device(){ID=34,Name="Binar-10Д" }} ,
             { 35, new Device(){ID=35,Name="Binar-10Б" }} ,
             { 123, new Device(){ID=123,Name="Bootloader" }} ,
-            { 126, new Device(){ID=126,Name="Устройство управления" }}
+            { 126, new Device(){ID=126,Name="Устройство управления" }},
+            { 255, new Device(){ID=255,Name="Не задано" }}
         };
 
             #region PGN initialise
@@ -823,11 +851,11 @@ namespace AdversCan
             PGNs[5].parameters.Add(new AC2PParameter() { Name = "SPN", BitLength = 16, StartByte = 0 });
             PGNs[5].parameters.Add(new AC2PParameter() { Name = "Значение", BitLength = 32, StartBit = 0, StartByte = 2 });
 
-            PGNs[6].parameters.Add(new AC2PParameter() { Name = "PGN", BitLength = 16, StartByte = 0, GetMeaning = x => PGNs[x].name });
+            PGNs[6].parameters.Add(new AC2PParameter() { Name = "PGN", BitLength = 16, StartByte = 0, GetMeaning = x => PGNs[x]?.name });
 
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 8, StartBit = 0, StartByte = 0, meanings = { { 0, "Стереть конфигурацию" }, { 1, "Запись параметра в ОЗУ" }, { 2, "Запись всех параметров во Flash" }, { 3, "Чтение параметра по номеру" }, { 4, "Успешный ответ на запрос" }, { 5, "Невозможно выполнить" } } });
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Запрошенная команда", BitLength = 8, StartBit = 0, StartByte = 1, meanings = { { 0, "Стереть конфигурацию" }, { 1, "Запись параметра в ОЗУ" }, { 2, "Запись всех параметров во Flash" }, { 3, "Чтение параметра по номеру" }, { 255, "" } } });
-            PGNs[7].parameters.Add(new AC2PParameter() { Name = "Параметр", BitLength = 16, StartBit = 0, StartByte = 2, GetMeaning = x => configParameters[x].NameRu });
+            PGNs[7].parameters.Add(new AC2PParameter() { Name = "Параметр", BitLength = 16, StartBit = 0, StartByte = 2, GetMeaning = x => configParameters[x]?.NameRu });
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Value", BitLength = 32, StartBit = 0, StartByte = 4 });
 
             PGNs[8].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 4, StartBit = 0, StartByte = 0, meanings = { { 0, "Стереть ЧЯ" }, { 3, "Чтение ЧЯ" }, { 6, "Чтение параметра (из paramsname.h)" } } });
@@ -879,8 +907,8 @@ namespace AdversCan
             PGNs[17].parameters.Add(new AC2PParameter() { Name = "10 канал АЦП ", BitLength = 16, StartByte = 4 });
             PGNs[17].parameters.Add(new AC2PParameter() { Name = "11 канал АЦП ", BitLength = 16, StartByte = 6 });
 
-            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Вид изделия", BitLength = 8, StartByte = 0, GetMeaning = i => Devices[i].Name });
-            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Напряжение питания", BitLength = 8, StartByte = 1, GetMeaning = i => Devices[i].Name, meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } } });
+            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Вид изделия", BitLength = 8, StartByte = 0, GetMeaning = i => Devices[i]?.Name });
+            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Напряжение питания", BitLength = 8, StartByte = 1, GetMeaning = i => Devices[i]?.Name, meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } } });
             PGNs[18].parameters.Add(new AC2PParameter() { Name = "Версия ПО", BitLength = 8, StartByte = 2 });
             PGNs[18].parameters.Add(new AC2PParameter() { Name = "Модификация ПО", BitLength = 8, StartByte = 3 });
             PGNs[18].parameters.Add(new AC2PParameter() { Name = "Дата релиза", BitLength = 24, StartByte = 5, GetMeaning = v => $"{v >> 16}.{(v >> 8) & 0xF}.{v & 0xFF}" });

@@ -70,6 +70,15 @@ namespace CAN_Tool
             AC2PMessageList.ItemsSource = AC2Pmessages;
             CanBitrateField.ItemsSource = Bitrates;
             CurrentDeviceSelectorField.ItemsSource = AC2P.connectedDevices;
+            CanBitrateField.SelectedIndex = 3;
+
+            foreach (var p in SerialPort.GetPortNames())
+                PortNameList.Items.Add(p);
+            if (PortNameList.Items.Count > 0)
+                PortNameList.SelectedIndex = 0;
+
+            CommandSelectorField.ItemsSource = AC2P.commands;
+            
         }
 
 
@@ -105,7 +114,8 @@ namespace CAN_Tool
 
         private void PortNameList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            canAdapter.PortName = (sender as ComboBox).SelectedItem.ToString();
+            if ((sender as ComboBox).SelectedItem != null)
+                canAdapter.PortName = (sender as ComboBox).SelectedItem.ToString();
         }
 
         private void CanMessageList_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -130,7 +140,7 @@ namespace CAN_Tool
 
         private void AC2PMessageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            AC2PVerboseInfoField.Text = (AC2PMessageList.CurrentItem as AC2Pmessage)?.VerboseInfo().Replace(';','\n');
+            AC2PVerboseInfoField.Text = (AC2PMessageList.CurrentItem as AC2Pmessage)?.VerboseInfo().Replace(';', '\n');
         }
 
         private void CurrentDeviceSelectorField_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -155,6 +165,23 @@ namespace CAN_Tool
             AC2P.connectedDevices.FirstOrDefault(d => d.ID.Equals((CurrentDeviceSelectorField.SelectedItem as ConnectedDevice).ID)).readedParameters.Clear();
             AC2P.EraseParameters((CurrentDeviceSelectorField?.SelectedItem as ConnectedDevice).ID);
         }
+
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void CanBitrateField_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selected = (sender as ComboBox).SelectedItem;
+            if (selected == null) return;
+            canAdapter.SetBitrate(int.Parse(selected.ToString()));
+        }
+
+        private void CommandSelectorField_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            
+        }
     }
-    
+
 }
