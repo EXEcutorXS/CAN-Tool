@@ -4,8 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CAN_Tool"
+        xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
         mc:Ignorable="d"
-        Title="Advers CAN Tool" Height="700" Width="1200" Loaded="Window_Loaded">
+        Title="{Binding Title}" Height="700" Width="1200" Loaded="Window_Loaded">
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
     <Grid>
         <TabControl Margin="0,50,0,0" Grid.ColumnSpan="2">
             <TabItem Header="Basic CAN">
@@ -57,7 +61,6 @@
                             </Grid>
 
                         </TabItem>
-
                         <TabItem Header="Control">
                             <Grid x:Name="ControlTabGrid">
                                 <Button x:Name="StartButton" Content="Старт" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8" Click="StartButton_Click"></Button>
@@ -75,7 +78,6 @@
                                 <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="558,7,0,0" Click="eraseParametersButton_Click"/>
                                 <ProgressBar x:Name="ConfigProgressBar"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="630,7,0,0" Height="20" Maximum="100" Minimum="0" Value="00" Width="210" />
                                 <TextBox x:Name="ProgressText" Text="" Width="42" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="714,7,0,0"/>
-
                                 <DataGrid x:Name = "ConfigParameterField" Margin = "5 40 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Binding="{Binding Path = Id}"  Header="ID" IsReadOnly="True">
@@ -88,12 +90,9 @@
                                         </DataGridTextColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
-
-
                             </Grid>
                         </TabItem>
                         <TabItem Header="Graph">
-
                         </TabItem>
                         <TabItem Header="Black Box">
                         </TabItem>
@@ -103,11 +102,6 @@
                 </Grid>
 
             </TabItem>
-            <TabItem Header="RV-C">
-                <Grid Background="#FFE5E5E5">
-                </Grid>
-            </TabItem>
-            
         </TabControl>
         <Button  Content="Refresh" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="70" Margin="15" Click="Button_Click"/>
         <ComboBox x:Name="PortNameList" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="100 15 15 15" SelectionChanged="PortNameList_SelectionChanged"/>
@@ -116,7 +110,5 @@
         <Button Content="Normal" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="400 15 15 15" Click="Button_Click_2"/>
         <Button Content="Listen" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="500 15 15 15" Click="Button_Click_3"/>
         <Button Content="Close" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="600 15 15 15" Click="Button_Click_4"/>
-
-
     </Grid>
 </Window>

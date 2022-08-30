@@ -30,7 +30,13 @@ namespace CAN_Tool.ViewModels.Base
         }
 
         private bool _Disposed;
+<<<<<<< HEAD
+        private bool disposedValue;
+
+        public void Dispose()
+=======
         protected virtual void Dispose()
+>>>>>>> be7bdf243bf257e8e5fc9e93949893652c00208b
         { 
         Dispose(true);
         }
