@@ -30,6 +30,8 @@ namespace CAN_Tool.ViewModels.Base
         }
 
         private bool _Disposed;
+
+        public void Dispose()
         { 
         Dispose(true);
         }
