@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO.Ports;
 using System.Threading;
 using System.ComponentModel;
+using System.Windows.Threading;
 
 namespace Can_Adapter
 {
@@ -195,6 +196,15 @@ namespace Can_Adapter
             RTR = msg.RTR;
             ID = msg.ID;
         }
+
+        public bool SimilliarTo(CanMessage m)
+        {
+            if (m.ID != ID) return false;
+            if (m.DLC != DLC) return false;
+            if (m.IDE != IDE) return false;
+            if (m.RTR != RTR) return false;
+            return true;
+        }
     }
     public class CanAdapter
     {
@@ -203,16 +213,17 @@ namespace Can_Adapter
         int ptr = 0;
 
         public UInt32 Version = 0;
-        public bool connected = false;
-        public UInt64 totalSent = 0;
-        public UInt64 totalReceived = 0;
 
         public int Bitrate = 250;
-
         public bool PortOpened => serialPort.IsOpen;
+
+
 
         SerialPort serialPort;
 
+        private BindingList<CanMessage> _messages = new BindingList<CanMessage>();
+
+        public BindingList<CanMessage> Messages { get => _messages; }
 
         public string PortName
         {
@@ -289,7 +300,13 @@ namespace Can_Adapter
                 case 't':
                 case 'r':
                 case 'R':
-                    GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = new CanMessage(new string(currentBuf)) });
+                    var m = new CanMessage(new string(currentBuf));
+                    GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = m });
+                    var foundMessage = Messages.FirstOrDefault(o => o.SimilliarTo(m));
+                    if (foundMessage != null)
+                        foundMessage.Update(m);
+                    else
+                        App.Current.Dispatcher.Invoke(()=> Messages.Add(m));
                     break;
                 case 'Z':
                     TransmissionSuccess?.Invoke(this, new EventArgs());

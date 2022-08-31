@@ -10,6 +10,7 @@ using Can_Adapter;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
 using System.Data;
+using Can_Adapter;
 
 namespace AdversCan
 {
@@ -39,7 +40,7 @@ namespace AdversCan
         public int PackNumber;
 
     }
-    class AC2Pcommand
+    public class AC2Pcommand
     {
         public CommandId Id
         {
@@ -295,7 +296,6 @@ namespace AdversCan
     {
         public Dictionary<string, double> Variables;
     }
-
     public class ReadedParameter : INotifyPropertyChanged
     {
 
@@ -365,12 +365,16 @@ namespace AdversCan
             return;
         }
 
+        public override int GetHashCode()
+        {
+            return firstByte * 256 + secondByte;
+        }
+
         public override bool Equals([NotNullWhen(true)] object obj)
         {
             if (!(obj is CommandId))
                 return false;
-            CommandId com = (CommandId)obj;
-            return firstByte == com.firstByte && secondByte == com.secondByte;
+            return ((CommandId)obj).GetHashCode() == GetHashCode();
         }
         public override string ToString()
         {
@@ -409,7 +413,6 @@ namespace AdversCan
             return $"{Id} - {StringId}: {NameRu}";
         }
     }
-
     public class Variable
     {
         public int Id;
@@ -437,7 +440,7 @@ namespace AdversCan
             return $"{Id} - {StringId}:{Description}";
         }
     }
-    static class AC2P
+    public class AC2P
     {
         static readonly Dictionary<int, string> defMeaningsYesNo = new Dictionary<int, string>() { { 0, "Нет" }, { 1, "Да" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
         static readonly Dictionary<int, string> defMeaningsOnOff = new Dictionary<int, string>() { { 0, "Выкл" }, { 1, "Вкл" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
@@ -448,8 +451,6 @@ namespace AdversCan
 
         public static Dictionary<CommandId, AC2Pcommand> commands = new Dictionary<CommandId, AC2Pcommand>();
 
-        public static BindingList<ConnectedDevice> connectedDevices = new BindingList<ConnectedDevice>();
-
         public static Dictionary<int, configParameter> configParameters = new Dictionary<int, configParameter>();
         public static Dictionary<int, Variable> Variables = new Dictionary<int, Variable>();
         public static Dictionary<int, BbParameter> BbParameters = new Dictionary<int, BbParameter>();
@@ -458,25 +459,16 @@ namespace AdversCan
         public static Dictionary<int, string> VariablesNames = new Dictionary<int, string>();
         public static Dictionary<int, string> BbParameterNames = new Dictionary<int, string>();
 
-        public static CanAdapter canAdapter;
+        public BindingList<ConnectedDevice> connectedDevices = new BindingList<ConnectedDevice>();
 
-        public static event EventHandler progressBarUpdated;
+        public BindingList<AC2Pmessage> receivedMessages = new BindingList<AC2Pmessage>();
 
-        private static int progress;
+        private CanAdapter canAdapter;
 
-        public static int Progress
-        {
-            get { return progress; }
-            set
-            {
-                progress = value;
-                progressBarUpdated?.Invoke(null, EventArgs.Empty);
-            }
-        }
+        
 
 
-
-        public static void ParseCanMessage(CanMessage msg)
+        public void ParseCanMessage(CanMessage msg)
         {
             AC2Pmessage m = new AC2Pmessage(msg);
             DeviceId id = m.TransmitterId;
@@ -495,6 +487,8 @@ namespace AdversCan
                 }
 
             }
+
+            var foundMessage = receivedMessages.FirstOrDefault(a => a.ReceiverId.Equals(m.ReceiverId)&&a.PGN==m.PGN);
 
         }
         public static void ParseParamsname(string filePath = "paramsname.h")
@@ -557,7 +551,7 @@ namespace AdversCan
             }
         }
 
-        public static async void ReadAllParameters(DeviceId id)
+        public async void ReadAllParameters(DeviceId id)
         {
             int cnt = 0;
             foreach (var p in configParameters)
@@ -574,13 +568,10 @@ namespace AdversCan
                 msg.Data[3] = (byte)(p.Key % 256);
                 canAdapter.Transmit(msg);
                 await Task.Run(() => Thread.Sleep(100));
-                progress = ++cnt * 100 / configParameters.Count;
-                progressBarUpdated?.Invoke(null, new EventArgs());
-
             }
         }
 
-        public static async void SaveParameters(DeviceId id)
+        public async void SaveParameters(DeviceId id)
         {
             var dev = connectedDevices.FirstOrDefault(d => d.ID.Equals(id));
             if (dev == null) return;
@@ -614,7 +605,7 @@ namespace AdversCan
             canAdapter.Transmit(msg);
         }
 
-        public static void EraseParameters(DeviceId id)
+        public void EraseParameters(DeviceId id)
         {
             var dev = connectedDevices.FirstOrDefault(d => d.ID.Equals(id));
             if (dev == null) return;
@@ -630,7 +621,7 @@ namespace AdversCan
             canAdapter.Transmit(msg);
         }
 
-        public static void SendCommand(CommandId com, DeviceId dev, byte[] data = null)
+        public void SendCommand(CommandId com, DeviceId dev, byte[] data = null)
         {
             AC2Pmessage message = new AC2Pmessage();
             message.PGN = 1;
@@ -651,10 +642,19 @@ namespace AdversCan
 
         public static Dictionary<int, Device> Devices;
 
-        static AC2P()
+        public AC2P(CanAdapter adapter)
         {
+            if (adapter == null) throw new ArgumentNullException("Can Adapter reference can't be null");
+            canAdapter = adapter;
+            adapter.GotNewMessage += Adapter_GotNewMessage;
             SeedStaticData();
         }
+
+        private void Adapter_GotNewMessage(object sender, EventArgs e)
+        {
+            ParseCanMessage((e as GotMessageEventArgs).receivedMessage);
+        }
+
         public static void SeedStaticData()
         {
             Devices = new Dictionary<int, Device>() {

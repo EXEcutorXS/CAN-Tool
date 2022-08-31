@@ -19,7 +19,7 @@ namespace CAN_Tool.ViewModels.Base
 
         protected virtual bool Set<T>(ref T field, T value, [CallerMemberName] string PropertyName = null)
         {
-            if (field.Equals(value))
+            if (!Equals(field,value))
             {
                 field = value;
                 OnPropertyChanged(PropertyName);

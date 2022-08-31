@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CAN_Tool"
         xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="700" Width="1200" Loaded="Window_Loaded">
+        Title="{Binding Title}" Height="700" Width="1200">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
@@ -19,7 +19,7 @@
                     <CheckBox x:Name="CanRtrField" Content="RTR" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150 8 8 8"></CheckBox>
                     <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200 8 8 8"></TextBox>
                     <Button Content="Send" VerticalAlignment="Top" HorizontalAlignment="Left" Height="20" Width="100" Margin="320 8 8 8"></Button>
-                    <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="5 40 5 5" FontFamily = "Courier New" AlternatingRowBackground="#FF81FF7D" SelectionMode="Single" GridLinesVisibility="All">
+                    <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="5 40 5 5" FontFamily = "Courier New" AlternatingRowBackground="#FF81FF7D" SelectionMode="Single" GridLinesVisibility="All" ItemsSource="{Binding Path = canAdapter.Messages}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Path = IdAsText}"  Header="ID" IsReadOnly="True">
                             </DataGridTextColumn>
@@ -36,11 +36,11 @@
             </TabItem>
             <TabItem Header="Advers">
                 <Grid>
-                    <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" SelectionChanged="CurrentDeviceSelectorField_SelectionChanged" Margin="8"/>
+                    <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8"/>
                     <TabControl Margin="3 35 3 3"  >
                         <TabItem Header="Messages">
                             <Grid>
-                                <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 50 400 5"  FontFamily = "Courier New" SelectionChanged="AC2PMessageList_SelectionChanged" AlternatingRowBackground="#FFA4EC84" SelectionMode="Single" Grid.ColumnSpan="2">
+                                <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 50 400 5"  FontFamily = "Courier New"  AlternatingRowBackground="#FFA4EC84" SelectionMode="Single" Grid.ColumnSpan="2">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Binding="{Binding Path = PGN}"  Header="PGN" IsReadOnly="True">
                                         </DataGridTextColumn>
@@ -63,21 +63,19 @@
                         </TabItem>
                         <TabItem Header="Control">
                             <Grid x:Name="ControlTabGrid">
-                                <Button x:Name="StartButton" Content="Старт" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8" Click="StartButton_Click"></Button>
+                                <Button x:Name="StartButton" Content="Старт" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8"></Button>
                                 <Button x:Name="StopButton" Content="Стоп" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="60 8 8 8"></Button>
                                 <Button x:Name="CalibrateButton" Content="Калибровка термопар" Width="150" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="115 8 8 8"></Button>
-                                <ComboBox x:Name="CommandSelectorField"  Width="500" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8 38 8 8" SelectionChanged="CommandSelectorField_SelectionChanged"></ComboBox>
+                                <ComboBox x:Name="CommandSelectorField"  Width="500" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8 38 8 8"></ComboBox>
                             </Grid>
 
                         </TabItem>
                         <TabItem Header="Config">
                             <Grid>
 
-                                <Button x:Name="readParametersButton"  Content="Read" Width="65" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="414,7,0,0" Click="readParametersButton_Click"/>
-                                <Button x:Name="saveParametersButton" Content="Save" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="487,7,0,0" Click="saveParametersButton_Click"/>
-                                <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="558,7,0,0" Click="eraseParametersButton_Click"/>
-                                <ProgressBar x:Name="ConfigProgressBar"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="630,7,0,0" Height="20" Maximum="100" Minimum="0" Value="00" Width="210" />
-                                <TextBox x:Name="ProgressText" Text="" Width="42" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="714,7,0,0"/>
+                                <Button x:Name="readParametersButton"  Content="Read" Width="65" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="414,7,0,0"/>
+                                <Button x:Name="saveParametersButton" Content="Save" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="487,7,0,0"/>
+                                <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="558,7,0,0" />
                                 <DataGrid x:Name = "ConfigParameterField" Margin = "5 40 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Binding="{Binding Path = Id}"  Header="ID" IsReadOnly="True">
@@ -103,12 +101,14 @@
 
             </TabItem>
         </TabControl>
-        <Button  Content="Refresh" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="70" Margin="15" Click="Button_Click"/>
-        <ComboBox x:Name="PortNameList" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="100 15 15 15" SelectionChanged="PortNameList_SelectionChanged"/>
-        <Button x:Name="PortOpenButton" Content="Open" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="200 15 15 15" Click="Button_Click_1"/>
-        <ComboBox x:Name="CanBitrateField" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="300 15 15 15" SelectionChanged="CanBitrateField_SelectionChanged"/>
-        <Button Content="Normal" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="400 15 15 15" Click="Button_Click_2"/>
-        <Button Content="Listen" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="500 15 15 15" Click="Button_Click_3"/>
-        <Button Content="Close" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="600 15 15 15" Click="Button_Click_4"/>
+        <Button  Content="Refresh" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="70" Margin="15" Command="{Binding Path=RefreshPortListCommand}"/>
+        <ComboBox x:Name="PortNameList" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="100 15 15 15"  ItemsSource="{Binding PortList}" SelectedIndex="{Binding SelectedPortIndex}"/>
+        <Button x:Name="PortOpenButton" Content="Open" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="200 15 15 15" Command="{Binding OpenPortCommand}"/>
+        <Button x:Name="PortOpenButton_Copy" Content="Close" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="303,15,0,0" Command="{Binding ClosePortCommand}"/>
+        <ComboBox x:Name="CanBitrateField" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="404,14,0,0" ItemsSource="{Binding Path=Bitrates}"/>
+        <Button Content="Normal" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="504,14,0,0"/>
+        <Button Content="Listen" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="604,14,0,0"/>
+        <Button Content="Close" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="704,14,0,0"/>
+        
     </Grid>
 </Window>

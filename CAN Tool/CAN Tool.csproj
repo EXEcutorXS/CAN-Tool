@@ -21,7 +21,6 @@
     <Folder Include="Views\" />
     <Folder Include="Services\" />
     <Folder Include="Data\" />
-	<Folder Include="Libs\" />
   </ItemGroup>
 
 </Project>
