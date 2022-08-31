@@ -217,7 +217,7 @@ namespace Can_Adapter
         public int Bitrate = 250;
         public bool PortOpened => serialPort.IsOpen;
 
-
+        private SynchronizationContext UIContext;
 
         SerialPort serialPort;
 
@@ -306,7 +306,7 @@ namespace Can_Adapter
                     if (foundMessage != null)
                         foundMessage.Update(m);
                     else
-                        App.Current.Dispatcher.Invoke(()=> Messages.Add(m));
+                        UIContext.Send(x => Messages.Add(m),null);
                     break;
                 case 'Z':
                     TransmissionSuccess?.Invoke(this, new EventArgs());
@@ -341,6 +341,7 @@ namespace Can_Adapter
         {
             serialPort = new SerialPort();
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            UIContext = SynchronizationContext.Current;
         }
     }
 }
