@@ -87,6 +87,7 @@ namespace Can_Adapter
                 data = value;
                 PropChanged("Data");
                 PropChanged("DataAsText");
+                PropChanged("VerboseInfo");
             }
         }
 

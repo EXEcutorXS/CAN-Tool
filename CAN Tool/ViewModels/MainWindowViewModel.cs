@@ -17,14 +17,25 @@ namespace CAN_Tool.ViewModels
 {
     internal class MainWindowViewModel : ViewModel
     {
-        public int[] Bitrates = new int[] { 20, 50, 125, 250, 500, 800, 1000 };
-        
 
-        private CanAdapter _canAdapter;
-        public CanAdapter canAdapter { get => _canAdapter;}
+        int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
 
-        public AC2P AC2PInstance;
-        
+        public int[] Bitrates => _Bitrates;
+
+        CanAdapter _canAdapter;
+        public CanAdapter canAdapter { get => _canAdapter; }
+
+        AC2P _AC2PInstance;
+        public AC2P AC2PInstance => _AC2PInstance;
+
+        ConnectedDevice _connectedDevice;
+        public ConnectedDevice SelectedConnectedDevice
+        {
+            set =>
+                Set(ref _connectedDevice, value);
+            get => _connectedDevice;
+        }
+
         #region Title property
         /// <summary>
         /// MainWindow title
@@ -93,16 +104,34 @@ namespace CAN_Tool.ViewModels
         private bool CanClosePortCommandExecute(object parameter) => (canAdapter.PortOpened);
         #endregion
 
+        #region ReadConfigCommand
+        public ICommand ReadConfigCommand { get; }
+        private void OnReadConfigCommandExecuted(object parameter)
+        {
+            AC2PInstance.ReadAllParameters(_connectedDevice.ID);
+        }
+        private bool CanReadConfigCommandExecute(object parameter) =>
+            (canAdapter.PortOpened && SelectedConnectedDevice != null);
+        #endregion
+
         public MainWindowViewModel()
         {
+            AC2P.ParseParamsname();
             _canAdapter = new CanAdapter();
-            AC2PInstance = new AC2P(canAdapter);
+            _AC2PInstance = new AC2P(canAdapter);
+            canAdapter.GotNewMessage += CanAdapter_GotNewMessage;
+
             ApplicationCloseCommand = new LambdaCommand(OnApplicationCloseCommandExecuted, CanApplicationCloseCommandExecute);
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
             ClosePortCommand = new LambdaCommand(OnClosePortCommandExecuted, CanClosePortCommandExecute);
             RefreshPortListCommand = new LambdaCommand(OnRefreshPortsCommandExecuted);
+            ReadConfigCommand = new LambdaCommand(OnReadConfigCommandExecuted, CanReadConfigCommandExecute);
         }
 
-
+        private void CanAdapter_GotNewMessage(object sender, EventArgs e)
+        {
+            CanMessage m = (e as GotMessageEventArgs).receivedMessage;
+            AC2PInstance.ParseCanMessage(m);
+        }
     }
 }
