@@ -10,12 +10,20 @@ using System.Windows.Threading;
 
 namespace Can_Adapter
 {
+    public interface IUpdatable<T>
+    {
+        public void Update(T item);
+
+        public bool IsSimmiliarTo(T item);
+    }
+    
+
     public class GotMessageEventArgs : EventArgs
     {
         public CanMessage receivedMessage;
     }
 
-    public partial class CanMessage : INotifyPropertyChanged
+    public class CanMessage : INotifyPropertyChanged, IUpdatable<CanMessage>
     {
         private bool ide;
 
@@ -189,21 +197,42 @@ namespace Can_Adapter
             }
             return ret;
         }
-        public void Update(CanMessage msg)
+        public void Update(CanMessage m)
         {
-            Data = msg.Data;
-            IDE = msg.IDE;
-            RTR = msg.RTR;
-            ID = msg.ID;
+            Data = m.Data;
+            IDE = m.IDE;
+            RTR = m.RTR;
+            ID = m.ID;
         }
 
-        public bool SimilliarTo(CanMessage m)
+        public bool IsSimmiliarTo(CanMessage m)
         {
             if (m.ID != ID) return false;
             if (m.DLC != DLC) return false;
             if (m.IDE != IDE) return false;
             if (m.RTR != RTR) return false;
             return true;
+        }
+    }
+
+    public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="unit">Element to add</param>
+        /// <returns>true - element was added, false - updated</returns>
+        public bool TryToAdd(T item)
+        {
+            var found = Items.FirstOrDefault(i => i.IsSimmiliarTo(item));
+            if (found == null)
+            {
+                Add(item);
+                return true;
+            }
+            else
+                found.Update(item);
+            return false;
         }
     }
     public class CanAdapter
@@ -221,9 +250,9 @@ namespace Can_Adapter
 
         SerialPort serialPort;
 
-        private BindingList<CanMessage> _messages = new BindingList<CanMessage>();
+        private UpdatableList<CanMessage> _messages = new UpdatableList<CanMessage>();
 
-        public BindingList<CanMessage> Messages { get => _messages; }
+        public UpdatableList<CanMessage> Messages { get => _messages; }
 
         public string PortName
         {
@@ -302,11 +331,7 @@ namespace Can_Adapter
                 case 'R':
                     var m = new CanMessage(new string(currentBuf));
                     GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = m });
-                    var foundMessage = Messages.FirstOrDefault(o => o.SimilliarTo(m));
-                    if (foundMessage != null)
-                        foundMessage.Update(m);
-                    else
-                        UIContext.Send(x => Messages.Add(m),null);
+                    UIContext.Send((x)=> Messages.TryToAdd(m),null);
                     break;
                 case 'Z':
                     TransmissionSuccess?.Invoke(this, new EventArgs());
