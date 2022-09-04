@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
 using System.Data;
 using Can_Adapter;
+using CAN_Tool.Libs;
 
 namespace AdversCan
 {

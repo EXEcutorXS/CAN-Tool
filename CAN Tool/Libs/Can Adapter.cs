@@ -7,16 +7,12 @@ using System.IO.Ports;
 using System.Threading;
 using System.ComponentModel;
 using System.Windows.Threading;
+using CAN_Tool.Libs;
 
 namespace Can_Adapter
 {
-    public interface IUpdatable<T>
-    {
-        public void Update(T item);
 
-        public bool IsSimmiliarTo(T item);
-    }
-    
+
 
     public class GotMessageEventArgs : EventArgs
     {
@@ -74,20 +70,21 @@ namespace Can_Adapter
             get { return dlc; }
         }
 
-        public byte[] data = new byte[8];
+        private ulong data;
 
-        public byte[] Data
+        public ulong Data
         {
             get { return data; }
 
             set
             {
-                if (Enumerable.SequenceEqual(data, value))
-                    return;
-                data = value;
-                PropChanged("Data");
-                PropChanged("DataAsText");
-                PropChanged("VerboseInfo");
+                if (data != value)
+                {
+                    data = value;
+                    PropChanged("Data");
+                    PropChanged("DataAsText");
+                    PropChanged("VerboseInfo");
+                }
             }
         }
 
@@ -99,23 +96,17 @@ namespace Can_Adapter
         public string GetDataInTextFormat(string beforeString = "", string afterString = "")
         {
             StringBuilder sb = new StringBuilder("");
-            foreach (var item in Data)
-                sb.Append($"{beforeString}{item:X02}{afterString}");
+            for (int i = 0; i < 8; i++)
+                sb.Append($"{beforeString}{((data >> (i * 2)) & 0xFF):X02}{afterString}");
             return sb.ToString();
         }
 
-        public string RtrAsString => RTR ? "1" : "0";
-
-        public string IdeAsString => IDE ? "1" : "0";
-
         public bool RvcCompatible => IDE && DLC == 8 && !RTR;
-
-        public string IdAsText => IDE ? string.Format("{0:X08}", ID) : string.Format("{0:X03}", ID);
 
 
         public override string ToString()
         {
-            return $"L:{DLC} IDE:{IdeAsString} RTR:{RtrAsString} ID:0x{IdAsText} Data:{GetDataInTextFormat(" ")}";
+            return $"L:{DLC} IDE:{IDE} RTR:{RTR} ID:0x{id:X08} Data:{GetDataInTextFormat(" ")}";
         }
 
         public virtual void PropChanged(string propertyName)
@@ -161,15 +152,14 @@ namespace Can_Adapter
                 ID = Convert.ToInt32(str.Substring(1, 8), 16);
             else
                 ID = Convert.ToInt32(str.Substring(1, 3), 16);
-            Data = new byte[DLC];
+
 
             int shift;
             if (!IDE)
                 shift = 5;
             else
                 shift = 10;
-            for (int i = 0; i < DLC; i++)
-                Data[i] = Convert.ToByte(str.Substring(shift + i * 2, 2), 16);
+            data += Convert.ToUInt64((str.Substring(shift, 8), 16));
         }
 
         public override bool Equals(object obj)
@@ -183,19 +173,14 @@ namespace Can_Adapter
             CanMessage toCompare = (CanMessage)obj;
             if (toCompare.ID != ID || toCompare.DLC != DLC || toCompare.IDE != IDE || toCompare.RTR != RTR)
                 return false;
-            for (int i = 0; i < toCompare.DLC; i++)
-                if (toCompare.Data[i] != Data[i])
-                    return false;
+            if (data != toCompare.data) return false;
             return true;
         }
 
         public override int GetHashCode()
         {
             int ret = ID;
-            for (int i = 0; i < DLC; i++)
-            {
-                ret ^= Data[i] << (8 * (i % 4));
-            }
+            ret ^= data.GetHashCode();
             return ret;
         }
         public void Update(CanMessage m)
@@ -216,26 +201,7 @@ namespace Can_Adapter
         }
     }
 
-    public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="unit">Element to add</param>
-        /// <returns>true - element was added, false - updated</returns>
-        public bool TryToAdd(T item)
-        {
-            var found = Items.FirstOrDefault(i => i.IsSimmiliarTo(item));
-            if (found == null)
-            {
-                Add(item);
-                return true;
-            }
-            else
-                found.Update(item);
-            return false;
-        }
-    }
+
     public class CanAdapter
     {
 
@@ -315,7 +281,10 @@ namespace Can_Adapter
                 str.Append('T');
             if (!msg.IDE && !msg.RTR)
                 str.Append('t');
-            str.Append(msg.IdAsText);
+            if (msg.IDE)
+                str.Append(msg.ID.ToString("X08"));
+            else
+                str.Append(msg.ID.ToString("X03"));
             str.Append(msg.DLC.ToString());
             str.Append(msg.GetDataInTextFormat());
             str.Append('\r');
@@ -332,7 +301,7 @@ namespace Can_Adapter
                 case 'R':
                     var m = new CanMessage(new string(currentBuf));
                     GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = m });
-                    UIContext.Send((x)=> Messages.TryToAdd(m),null);
+                    UIContext.Send((x) => Messages.TryToAdd(m), null);
                     break;
                 case 'Z':
                     TransmissionSuccess?.Invoke(this, new EventArgs());
