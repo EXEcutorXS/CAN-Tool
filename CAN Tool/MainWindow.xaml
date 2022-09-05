@@ -59,22 +59,23 @@
                                         </DataGridTextColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
-                           </Grid>
+                            </Grid>
 
                         </TabItem>
                         <TabItem Header="Control">
                             <Grid x:Name="ControlTabGrid">
                                 <Button x:Name="StartButton" Content="Старт" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8"></Button>
-                                <Button x:Name="StopButton" Content="Стоп" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="60 8 8 8"></Button>
-                                <Button x:Name="CalibrateButton" Content="Калибровка термопар" Width="150" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="115 8 8 8"></Button>
+                                <TextBox Width="60" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Text="time limit" Margin="55 8 8 8"></TextBox>
+                                <Button x:Name="StopButton" Content="Стоп" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="120,8,0,0"></Button>
+                                <Button x:Name="CalibrateButton" Content="Калибровка термопар" Width="150" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="165,8,0,0"></Button>
                                 <ComboBox x:Name="CommandSelectorField"  Width="500" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8 38 8 8"></ComboBox>
-                                <TextBox Width="300" Height="26" Margin="5 68 5 5" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
+                                <TextBox x:Name="CommandPreviewField" Width="503" Height="26" Margin="5,68,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
                                 <DataGrid x:Name="CommandParameterField" Margin="5,100,5,5" ItemsSource="{Binding ElementName=CommandSelectorField, Path=SelectedItem.Value.Parameters}" AutoGenerateColumns="False">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn  Header="Parameter" IsReadOnly="True" Binding="{Binding Path=Name}">
-                                    </DataGridTextColumn>
+                                        </DataGridTextColumn>
                                         <DataGridTextColumn  Header="Value"  IsReadOnly="False" Binding="{Binding Path=Value}">
-                                    </DataGridTextColumn>
+                                        </DataGridTextColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Grid>
@@ -105,6 +106,8 @@
                         <TabItem Header="Black Box">
                             <Grid>
                                 <Button Content="Read Data" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" Command="{Binding ReadBlackBoxCommand}"></Button>
+                                <Button Content="Read Errors" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="105,10,0,0" Command="{Binding ReadBlackBoxCommand}"></Button>
+                                <Button Content="Erase" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,10,0,0" Command="{Binding ReadBlackBoxCommand}"></Button>
                                 <DataGrid Margin="5 50 5 5" ItemsSource="{Binding SelectedConnectedDevice.BBValues}" AutoGenerateColumns="False">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="ID" Binding="{Binding Path=Id}"></DataGridTextColumn>
@@ -115,6 +118,12 @@
                             </Grid>
                         </TabItem>
                         <TabItem Header="Firmware">
+                            <Grid>
+                                <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Load HEX" Margin="10,10,0,10"/>
+                                <Button Width="120" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Enter Bootloader" Margin="110,10,0,10"/>
+                                <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Update" Margin="240,10,0,10"/>
+                                <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Start program" Margin="340,10,0,10"/>
+                            </Grid>
                         </TabItem>
                     </TabControl>
                 </Grid>
@@ -129,6 +138,6 @@
         <Button Content="Normal" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="504,14,0,0"/>
         <Button Content="Listen" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="604,14,0,0"/>
         <Button Content="Close" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="704,14,0,0"/>
-        
+
     </Grid>
 </Window>
