@@ -33,8 +33,16 @@ namespace CAN_Tool
             InitializeComponent();
         }
 
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            CommandSelectorField.ItemsSource = AC2P.commands;
+            CommandSelectorField.DisplayMemberPath = "Value.Name";
+            CommandSelectorField.SelectedValuePath = "Value";
+
+            
 
 
+        }
     }
 
 }

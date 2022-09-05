@@ -17,7 +17,7 @@ namespace CAN_Tool.ViewModels
 {
     internal class MainWindowViewModel : ViewModel
     {
-
+        
         int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
 
         public int[] Bitrates => _Bitrates;
@@ -35,6 +35,11 @@ namespace CAN_Tool.ViewModels
                 Set(ref _connectedDevice, value);
             get => _connectedDevice;
         }
+
+        public Dictionary<CommandId, AC2PCommand> Commands => AC2P.commands;
+
+        public AC2PMessage prepearedCommandMessage  { get; set; }
+        
 
         #region Title property
         /// <summary>
@@ -104,6 +109,7 @@ namespace CAN_Tool.ViewModels
         private bool CanClosePortCommandExecute(object parameter) => (canAdapter.PortOpened);
         #endregion
 
+
         #region ReadConfigCommand
         public ICommand ReadConfigCommand { get; }
         private void OnReadConfigCommandExecuted(object parameter)
@@ -111,6 +117,16 @@ namespace CAN_Tool.ViewModels
             AC2PInstance.ReadAllParameters(_connectedDevice.ID);
         }
         private bool CanReadConfigCommandExecute(object parameter) =>
+            (canAdapter.PortOpened && SelectedConnectedDevice != null);
+        #endregion
+
+        #region ReadBlackBoxCommand
+        public ICommand ReadBlackBoxCommand { get; }
+        private void OnReadBlackBoxCommandExecuted(object parameter)
+        {
+            AC2PInstance.ReadBlackBox(_connectedDevice.ID);
+        }
+        private bool CanReadBlackBoxExecute(object parameter) =>
             (canAdapter.PortOpened && SelectedConnectedDevice != null);
         #endregion
 
@@ -126,6 +142,7 @@ namespace CAN_Tool.ViewModels
             ClosePortCommand = new LambdaCommand(OnClosePortCommandExecuted, CanClosePortCommandExecute);
             RefreshPortListCommand = new LambdaCommand(OnRefreshPortsCommandExecuted);
             ReadConfigCommand = new LambdaCommand(OnReadConfigCommandExecuted, CanReadConfigCommandExecute);
+            ReadBlackBoxCommand = new LambdaCommand(OnReadBlackBoxCommandExecuted, CanReadBlackBoxExecute);
         }
 
         private void CanAdapter_GotNewMessage(object sender, EventArgs e)
