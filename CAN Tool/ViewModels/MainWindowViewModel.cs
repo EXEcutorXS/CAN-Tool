@@ -12,12 +12,13 @@ using System.IO.Ports;
 using Can_Adapter;
 using AdversCan;
 using System.Windows.Threading;
+using System.Threading;
 
 namespace CAN_Tool.ViewModels
 {
     internal class MainWindowViewModel : ViewModel
     {
-        
+
         int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
 
         public int[] Bitrates => _Bitrates;
@@ -38,7 +39,18 @@ namespace CAN_Tool.ViewModels
 
         public Dictionary<CommandId, AC2PCommand> Commands => AC2P.commands;
 
-        public AC2PMessage prepearedCommandMessage  { get; set; }
+        public AC2PMessage prepearedCommandMessage { get; set; }
+
+        public AC2PMessage CustomMessage { get; set; } = new AC2PMessage();
+
+        public string CustomMessageDataString { get; set; }
+
+        public string CustomMessagePgn { set; get; }
+
+        public Task CurrentTask;
+
+        public CancellationTokenSource Cts = new CancellationTokenSource();
+
         
 
         #region Title property
@@ -109,6 +121,15 @@ namespace CAN_Tool.ViewModels
         private bool CanClosePortCommandExecute(object parameter) => (canAdapter.PortOpened);
         #endregion
 
+        #region CancelOperationCommand
+        public ICommand CancelOperationCommand { get; }
+        private void OnCancelOperationCommandExecuted(object parameter)
+        {
+            Cts.Cancel();
+        }
+        private bool CanCancelOperationCommandExecute(object parameter) => (true);
+        #endregion
+
 
         #region ReadConfigCommand
         public ICommand ReadConfigCommand { get; }
@@ -120,14 +141,58 @@ namespace CAN_Tool.ViewModels
             (canAdapter.PortOpened && SelectedConnectedDevice != null);
         #endregion
 
-        #region ReadBlackBoxCommand
-        public ICommand ReadBlackBoxCommand { get; }
-        private void OnReadBlackBoxCommandExecuted(object parameter)
+        #region ReadCommonBlackBoxCommand
+        public ICommand ReadCommonBlackBoxCommand { get; }
+        private void OnReadCommonBlackBoxCommandExecuted(object parameter)
         {
-            AC2PInstance.ReadBlackBox(_connectedDevice.ID);
+            Cts = new CancellationTokenSource();
+            AC2PInstance.ReadCommonBlackBox(_connectedDevice.ID,Cts.Token);
         }
-        private bool CanReadBlackBoxExecute(object parameter) =>
+        private bool CanReadCommonBlackBoxExecute(object parameter) =>
             (canAdapter.PortOpened && SelectedConnectedDevice != null);
+        #endregion
+
+        #region ReadBlackBoxErrorsCommand
+        public ICommand ReadBlackBoxErrorsCommand { get; }
+        private void OnReadBlackBoxErrorsCommandExecuted(object parameter)
+        {
+            Cts = new CancellationTokenSource();
+            CurrentTask = Task.Run(()=>AC2PInstance.ReadErrorsBlackBox(_connectedDevice.ID,Cts.Token));
+        }
+        private bool CanReadBlackBoxErrorsExecute(object parameter) =>
+            (canAdapter.PortOpened && SelectedConnectedDevice != null);
+        #endregion
+
+        #region SendCustomMessageCommand
+        public ICommand SendCustomMessageCommand { get; }
+        private void OnSendCustomMessageCommandExecuted(object parameter)
+        {
+            byte[] data = new byte[8];
+            if (CustomMessageDataString.Length != 16) return;
+            for (int i = 0; i < 8; i++)
+                data[i] = Convert.ToByte(CustomMessageDataString.Substring(i * 2, 2), 16);
+            CustomMessage.Data = data;
+            CustomMessage.TransmitterId = new DeviceId(126, 6);
+            CustomMessage.ReceiverId = SelectedConnectedDevice.ID;
+            CustomMessage.PGN = Convert.ToInt32(CustomMessagePgn);
+            AC2PInstance.SendMessage(CustomMessage);
+        }
+        private bool CanSendCustomMessageCommandExecute(object parameter)
+        {
+            if (CustomMessageDataString.Length != 16) return false;
+            try
+            {
+                Convert.ToInt64(CustomMessageDataString, 16);
+                if (Convert.ToInt32(CustomMessagePgn)>511) return false;
+            }
+            catch
+            {
+                return false;
+            }
+            if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
+            return true;
+        }
+
         #endregion
 
         public MainWindowViewModel()
@@ -142,7 +207,10 @@ namespace CAN_Tool.ViewModels
             ClosePortCommand = new LambdaCommand(OnClosePortCommandExecuted, CanClosePortCommandExecute);
             RefreshPortListCommand = new LambdaCommand(OnRefreshPortsCommandExecuted);
             ReadConfigCommand = new LambdaCommand(OnReadConfigCommandExecuted, CanReadConfigCommandExecute);
-            ReadBlackBoxCommand = new LambdaCommand(OnReadBlackBoxCommandExecuted, CanReadBlackBoxExecute);
+            ReadCommonBlackBoxCommand = new LambdaCommand(OnReadCommonBlackBoxCommandExecuted, CanReadCommonBlackBoxExecute);
+            ReadBlackBoxErrorsCommand = new LambdaCommand(OnReadBlackBoxErrorsCommandExecuted, CanReadBlackBoxErrorsExecute);
+            SendCustomMessageCommand = new LambdaCommand(OnSendCustomMessageCommandExecuted, CanSendCustomMessageCommandExecute);
+            CancelOperationCommand = new LambdaCommand(OnCancelOperationCommandExecuted, CanCancelOperationCommandExecute);
         }
 
         private void CanAdapter_GotNewMessage(object sender, EventArgs e)

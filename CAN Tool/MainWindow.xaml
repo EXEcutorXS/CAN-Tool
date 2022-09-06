@@ -38,10 +38,18 @@
             <TabItem Header="Advers">
                 <Grid>
                     <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}" />
+                    <Button Height="26" Width="100" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10" Content="Cancel" Command="{Binding Path=CancelOperationCommand}"></Button>
                     <TabControl Margin="3 40 3 3"  >
                         <TabItem Header="Messages">
                             <Grid>
-                                <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 5 5 5"  FontFamily = "Courier New"  AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" Grid.ColumnSpan="2"  ItemsSource="{Binding AC2PInstance.Messages}">
+                                <Grid>
+                                <TextBox x:Name="MessageDataField" VerticalAlignment="Top" HorizontalAlignment="Left" Width="200" Height="20" Margin="10" Text="{Binding Path=CustomMessageDataString,Mode=OneWayToSource}" />
+                                    <TextBox x:Name="PGNField" VerticalAlignment="Top" HorizontalAlignment="Left" Width="100" Height="20" Margin="10 40 10 10" Text="{Binding Path=CustomMessagePgn,Mode=OneWayToSource,UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox x:Name="MessageDescription" VerticalAlignment="Top" HorizontalAlignment="Left" Width="500" Height="100" Margin="220 10 10 10" Text="{Binding Path=CustomMessage.VerboseInfo,Mode=OneWay}" > </TextBox>
+                                    <Button x:Name="CustomMessageSendButton" Content="Send" VerticalAlignment="Top" HorizontalAlignment="Left" Width="60" Height="20" Margin="730 10 10 10" Command="{Binding Path=SendCustomMessageCommand}"></Button>
+                                </Grid>
+                                <Grid>
+                                <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 120 5 5"  FontFamily = "Courier New"  AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" Grid.ColumnSpan="2"  ItemsSource="{Binding AC2PInstance.Messages}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Binding="{Binding Path = PGN}"  Header="PGN" IsReadOnly="True">
                                         </DataGridTextColumn>
@@ -59,6 +67,7 @@
                                         </DataGridTextColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
+                                </Grid>
                             </Grid>
 
                         </TabItem>
@@ -105,16 +114,29 @@
                         </TabItem>
                         <TabItem Header="Black Box">
                             <Grid>
-                                <Button Content="Read Data" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" Command="{Binding ReadBlackBoxCommand}"></Button>
-                                <Button Content="Read Errors" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="105,10,0,0" Command="{Binding ReadBlackBoxCommand}"></Button>
-                                <Button Content="Erase" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,10,0,0" Command="{Binding ReadBlackBoxCommand}"></Button>
-                                <DataGrid Margin="5 50 5 5" ItemsSource="{Binding SelectedConnectedDevice.BBValues}" AutoGenerateColumns="False">
+                                <Button Content="Read Data" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" Command="{Binding ReadCommonBlackBoxCommand}"></Button>
+                                <Button Content="Read Errors" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="105,10,0,0" Command="{Binding ReadBlackBoxErrorsCommand}"></Button>
+                                <Button Content="Erase" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,10,0,0" Command="{Binding EraseBlackBoxCommand}"></Button>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                <DataGrid Grid.Column="0" Margin="5 50 5 5" ItemsSource="{Binding SelectedConnectedDevice.BBValues}" AutoGenerateColumns="False">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="ID" Binding="{Binding Path=Id}"></DataGridTextColumn>
                                         <DataGridTextColumn Header="VALUE" Binding="{Binding Path=Value}"></DataGridTextColumn>
                                         <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Path=Description}"></DataGridTextColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
+                                    <ComboBox x:Name="ErrorSelector" Grid.Column="1"  Height="20" VerticalAlignment="Top" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BBErrors, Mode=OneWay}"></ComboBox>
+                                    <DataGrid Grid.Column="1" Margin="5 50 5 5" ItemsSource="{Binding ElementName=ErrorSelector, Path=SelectedItem.Variables}" AutoGenerateColumns="False">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>
+                                            <DataGridTextColumn Header="Value" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
                             </Grid>
                         </TabItem>
                         <TabItem Header="Firmware">

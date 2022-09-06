@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
 using System.Data;
 using Can_Adapter;
-
+using CAN_Tool.ViewModels.Base;
 namespace AdversCan
 {
     public class PGN
@@ -36,6 +36,7 @@ namespace AdversCan
         public string OutputFormat = "";
         public Dictionary<int, string> meanings = new Dictionary<int, string>();
         public Func<int, string> GetMeaning;
+        public Func<byte[], string> CustomDecoder;
         public string Tip = "";
         public int PackNumber;
         public int Value { set; get; }
@@ -186,7 +187,8 @@ namespace AdversCan
             StringBuilder retString = new StringBuilder();
             int rawValue;
             retString.Append(p.Name + ": ");
-
+            if (p.CustomDecoder != null)
+                return p.CustomDecoder(Data);
             switch (p.BitLength)
             {
                 case 1: rawValue = Data[p.StartByte] >> p.StartBit & 0b1; break;
@@ -419,6 +421,104 @@ namespace AdversCan
         public string enName => AC2P.configParameters[Id]?.NameEn;
 
     }
+
+    public class ReadedVariable : ViewModel, IUpdatable<ReadedVariable>
+    {
+        int id;
+        public int Id { get => id; set => id = value; }
+
+        int _value;
+        public int Value
+        {
+            get => _value;
+            set
+            {
+                if (value == _value) return;
+                Set(ref _value, value);
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void Update(ReadedVariable item)
+        {
+            Set(ref _value, item.Value);
+        }
+
+        public bool IsSimmiliarTo(ReadedVariable item)
+        {
+            return id == item.id;
+        }
+
+        public string Name
+        {
+            get
+            {
+                if (AC2P.VariablesNames.ContainsKey(id))
+                    return $"{AC2P.VariablesNames[id]}: {_value}";
+                else
+                    return "Параметр# " + id.ToString();
+            }
+        }
+        public string Description => ToString();
+        public override string ToString()
+        {
+            if (AC2P.VariablesNames.ContainsKey(id))
+                return $"{AC2P.VariablesNames[id]}: {_value}";
+            else
+                return "";
+        }
+    }
+    public class BBError : IUpdatable<BBError>, INotifyPropertyChanged
+    {
+        private UpdatableList<ReadedVariable> _variables = new UpdatableList<ReadedVariable>();
+
+        public UpdatableList<ReadedVariable> Variables { get => _variables; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool IsSimmiliarTo(BBError item)
+        {
+            return false;
+        }
+
+        public BBError()
+        {
+            _variables.ListChanged += (s, a) => onChange("Name");
+            _variables.AddingNew += (s, a) => onChange("Name");
+            _variables.ListChanged += (s, a) => onChange("Description");
+            _variables.AddingNew += (s, a) => onChange("Description");
+        }
+        public void Update(BBError item)
+        {
+            throw new NotImplementedException();
+        }
+        public string Description => ToString();
+        public override string ToString()
+        {
+            StringBuilder retString = new StringBuilder("");
+            foreach (var v in Variables)
+                retString.Append(v.ToString() + ";");
+            return retString.ToString();
+        }
+
+        public string Name
+        {
+            get
+            {
+                ReadedVariable error = Variables.FirstOrDefault(v => v.Id == 24);
+
+                if (error == null)
+                    return "Нет кода ошибки";
+                else
+                    return $"Код {AC2P.ErrorNames[error.Value]}";
+            }
+        }
+
+        void onChange(string propName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+    }
     public class ConnectedDevice
     {
         public DeviceId ID;
@@ -432,6 +532,11 @@ namespace AdversCan
 
         private UpdatableList<ReadedBlackBoxValue> _bbValues = new UpdatableList<ReadedBlackBoxValue>();
         public UpdatableList<ReadedBlackBoxValue> BBValues => _bbValues;
+
+
+        public BBError currentError { set; get; }
+        private UpdatableList<BBError> _BBErrors = new UpdatableList<BBError>();
+        public UpdatableList<BBError> BBErrors => _BBErrors;
 
 
         public override string ToString()
@@ -577,7 +682,11 @@ namespace AdversCan
         private UpdatableList<AC2PMessage> _messages = new UpdatableList<AC2PMessage>();
         public UpdatableList<AC2PMessage> Messages => _messages;
 
+        public static Dictionary<int, string> ErrorNames = new Dictionary<int, string>();
+
         private CanAdapter canAdapter;
+
+        public bool WaitingForBBErrors { get; set; } = false;
 
 
         public void ParseCanMessage(CanMessage msg)
@@ -588,6 +697,8 @@ namespace AdversCan
             if (ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id)) == null)
                 UIContext.Send(x => ConnectedDevices.Add(new ConnectedDevice() { ID = id }), null);
 
+            ConnectedDevice currentDevice = ConnectedDevices.First(d => d.ID.Equals(m.TransmitterId));
+
             if (m.PGN == 7) //Ответ на запрос параметра
             {
                 if (m.Data[0] == 4) // Обрабатываем только упешные ответы на запросы
@@ -595,7 +706,7 @@ namespace AdversCan
                     int parameterId = m.Data[3] + m.Data[2] * 256;
                     uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
                     if (parameterValue != 0xFFFFFFFF)
-                        UIContext.Send(x => ConnectedDevices.First(d => d.ID.Equals(id)).readedParameters.TryToAdd(new ReadedParameter() { Id = parameterId, Value = parameterValue }), null);
+                        UIContext.Send(x => currentDevice.readedParameters.TryToAdd(new ReadedParameter() { Id = parameterId, Value = parameterValue }), null);
                 }
 
             }
@@ -604,10 +715,33 @@ namespace AdversCan
             {
                 if (m.Data[0] == 4) // Обрабатываем только упешные ответы на запросы
                 {
-                    int parameterId = m.Data[3] + m.Data[2] * 256;
-                    uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
-                    if (parameterValue != 0xFFFFFFFF)
-                        UIContext.Send(x => ConnectedDevices.First(d => d.ID.Equals(id)).BBValues.TryToAdd(new ReadedBlackBoxValue() { Id = parameterId, Value = parameterValue }), null);
+                    if (!WaitingForBBErrors)
+                    {
+                        int parameterId = m.Data[3] + m.Data[2] * 256;
+                        uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
+                        if (parameterValue != 0xFFFFFFFF)
+                            UIContext.Send(x => currentDevice.BBValues.TryToAdd(new ReadedBlackBoxValue() { Id = parameterId, Value = parameterValue }), null);
+                    }
+                    else
+                    {
+                        if (m.Data[2] == 0xFF && m.Data[3] == 0xFA) //Заголовок отчёта
+                        {
+                            if (currentDevice.currentError.Variables.Count > 0)
+                            {
+                                BBError e = new BBError();
+                                currentDevice.currentError = e;
+                                UIContext.Send(x => currentDevice.BBErrors.Add(e), null);
+                            }
+                        }
+                        else
+                        {
+                            if (currentDevice.currentError == null || m.Data[2] == 0xFF && m.Data[3] == 0xFF) return;
+                            ReadedVariable v = new ReadedVariable();
+                            v.Id = m.Data[2] * 256 + m.Data[3];
+                            v.Value = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
+                            UIContext.Send(x => currentDevice.currentError.Variables.TryToAdd(v), null);
+                        }
+                    }
                 }
 
             }
@@ -675,25 +809,60 @@ namespace AdversCan
             }
         }
 
-        public async void ReadBlackBox(DeviceId id)
+        public async void ReadCommonBlackBox(DeviceId id, CancellationToken ct)
         {
+            WaitingForBBErrors = false;
+            AC2PMessage msg = new AC2PMessage();
+            msg.PGN = 8;
+            msg.TransmitterAddress = 6;
+            msg.TransmitterType = 126;
+            msg.ReceiverAddress = id.Address;
+            msg.ReceiverType = id.Type;
+            msg.Data[0] = 6; //Read Single Param
+            msg.Data[1] = 0xFF; //Read Param
             foreach (var p in BbParameters)
             {
-                AC2PMessage msg = new AC2PMessage();
-                msg.PGN = 8;
-                msg.TransmitterAddress = 6;
-                msg.TransmitterType = 126;
-                msg.ReceiverAddress = id.Address;
-                msg.ReceiverType = id.Type;
-                msg.Data[0] = 6; //Read Single Param
-                msg.Data[1] = 0xFF; //Read Param
+                
                 msg.Data[4] = (byte)(p.Key / 256);
                 msg.Data[5] = (byte)(p.Key % 256);
                 canAdapter.Transmit(msg);
                 await Task.Run(() => Thread.Sleep(100));
+                if (ct.IsCancellationRequested) break;
             }
 
 
+        }
+
+        public async void ReadErrorsBlackBox(DeviceId id, CancellationToken ct)
+        {
+            WaitingForBBErrors = true;
+            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
+            UIContext.Send(x =>
+            {
+                currentDevice.BBErrors.Clear();
+                currentDevice.currentError = new BBError();
+                currentDevice.BBErrors.Add(currentDevice.currentError);
+            }, null);
+
+            AC2PMessage msg = new AC2PMessage();
+            msg.PGN = 8;
+            msg.TransmitterAddress = 6;
+            msg.TransmitterType = 126;
+            msg.ReceiverAddress = id.Address;
+            msg.ReceiverType = id.Type;
+            msg.Data[0] = 0x13; //Read Errors
+            msg.Data[1] = 0xFF;
+            for (int i = 0; i < 1024; i++)
+            {
+                msg.Data[4] = (byte)(i / 256);  //Pair count
+                msg.Data[5] = (byte)(i % 256);  //Pair count
+                msg.Data[6] = 0x00; //Pair count MSB
+                msg.Data[7] = 0x01; //Pair count LSB
+
+                canAdapter.Transmit(msg);
+                await Task.Run(() => Thread.Sleep(40));
+                if (ct.IsCancellationRequested) break;
+            }
         }
         public async void ReadAllParameters(DeviceId id)
         {
@@ -764,6 +933,21 @@ namespace AdversCan
             canAdapter.Transmit(msg);
         }
 
+        public void SendMessage(AC2PMessage m)
+        {
+            canAdapter.Transmit(m);
+        }
+        public void SendMessage(DeviceId from, DeviceId to, int pgn, byte[] data)
+        {
+            AC2PMessage msg = new AC2PMessage();
+            msg.PGN = pgn;
+            msg.TransmitterAddress = from.Address;
+            msg.TransmitterType = from.Type;
+            msg.ReceiverAddress = to.Address;
+            msg.ReceiverType = to.Type;
+            data.CopyTo(msg.Data, 0);
+            canAdapter.Transmit(msg);
+        }
         public void SendCommand(CommandId com, DeviceId dev, byte[] data = null)
         {
             AC2PMessage message = new AC2PMessage();
@@ -905,7 +1089,7 @@ namespace AdversCan
             commands.Add(new CommandId(0, 70), new AC2PCommand() { firstByte = 0, secondByte = 69, name = "Включение/Выключение устройств" });
             #endregion
 
-            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, GetMeaning = i => ("Устройство: " + Devices[i].Name + ";")});
+            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, GetMeaning = i => ("Устройство: " + Devices[i].Name + ";") });
             commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 8, meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } } });
             commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 8, Name = "Верия ПО" });
             commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 8, Name = "Модификация ПО" });
@@ -1002,8 +1186,14 @@ namespace AdversCan
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Параметр", BitLength = 16, StartBit = 0, StartByte = 2, GetMeaning = x => configParameters[x]?.NameRu });
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Value", BitLength = 32, StartBit = 0, StartByte = 4 });
 
-            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 4, StartBit = 0, StartByte = 0, meanings = { { 0, "Стереть ЧЯ" }, { 3, "Чтение ЧЯ" }, { 6, "Чтение параметра (из paramsname.h)" } } });
-            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 2, StartBit = 4, StartByte = 0, meanings = { { 0, "Общие данные" }, { 1, "Неисправности" } } });
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 4, StartBit = 0, StartByte = 0, meanings = { { 0, "Стереть ЧЯ" }, { 3, "Чтение ЧЯ" }, { 4, "Ответ" }, { 6, "Чтение параметра (из paramsname.h)" } } });
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Тип:", BitLength = 2, StartBit = 4, StartByte = 0, meanings = { { 0, "Общие данные" }, { 1, "Неисправности" } } });
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Номер пары", CustomDecoder = d => { if ((d[0] & 0xF) == 3) return "Номер пары:" + (d[4] * 0x100 + d[5]).ToString() + ";"; else return ""; } });
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Номер параметра", CustomDecoder = d => { if ((d[0] & 0xF) == 6) return "Номер параметра:" + (d[4] * 0x100 + d[5]).ToString() + ";"; else return ""; } });
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Число пар", CustomDecoder = d => { if ((d[0] & 0xF) == 6) return "Запрошено пар:" + (d[6] * 0x100 + d[7]).ToString() + ";"; else return ""; } });
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Номер параметра", CustomDecoder = d => { if (d[0] == 4) return "Параметр:" + (d[2] * 256 + d[3]).ToString() + ";"; else return ""; } });
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Номер параметра", CustomDecoder = d => { if (d[0] == 4) return "Значение:" + (d[4] * 0x1000000 + d[5] * 0x10000 + d[6] * 0x100 + d[7]).ToString() + ";"; else return ""; } });
+
 
             PGNs[10].parameters.Add(new AC2PParameter() { Name = "Стадия", BitLength = 8, StartByte = 0, meanings = Stages });
             PGNs[10].parameters.Add(new AC2PParameter() { Name = "Режим", BitLength = 8, StartByte = 1 });
@@ -1052,7 +1242,7 @@ namespace AdversCan
             PGNs[17].parameters.Add(new AC2PParameter() { Name = "11 канал АЦП ", BitLength = 16, StartByte = 6 });
 
             PGNs[18].parameters.Add(new AC2PParameter() { Name = "Вид изделия", BitLength = 8, StartByte = 0, GetMeaning = i => Devices[i]?.Name });
-            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Напряжение питания", BitLength = 8, StartByte = 1, GetMeaning = i => Devices[i]?.Name, meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } } });
+            PGNs[18].parameters.Add(new AC2PParameter() { Name = "Напряжение питания", BitLength = 8, StartByte = 1, meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } } });
             PGNs[18].parameters.Add(new AC2PParameter() { Name = "Версия ПО", BitLength = 8, StartByte = 2 });
             PGNs[18].parameters.Add(new AC2PParameter() { Name = "Модификация ПО", BitLength = 8, StartByte = 3 });
             PGNs[18].parameters.Add(new AC2PParameter() { Name = "Дата релиза", BitLength = 24, StartByte = 5, GetMeaning = v => $"{v >> 16}.{(v >> 8) & 0xF}.{v & 0xFF}" });
@@ -1095,9 +1285,74 @@ namespace AdversCan
             PGNs[31].parameters.Add(new AC2PParameter() { Name = "Время работы", BitLength = 32, StartByte = 0, Unit = "с" });
             PGNs[31].parameters.Add(new AC2PParameter() { Name = "Время работы на режиме", BitLength = 32, StartByte = 4, Unit = "с" });
             #endregion
+
+            ErrorNames = new Dictionary<int, string>() {
+              {1  , "overheat"},
+{2  , "overheat"},
+{3  , "error of the overheat temp. sensor"},
+{4  , "error of the liquid temp. sensor"},
+{5  , "open circuit of the flame temp. sensor"},
+{9  , "glow plug error"},
+{10 , "fan speed does not correspond to the defined"},
+{12 , "high supply voltage"},
+{13 , "no ignition"},
+{14 , "water pump error"},
+{15 , "low supply voltage"},
+{16 , "body temp.sensor does not cool down"},
+{17 , "short circuit of the fuel pump"},
+{22 , "open circuit of the fuel pump"},
+{27 , "fan does not rotate"},
+{28 , "fan self-rotation"},
+{29 , "exceeding the limit of flame blowout"},
+{36 , "overheating of the flame indicator"},
+{40 , "no connection with the heater"},
+{45 , "open circuit of the tank temp. sensor"},
+{46 , "short circuit of the tank temp. sensor"},
+{53 , "open circuit of the flow sensor"},
+{54 , "short circuit of the flow sensor"},
+{55 , "open circuit of the air temp. sensor"},
+{56 , "short circuit of the air temp. sensor"},
+{57 , "short circuit of the zone 1 temp. sensor"},
+{58 , "open circuit of the zone 1 temp. sensor"},
+{59 , "short circuit of the zone 2 temp. sensor"},
+{60 , "open circuit of the zone 2 temp. sensor"},
+{61 , "short circuit of the zone 3 temp. sensor"},
+{62 , "open circuit of the zone 3 temp. sensor"},
+{63 , "short circuit of the zone 4 temp. sensor"},
+{64 , "open circuit of the zone 4 temp. sensor"},
+{65 , "short circuit of the zone 5 temp. sensor"},
+{66 , "open circuit of the zone 5 temp. sensor"},
+{69 , "short circuit of the pump 1"},
+{70 , "open circuit of the pump 1"},
+{71 , "short circuit of the pump 2"},
+{72 , "open circuit of the pump 2"},
+{73 , "short circuit of the pump 3"},
+{74 , "open circuit of the pump 3"},
+{75 , "short circuit of the pump 4"},
+{76 , "open circuit of the pump 4"},
+{77 , "short circuit of the pump 5"},
+{78 , "open circuit of the pump 5"},
+{79 , "short circuit of the fan 1"},
+{80 , "open circuit of the fan 1"},
+{81 , "short circuit of the fan 2"},
+{82 , "open circuit of the fan 2"},
+{83 , "short circuit of the fan 3"},
+{84 , "open circuit of the fan 3"},
+{85 , "short circuit of the fan 4"},
+{86 , "open circuit of the fan 4"},
+{87 , "short circuit of the fan 5"},
+{88 , "open circuit of the fan 5"},
+{91 , "liquid level too low"},
+{92 , "liquid level too high"},
+{93 , "level sensor short circuit"},
+{94 , "level sensor open circuit"} };
+
         }
 
     }
 
-
 }
+
+
+
+
