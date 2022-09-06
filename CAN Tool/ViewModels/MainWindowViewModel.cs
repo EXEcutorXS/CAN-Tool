@@ -49,9 +49,7 @@ namespace CAN_Tool.ViewModels
 
         public Task CurrentTask;
 
-        public CancellationTokenSource Cts = new CancellationTokenSource();
-
-        
+       
 
         #region Title property
         /// <summary>
@@ -125,7 +123,7 @@ namespace CAN_Tool.ViewModels
         public ICommand CancelOperationCommand { get; }
         private void OnCancelOperationCommandExecuted(object parameter)
         {
-            Cts.Cancel();
+            AC2PInstance.CTS.Cancel();
         }
         private bool CanCancelOperationCommandExecute(object parameter) => (true);
         #endregion
@@ -145,8 +143,8 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadCommonBlackBoxCommand { get; }
         private void OnReadCommonBlackBoxCommandExecuted(object parameter)
         {
-            Cts = new CancellationTokenSource();
-            AC2PInstance.ReadCommonBlackBox(_connectedDevice.ID,Cts.Token);
+            AC2PInstance.CTS = new CancellationTokenSource();
+            AC2PInstance.ReadCommonBlackBox(_connectedDevice.ID,AC2PInstance.CTS.Token);
         }
         private bool CanReadCommonBlackBoxExecute(object parameter) =>
             (canAdapter.PortOpened && SelectedConnectedDevice != null);
@@ -156,8 +154,8 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadBlackBoxErrorsCommand { get; }
         private void OnReadBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Cts = new CancellationTokenSource();
-            CurrentTask = Task.Run(()=>AC2PInstance.ReadErrorsBlackBox(_connectedDevice.ID,Cts.Token));
+            AC2PInstance.CTS = new CancellationTokenSource();
+            CurrentTask = Task.Run(()=>AC2PInstance.ReadErrorsBlackBox(_connectedDevice.ID, AC2PInstance.CTS.Token));
         }
         private bool CanReadBlackBoxErrorsExecute(object parameter) =>
             (canAdapter.PortOpened && SelectedConnectedDevice != null);

@@ -431,11 +431,8 @@ namespace AdversCan
         public int Value
         {
             get => _value;
-            set
-            {
-                if (value == _value) return;
-                Set(ref _value, value);
-            }
+            set => Set(ref _value, value);
+            
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -519,6 +516,29 @@ namespace AdversCan
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
     }
+
+    public class AC2PTask : ViewModel
+    {
+        CancellationTokenSource CTS = new CancellationTokenSource();
+
+
+        int percentComplete;
+        public int PercentComplete
+        {
+            get => percentComplete;
+            set => Set(ref percentComplete, value);
+            
+        }
+
+        string name;
+        public string Name
+        {
+            get => name;
+            set => Set(ref name, value);
+            
+        }
+       
+    }
     public class ConnectedDevice
     {
         public DeviceId ID;
@@ -537,6 +557,8 @@ namespace AdversCan
         public BBError currentError { set; get; }
         private UpdatableList<BBError> _BBErrors = new UpdatableList<BBError>();
         public UpdatableList<BBError> BBErrors => _BBErrors;
+
+
 
 
         public override string ToString()
@@ -686,6 +708,8 @@ namespace AdversCan
 
         private CanAdapter canAdapter;
 
+        public CancellationTokenSource CTS { get; set; }
+
         public bool WaitingForBBErrors { get; set; } = false;
 
 
@@ -721,6 +745,7 @@ namespace AdversCan
                         uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
                         if (parameterValue != 0xFFFFFFFF)
                             UIContext.Send(x => currentDevice.BBValues.TryToAdd(new ReadedBlackBoxValue() { Id = parameterId, Value = parameterValue }), null);
+
                     }
                     else
                     {
@@ -735,7 +760,9 @@ namespace AdversCan
                         }
                         else
                         {
-                            if (currentDevice.currentError == null || m.Data[2] == 0xFF && m.Data[3] == 0xFF) return;
+                            if (currentDevice.currentError == null) return;
+                            if (m.Data[1] == 0xFF && m.Data[2] == 0xFF && m.Data[3] == 0xFF && m.Data[4] == 0xFF && m.Data[5] == 0xFF && m.Data[6] == 0xFF && m.Data[7] == 0xFF)
+                                CTS.Cancel();
                             ReadedVariable v = new ReadedVariable();
                             v.Id = m.Data[2] * 256 + m.Data[3];
                             v.Value = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
@@ -822,7 +849,7 @@ namespace AdversCan
             msg.Data[1] = 0xFF; //Read Param
             foreach (var p in BbParameters)
             {
-                
+
                 msg.Data[4] = (byte)(p.Key / 256);
                 msg.Data[5] = (byte)(p.Key % 256);
                 canAdapter.Transmit(msg);
@@ -1151,8 +1178,8 @@ namespace AdversCan
             commands[new CommandId(0, 65)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "", meanings = { { 7, "Температура жидкости" }, { 10, "Температура перегрева" }, { 12, "Температура пламени" }, { 13, "Температура корпуса" }, { 27, "Температура воздуха" } } });
             commands[new CommandId(0, 65)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 16, Name = "Значение температуры", Unit = "°C" });
 
-            commands[new CommandId(0, 66)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "", meanings = { { 0, "Выход из режима М" }, { 1, "Вход в режим М" } } });
-            commands[new CommandId(0, 66)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "", meanings = { { 0, "Выход из режима Т" }, { 1, "Вход в режим Т" } } });
+            commands[new CommandId(0, 67)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "", meanings = { { 0, "Выход из режима М" }, { 1, "Вход в режим М" } } });
+            commands[new CommandId(0, 67)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "", meanings = { { 0, "Выход из режима Т" }, { 1, "Вход в режим Т" } } });
 
             commands[new CommandId(0, 68)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Состояние помпы", meanings = defMeaningsOnOff });
             commands[new CommandId(0, 68)].Parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 0, BitLength = 8, Name = "Обороты нагнетателя", Unit = "об/с" });
