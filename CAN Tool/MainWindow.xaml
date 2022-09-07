@@ -1,4 +1,4 @@
-﻿<Window x:Class="CAN_Tool.MainWindow"
+﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,159 +7,183 @@
         xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
         xmlns:acan="clr-namespace:AdversCan"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="700" Width="1200">
+        Title="{Binding Title}" Height="700" Width="1200"
+        >
+
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
-    <Grid Loaded="Grid_Loaded">
-        <TabControl Margin="0,50,0,0" Grid.ColumnSpan="2">
-            <TabItem Header="Basic CAN">
-                <Grid Background="#FFE5E5E5">
-                    <TextBox x:Name="CanIdField" Text="ID" Height="20" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8 8 8 8"></TextBox>
-                    <CheckBox x:Name="CanIdeField" Content="IDE" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100 8 8 8"></CheckBox>
-                    <CheckBox x:Name="CanRtrField" Content="RTR" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150 8 8 8"></CheckBox>
-                    <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200 8 8 8"></TextBox>
-                    <Button Content="Send" VerticalAlignment="Top" HorizontalAlignment="Left" Height="20" Width="100" Margin="320 8 8 8"></Button>
-                    <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="5 40 5 5" FontFamily = "Courier New" AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" GridLinesVisibility="All" ItemsSource="{Binding Path = canAdapter.Messages}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Path = IdAsText}"  Header="ID" IsReadOnly="True">
-                            </DataGridTextColumn>
-                            <DataGridCheckBoxColumn Binding="{Binding Path = IDE}" Header="IDE"  IsReadOnly="True">
-                            </DataGridCheckBoxColumn>
-                            <DataGridCheckBoxColumn Binding= "{Binding Path = RTR}" Header="RTR"  IsReadOnly="True">
-                            </DataGridCheckBoxColumn>
-                            <DataGridTextColumn Binding= "{Binding Path = DataAsText}" Header="DATA"  IsReadOnly="True">
-                            </DataGridTextColumn>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem></MenuItem>
+        </Menu>
+        
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Text="Status text"></TextBlock>
+            </StatusBarItem>
+        </StatusBar>
+        <Grid DockPanel.Dock="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="317*"/>
+            </Grid.RowDefinitions>
+            <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Height" Value="26"/>
+                        <Setter Property="Margin" Value="5"/>
+                        <Setter Property="Padding" Value="10 0 10 0"/>
+                    </Style>
+                    </StackPanel.Resources>
+             <Button  Grid.Row="0" Content="Refresh ports" Command="{Binding Path=RefreshPortListCommand}"/>
+                <ComboBox Grid.Row="0" x:Name="PortNameList" Margin ="5 15"  MinWidth="70"  ItemsSource="{Binding PortList}" SelectedIndex="{Binding SelectedPortIndex}"/>
+            <Button Grid.Row="0" x:Name="PortOpenButton" Content="Open"  Command="{Binding OpenPortCommand}"/>
+            <Button Grid.Row="0" x:Name="PortOpenButton_Copy" Content="Close" Command="{Binding ClosePortCommand}"/>
+            <ComboBox Grid.Row="0" x:Name="CanBitrateField" Margin ="5 15"  MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3"/>
+            <Button Grid.Row="0" Content="Normal"  Margin ="5"/>
+            <Button Grid.Row="0" Content="Listen" Margin ="5"/>
+            <Button Grid.Row="0" Content="Close" Margin ="5"/>
+            </StackPanel>
+            <TabControl Grid.Row="1" Margin="5,5,5,5" Grid.RowSpan="2" >
+                <TabItem Header="Basic CAN">
+                    <Grid Background="#FFE5E5E5">
+                        <TextBox x:Name="CanIdField" Text="ID" Height="20" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8 8 8 8"></TextBox>
+                        <CheckBox x:Name="CanIdeField" Content="IDE" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100 8 8 8"></CheckBox>
+                        <CheckBox x:Name="CanRtrField" Content="RTR" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150 8 8 8"></CheckBox>
+                        <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200 8 8 8"></TextBox>
+                        <Button Content="Send" VerticalAlignment="Top" HorizontalAlignment="Left" Height="20" Width="100" Margin="320 8 8 8"></Button>
+                        <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="5 40 5 5" FontFamily = "Courier New" AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" GridLinesVisibility="All" ItemsSource="{Binding Path = canAdapter.Messages}" >
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Path = IdAsText}"  Header="ID" IsReadOnly="True">
+                                </DataGridTextColumn>
+                                <DataGridCheckBoxColumn Binding="{Binding Path = IDE}" Header="IDE"  IsReadOnly="True">
+                                </DataGridCheckBoxColumn>
+                                <DataGridCheckBoxColumn Binding= "{Binding Path = RTR}" Header="RTR"  IsReadOnly="True">
+                                </DataGridCheckBoxColumn>
+                                <DataGridTextColumn Binding= "{Binding Path = DataAsText}" Header="DATA"  IsReadOnly="True">
+                                </DataGridTextColumn>
 
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Advers">
-                <Grid>
-                    <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}" />
-                    <Button Height="26" Width="100" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10" Content="Cancel" Command="{Binding Path=CancelOperationCommand}"></Button>
-                    <TabControl Margin="3 40 3 3"  >
-                        <TabItem Header="Messages">
-                            <Grid>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Advers">
+                    <Grid>
+                        <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}" />
+                        <Button Height="26" Width="100" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10" Content="Cancel" Command="{Binding Path=CancelOperationCommand}"></Button>
+                        <TabControl Margin="3 40 3 3"  >
+                            <TabItem Header="Messages">
                                 <Grid>
-                                <TextBox x:Name="MessageDataField" VerticalAlignment="Top" HorizontalAlignment="Left" Width="200" Height="20" Margin="10" Text="{Binding Path=CustomMessageDataString,Mode=OneWayToSource}" />
-                                    <TextBox x:Name="PGNField" VerticalAlignment="Top" HorizontalAlignment="Left" Width="100" Height="20" Margin="10 40 10 10" Text="{Binding Path=CustomMessagePgn,Mode=OneWayToSource,UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBox x:Name="MessageDescription" VerticalAlignment="Top" HorizontalAlignment="Left" Width="500" Height="100" Margin="220 10 10 10" Text="{Binding Path=CustomMessage.VerboseInfo,Mode=OneWay}" > </TextBox>
-                                    <Button x:Name="CustomMessageSendButton" Content="Send" VerticalAlignment="Top" HorizontalAlignment="Left" Width="60" Height="20" Margin="730 10 10 10" Command="{Binding Path=SendCustomMessageCommand}"></Button>
+                                    <Grid>
+                                        <TextBox x:Name="MessageDataField" VerticalAlignment="Top" HorizontalAlignment="Left" Width="200" Height="20" Margin="10" Text="{Binding Path=CustomMessageDataString,Mode=OneWayToSource}" />
+                                        <TextBox x:Name="PGNField" VerticalAlignment="Top" HorizontalAlignment="Left" Width="100" Height="20" Margin="10 40 10 10" Text="{Binding Path=CustomMessagePgn,Mode=OneWayToSource,UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBox x:Name="MessageDescription" VerticalAlignment="Top" HorizontalAlignment="Left" Width="500" Height="100" Margin="220 10 10 10" Text="{Binding Path=CustomMessage.VerboseInfo,Mode=OneWay}" ></TextBox>
+                                        <Button x:Name="CustomMessageSendButton" Content="Send" VerticalAlignment="Top" HorizontalAlignment="Left" Width="60" Height="20" Margin="730 10 10 10" Command="{Binding Path=SendCustomMessageCommand}"></Button>
+                                    </Grid>
+                                    <Grid>
+                                        <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 120 5 5"  FontFamily = "Courier New"  AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" Grid.ColumnSpan="2"  ItemsSource="{Binding AC2PInstance.Messages}">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Binding="{Binding Path = PGN}"  Header="PGN" IsReadOnly="True">
+                                                </DataGridTextColumn>
+                                                <DataGridTextColumn Binding="{Binding Path = TransmitterType}" Header="FROM"  IsReadOnly="True">
+                                                </DataGridTextColumn>
+                                                <DataGridTextColumn Binding="{Binding Path = TransmitterAddress}" Header="ADR"  IsReadOnly="True">
+                                                </DataGridTextColumn>
+                                                <DataGridTextColumn Binding= "{Binding Path = ReceiverType}" Header="TO"  IsReadOnly="True">
+                                                </DataGridTextColumn>
+                                                <DataGridTextColumn Binding="{Binding Path = ReceiverAddress}" Header="ADR"  IsReadOnly="True">
+                                                </DataGridTextColumn>
+                                                <DataGridTextColumn Binding= "{Binding Path = DataAsText}" Header="DATA"  IsReadOnly="True">
+                                                </DataGridTextColumn>
+                                                <DataGridTextColumn Binding= "{Binding Path = VerboseInfo}" Header="VERBOSE"  IsReadOnly="True">
+                                                </DataGridTextColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
                                 </Grid>
-                                <Grid>
-                                <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 120 5 5"  FontFamily = "Courier New"  AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" Grid.ColumnSpan="2"  ItemsSource="{Binding AC2PInstance.Messages}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Binding="{Binding Path = PGN}"  Header="PGN" IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path = TransmitterType}" Header="FROM"  IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path = TransmitterAddress}" Header="ADR"  IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding= "{Binding Path = ReceiverType}" Header="TO"  IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path = ReceiverAddress}" Header="ADR"  IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding= "{Binding Path = DataAsText}" Header="DATA"  IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding= "{Binding Path = VerboseInfo}" Header="VERBOSE"  IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                </Grid>
-                            </Grid>
 
-                        </TabItem>
-                        <TabItem Header="Control">
-                            <Grid x:Name="ControlTabGrid">
-                                <Button x:Name="StartButton" Content="Старт" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8"></Button>
-                                <TextBox Width="60" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Text="time limit" Margin="55 8 8 8"></TextBox>
-                                <Button x:Name="StopButton" Content="Стоп" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="120,8,0,0"></Button>
-                                <Button x:Name="CalibrateButton" Content="Калибровка термопар" Width="150" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="165,8,0,0"></Button>
-                                <ComboBox x:Name="CommandSelectorField"  Width="500" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8 38 8 8"></ComboBox>
-                                <TextBox x:Name="CommandPreviewField" Width="503" Height="26" Margin="5,68,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
-                                <DataGrid x:Name="CommandParameterField" Margin="5,100,5,5" ItemsSource="{Binding ElementName=CommandSelectorField, Path=SelectedItem.Value.Parameters}" AutoGenerateColumns="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn  Header="Parameter" IsReadOnly="True" Binding="{Binding Path=Name}">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn  Header="Value"  IsReadOnly="False" Binding="{Binding Path=Value}">
-                                        </DataGridTextColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-
-                        </TabItem>
-                        <TabItem Header="Config">
-                            <Grid>
-
-                                <Button x:Name="readParametersButton"  Content="Read" Width="65" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="414,7,0,0" Command="{Binding Path=ReadConfigCommand}"/>
-                                <Button x:Name="saveParametersButton" Content="Save" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="487,7,0,0"/>
-                                <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="558,7,0,0" />
-                                <DataGrid x:Name = "ConfigParameterField" Margin = "5 40 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.readedParameters}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Binding="{Binding Path = Id}"  Header="ID" IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path = idString}" Header="CODENAME"  IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path = Value}" Header="VAVUE">
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding= "{Binding Path = rusName}" Header="DESCRIPTION"  IsReadOnly="True">
-                                        </DataGridTextColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </TabItem>
-                        <TabItem Header="Graph">
-                        </TabItem>
-                        <TabItem Header="Black Box">
-                            <Grid>
-                                <Button Content="Read Data" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" Command="{Binding ReadCommonBlackBoxCommand}"></Button>
-                                <Button Content="Read Errors" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="105,10,0,0" Command="{Binding ReadBlackBoxErrorsCommand}"></Button>
-                                <Button Content="Erase" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,10,0,0" Command="{Binding EraseBlackBoxCommand}"></Button>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                    </Grid.ColumnDefinitions>
-                                <DataGrid Grid.Column="0" Margin="5 50 5 5" ItemsSource="{Binding SelectedConnectedDevice.BBValues}" AutoGenerateColumns="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="ID" Binding="{Binding Path=Id}"></DataGridTextColumn>
-                                        <DataGridTextColumn Header="VALUE" Binding="{Binding Path=Value}"></DataGridTextColumn>
-                                        <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Path=Description}"></DataGridTextColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                    <ComboBox x:Name="ErrorSelector" Grid.Column="1"  Height="20" VerticalAlignment="Top" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BBErrors, Mode=OneWay}"></ComboBox>
-                                    <DataGrid Grid.Column="1" Margin="5 50 5 5" ItemsSource="{Binding ElementName=ErrorSelector, Path=SelectedItem.Variables}" AutoGenerateColumns="False">
+                            </TabItem>
+                            <TabItem Header="Control">
+                                <Grid x:Name="ControlTabGrid">
+                                    <Button x:Name="StartButton" Content="Старт" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8"></Button>
+                                    <TextBox Width="60" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Text="time limit" Margin="55 8 8 8"></TextBox>
+                                    <Button x:Name="StopButton" Content="Стоп" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="120,8,0,0"></Button>
+                                    <Button x:Name="CalibrateButton" Content="Калибровка термопар" Width="150" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="165,8,0,0"></Button>
+                                    <ComboBox x:Name="CommandSelectorField"  Width="500" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8 38 8 8"></ComboBox>
+                                    <TextBox x:Name="CommandPreviewField" Width="503" Height="26" Margin="5,68,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
+                                    <DataGrid x:Name="CommandParameterField" Margin="5,100,5,5" ItemsSource="{Binding ElementName=CommandSelectorField, Path=SelectedItem.Value.Parameters}" AutoGenerateColumns="False">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>
-                                            <DataGridTextColumn Header="Value" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
+                                            <DataGridTextColumn  Header="Parameter" IsReadOnly="True" Binding="{Binding Path=Name}">
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn  Header="Value"  IsReadOnly="False" Binding="{Binding Path=Value}">
+                                            </DataGridTextColumn>
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </Grid>
-                            </Grid>
-                        </TabItem>
-                        <TabItem Header="Firmware">
-                            <Grid>
-                                <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Load HEX" Margin="10,10,0,10"/>
-                                <Button Width="120" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Enter Bootloader" Margin="110,10,0,10"/>
-                                <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Update" Margin="240,10,0,10"/>
-                                <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Start program" Margin="340,10,0,10"/>
-                            </Grid>
-                        </TabItem>
-                    </TabControl>
-                </Grid>
 
-            </TabItem>
-        </TabControl>
-        <Button  Content="Refresh" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="70" Margin="15" Command="{Binding Path=RefreshPortListCommand}"/>
-        <ComboBox x:Name="PortNameList" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="100 15 15 15"  ItemsSource="{Binding PortList}" SelectedIndex="{Binding SelectedPortIndex}"/>
-        <Button x:Name="PortOpenButton" Content="Open" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="200 15 15 15" Command="{Binding OpenPortCommand}"/>
-        <Button x:Name="PortOpenButton_Copy" Content="Close" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="303,15,0,0" Command="{Binding ClosePortCommand}"/>
-        <ComboBox x:Name="CanBitrateField" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24" Width="90" Margin="404,14,0,0" ItemsSource="{Binding Path=Bitrates}"/>
-        <Button Content="Normal" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="504,14,0,0"/>
-        <Button Content="Listen" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="604,14,0,0"/>
-        <Button Content="Close" Height="24" Width="90" HorizontalAlignment="Left" VerticalAlignment="Top" Margin ="704,14,0,0"/>
+                            </TabItem>
+                            <TabItem Header="Config">
+                                <Grid>
 
-    </Grid>
+                                    <Button x:Name="readParametersButton"  Content="Read" Width="65" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="414,7,0,0" Command="{Binding Path=ReadConfigCommand}"/>
+                                    <Button x:Name="saveParametersButton" Content="Save" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="487,7,0,0"/>
+                                    <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="558,7,0,0" />
+                                    <DataGrid x:Name = "ConfigParameterField" Margin = "5 40 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.readedParameters}">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Binding="{Binding Path = Id}"  Header="ID" IsReadOnly="True">
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Binding="{Binding Path = idString}" Header="CODENAME"  IsReadOnly="True">
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Binding="{Binding Path = Value}" Header="VAVUE">
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Binding= "{Binding Path = rusName}" Header="DESCRIPTION"  IsReadOnly="True">
+                                            </DataGridTextColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Graph">
+                            </TabItem>
+                            <TabItem Header="Black Box">
+                                <Grid>
+                                    <Button Content="Read Data" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" Command="{Binding ReadCommonBlackBoxCommand}"></Button>
+                                    <Button Content="Read Errors" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="105,10,0,0" Command="{Binding ReadBlackBoxErrorsCommand}"></Button>
+                                    <Button Content="Erase" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,10,0,0" Command="{Binding EraseBlackBoxCommand}"></Button>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <DataGrid Grid.Column="0" Margin="5 50 5 5" ItemsSource="{Binding SelectedConnectedDevice.BBValues}" AutoGenerateColumns="False">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="ID" Binding="{Binding Path=Id}"></DataGridTextColumn>
+                                                <DataGridTextColumn Header="VALUE" Binding="{Binding Path=Value}"></DataGridTextColumn>
+                                                <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Path=Description}"></DataGridTextColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <ComboBox x:Name="ErrorSelector" Grid.Column="1"  Height="20" VerticalAlignment="Top" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BBErrors, Mode=OneWay}"></ComboBox>
+                                        <DataGrid Grid.Column="1" Margin="5 50 5 5" ItemsSource="{Binding ElementName=ErrorSelector, Path=SelectedItem.Variables}" AutoGenerateColumns="False">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>
+                                                <DataGridTextColumn Header="Value" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Firmware">
+                                <Grid>
+                                    <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Load HEX" Margin="10,10,0,10"/>
+                                    <Button Width="120" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Enter Bootloader" Margin="110,10,0,10"/>
+                                    <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Update" Margin="240,10,0,10"/>
+                                    <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Start program" Margin="340,10,0,10"/>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
 </Window>

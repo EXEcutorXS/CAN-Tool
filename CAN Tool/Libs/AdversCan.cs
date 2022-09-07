@@ -10,7 +10,6 @@ using Can_Adapter;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
 using System.Data;
-using Can_Adapter;
 using CAN_Tool.ViewModels.Base;
 namespace AdversCan
 {
