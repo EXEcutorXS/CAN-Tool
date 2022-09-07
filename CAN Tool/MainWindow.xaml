@@ -7,7 +7,8 @@
         xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
         xmlns:acan="clr-namespace:AdversCan"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="700" Width="1200"
+        Title="Adver CAN-Tool" 
+        Height="700" Width="1200"
         >
 
     <Window.DataContext>
@@ -19,8 +20,12 @@
         </Menu>
         
         <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Width="auto">
+                <TextBlock Text="{Binding AC2PInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
+            </StatusBarItem>
+                <ProgressBar Width="200" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="15" Margin="10 0 10 0"></ProgressBar>
             <StatusBarItem>
-                <TextBlock Text="Status text"></TextBlock>
+                <Button Content="Cancel"  Command="{Binding CancelOperationCommand}"></Button>
             </StatusBarItem>
         </StatusBar>
         <Grid DockPanel.Dock="Top">
@@ -45,7 +50,7 @@
             <Button Grid.Row="0" Content="Listen" Margin ="5"/>
             <Button Grid.Row="0" Content="Close" Margin ="5"/>
             </StackPanel>
-            <TabControl Grid.Row="1" Margin="5,5,5,5" Grid.RowSpan="2" >
+            <TabControl Grid.Row="1" Margin="5,5,5,5"  >
                 <TabItem Header="Basic CAN">
                     <Grid Background="#FFE5E5E5">
                         <TextBox x:Name="CanIdField" Text="ID" Height="20" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8 8 8 8"></TextBox>
@@ -71,7 +76,6 @@
                 <TabItem Header="Advers">
                     <Grid>
                         <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}" />
-                        <Button Height="26" Width="100" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10" Content="Cancel" Command="{Binding Path=CancelOperationCommand}"></Button>
                         <TabControl Margin="3 40 3 3"  >
                             <TabItem Header="Messages">
                                 <Grid>
@@ -125,11 +129,16 @@
                             </TabItem>
                             <TabItem Header="Config">
                                 <Grid>
-
-                                    <Button x:Name="readParametersButton"  Content="Read" Width="65" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="414,7,0,0" Command="{Binding Path=ReadConfigCommand}"/>
-                                    <Button x:Name="saveParametersButton" Content="Save" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="487,7,0,0"/>
-                                    <Button x:Name="EraseParametersButton" Content="Erase" Width="60" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="558,7,0,0" />
-                                    <DataGrid x:Name = "ConfigParameterField" Margin = "5 40 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.readedParameters}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="35"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" FlowDirection="LeftToRight" Orientation="Horizontal">
+                                    <Button   Content="Read" Width="65" Height="20"  Margin="20 5 5 5" Command="{Binding ReadConfigCommand}"/>
+                                    <Button  Content="Save" Width="60" Height="20"  Margin="5" Command="{Binding SaveConfigCommand}"/>
+                                    <Button  Content ="Reset" Width="60" Height="20"  Margin="5" Command="{Binding ResetConfigCommand}"/>
+                                    </StackPanel>
+                                    <DataGrid Grid.Row="1" x:Name = "ConfigParameterField" Margin = "5 5 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.readedParameters}">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Path = Id}"  Header="ID" IsReadOnly="True">
                                             </DataGridTextColumn>
@@ -147,9 +156,12 @@
                             </TabItem>
                             <TabItem Header="Black Box">
                                 <Grid>
-                                    <Button Content="Read Data" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" Command="{Binding ReadCommonBlackBoxCommand}"></Button>
-                                    <Button Content="Read Errors" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="105,10,0,0" Command="{Binding ReadBlackBoxErrorsCommand}"></Button>
-                                    <Button Content="Erase" Width="90" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,10,0,0" Command="{Binding EraseBlackBoxCommand}"></Button>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                                    <Button Content="Read Data" Width="90" Height="26"  Margin="10" Command="{Binding ReadBlackBoxDataCommand}"></Button>
+                                    <Button Content="Read Errors" Width="90" Height="26" Margin="10" Command="{Binding ReadBlackBoxErrorsCommand}"></Button>
+                                    <Button Content="Erase Data" Width="90" Height="26" Margin="10" Command="{Binding EraseBlackBoxDataCommand}"></Button>
+                                    <Button Content="Erase Errors" Width="90" Height="26"  Margin="10" Command="{Binding EraseBlackBoxErrorsCommand}"></Button>
+                                    </StackPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>

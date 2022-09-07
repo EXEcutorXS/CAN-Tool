@@ -47,22 +47,6 @@ namespace CAN_Tool.ViewModels
 
         public string CustomMessagePgn { set; get; }
 
-        public Task CurrentTask;
-
-       
-
-        #region Title property
-        /// <summary>
-        /// MainWindow title
-        /// </summary>
-        private string _Title = "Advers CAN Tool";
-
-        public string Title
-        {
-            get => _Title;
-            set => Set(ref _Title, value);
-        }
-        #endregion
 
         #region SelectedPortIndex;
         private int _SelectedPortIndex = -1;
@@ -123,9 +107,9 @@ namespace CAN_Tool.ViewModels
         public ICommand CancelOperationCommand { get; }
         private void OnCancelOperationCommandExecuted(object parameter)
         {
-            AC2PInstance.CTS.Cancel();
+            AC2PInstance.CurrentTask.onCancel();
         }
-        private bool CanCancelOperationCommandExecute(object parameter) => (true);
+        private bool CanCancelOperationCommandExecute(object parameter) => (AC2PInstance.CurrentTask.Occupied);
         #endregion
 
 
@@ -136,29 +120,67 @@ namespace CAN_Tool.ViewModels
             AC2PInstance.ReadAllParameters(_connectedDevice.ID);
         }
         private bool CanReadConfigCommandExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
         #endregion
 
-        #region ReadCommonBlackBoxCommand
-        public ICommand ReadCommonBlackBoxCommand { get; }
-        private void OnReadCommonBlackBoxCommandExecuted(object parameter)
+        #region SaveConfigCommand
+        public ICommand SaveConfigCommand { get; }
+        private void OnSaveConfigCommandExecuted(object parameter)
         {
-            AC2PInstance.CTS = new CancellationTokenSource();
-            AC2PInstance.ReadCommonBlackBox(_connectedDevice.ID,AC2PInstance.CTS.Token);
+            AC2PInstance.SaveParameters(_connectedDevice.ID);
         }
-        private bool CanReadCommonBlackBoxExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null);
+        private bool CanSaveConfigCommandExecute(object parameter) =>
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count>0);
+        #endregion
+
+        #region ResetConfigCommand
+        public ICommand ResetConfigCommand { get; }
+        private void OnResetConfigCommandExecuted(object parameter)
+        {
+            AC2PInstance.ResetParameters(_connectedDevice.ID);
+        }
+        private bool CanResetConfigCommandExecute(object parameter) =>
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
+        #endregion
+
+        #region ReadBlackBoxDataCommand
+        public ICommand ReadBlackBoxDataCommand { get; }
+        private void OnReadBlackBoxDataCommandExecuted(object parameter)
+        {
+            AC2PInstance.ReadBlackBoxData(_connectedDevice.ID);
+        }
+        private bool CanReadBlackBoxDataExecute(object parameter) =>
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
         #endregion
 
         #region ReadBlackBoxErrorsCommand
         public ICommand ReadBlackBoxErrorsCommand { get; }
         private void OnReadBlackBoxErrorsCommandExecuted(object parameter)
         {
-            AC2PInstance.CTS = new CancellationTokenSource();
-            CurrentTask = Task.Run(()=>AC2PInstance.ReadErrorsBlackBox(_connectedDevice.ID, AC2PInstance.CTS.Token));
+            Task.Run(()=>AC2PInstance.ReadErrorsBlackBox(_connectedDevice.ID));
         }
         private bool CanReadBlackBoxErrorsExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
+        #endregion
+
+        #region EraseBlackBoxErrorsCommand
+        public ICommand EraseBlackBoxErrorsCommand { get; }
+        private void OnEraseBlackBoxErrorsCommandExecuted(object parameter)
+        {
+            Task.Run(() => AC2PInstance.EraseErrorsBlackBox(_connectedDevice.ID));
+        }
+        private bool CanEraseBlackBoxErrorsExecute(object parameter) =>
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
+        #endregion
+
+        #region EraseBlackBoxDataCommand
+        public ICommand EraseBlackBoxDataCommand { get; }
+        private void OnEraseBlackBoxDataCommandExecuted(object parameter)
+        {
+            Task.Run(() => AC2PInstance.EraseErrorsBlackBox(_connectedDevice.ID));
+        }
+        private bool CanEraseBlackBoxDataExecute(object parameter) =>
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
         #endregion
 
         #region SendCustomMessageCommand
@@ -198,23 +220,22 @@ namespace CAN_Tool.ViewModels
             AC2P.ParseParamsname();
             _canAdapter = new CanAdapter();
             _AC2PInstance = new AC2P(canAdapter);
-            canAdapter.GotNewMessage += CanAdapter_GotNewMessage;
 
             ApplicationCloseCommand = new LambdaCommand(OnApplicationCloseCommandExecuted, CanApplicationCloseCommandExecute);
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
             ClosePortCommand = new LambdaCommand(OnClosePortCommandExecuted, CanClosePortCommandExecute);
             RefreshPortListCommand = new LambdaCommand(OnRefreshPortsCommandExecuted);
             ReadConfigCommand = new LambdaCommand(OnReadConfigCommandExecuted, CanReadConfigCommandExecute);
-            ReadCommonBlackBoxCommand = new LambdaCommand(OnReadCommonBlackBoxCommandExecuted, CanReadCommonBlackBoxExecute);
+            ReadBlackBoxDataCommand = new LambdaCommand(OnReadBlackBoxDataCommandExecuted, CanReadBlackBoxDataExecute);
             ReadBlackBoxErrorsCommand = new LambdaCommand(OnReadBlackBoxErrorsCommandExecuted, CanReadBlackBoxErrorsExecute);
+            EraseBlackBoxErrorsCommand = new LambdaCommand(OnEraseBlackBoxErrorsCommandExecuted, CanEraseBlackBoxErrorsExecute);
+            EraseBlackBoxDataCommand = new LambdaCommand(OnEraseBlackBoxDataCommandExecuted, CanEraseBlackBoxDataExecute);
             SendCustomMessageCommand = new LambdaCommand(OnSendCustomMessageCommandExecuted, CanSendCustomMessageCommandExecute);
             CancelOperationCommand = new LambdaCommand(OnCancelOperationCommandExecuted, CanCancelOperationCommandExecute);
+            SaveConfigCommand = new LambdaCommand(OnSaveConfigCommandExecuted, CanSaveConfigCommandExecute);
+            ResetConfigCommand = new LambdaCommand(OnResetConfigCommandExecuted, CanResetConfigCommandExecute);
+            
         }
 
-        private void CanAdapter_GotNewMessage(object sender, EventArgs e)
-        {
-            CanMessage m = (e as GotMessageEventArgs).receivedMessage;
-            AC2PInstance.ParseCanMessage(m);
-        }
     }
 }

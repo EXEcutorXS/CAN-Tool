@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace CAN_Tool.ViewModels.Base
 {
@@ -23,6 +24,7 @@ namespace CAN_Tool.ViewModels.Base
             {
                 field = value;
                 OnPropertyChanged(PropertyName);
+                CommandManager.InvalidateRequerySuggested();
                 return true;
             }
             else

@@ -431,9 +431,8 @@ namespace AdversCan
         {
             get => _value;
             set => Set(ref _value, value);
-            
+
         }
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public void Update(ReadedVariable item)
         {
@@ -450,9 +449,9 @@ namespace AdversCan
             get
             {
                 if (AC2P.VariablesNames.ContainsKey(id))
-                    return $"{AC2P.VariablesNames[id]}: {_value}";
+                    return $"{AC2P.VariablesNames[id]}";
                 else
-                    return "Параметр# " + id.ToString();
+                    return "Неизв.переменная # " + id.ToString();
             }
         }
         public string Description => ToString();
@@ -518,15 +517,12 @@ namespace AdversCan
 
     public class AC2PTask : ViewModel
     {
-        CancellationTokenSource CTS = new CancellationTokenSource();
-
-
         int percentComplete;
         public int PercentComplete
         {
             get => percentComplete;
             set => Set(ref percentComplete, value);
-            
+
         }
 
         string name;
@@ -534,10 +530,75 @@ namespace AdversCan
         {
             get => name;
             set => Set(ref name, value);
-            
+
         }
-       
+        public CancellationTokenSource CTS { get; set; } = new CancellationTokenSource();
+
+        bool done = false;
+
+        public bool Done
+        {
+            get { return done; }
+            set { Set(ref done, value); }
+        }
+
+        bool cancelled;
+        public bool Cancelled
+        {
+            get { return cancelled; }
+            set { Set(ref cancelled, value); }
+        }
+
+        public event EventHandler TaskDone;
+        public event EventHandler TaskCancelled;
+
+        public void onDone()
+        {
+            Occupied = false;
+            PercentComplete = 100;
+            Done = true;
+            TaskDone?.Invoke(null, null);
+        }
+
+        public void onCancel()
+        {
+            CTS.Cancel();
+            Occupied = false;
+            Cancelled = true;
+            TaskCancelled?.Invoke(null, null);
+        }
+
+        private bool occupied;
+
+        public bool Occupied
+        {
+            get { return occupied; }
+            set { Set(ref occupied, value); }
+        }
+        /// <summary>
+        /// Captures current task instance
+        /// </summary>
+        /// <param name="TaskName"></param>
+        /// <returns>true if capture was successful, false if it's not</returns>
+        public bool Capture(string TaskName)
+        {
+            if (occupied) return false;
+            Occupied = true;
+            Name = TaskName;
+            PercentComplete = 0;
+            Done = false;
+            Cancelled = false;
+            CTS = new CancellationTokenSource();
+            return true;
+        }
+        public void UpdatePercent(int p)
+        {
+            PercentComplete = p;
+        }
+
     }
+
+
     public class ConnectedDevice
     {
         public DeviceId ID;
@@ -552,13 +613,10 @@ namespace AdversCan
         private UpdatableList<ReadedBlackBoxValue> _bbValues = new UpdatableList<ReadedBlackBoxValue>();
         public UpdatableList<ReadedBlackBoxValue> BBValues => _bbValues;
 
-
         public BBError currentError { set; get; }
+
         private UpdatableList<BBError> _BBErrors = new UpdatableList<BBError>();
         public UpdatableList<BBError> BBErrors => _BBErrors;
-
-
-
 
         public override string ToString()
         {
@@ -676,7 +734,7 @@ namespace AdversCan
             return $"{Id} - {StringId}:{Description}";
         }
     }
-    public class AC2P
+    public class AC2P : ViewModel
     {
         private SynchronizationContext UIContext;
 
@@ -707,12 +765,28 @@ namespace AdversCan
 
         private CanAdapter canAdapter;
 
-        public CancellationTokenSource CTS { get; set; }
-
         public bool WaitingForBBErrors { get; set; } = false;
 
+        AC2PTask currentTask = new AC2PTask();
 
-        public void ParseCanMessage(CanMessage msg)
+        public AC2PTask CurrentTask
+        {
+            get { return currentTask; }
+            set { Set(ref currentTask, value); }
+        }
+
+
+        private bool CancellationRequested => CurrentTask.CTS.IsCancellationRequested;
+
+        private bool Capture(string n) => CurrentTask.Capture(n);
+
+        private void Done() => CurrentTask.onDone();
+
+        private void Cancel() => CurrentTask.onCancel();
+
+        private void UpdatePercent(int p) => CurrentTask.UpdatePercent(p);
+
+        private void ParseCanMessage(CanMessage msg)
         {
             AC2PMessage m = new AC2PMessage(msg);
             DeviceId id = m.TransmitterId;
@@ -760,8 +834,6 @@ namespace AdversCan
                         else
                         {
                             if (currentDevice.currentError == null) return;
-                            if (m.Data[1] == 0xFF && m.Data[2] == 0xFF && m.Data[3] == 0xFF && m.Data[4] == 0xFF && m.Data[5] == 0xFF && m.Data[6] == 0xFF && m.Data[7] == 0xFF)
-                                CTS.Cancel();
                             ReadedVariable v = new ReadedVariable();
                             v.Id = m.Data[2] * 256 + m.Data[3];
                             v.Value = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
@@ -835,8 +907,9 @@ namespace AdversCan
             }
         }
 
-        public async void ReadCommonBlackBox(DeviceId id, CancellationToken ct)
+        public async void ReadBlackBoxData(DeviceId id)
         {
+            if (!Capture("Чтение параметров чёрного ящика")) return;
             WaitingForBBErrors = false;
             AC2PMessage msg = new AC2PMessage();
             msg.PGN = 8;
@@ -846,6 +919,8 @@ namespace AdversCan
             msg.ReceiverType = id.Type;
             msg.Data[0] = 6; //Read Single Param
             msg.Data[1] = 0xFF; //Read Param
+
+            int counter = 0;
             foreach (var p in BbParameters)
             {
 
@@ -853,14 +928,19 @@ namespace AdversCan
                 msg.Data[5] = (byte)(p.Key % 256);
                 canAdapter.Transmit(msg);
                 await Task.Run(() => Thread.Sleep(100));
-                if (ct.IsCancellationRequested) break;
+                if (CancellationRequested)
+                {
+                    Cancel();
+                    return;
+                }
+                UpdatePercent(100 * counter++ / BbParameters.Count);
             }
-
-
+            Done();
         }
 
-        public async void ReadErrorsBlackBox(DeviceId id, CancellationToken ct)
+        public async void ReadErrorsBlackBox(DeviceId id)
         {
+            if (!Capture("Чтение ошибок из чёрного ящика")) return;
             WaitingForBBErrors = true;
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
             UIContext.Send(x =>
@@ -887,11 +967,61 @@ namespace AdversCan
 
                 canAdapter.Transmit(msg);
                 await Task.Run(() => Thread.Sleep(40));
-                if (ct.IsCancellationRequested) break;
+                if (CancellationRequested)
+                {
+                    Cancel();
+                    return;
+                }
+                UpdatePercent(100 * i / 1024);
             }
+            Done();
+        }
+
+        public void EraseCommonBlackBox(DeviceId id)
+        {
+            if (!Capture("Стирание параметров чёрного ящика")) return;
+
+            AC2PMessage msg = new AC2PMessage();
+            msg.PGN = 8;
+            msg.TransmitterAddress = 6;
+            msg.TransmitterType = 126;
+            msg.ReceiverAddress = id.Address;
+            msg.ReceiverType = id.Type;
+            msg.Data[0] = 0x0; //Erase Common
+            msg.Data[1] = 0xFF;
+            msg.Data[4] = 0xFF;
+            msg.Data[5] = 0xFF;
+            msg.Data[6] = 0xFF;
+            msg.Data[7] = 0xFF;
+            canAdapter.Transmit(msg);
+
+            Done();
+        }
+
+        public void EraseErrorsBlackBox(DeviceId id)
+        {
+            if (!Capture("Стирание ошибок чёрного ящика")) return;
+
+            AC2PMessage msg = new AC2PMessage();
+            msg.PGN = 8;
+            msg.TransmitterAddress = 6;
+            msg.TransmitterType = 126;
+            msg.ReceiverAddress = id.Address;
+            msg.ReceiverType = id.Type;
+            msg.Data[0] = 0x10; //Erase Errors
+            msg.Data[1] = 0xFF;
+            msg.Data[4] = 0xFF;
+            msg.Data[5] = 0xFF;
+            msg.Data[6] = 0xFF;
+            msg.Data[7] = 0xFF;
+            canAdapter.Transmit(msg);
+
+            Done();
         }
         public async void ReadAllParameters(DeviceId id)
         {
+            if (!Capture("Чтение параметров из Flash")) return;
+            int cnt = 0;
             foreach (var p in configParameters)
             {
                 AC2PMessage msg = new AC2PMessage();
@@ -906,18 +1036,26 @@ namespace AdversCan
                 msg.Data[3] = (byte)(p.Key % 256);
                 canAdapter.Transmit(msg);
                 await Task.Run(() => Thread.Sleep(100));
+                UpdatePercent(cnt++ * 100 / configParameters.Count);
+                if (CancellationRequested)
+                {
+                    Cancel();
+                    return;
+                }
             }
+            Done();
         }
 
         public async void SaveParameters(DeviceId id)
         {
+            if (!Capture("Сохранение параметров во Flash")) return;
             var dev = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id));
             if (dev == null) return;
             AC2PMessage msg = new AC2PMessage();
             List<ReadedParameter> tempCollection = new List<ReadedParameter>();
             foreach (var p in dev.readedParameters)
                 tempCollection.Add(p);
-
+            int cnt = 0;
             foreach (var p in tempCollection)
             {
                 msg.PGN = 7;
@@ -925,8 +1063,8 @@ namespace AdversCan
                 msg.TransmitterType = 126;
                 msg.ReceiverAddress = id.Address;
                 msg.ReceiverType = id.Type;
-                msg.Data[0] = 1; //Write Param
-                msg.Data[1] = 0xFF; //Read Param
+                msg.Data[0] = 1; //Write Param to raw
+                msg.Data[1] = 0xFF;
                 msg.Data[2] = (byte)(p.Id / 256);
                 msg.Data[3] = (byte)(p.Id % 256);
                 msg.Data[4] = (byte)((p.Value >> 24) & 0xFF);
@@ -935,16 +1073,22 @@ namespace AdversCan
                 msg.Data[7] = (byte)((p.Value) & 0xFF);
                 canAdapter.Transmit(msg);
                 await Task.Run(() => Thread.Sleep(100));
+                UpdatePercent(cnt++ * 100 / tempCollection.Count);
+                if (CancellationRequested)
+                {
+                    Cancel();
+                    return;
+                }
             }
-            msg.Data[0] = 0;
-            canAdapter.Transmit(msg);
-            await Task.Run(() => Thread.Sleep(1000));
+            await Task.Run(() => Thread.Sleep(100));
             msg.Data[0] = 2;
             canAdapter.Transmit(msg);
+            Done();
         }
 
-        public void EraseParameters(DeviceId id)
+        public void ResetParameters(DeviceId id)
         {
+            if (!Capture("Стирание пареметров")) return;
             var dev = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id));
             if (dev == null) return;
             AC2PMessage msg = new AC2PMessage();
@@ -957,6 +1101,7 @@ namespace AdversCan
             msg.Data[0] = 0; //Erase 
             msg.Data[1] = 0xFF;
             canAdapter.Transmit(msg);
+            Done();
         }
 
         public void SendMessage(AC2PMessage m)
