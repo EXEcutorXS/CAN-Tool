@@ -27,6 +27,9 @@
             <StatusBarItem>
                 <Button Content="Cancel"  Command="{Binding CancelOperationCommand}"></Button>
             </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
+            </StatusBarItem>
         </StatusBar>
         <Grid DockPanel.Dock="Top">
             <Grid.RowDefinitions>
@@ -78,15 +81,14 @@
                         <ComboBox x:Name="CurrentDeviceSelectorField" Width="400" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}" />
                         <TabControl Margin="3 40 3 3"  >
                             <TabItem Header="Messages">
-                                <Grid>
-                                    <Grid>
-                                        <TextBox x:Name="MessageDataField" VerticalAlignment="Top" HorizontalAlignment="Left" Width="200" Height="20" Margin="10" Text="{Binding Path=CustomMessageDataString,Mode=OneWayToSource}" />
-                                        <TextBox x:Name="PGNField" VerticalAlignment="Top" HorizontalAlignment="Left" Width="100" Height="20" Margin="10 40 10 10" Text="{Binding Path=CustomMessagePgn,Mode=OneWayToSource,UpdateSourceTrigger=PropertyChanged}" />
-                                        <TextBox x:Name="MessageDescription" VerticalAlignment="Top" HorizontalAlignment="Left" Width="500" Height="100" Margin="220 10 10 10" Text="{Binding Path=CustomMessage.VerboseInfo,Mode=OneWay}" ></TextBox>
-                                        <Button x:Name="CustomMessageSendButton" Content="Send" VerticalAlignment="Top" HorizontalAlignment="Left" Width="60" Height="20" Margin="730 10 10 10" Command="{Binding Path=SendCustomMessageCommand}"></Button>
-                                    </Grid>
-                                    <Grid>
-                                        <DataGrid x:Name="AC2PMessageList" AutoGenerateColumns="False"   Margin="5 120 5 5"  FontFamily = "Courier New"  AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" Grid.ColumnSpan="2"  ItemsSource="{Binding AC2PInstance.Messages}">
+                                <DockPanel>
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                                        <TextBox ToolTip="Data in HEX format" VerticalAlignment="Top" Width="200" Height="20" Margin="10" Text="{Binding Path=CustomMessageDataString,UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBox ToolTip="PGN" VerticalAlignment="Top" Width="40" Height="20" Margin="10" Text="{Binding Path=CustomMessagePgn,UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button  VerticalAlignment="Top" Content="Send" Width="60" Height="20" Margin="10" Command="{Binding Path=SendCustomMessageCommand}"></Button>
+                                        <TextBox MaxHeight="200" Margin="10" Text="{Binding Path=CustomMessage.VerboseInfo, Mode=OneWay}" ></TextBox>
+                                    </StackPanel>
+                                        <DataGrid  AutoGenerateColumns="False"   Margin="5"  FontFamily = "Courier New"  AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" Grid.ColumnSpan="2"  ItemsSource="{Binding AC2PInstance.Messages}">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Binding="{Binding Path = PGN}"  Header="PGN" IsReadOnly="True">
                                                 </DataGridTextColumn>
@@ -104,8 +106,8 @@
                                                 </DataGridTextColumn>
                                             </DataGrid.Columns>
                                         </DataGrid>
-                                    </Grid>
-                                </Grid>
+                                    
+                                </DockPanel>
 
                             </TabItem>
                             <TabItem Header="Control">

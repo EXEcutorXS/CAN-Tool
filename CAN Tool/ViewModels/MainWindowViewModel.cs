@@ -41,12 +41,63 @@ namespace CAN_Tool.ViewModels
 
         public AC2PMessage prepearedCommandMessage { get; set; }
 
+        #region CustomMessage
         public AC2PMessage CustomMessage { get; set; } = new AC2PMessage();
 
-        public string CustomMessageDataString { get; set; }
+        string customMessageDataString = "";
+        public string CustomMessageDataString
+        {
+            get => customMessageDataString;
+            set
+            {
+                //string back = customMessageDataString;
+                try
+                {
+                    Convert.ToUInt64(value, 16);
+                    customMessageDataString = value;
+                    string tempString = value + "0000000000000000";
+                    byte[] data = new byte[8];
+                    for (int i = 0; i < 8; i++)
+                        data[i] = Convert.ToByte(tempString.Substring(i * 2, 2), 16);
+                    CustomMessage.Data = data;
+                }
+                catch
+                {
+                  //  CustomMessageDataString = back;
+                }
+            }
+        }
 
-        public string CustomMessagePgn { set; get; }
+        string customMessagePgn = "0";
+        public string CustomMessagePgn
+        {
+            get => customMessagePgn;
+            set
+            {
+                string back = customMessagePgn;
+                try
+                {
+                    CustomMessage.PGN = Convert.ToInt32(value);
+                    customMessagePgn = value;
+                }
+                catch
+                {
+                    CustomMessageDataString = back;
+                }
+            }
+        }
 
+        #endregion
+
+        #region ErrorString
+        private string error;
+
+        public string Error
+        {
+            get { return error; }
+            set { Set(ref error, value); }
+        }
+        #endregion
 
         #region SelectedPortIndex;
         private int _SelectedPortIndex = -1;
@@ -130,7 +181,7 @@ namespace CAN_Tool.ViewModels
             AC2PInstance.SaveParameters(_connectedDevice.ID);
         }
         private bool CanSaveConfigCommandExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count>0);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count > 0);
         #endregion
 
         #region ResetConfigCommand
@@ -157,7 +208,7 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadBlackBoxErrorsCommand { get; }
         private void OnReadBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Task.Run(()=>AC2PInstance.ReadErrorsBlackBox(_connectedDevice.ID));
+            Task.Run(() => AC2PInstance.ReadErrorsBlackBox(_connectedDevice.ID));
         }
         private bool CanReadBlackBoxErrorsExecute(object parameter) =>
             (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
@@ -203,7 +254,7 @@ namespace CAN_Tool.ViewModels
             try
             {
                 Convert.ToInt64(CustomMessageDataString, 16);
-                if (Convert.ToInt32(CustomMessagePgn)>511) return false;
+                if (Convert.ToInt32(CustomMessagePgn) > 511) return false;
             }
             catch
             {
@@ -234,7 +285,7 @@ namespace CAN_Tool.ViewModels
             CancelOperationCommand = new LambdaCommand(OnCancelOperationCommandExecuted, CanCancelOperationCommandExecute);
             SaveConfigCommand = new LambdaCommand(OnSaveConfigCommandExecuted, CanSaveConfigCommandExecute);
             ResetConfigCommand = new LambdaCommand(OnResetConfigCommandExecuted, CanResetConfigCommandExecute);
-            
+
         }
 
     }

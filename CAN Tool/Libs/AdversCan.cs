@@ -277,8 +277,8 @@ namespace AdversCan
             TransmitterId = item.TransmitterId;
             ReceiverId = item.ReceiverId;
             Data = item.Data;
-
         }
+
 
         public bool IsSimmiliarTo(AC2PMessage m)
         {
@@ -1350,7 +1350,7 @@ namespace AdversCan
             PGNs[5].parameters.Add(new AC2PParameter() { Name = "SPN", BitLength = 16, StartByte = 0 });
             PGNs[5].parameters.Add(new AC2PParameter() { Name = "Значение", BitLength = 32, StartBit = 0, StartByte = 2 });
 
-            PGNs[6].parameters.Add(new AC2PParameter() { Name = "PGN", BitLength = 16, StartByte = 0, GetMeaning = x => PGNs[x]?.name });
+            PGNs[6].parameters.Add(new AC2PParameter() { Name = "PGN", BitLength = 16, StartByte = 0, GetMeaning = x => { if (PGNs.ContainsKey(x)) return PGNs[x].name; else return "Нет такого PGN"; } });
 
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 8, StartBit = 0, StartByte = 0, meanings = { { 0, "Стереть конфигурацию" }, { 1, "Запись параметра в ОЗУ" }, { 2, "Запись всех параметров во Flash" }, { 3, "Чтение параметра по номеру" }, { 4, "Успешный ответ на запрос" }, { 5, "Невозможно выполнить" } } });
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Запрошенная команда", BitLength = 8, StartBit = 0, StartByte = 1, meanings = { { 0, "Стереть конфигурацию" }, { 1, "Запись параметра в ОЗУ" }, { 2, "Запись всех параметров во Flash" }, { 3, "Чтение параметра по номеру" }, { 255, "" } } });

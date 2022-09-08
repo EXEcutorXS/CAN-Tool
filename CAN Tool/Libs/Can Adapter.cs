@@ -121,6 +121,7 @@ namespace Can_Adapter
         public virtual void PropChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("VerboseInfo"));
         }
 
         public CanMessage()
