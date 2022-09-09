@@ -18,11 +18,10 @@ namespace AdversCan
         public int id;
         public string name = "";
         public bool multipack;
-        public List<AC2PParameter> parameters = new List<AC2PParameter>();
+        public List<AC2PParameter> parameters = new();
     }
     public class AC2PParameter
     {
-        public int Id;
         public string ParamsName = "";//from ParamsName.h
         public int StartByte;   //Начальный байт в пакете
         public int StartBit;    //Начальный бит в байте
@@ -33,12 +32,36 @@ namespace AdversCan
         public double b = 0;         //смещение
         //value = rawData*a+b
         public string OutputFormat = "";
-        public Dictionary<int, string> meanings = new Dictionary<int, string>();
+        public Dictionary<int, string> meanings = new();
         public Func<int, string> GetMeaning;
         public Func<byte[], string> CustomDecoder;
         public string Tip = "";
         public int PackNumber;
-        public int Value { set; get; }
+        public int Var;
+        public string Decode(int rawValue)
+        {
+            StringBuilder retString = new();
+
+            retString.Append(Name + ": ");
+            if (CustomDecoder != null)
+                return "Not available for custom decoded parameters";
+            if (GetMeaning != null)
+                return GetMeaning(rawValue);
+            if (meanings != null && meanings.ContainsKey(rawValue))
+                retString.Append(rawValue.ToString() + " - " + meanings[rawValue]);
+            else
+            {
+                if (rawValue == Math.Pow(2, BitLength) - 1)
+                    retString.Append($"Нет данных({rawValue})");
+                else
+                {
+                    double rawDouble = rawValue;
+                    double value = rawDouble * a + b;
+                    retString.Append(value.ToString(OutputFormat) + Unit + '(' + rawValue.ToString() + ')');
+                }
+            }
+            return retString.ToString();
+        }
 
     }
     public class AC2PCommand
@@ -57,7 +80,7 @@ namespace AdversCan
         public byte secondByte;
         public string name = "";
         public string Name => name;
-        private List<AC2PParameter> _Parameters = new List<AC2PParameter>();
+        private readonly List<AC2PParameter> _Parameters = new();
         public List<AC2PParameter> Parameters => _Parameters;
         public override string ToString()
         {
@@ -93,7 +116,7 @@ namespace AdversCan
                     return;
                 ID &= ~(0x1FF << 20);
                 ID |= value << 20;
-                PropChanged("PGN");
+                PropChanged(nameof(PGN));
             }
         }
         public int ReceiverType
@@ -107,7 +130,7 @@ namespace AdversCan
                     return;
                 ID &= ~(0x7F << 13);
                 ID |= value << 13;
-                PropChanged("ReceiverType");
+                PropChanged(nameof(ReceiverType));
             }
         }
         public int ReceiverAddress
@@ -121,7 +144,7 @@ namespace AdversCan
                     return;
                 ID &= ~(0x3 << 10);
                 ID |= value << 10;
-                PropChanged("ReceiverAddress");
+                PropChanged(nameof(ReceiverAddress));
             }
         }
         public int TransmitterType
@@ -135,7 +158,7 @@ namespace AdversCan
                     return;
                 ID &= ~(0x7F << 3);
                 ID |= value << 3;
-                PropChanged("TransmitterType");
+                PropChanged(nameof(TransmitterType));
             }
         }
         public int TransmitterAddress
@@ -149,7 +172,7 @@ namespace AdversCan
                     return;
                 ID &= ~(0x3);
                 ID |= value;
-                PropChanged("TransmitterAddress");
+                PropChanged(nameof(TransmitterAddress));
             }
         }
 
@@ -173,7 +196,7 @@ namespace AdversCan
             }
             set
             {
-                if (value == null) throw new ArgumentNullException("Null is not an option");
+                if (value == null) throw new ArgumentNullException(nameof(CommandId));
                 if (PGN != 1 && PGN != 2) throw new Exception("Use Command property only for Command PGNs (1 and 2)");
                 Data[0] = value.Value.firstByte;
                 Data[1] = value.Value.secondByte;
@@ -181,9 +204,9 @@ namespace AdversCan
 
         }
 
-        public string printParameter(AC2PParameter p)
+        public string PrintParameter(AC2PParameter p)
         {
-            StringBuilder retString = new StringBuilder();
+            StringBuilder retString = new();
             int rawValue;
             retString.Append(p.Name + ": ");
             if (p.CustomDecoder != null)
@@ -220,7 +243,7 @@ namespace AdversCan
         }
         public override string ToString()
         {
-            StringBuilder retString = new StringBuilder();
+            StringBuilder retString = new();
             retString.Append($"<{PGN:D02}>[{TransmitterType}]({TransmitterAddress})->[{ReceiverType}]({ReceiverAddress}):");
             foreach (byte b in Data)
                 retString.Append($"{b:X02} ");
@@ -262,12 +285,12 @@ namespace AdversCan
                 retString.Append(cmd.name + ";");
                 if (cmd.Parameters != null)
                     foreach (AC2PParameter p in cmd.Parameters)
-                        retString.Append(printParameter(p));
+                        retString.Append(PrintParameter(p));
             }
             if (pgn.parameters != null)
                 foreach (AC2PParameter p in pgn.parameters)
                     if (!pgn.multipack || Data[0] == p.PackNumber)
-                        retString.Append(printParameter(p));
+                        retString.Append(PrintParameter(p));
             return retString.ToString();
         }
         public string VerboseInfo => GetVerboseInfo().Replace(';', '\n');
@@ -312,11 +335,6 @@ namespace AdversCan
         }
 
     }
-    public class DeviceStatus
-    {
-        public Dictionary<string, double> Variables;
-    }
-
     public class ReadedBlackBoxValue : INotifyPropertyChanged, IUpdatable<ReadedBlackBoxValue>
     {
         private int id;
@@ -421,6 +439,38 @@ namespace AdversCan
 
     }
 
+    public class StatusVariable : ViewModel, IUpdatable<StatusVariable>
+    {
+        public int Id { get; set; }
+
+        double val;
+
+        public double Value
+        {
+            get => val;
+            set => Set(ref val, value);
+        }
+
+        public string Name
+        {
+            get
+            {
+                if (AC2P.Variables.ContainsKey(Id))
+                    return AC2P.Variables[Id].ShortName;
+                else
+                    return $"Unknown parameter {Id}";
+            }
+        }
+        public bool IsSimmiliarTo(StatusVariable item)
+        {
+            return (Id == item.Id);
+        }
+
+        public void Update(StatusVariable item)
+        {
+            Set(ref val, item.Value);
+        }
+    }
     public class ReadedVariable : ViewModel, IUpdatable<ReadedVariable>
     {
         int id;
@@ -465,7 +515,7 @@ namespace AdversCan
     }
     public class BBError : IUpdatable<BBError>, INotifyPropertyChanged
     {
-        private UpdatableList<ReadedVariable> _variables = new UpdatableList<ReadedVariable>();
+        private readonly UpdatableList<ReadedVariable> _variables = new();
 
         public UpdatableList<ReadedVariable> Variables { get => _variables; }
 
@@ -490,7 +540,7 @@ namespace AdversCan
         public string Description => ToString();
         public override string ToString()
         {
-            StringBuilder retString = new StringBuilder("");
+            StringBuilder retString = new("");
             foreach (var v in Variables)
                 retString.Append(v.ToString() + ";");
             return retString.ToString();
@@ -505,7 +555,7 @@ namespace AdversCan
                 if (error == null)
                     return "Нет кода ошибки";
                 else
-                    return $"Код {AC2P.ErrorNames[error.Value]}";
+                    return $"Код {AC2P.ErrorNames[(int)error.Value]}";
             }
         }
 
@@ -598,24 +648,28 @@ namespace AdversCan
 
     }
 
-
-    public class ConnectedDevice
+    public class ConnectedDevice : ViewModel
     {
-        public DeviceId ID;
+        private DeviceId id;
 
-        BindingList<Variable> _variables = new BindingList<Variable>();
+        public DeviceId ID
+        {
+            get { return id; }
+            set { Set(ref id, value); }
+        }
 
-        public BindingList<Variable> Variables => _variables;
+        readonly UpdatableList<StatusVariable> _variables = new();
+        public UpdatableList<StatusVariable> Status => _variables;
 
-        private UpdatableList<ReadedParameter> _readedParameters = new UpdatableList<ReadedParameter>();
+        private readonly UpdatableList<ReadedParameter> _readedParameters = new();
         public UpdatableList<ReadedParameter> readedParameters => _readedParameters;
 
-        private UpdatableList<ReadedBlackBoxValue> _bbValues = new UpdatableList<ReadedBlackBoxValue>();
+        private UpdatableList<ReadedBlackBoxValue> _bbValues = new();
         public UpdatableList<ReadedBlackBoxValue> BBValues => _bbValues;
 
         public BBError currentError { set; get; }
 
-        private UpdatableList<BBError> _BBErrors = new UpdatableList<BBError>();
+        private UpdatableList<BBError> _BBErrors = new();
         public UpdatableList<BBError> BBErrors => _BBErrors;
 
         public override string ToString()
@@ -657,7 +711,7 @@ namespace AdversCan
 
         public override bool Equals([NotNullWhen(true)] object obj)
         {
-            if (!(obj is CommandId))
+            if (obj is not CommandId)
                 return false;
             return ((CommandId)obj).GetHashCode() == GetHashCode();
         }
@@ -667,10 +721,24 @@ namespace AdversCan
         }
 
     }
-    public struct DeviceId
+    public class DeviceId : ViewModel
     {
-        public int Type;
-        public int Address;
+        private int type;
+
+        public int Type
+        {
+            get { return type; }
+            set { Set(ref type, value); }
+        }
+
+        private int adr;
+
+        public int Address
+        {
+            get { return adr; }
+            set { Set(ref adr, value); }
+        }
+
         public DeviceId(int type, int adr)
         {
             if (type > 127 || adr > 7)
@@ -738,36 +806,36 @@ namespace AdversCan
     {
         private SynchronizationContext UIContext;
 
-        static readonly Dictionary<int, string> defMeaningsYesNo = new Dictionary<int, string>() { { 0, "Нет" }, { 1, "Да" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
-        static readonly Dictionary<int, string> defMeaningsOnOff = new Dictionary<int, string>() { { 0, "Выкл" }, { 1, "Вкл" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
-        static readonly Dictionary<int, string> defMeaningsAllow = new Dictionary<int, string>() { { 0, "Разрешено" }, { 1, "Запрещёно" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
-        static readonly Dictionary<int, string> Stages = new Dictionary<int, string>() { { 0, "STAGE_Z" }, { 1, "STAGE_P" }, { 2, "STAGE_H" }, { 3, "STAGE_W" }, { 4, "STAGE_F" }, { 5, "STAGE_T" }, { 6, "STAGE_M" } };
+        static readonly Dictionary<int, string> defMeaningsYesNo = new() { { 0, "Нет" }, { 1, "Да" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
+        static readonly Dictionary<int, string> defMeaningsOnOff = new() { { 0, "Выкл" }, { 1, "Вкл" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
+        static readonly Dictionary<int, string> defMeaningsAllow = new() { { 0, "Разрешено" }, { 1, "Запрещёно" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
+        static readonly Dictionary<int, string> Stages = new() { { 0, "STAGE_Z" }, { 1, "STAGE_P" }, { 2, "STAGE_H" }, { 3, "STAGE_W" }, { 4, "STAGE_F" }, { 5, "STAGE_T" }, { 6, "STAGE_M" } };
 
-        public static Dictionary<int, PGN> PGNs = new Dictionary<int, PGN>();
+        public static Dictionary<int, PGN> PGNs = new();
 
-        public static Dictionary<CommandId, AC2PCommand> commands = new Dictionary<CommandId, AC2PCommand>();
+        public static Dictionary<CommandId, AC2PCommand> commands = new();
 
-        public static Dictionary<int, configParameter> configParameters = new Dictionary<int, configParameter>();
-        public static Dictionary<int, Variable> Variables = new Dictionary<int, Variable>();
-        public static Dictionary<int, BbParameter> BbParameters = new Dictionary<int, BbParameter>();
+        public static Dictionary<int, configParameter> configParameters = new();
+        public static Dictionary<int, Variable> Variables = new();
+        public static Dictionary<int, BbParameter> BbParameters = new();
 
-        public static Dictionary<int, string> ParamtersNames = new Dictionary<int, string>();
-        public static Dictionary<int, string> VariablesNames = new Dictionary<int, string>();
-        public static Dictionary<int, string> BbParameterNames = new Dictionary<int, string>();
+        public static Dictionary<int, string> ParamtersNames = new();
+        public static Dictionary<int, string> VariablesNames = new();
+        public static Dictionary<int, string> BbParameterNames = new();
 
-        private BindingList<ConnectedDevice> _connectedDevices = new BindingList<ConnectedDevice>();
+        private BindingList<ConnectedDevice> _connectedDevices = new();
         public BindingList<ConnectedDevice> ConnectedDevices => _connectedDevices;
 
-        private UpdatableList<AC2PMessage> _messages = new UpdatableList<AC2PMessage>();
+        private UpdatableList<AC2PMessage> _messages = new();
         public UpdatableList<AC2PMessage> Messages => _messages;
 
-        public static Dictionary<int, string> ErrorNames = new Dictionary<int, string>();
+        public static Dictionary<int, string> ErrorNames = new();
 
-        private CanAdapter canAdapter;
+        private readonly CanAdapter canAdapter;
 
         public bool WaitingForBBErrors { get; set; } = false;
 
-        AC2PTask currentTask = new AC2PTask();
+        AC2PTask currentTask = new();
 
         public AC2PTask CurrentTask
         {
@@ -796,6 +864,29 @@ namespace AdversCan
 
             ConnectedDevice currentDevice = ConnectedDevices.First(d => d.ID.Equals(m.TransmitterId));
 
+            foreach (AC2PParameter p in PGNs[m.PGN].parameters)
+            {
+                if (p.Var != 0)
+                {
+                    StatusVariable rp = new StatusVariable();
+                    rp.Id = p.Var;
+                    int rawValue;
+                    switch (p.BitLength)
+                    {
+                        case 1: rawValue = m.Data[p.StartByte] >> p.StartBit & 0b1; break;
+                        case 2: rawValue = m.Data[p.StartByte] >> p.StartBit & 0b11; break;
+                        case 3: rawValue = m.Data[p.StartByte] >> p.StartBit & 0b111; break;
+                        case 4: rawValue = m.Data[p.StartByte] >> p.StartBit & 0b1111; break;
+                        case 8: rawValue = m.Data[p.StartByte]; break;
+                        case 16: rawValue = m.Data[p.StartByte] * 256 + m.Data[p.StartByte + 1]; break;
+                        case 24: rawValue = m.Data[p.StartByte] * 65536 + m.Data[p.StartByte + 1] * 256 + m.Data[p.StartByte + 2]; break;
+                        case 32: rawValue = m.Data[p.StartByte] * 16777216 + m.Data[p.StartByte + 1] * 65536 + m.Data[p.StartByte + 2] * 256 + m.Data[p.StartByte + 3]; break;
+                        default: throw new Exception("Bad parameter size");
+                    }
+                    rp.Value = rawValue;
+                    currentDevice.Status.TryToAdd(rp);
+                }
+            }
             if (m.PGN == 7) //Ответ на запрос параметра
             {
                 if (m.Data[0] == 4) // Обрабатываем только упешные ответы на запросы
@@ -911,7 +1002,7 @@ namespace AdversCan
         {
             if (!Capture("Чтение параметров чёрного ящика")) return;
             WaitingForBBErrors = false;
-            AC2PMessage msg = new AC2PMessage();
+            AC2PMessage msg = new();
             msg.PGN = 8;
             msg.TransmitterAddress = 6;
             msg.TransmitterType = 126;
@@ -1377,8 +1468,8 @@ namespace AdversCan
             PGNs[11].parameters.Add(new AC2PParameter() { Name = "Атмосферное давление", BitLength = 8, StartByte = 2, Unit = "кПа" });
             PGNs[11].parameters.Add(new AC2PParameter() { Name = "Ток двигателя, значения АЦП", BitLength = 16, StartByte = 3 });
 
-            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Заданные обороты нагнетателя воздуха", BitLength = 8, StartByte = 0, Unit = "об/с" });
-            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Измеренные обороты нагнетателя воздуха,", BitLength = 8, StartByte = 1, Unit = "об/с" });
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Заданные обороты нагнетателя воздуха", BitLength = 8, StartByte = 0, Unit = "об/с", Var = 15 });
+            PGNs[12].parameters.Add(new AC2PParameter() { Name = "Измеренные обороты нагнетателя воздуха,", BitLength = 8, StartByte = 1, Unit = "об/с", Var = 16 });
             PGNs[12].parameters.Add(new AC2PParameter() { Name = "Заданная частота ТН", BitLength = 16, StartByte = 2, a = 0.01, Unit = "Гц" });
             PGNs[12].parameters.Add(new AC2PParameter() { Name = "Реализованная частота ТН", BitLength = 16, StartByte = 4, a = 0.01, Unit = "Гц" });
             PGNs[12].parameters.Add(new AC2PParameter() { Name = "Мощность свечи", BitLength = 8, StartByte = 6, Unit = "%" });
@@ -1453,8 +1544,8 @@ namespace AdversCan
             PGNs[29].parameters.Add(new AC2PParameter() { Name = "Флаг появления пламени по пульсации давления", BitLength = 2, StartByte = 3, meanings = defMeaningsYesNo, PackNumber = 2 });
             PGNs[29].parameters.Add(new AC2PParameter() { Name = "Атмосферное давление", BitLength = 24, StartByte = 4, Unit = "кПа", a = 0.001, PackNumber = 2 });
 
-            PGNs[31].parameters.Add(new AC2PParameter() { Name = "Время работы", BitLength = 32, StartByte = 0, Unit = "с" });
-            PGNs[31].parameters.Add(new AC2PParameter() { Name = "Время работы на режиме", BitLength = 32, StartByte = 4, Unit = "с" });
+            PGNs[31].parameters.Add(new AC2PParameter() { Name = "Время работы", BitLength = 32, StartByte = 0, Unit = "с", Var = 3 });
+            PGNs[31].parameters.Add(new AC2PParameter() { Name = "Время работы на режиме", BitLength = 32, StartByte = 4, Unit = "с", Var = 4 });
             #endregion
 
             ErrorNames = new Dictionary<int, string>() {

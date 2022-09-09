@@ -7,6 +7,7 @@ using System.IO.Ports;
 using System.Threading;
 using System.ComponentModel;
 using System.Windows.Threading;
+using CAN_Tool.ViewModels.Base;
 
 namespace Can_Adapter
 {
@@ -16,7 +17,7 @@ namespace Can_Adapter
 
         public bool IsSimmiliarTo(T item);
     }
-    
+
 
     public class GotMessageEventArgs : EventArgs
     {
@@ -87,7 +88,6 @@ namespace Can_Adapter
                 data = value;
                 PropChanged("Data");
                 PropChanged("DataAsText");
-                PropChanged("VerboseInfo");
             }
         }
 
@@ -237,7 +237,7 @@ namespace Can_Adapter
             return false;
         }
     }
-    public class CanAdapter
+    public class CanAdapter : ViewModel
     {
 
         char[] currentBuf = new char[1024];
@@ -264,6 +264,7 @@ namespace Can_Adapter
                 if (serialPort.IsOpen)
                     serialPort.Close();
                 serialPort.PortName = value;
+                OnPropertyChanged("PortName");
             }
         }
 
@@ -276,32 +277,11 @@ namespace Can_Adapter
 
         public void PortOpen() => serialPort.Open();
         public void PortClose() => serialPort.Close();
-
-        public void StartNormal()
-        {
-            serialPort.Write("O\r");
-        }
-
-        public void StartListen()
-        {
-            serialPort.Write("L\r");
-        }
-
-        public void startSelfReception()
-        {
-            serialPort.Write("Y\r");
-        }
-
-        public void Stop()
-        {
-            serialPort.Write("C\r");
-        }
-
-        public void SetBitrate(int bitrate)
-        {
-            if (PortOpened)
-                serialPort.Write($"S{bitrate}\r");
-        }
+        public void StartNormal() => serialPort.Write("O\r");
+        public void StartListen() => serialPort.Write("L\r");
+        public void StartSelfReception() => serialPort.Write("Y\r");
+        public void Stop() => serialPort.Write("C\r");
+        public void SetBitrate(int bitrate) => serialPort.Write($"S{bitrate}\r");
 
         public void Transmit(CanMessage msg)
         {
@@ -333,7 +313,7 @@ namespace Can_Adapter
                 case 'R':
                     var m = new CanMessage(new string(currentBuf));
                     GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = m });
-                    UIContext.Send((x)=> Messages.TryToAdd(m),null);
+                    UIContext.Send((x) => Messages.TryToAdd(m), null);
                     break;
                 case 'Z':
                     TransmissionSuccess?.Invoke(this, new EventArgs());

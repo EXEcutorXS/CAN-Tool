@@ -13,6 +13,8 @@ using Can_Adapter;
 using AdversCan;
 using System.Windows.Threading;
 using System.Threading;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace CAN_Tool.ViewModels
 {
@@ -41,51 +43,12 @@ namespace CAN_Tool.ViewModels
 
         public AC2PMessage prepearedCommandMessage { get; set; }
 
-        #region CustomMessage
-        public AC2PMessage CustomMessage { get; set; } = new AC2PMessage();
+        #region  CustomMessage
 
-        string customMessageDataString = "";
-        public string CustomMessageDataString
-        {
-            get => customMessageDataString;
-            set
-            {
-                //string back = customMessageDataString;
-                try
-                {
-                    Convert.ToUInt64(value, 16);
-                    customMessageDataString = value;
-                    string tempString = value + "0000000000000000";
-                    byte[] data = new byte[8];
-                    for (int i = 0; i < 8; i++)
-                        data[i] = Convert.ToByte(tempString.Substring(i * 2, 2), 16);
-                    CustomMessage.Data = data;
-                }
-                catch
-                {
-                  //  CustomMessageDataString = back;
-                }
-            }
-        }
+        AC2PMessage customMessage = new AC2PMessage();
 
-        string customMessagePgn = "0";
-        public string CustomMessagePgn
-        {
-            get => customMessagePgn;
-            set
-            {
-                string back = customMessagePgn;
-                try
-                {
-                    CustomMessage.PGN = Convert.ToInt32(value);
-                    customMessagePgn = value;
-                }
-                catch
-                {
-                    CustomMessageDataString = back;
-                }
-            }
-        }
+        public Dictionary<CommandId, AC2PCommand> CommandList { set; get; } = AC2P.commands;
+        public AC2PMessage CustomMessage { get => customMessage; set => customMessage.Update(value); }
 
         #endregion
 
@@ -117,11 +80,40 @@ namespace CAN_Tool.ViewModels
         }
         #endregion
 
-        #region ApplicationCloseCommand
-        public ICommand ApplicationCloseCommand;
-        private void OnApplicationCloseCommandExecuted(object parameter) => Application.Current.Shutdown();
-        private bool CanApplicationCloseCommandExecute(object parameter) => true;
+        #region Commands
 
+        #region CanAdapterCommands
+
+        #region SetAdapterNormalModeCommand
+
+        public ICommand SetAdapterNormalModeCommand { get; }
+
+        private void OnSetAdapterNormalModeCommandExecuted(object Parameter) => canAdapter.StartNormal();
+        private bool CanSetAdapterNormalModeCommandExecute(object Parameter) => canAdapter.PortOpened;
+        #endregion
+
+        #region SetAdapterListedModeCommand
+
+        public ICommand SetAdapterListedModeCommand { get; }
+
+        private void OnSetAdapterListedModeCommandExecuted(object Parameter) => canAdapter.StartListen();
+        private bool CanSetAdapterListedModeCommandExecute(object Parameter) => canAdapter.PortOpened;
+        #endregion
+
+        #region SetAdapterSelfReceptionModeCommand
+
+        public ICommand SetAdapterSelfReceptionModeCommand { get; }
+
+        private void OnSetAdapterSelfReceptionModeCommandExecuted(object Parameter) => canAdapter.StartSelfReception();
+        private bool CanSetAdapterSelfReceptionModeCommandExecute(object Parameter) => canAdapter.PortOpened;
+        #endregion
+
+        #region StopCanAdapterCommand
+
+        public ICommand StopCanAdapterCommand { get; }
+
+        private void OnStopCanAdapterCommandExecuted(object Parameter) => canAdapter.Stop();
+        private bool CanStopCanAdapterCommandExecute(object Parameter) => canAdapter.PortOpened;
         #endregion
 
         #region RefreshPortsCommand
@@ -153,6 +145,7 @@ namespace CAN_Tool.ViewModels
         }
         private bool CanClosePortCommandExecute(object parameter) => (canAdapter.PortOpened);
         #endregion
+        #endregion
 
         #region CancelOperationCommand
         public ICommand CancelOperationCommand { get; }
@@ -163,7 +156,7 @@ namespace CAN_Tool.ViewModels
         private bool CanCancelOperationCommandExecute(object parameter) => (AC2PInstance.CurrentTask.Occupied);
         #endregion
 
-
+        #region ConfigCommands
         #region ReadConfigCommand
         public ICommand ReadConfigCommand { get; }
         private void OnReadConfigCommandExecuted(object parameter)
@@ -193,7 +186,9 @@ namespace CAN_Tool.ViewModels
         private bool CanResetConfigCommandExecute(object parameter) =>
             (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
         #endregion
+        #endregion
 
+        #region BlackBoxCommands
         #region ReadBlackBoxDataCommand
         public ICommand ReadBlackBoxDataCommand { get; }
         private void OnReadBlackBoxDataCommandExecuted(object parameter)
@@ -233,46 +228,31 @@ namespace CAN_Tool.ViewModels
         private bool CanEraseBlackBoxDataExecute(object parameter) =>
             (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
         #endregion
+        #endregion
 
         #region SendCustomMessageCommand
         public ICommand SendCustomMessageCommand { get; }
         private void OnSendCustomMessageCommandExecuted(object parameter)
         {
-            byte[] data = new byte[8];
-            if (CustomMessageDataString.Length != 16) return;
-            for (int i = 0; i < 8; i++)
-                data[i] = Convert.ToByte(CustomMessageDataString.Substring(i * 2, 2), 16);
-            CustomMessage.Data = data;
             CustomMessage.TransmitterId = new DeviceId(126, 6);
             CustomMessage.ReceiverId = SelectedConnectedDevice.ID;
-            CustomMessage.PGN = Convert.ToInt32(CustomMessagePgn);
             AC2PInstance.SendMessage(CustomMessage);
         }
         private bool CanSendCustomMessageCommandExecute(object parameter)
         {
-            if (CustomMessageDataString.Length != 16) return false;
-            try
-            {
-                Convert.ToInt64(CustomMessageDataString, 16);
-                if (Convert.ToInt32(CustomMessagePgn) > 511) return false;
-            }
-            catch
-            {
-                return false;
-            }
             if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
             return true;
         }
 
         #endregion
 
+        #endregion
         public MainWindowViewModel()
         {
             AC2P.ParseParamsname();
             _canAdapter = new CanAdapter();
             _AC2PInstance = new AC2P(canAdapter);
 
-            ApplicationCloseCommand = new LambdaCommand(OnApplicationCloseCommandExecuted, CanApplicationCloseCommandExecute);
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
             ClosePortCommand = new LambdaCommand(OnClosePortCommandExecuted, CanClosePortCommandExecute);
             RefreshPortListCommand = new LambdaCommand(OnRefreshPortsCommandExecuted);
@@ -285,8 +265,12 @@ namespace CAN_Tool.ViewModels
             CancelOperationCommand = new LambdaCommand(OnCancelOperationCommandExecuted, CanCancelOperationCommandExecute);
             SaveConfigCommand = new LambdaCommand(OnSaveConfigCommandExecuted, CanSaveConfigCommandExecute);
             ResetConfigCommand = new LambdaCommand(OnResetConfigCommandExecuted, CanResetConfigCommandExecute);
-
+            SetAdapterNormalModeCommand = new LambdaCommand(OnSetAdapterNormalModeCommandExecuted, CanSetAdapterNormalModeCommandExecute);
+            SetAdapterListedModeCommand = new LambdaCommand(OnSetAdapterListedModeCommandExecuted, CanSetAdapterListedModeCommandExecute);
+            SetAdapterSelfReceptionModeCommand = new LambdaCommand(OnSetAdapterSelfReceptionModeCommandExecuted,CanSetAdapterSelfReceptionModeCommandExecute);
+            StopCanAdapterCommand = new LambdaCommand(OnStopCanAdapterCommandExecuted,CanStopCanAdapterCommandExecute);
+            CustomMessage.TransmitterAddress = 6;
+            CustomMessage.TransmitterType = 126;
         }
-
     }
 }
