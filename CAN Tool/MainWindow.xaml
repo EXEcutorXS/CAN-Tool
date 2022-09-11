@@ -1,7 +1,4 @@
-﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" 
-        xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" Title="Adver CAN-Tool" Height="700" Width="1200">
+﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" Title="Adver CAN-Tool" Height="700" Width="1200" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}">
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:DataToStringConverter x:Key="StringToDecConverter" />
@@ -28,32 +25,27 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="317*" />
             </Grid.RowDefinitions>
-            <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
-                <StackPanel.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Height" Value="26" />
-                        <Setter Property="Margin" Value="5" />
-                        <Setter Property="Padding" Value="10 0 10 0" />
-                    </Style>
-                </StackPanel.Resources>
-                <Button Grid.Row="0" Content="Refresh ports" Command="{Binding Path=RefreshPortListCommand}" />
-                <ComboBox Grid.Row="0" x:Name="PortNameList" Margin="5 15" MinWidth="70" ItemsSource="{Binding PortList}" SelectedIndex="{Binding SelectedPortIndex}" />
-                <Button Grid.Row="0" x:Name="PortOpenButton" Content="Open" Command="{Binding OpenPortCommand}" />
-                <Button Grid.Row="0" x:Name="PortOpenButton_Copy" Content="Close" Command="{Binding ClosePortCommand}" />
-                <ComboBox Grid.Row="0" x:Name="CanBitrateField" Margin="5 15" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" />
-                <Button Grid.Row="0" Content="Normal" Margin="5" Command="{Binding SetAdapterNormalModeCommand}" />
-                <Button Grid.Row="0" Content="Listen" Margin="5" Command="{Binding SetAdapterListedModeCommand}" />
-                <Button Grid.Row="0" Content="Self Reception" Margin="5" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
-                <Button Grid.Row="0" Content="Stop" Margin="5" Command="{Binding StopCanAdapterCommand}" />
+            <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal" Grid.Row="0">
+                <Button Content="Refresh ports" Margin="10" Command="{Binding Path=RefreshPortListCommand}" />
+                <ComboBox x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedIndex="{Binding SelectedPortIndex}" />
+                <Button x:Name="PortOpenButton" Margin="10" Content="Open" Command="{Binding OpenPortCommand}" />
+                <Button x:Name="PortOpenButton_Copy" Margin="10" Content="Close" Command="{Binding ClosePortCommand}" />
+                <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" />
+                <Button Content="Normal" Margin="10" Command="{Binding SetAdapterNormalModeCommand}" />
+                <Button Content="Listen" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
+                <Button Content="Self Reception" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
+                <Button Content="Stop" Margin="10" Command="{Binding StopCanAdapterCommand}" />
             </StackPanel>
-            <TabControl Grid.Row="1" Margin="5,5,5,5">
+            <TabControl Grid.Row="1">
                 <TabItem Header="Basic CAN">
-                    <Grid Background="#FFE5E5E5">
-                        <TextBox x:Name="CanIdField" Text="ID" Height="20" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8 8 8 8"></TextBox>
-                        <CheckBox x:Name="CanIdeField" Content="IDE" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100 8 8 8"></CheckBox>
-                        <CheckBox x:Name="CanRtrField" Content="RTR" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150 8 8 8"></CheckBox>
-                        <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200 8 8 8"></TextBox>
-                        <Button Content="Send" VerticalAlignment="Top" HorizontalAlignment="Left" Height="20" Width="100" Margin="320 8 8 8"></Button>
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                            <TextBox x:Name="CanIdField" Text="1FFFF" Margin="10"></TextBox>
+                            <CheckBox x:Name="CanIdeField" Content="IDE" Margin="10"></CheckBox>
+                            <CheckBox x:Name="CanRtrField" Content="RTR" Margin="10"></CheckBox>
+                            <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Margin="10"></TextBox>
+                            <Button Content="Send" Margin="10"></Button>
+                        </StackPanel>
                         <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="5 40 5 5" FontFamily="Courier New" AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" GridLinesVisibility="All" ItemsSource="{Binding Path = canAdapter.Messages}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path = IdAsText}" Header="ID" IsReadOnly="True">
@@ -67,7 +59,7 @@
 
                             </DataGrid.Columns>
                         </DataGrid>
-                    </Grid>
+                    </DockPanel>
                 </TabItem>
                 <TabItem Header="Advers">
                     <DockPanel>
@@ -82,17 +74,16 @@
                                                 <RowDefinition Height="auto"></RowDefinition>
                                             </Grid.RowDefinitions>
                                             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                                <TextBox ToolTip="Type" VerticalAlignment="Top" Width="40" Height="20" Margin="5 10" Text="{Binding ElementName=DeviceSelector,Path=SelectedItem.ID.Type,Mode=OneWay}" IsReadOnly="True" />
-                                                <TextBox ToolTip="Adress" VerticalAlignment="Top" Width="30" Height="20" Margin="5 10" Text="{Binding ElementName=DeviceSelector,Path=SelectedItem.ID.Address,Mode=OneWay}" IsReadOnly="True" />
-                                                <TextBox ToolTip="PGN" VerticalAlignment="Top" Width="40" Height="20" Margin="5 10" Text="{Binding Path=CustomMessage.PGN,UpdateSourceTrigger=PropertyChanged}" />
-                                                <TextBox ToolTip="Data in HEX format" VerticalAlignment="Top" Width="200" Height="20" Margin="5 10" Text="{Binding Path=CustomMessage.Data,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource DataConverter},Mode=OneWayToSource}" />
-                                                <TextBox ToolTip="Data Preview " MaxHeight="200" VerticalAlignment="Top" Margin="5 10" Height="20" Text="{Binding Path=CustomMessage.Data,Mode=OneWay,Converter = {StaticResource DataConverter}}" />
-                                                <Button VerticalAlignment="Top" Content="Send" Width="60" Height="20" Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}" />
+                                                <TextBox ToolTip="Type" Width="40" Margin="5 10" Text="{Binding ElementName=DeviceSelector,Path=SelectedItem.ID.Type,Mode=OneWay}" IsReadOnly="True" />
+                                                <TextBox ToolTip="Adress" Width="30" Margin="5 10" Text="{Binding ElementName=DeviceSelector,Path=SelectedItem.ID.Address,Mode=OneWay}" IsReadOnly="True" />
+                                                <TextBox ToolTip="PGN" Width="40" Margin="5 10" Text="{Binding Path=CustomMessage.PGN,UpdateSourceTrigger=PropertyChanged}" />
+                                                <TextBox ToolTip="Data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.Data,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource DataConverter},Mode=OneWayToSource}" />
+                                                <TextBox ToolTip="Data Preview " MaxHeight="200" Margin="5 10" Text="{Binding Path=CustomMessage.Data,Mode=OneWay,Converter = {StaticResource DataConverter}}" />
+                                                <Button Content="Send" Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}" />
                                             </StackPanel>
 
                                         </Grid>
                                         <TextBlock DockPanel.Dock="Right" MaxHeight="200" Margin="10" Text="{Binding Path=CustomMessage.VerboseInfo, Mode=OneWay}"></TextBlock>
-
 
                                     </DockPanel>
                                     <DockPanel>
@@ -119,36 +110,29 @@
 
                             </TabItem>
                             <TabItem Header="Control">
-                                <Grid x:Name="ControlTabGrid">
-                                    <Button x:Name="StartButton" Content="Старт" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8"></Button>
-                                    <TextBox Width="60" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Text="time limit" Margin="55 8 8 8"></TextBox>
-                                    <Button x:Name="StopButton" Content="Стоп" Width="40" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="120,8,0,0"></Button>
-                                    <Button x:Name="CalibrateButton" Content="Калибровка термопар" Width="150" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="165,8,0,0"></Button>
-                                    <ComboBox x:Name="CommandSelectorField" Width="500" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8 38 8 8" ItemsSource="{Binding CommandList}"></ComboBox>
-                                    <TextBox x:Name="CommandPreviewField" Width="503" Height="26" Margin="5,68,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
-                                    <DataGrid x:Name="CommandParameterField" Margin="5,100,5,5" ItemsSource="{Binding ElementName=CommandSelectorField, Path=SelectedItem.Value.Parameters}" AutoGenerateColumns="False">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Parameter" IsReadOnly="True" Binding="{Binding Path=Name}">
-                                            </DataGridTextColumn>
-                                            <DataGridTextColumn Header="Value" IsReadOnly="False" Binding="{Binding Path=Value}">
-                                            </DataGridTextColumn>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </Grid>
-
+                                <DockPanel>
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                                        <Button Content="Старт" Margin="10"></Button>
+                                        <TextBox Text="3600" TextAlignment="Center" Margin="10" />
+                                        <Button Content="Стоп" Margin="8"></Button>
+                                        <Button Content="Калибровка термопар" Margin="10" />
+                                    </StackPanel>
+                                    <StackPanel x:Name="CommandConstructor" DockPanel.Dock="Top" Orientation="Vertical">
+                                        <Label HorizontalAlignment="Center" Content="Choose command:" />
+                                        <ComboBox Margin="10" ItemsSource="{Binding CommandList}" SelectionChanged="ComboBox_SelectionChanged" />
+                                    </StackPanel>
+                                    <StackPanel x:Name="CommandParameterPanel" Orientation="Vertical"></StackPanel>
+                               </DockPanel>
                             </TabItem>
                             <TabItem Header="Config">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="35" />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <StackPanel Grid.Row="0" FlowDirection="LeftToRight" Orientation="Horizontal">
-                                        <Button Content="Read" Width="65" Height="20" Margin="20 5 5 5" Command="{Binding ReadConfigCommand}" />
-                                        <Button Content="Save" Width="60" Height="20" Margin="5" Command="{Binding SaveConfigCommand}" />
-                                        <Button Content="Reset" Width="60" Height="20" Margin="5" Command="{Binding ResetConfigCommand}" />
+                                <DockPanel>
+
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" DockPanel.Dock="Top">
+                                        <Button Content="Read" Margin="10" Command="{Binding ReadConfigCommand}" />
+                                        <Button Content="Save" Margin="10" Command="{Binding SaveConfigCommand}" />
+                                        <Button Content="Reset" Margin="10" Command="{Binding ResetConfigCommand}" />
                                     </StackPanel>
-                                    <DataGrid Grid.Row="1" x:Name="ConfigParameterField" Margin="5 5 5 5" Grid.ColumnSpan="2" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.readedParameters}">
+                                    <DataGrid DockPanel.Dock="Top" x:Name="ConfigParameterField" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.readedParameters}">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Path = Id}" Header="ID" IsReadOnly="True">
                                             </DataGridTextColumn>
@@ -160,7 +144,7 @@
                                             </DataGridTextColumn>
                                         </DataGrid.Columns>
                                     </DataGrid>
-                                </Grid>
+                                </DockPanel>
                             </TabItem>
                             <TabItem Header="Graph">
                             </TabItem>
@@ -174,44 +158,51 @@
                             </TabItem>
                             <TabItem Header="Black Box">
                                 <Grid>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                                        <Button Content="Read Data" Width="90" Height="26" Margin="10" Command="{Binding ReadBlackBoxDataCommand}"></Button>
-                                        <Button Content="Read Errors" Width="90" Height="26" Margin="10" Command="{Binding ReadBlackBoxErrorsCommand}"></Button>
-                                        <Button Content="Erase Data" Width="90" Height="26" Margin="10" Command="{Binding EraseBlackBoxDataCommand}"></Button>
-                                        <Button Content="Erase Errors" Width="90" Height="26" Margin="10" Command="{Binding EraseBlackBoxErrorsCommand}"></Button>
-                                    </StackPanel>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <DataGrid Grid.Column="0" Margin="5 50 5 5" ItemsSource="{Binding SelectedConnectedDevice.BBValues}" AutoGenerateColumns="False">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <DockPanel Grid.Column="0">
+                                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Top">
+                                            <Button Content="Read Data" Margin="10" Command="{Binding ReadBlackBoxDataCommand}"></Button>
+                                            <Button Content="Read Errors" Margin="10" Command="{Binding ReadBlackBoxErrorsCommand}"></Button>
+                                            <Button Content="Erase Data" Margin="10" Command="{Binding EraseBlackBoxDataCommand}"></Button>
+                                            <Button Content="Erase Errors" Margin="10" Command="{Binding EraseBlackBoxErrorsCommand}"></Button>
+                                        </StackPanel>
+                                        <DataGrid ItemsSource="{Binding SelectedConnectedDevice.BBValues}" AutoGenerateColumns="False">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="ID" Binding="{Binding Path=Id}"></DataGridTextColumn>
                                                 <DataGridTextColumn Header="VALUE" Binding="{Binding Path=Value}"></DataGridTextColumn>
                                                 <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Path=Description}"></DataGridTextColumn>
                                             </DataGrid.Columns>
                                         </DataGrid>
-                                        <ComboBox x:Name="ErrorSelector" Grid.Column="1" Height="20" VerticalAlignment="Top" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BBErrors, Mode=OneWay}"></ComboBox>
-                                        <DataGrid Grid.Column="1" Margin="5 50 5 5" ItemsSource="{Binding ElementName=ErrorSelector, Path=SelectedItem.Variables}" AutoGenerateColumns="False">
+                                    </DockPanel>
+                                    <DockPanel Grid.Column="1">
+                                        <ComboBox DockPanel.Dock="Top" x:Name="ErrorSelector" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BBErrors, Mode=OneWay}"></ComboBox>
+                                        <DataGrid ItemsSource="{Binding ElementName=ErrorSelector, Path=SelectedItem.Variables}" AutoGenerateColumns="False">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>
                                                 <DataGridTextColumn Header="Value" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
                                             </DataGrid.Columns>
                                         </DataGrid>
-                                    </Grid>
+                                    </DockPanel>
                                 </Grid>
                             </TabItem>
                             <TabItem Header="Firmware">
-                                <Grid>
-                                    <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Load HEX" Margin="10,10,0,10" />
-                                    <Button Width="120" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Enter Bootloader" Margin="110,10,0,10" />
-                                    <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Update" Margin="240,10,0,10" />
-                                    <Button Width="90" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Start program" Margin="340,10,0,10" />
-                                </Grid>
+                                <DockPanel>
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                                        <Button Content="Load HEX" Margin="10" />
+                                        <Button Content="Enter Bootloader" Margin="10" />
+                                        <Button Content="Update" Margin="10" />
+                                        <Button Content="Start program" Margin="10" />
+                                    </StackPanel>
+                                    <StackPanel></StackPanel>
+                                </DockPanel>
                             </TabItem>
                         </TabControl>
                     </DockPanel>
+                </TabItem>
+                <TabItem Header="RV-C">
                 </TabItem>
             </TabControl>
         </Grid>
