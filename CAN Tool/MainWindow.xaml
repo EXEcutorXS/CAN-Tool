@@ -25,7 +25,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="317*" />
             </Grid.RowDefinitions>
-            <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal" Grid.Row="0">
+            <StackPanel  Orientation="Horizontal" Grid.Row="0">
                 <Button Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" />
                 <ComboBox x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedIndex="{Binding SelectedPortIndex}" />
                 <Button x:Name="PortOpenButton" Margin="10" Content="Open" Command="{Binding OpenPortCommand}" />
@@ -35,7 +35,10 @@
                 <Button Content="Listen" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                 <Button Content="Self Reception" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                 <Button Content="Stop" Margin="10" Command="{Binding StopCanAdapterCommand}" />
-                <ComboBox x:Name="menuLanguage"></ComboBox>
+                
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Margin="10">
+                <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="0 0 40 0"></ComboBox>
             </StackPanel>
             <TabControl Grid.Row="1">
                 <TabItem>
@@ -158,7 +161,7 @@
                                     <StackPanel x:Name="CommandConstructor" DockPanel.Dock="Top" Orientation="Vertical">
                                         <Label HorizontalAlignment="Center" Content="Choose command:" />
                                         <ComboBox x:Name ="CommandSelector" Margin="10" ItemsSource="{Binding CommandList}" SelectionChanged="ComboBox_SelectionChanged" />
-                                        <TextBlock x:Name ="CommandPrevirew" TextAlignment="Center" Foreground="LightBlue" Text="{Binding CustomMessage.Data,Converter={StaticResource DataConverter}}"></TextBlock>
+                                        <TextBlock x:Name ="CommandPrevirew" TextAlignment="Center" Foreground="LightBlue" Text="{Binding CustomMessage.DataAsText,Mode=OneWay}"></TextBlock>
                                     </StackPanel>
                                     <StackPanel x:Name="CommandParameterPanel" Orientation="Vertical"></StackPanel>
                                 </DockPanel>

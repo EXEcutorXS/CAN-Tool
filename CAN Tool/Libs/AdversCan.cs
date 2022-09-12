@@ -45,14 +45,6 @@ namespace AdversCan
         public double MinValue;// Для правильного масштаба графиков
         public double MaxValue;// Для правильного масштаба графиков
 
-        private double val;
-
-        public double Value
-        {
-            get { return val; }
-            set { Set(ref value, value); }
-        }
-
     }
     public class AC2PCommand:ViewModel
     {
@@ -1354,8 +1346,8 @@ namespace AdversCan
             commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 4, Name = "Режим работы", Meanings = { { 0, "обычный" }, { 1, "экономичный" }, { 2, "догреватель" }, { 3, "отопление" }, { 4, "отопительные системы" } } });
             commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 4, StartBit = 4, BitLength = 4, Name = "Режим догрева", Meanings = { { 0, "отключен" }, { 1, "автоматический" }, { 2, "ручной" } } });
             commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 16, Name = "Уставка температуры", Unit = "°С" });
-            commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 7, BitLength = 2, Name = "Работы помпы в ждущем режиме", Meanings = defMeaningsOnOff });
-            commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 7, BitLength = 2, StartBit = 2, Name = "Работы помпы при заведённом двигателе", Meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 7, BitLength = 2, Name = "Работа помпы в ждущем режиме", Meanings = defMeaningsOnOff });
+            commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 7, BitLength = 2, StartBit = 2, Name = "Работа помпы при заведённом двигателе", Meanings = defMeaningsOnOff });
 
             commands[new CommandId(0, 7)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, Name = "Номер мощности" });
 

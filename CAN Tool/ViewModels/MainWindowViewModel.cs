@@ -52,7 +52,7 @@ namespace CAN_Tool.ViewModels
         public AC2PParameter SelectedParameter { set; get; } = new();
         public AC2PMessage CustomMessage { get => customMessage; set => customMessage.Update(value); }
 
-        public Dictionary<string, double> CommandParametersList = new();
+        public double[] CommandParametersArray;
 
 
         #endregion
