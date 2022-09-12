@@ -17,6 +17,7 @@ using Can_Adapter;
 using AdversCan;
 using RVC;
 using CAN_Tool.ViewModels;
+using System.Globalization;
 
 namespace CAN_Tool
 {
@@ -32,8 +33,50 @@ namespace CAN_Tool
         public MainWindow()
         {
             InitializeComponent();
+
+            App.LanguageChanged += LanguageChanged;
+
+            CultureInfo currLang = App.Language;
+
+            //Заполняем меню смены языка:
+            menuLanguage.Items.Clear();
+
+            foreach (var lang in App.Languages)
+            {
+                
+                ComboBoxItem menuLang = new();
+                menuLang.Content = lang.DisplayName;
+                menuLang.Tag = lang;
+                menuLang.Selected += ChangeLanguageClick;
+                menuLanguage.Items.Add(menuLang);
+            }
         }
 
+        private void LanguageChanged(Object sender, EventArgs e)
+        {
+            CultureInfo currLang = App.Language;
+
+            //Отмечаем нужный пункт смены языка как выбранный язык
+            foreach (ComboBoxItem i in menuLanguage.Items)
+            {
+                CultureInfo ci = i.Tag as CultureInfo;
+                i.IsSelected = ci != null && ci.Equals(currLang);
+            }
+        }
+
+        private void ChangeLanguageClick(Object sender, EventArgs e)
+        {
+            ComboBoxItem ci = sender as ComboBoxItem;
+            if (ci != null)
+            {
+                CultureInfo lang = ci.Tag as CultureInfo;
+                if (lang != null)
+                {
+                    App.Language = lang;
+                }
+            }
+
+        }
         private void UpdateCommand(object sender, EventArgs e)
         {
             
