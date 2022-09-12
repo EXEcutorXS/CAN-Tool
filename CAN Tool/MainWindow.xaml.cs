@@ -16,6 +16,7 @@ using System.IO.Ports;
 using Can_Adapter;
 using AdversCan;
 using RVC;
+using CAN_Tool.ViewModels;
 
 namespace CAN_Tool
 {
@@ -35,11 +36,12 @@ namespace CAN_Tool
 
         private void UpdateCommand(object sender, EventArgs e)
         {
-
+            
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            MainWindowViewModel mainWindowViewModel = (MainWindowViewModel)DataContext;
             ComboBox comboBox = sender as ComboBox;
             AC2PCommand cmd = ((KeyValuePair<CommandId, AC2PCommand>)comboBox.SelectedItem).Value;
             CommandParameterPanel.Children.Clear();
@@ -49,7 +51,7 @@ namespace CAN_Tool
                 panel.Orientation = Orientation.Horizontal;
                 Label label = new();
                 label.Content = p.Name;
-                label.Name = p.ParamsName + "label";
+                label.Name = p.ParamsName + "_label";
                 label.Margin = new Thickness(10);
                 panel.Children.Add(label);
                 if (p.Meanings != null && p.Meanings.Count > 0)
@@ -58,7 +60,7 @@ namespace CAN_Tool
                     cb.ItemsSource = p.Meanings;
                     cb.DisplayMemberPath = "Value";
                     cb.SelectionChanged += UpdateCommand;
-                    cb.Name = p.ParamsName + "Field";
+                    cb.Name = p.ParamsName + "_field";
                     cb.SelectedIndex = (int)p.DefaultValue;
                     cb.Margin = new Thickness(10);
                     panel.Children.Add(cb);
@@ -66,12 +68,13 @@ namespace CAN_Tool
                 else
                 {
                     TextBox tb = new();
-                    tb.Name = p.ParamsName + "Field";
+                    tb.Name = p.ParamsName + "_field";
                     tb.Text = p.DefaultValue.ToString();
+                    tb.TextChanged += UpdateCommand;
                     tb.Margin = new Thickness(10);
                     panel.Children.Add(tb);
                 }
-
+                mainWindowViewModel.CommandParametersList.Add(p.ParamsName, p.DefaultValue);
                 CommandParameterPanel.Children.Add(panel);
 
             }

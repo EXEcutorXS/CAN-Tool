@@ -22,7 +22,7 @@ namespace AdversCan
         public bool multipack;
         public List<AC2PParameter> parameters = new();
     }
-    public class AC2PParameter
+    public class AC2PParameter:ViewModel
     {
         public string ParamsName = "";//from ParamsName.h
         public int StartByte;   //Начальный байт в пакете
@@ -41,9 +41,20 @@ namespace AdversCan
         public string Tip = ""; //Подсказка
         public int PackNumber; //Номер пакета в мультипакете
         public int Var; //Соответствующая переменная из paramsName.h
-        public double DefaultValue;
+        public double DefaultValue; //Для конструктора комманд
+        public double MinValue;// Для правильного масштаба графиков
+        public double MaxValue;// Для правильного масштаба графиков
+
+        private double val;
+
+        public double Value
+        {
+            get { return val; }
+            set { Set(ref value, value); }
+        }
+
     }
-    public class AC2PCommand
+    public class AC2PCommand:ViewModel
     {
         public CommandId Id
         {

@@ -17,7 +17,7 @@ namespace CAN_Tool.ViewModels.Converters
             StringBuilder sb = new StringBuilder("");
             byte[] bytes = value as byte[];
             foreach (byte b in bytes)
-                sb.Append($"{b:X02} ");
+                sb.Append($"{b:X02}");
             
             return sb.ToString();
         }
