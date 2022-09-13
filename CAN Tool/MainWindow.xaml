@@ -1,4 +1,20 @@
-﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" Title="Adver CAN-Tool" Height="700" Width="1200" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}">
+﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow"
+        xmlns:fa="http://schemas.fontawesome.com/icons/" 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CAN_Tool" 
+        xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
+        xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" 
+        mc:Ignorable="d" Title="Adver CAN-Tool" Height="700" Width="1200"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular" TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto" 
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:DataToStringConverter x:Key="StringToDecConverter" />
@@ -25,9 +41,10 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="317*" />
             </Grid.RowDefinitions>
-            <StackPanel  Orientation="Horizontal" Grid.Row="0">
+            <StackPanel  Orientation="Horizontal" Grid.Row="0" Margin="5">
                 <Button Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" />
-                <ComboBox x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedIndex="{Binding SelectedPortIndex}" />
+                <ComboBox x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
+    
                 <Button x:Name="PortOpenButton" Margin="10" Content="Open" Command="{Binding OpenPortCommand}" />
                 <Button x:Name="PortOpenButton_Copy" Margin="10" Content="Close" Command="{Binding ClosePortCommand}" />
                 <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" />
@@ -35,13 +52,12 @@
                 <Button Content="Listen" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                 <Button Content="Self Reception" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                 <Button Content="Stop" Margin="10" Command="{Binding StopCanAdapterCommand}" />
-                
             </StackPanel>
-            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Margin="10">
-                <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="0 0 40 0"></ComboBox>
+            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Margin="5">
+                <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5"></ComboBox>
             </StackPanel>
             <TabControl Grid.Row="1">
-                <TabItem>
+                <TabItem MaxWidth="1000">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_NetworkWired" Margin="2 2 5 2" Foreground="White" />
@@ -56,7 +72,7 @@
                             <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Margin="10"></TextBox>
                             <Button Content="Send" Margin="10"></Button>
                         </StackPanel>
-                        <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="5 40 5 5" FontFamily="Courier New" AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" GridLinesVisibility="All" ItemsSource="{Binding Path = canAdapter.Messages}">
+                        <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="10" FontFamily="Courier New" AlternatingRowBackground="LightGray" SelectionMode="Single" GridLinesVisibility="Horizontal" ItemsSource="{Binding Path = canAdapter.Messages}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path = IdAsText}" Header="ID" IsReadOnly="True">
                                 </DataGridTextColumn>
@@ -71,7 +87,7 @@
                         </DataGrid>
                     </DockPanel>
                 </TabItem>
-                <TabItem>
+                <TabItem MaxWidth="1000">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_Fire" Margin="2 2 5 2" Foreground="White" />
@@ -113,7 +129,7 @@
 
                                     </DockPanel>
                                     <DockPanel>
-                                        <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" Grid.ColumnSpan="2" ItemsSource="{Binding AC2PInstance.Messages}">
+                                        <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" Grid.ColumnSpan="2" ItemsSource="{Binding AC2PInstance.Messages}" ToolTip="{Binding ElementName=AC2PmessagesField,Path=SelectedItem.VerboseInfo}">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Binding="{Binding Path = PGN}" Header="PGN" IsReadOnly="True">
                                                 </DataGridTextColumn>
@@ -143,7 +159,7 @@
                                     </StackPanel>
                                 </TabItem.Header>
                                 <DockPanel>
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
                                         <Button Margin="10">
                                             <Button.Content>
                                                 <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="White" />
@@ -155,10 +171,10 @@
                                                 <fa:ImageAwesome Icon="Solid_Stop" Margin="2" Foreground="White" />
                                             </Button.Content>
                                         </Button>
-                                        <Button Content="Thermocouple calibrate" Margin="10" />
+                                        <Button Content="Thermocouple calibrate" Margin="10" Cursor="Hand" />
                                         <Button Content="Erase Failures" Margin="10" />
                                     </StackPanel>
-                                    <StackPanel x:Name="CommandConstructor" DockPanel.Dock="Top" Orientation="Vertical">
+                                    <StackPanel x:Name="CommandConstructor" DockPanel.Dock="Top" Orientation="Vertical" Margin="10">
                                         <Label HorizontalAlignment="Center" Content="Choose command:" />
                                         <ComboBox x:Name ="CommandSelector" Margin="10" ItemsSource="{Binding CommandList}" SelectionChanged="ComboBox_SelectionChanged" />
                                         <TextBlock x:Name ="CommandPrevirew" TextAlignment="Center" Foreground="LightBlue" Text="{Binding CustomMessage.DataAsText,Mode=OneWay}"></TextBlock>
@@ -175,7 +191,7 @@
                                 </TabItem.Header>
                                 <DockPanel>
 
-                                    <StackPanel Grid.Row="0" Orientation="Horizontal" DockPanel.Dock="Top">
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
                                         <Button Content="Read" Margin="10" Command="{Binding ReadConfigCommand}" />
                                         <Button Content="Save" Margin="10" Command="{Binding SaveConfigCommand}" />
                                         <Button Content="Reset" Margin="10" Command="{Binding ResetConfigCommand}" />
@@ -198,9 +214,19 @@
                                 <TabItem.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <fa:ImageAwesome Icon="Solid_ChartLine" Margin="2 2 5 2" Foreground="White" />
-                                        <TextBlock Margin="5 2 2 2"> Graphs</TextBlock>
+                                        <TextBlock Margin="5 2 2 2"> Charts</TextBlock>
                                     </StackPanel>
                                 </TabItem.Header>
+                                <DockPanel>
+                                    <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
+                                        <Button Margin="10" Content="Start"></Button>
+                                        <Button Margin="10" Content="Stop"></Button>
+                                        <Button Margin="10" Content="Clear"></Button>
+                                    </StackPanel>
+                                    <Grid>
+                                        <WpfPlot Name="Chart"></WpfPlot>
+                                    </Grid>
+                                </DockPanel>
                             </TabItem>
                             <TabItem>
                                 <TabItem.Header>
@@ -229,13 +255,13 @@
                                         <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
                                     <DockPanel Grid.Column="0">
-                                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Top">
+                                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Top" Margin="10">
                                             <Button Content="Read Data" Margin="10" Command="{Binding ReadBlackBoxDataCommand}"></Button>
                                             <Button Content="Read Errors" Margin="10" Command="{Binding ReadBlackBoxErrorsCommand}"></Button>
                                             <Button Content="Erase Data" Margin="10" Command="{Binding EraseBlackBoxDataCommand}"></Button>
                                             <Button Content="Erase Errors" Margin="10" Command="{Binding EraseBlackBoxErrorsCommand}"></Button>
                                         </StackPanel>
-                                        <DataGrid ItemsSource="{Binding SelectedConnectedDevice.BBValues}" AutoGenerateColumns="False">
+                                        <DataGrid ItemsSource="{Binding SelectedConnectedDevice.BBValues}" AutoGenerateColumns="False" Margin="10">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="ID" Binding="{Binding Path=Id}"></DataGridTextColumn>
                                                 <DataGridTextColumn Header="VALUE" Binding="{Binding Path=Value}"></DataGridTextColumn>
@@ -245,7 +271,7 @@
                                     </DockPanel>
                                     <DockPanel Grid.Column="1">
                                         <ComboBox DockPanel.Dock="Top" x:Name="ErrorSelector" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BBErrors, Mode=OneWay}"></ComboBox>
-                                        <DataGrid ItemsSource="{Binding ElementName=ErrorSelector, Path=SelectedItem.Variables}" AutoGenerateColumns="False">
+                                        <DataGrid ItemsSource="{Binding ElementName=ErrorSelector, Path=SelectedItem.Variables}" AutoGenerateColumns="False" Margin="10">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>
                                                 <DataGridTextColumn Header="Value" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
@@ -282,13 +308,14 @@
                         </TabControl>
                     </DockPanel>
                 </TabItem>
-                <TabItem>
+                <TabItem MaxWidth="1000">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_Caravan" Margin="2 2 5 2" Foreground="White" />
                             <TextBlock Margin="5 2 2 2"> RV-C</TextBlock>
                         </StackPanel>
                     </TabItem.Header>
+                   
                 </TabItem>
             </TabControl>
         </Grid>

@@ -22,12 +22,12 @@ namespace AdversCan
         public bool multipack;
         public List<AC2PParameter> parameters = new();
     }
-    public class AC2PParameter:ViewModel
+    public class AC2PParameter : ViewModel
     {
         public string ParamsName = "";//from ParamsName.h
         public int StartByte;   //Начальный байт в пакете
         public int StartBit;    //Начальный бит в байте
-        public int BitLength;   //Ддина параметра в битах
+        public int BitLength;   //Длина параметра в битах
         public string Name { set; get; }     //Имя параметра
         public string Unit = "";     //Единица измерения
         public double a = 1;         //коэффициент приведения
@@ -44,9 +44,9 @@ namespace AdversCan
         public double DefaultValue; //Для конструктора комманд
         public double MinValue;// Для правильного масштаба графиков
         public double MaxValue;// Для правильного масштаба графиков
-
+        public bool AnswerOnly = false;
     }
-    public class AC2PCommand:ViewModel
+    public class AC2PCommand : ViewModel
     {
         public CommandId Id
         {
@@ -842,7 +842,7 @@ namespace AdversCan
             DeviceId id = m.TransmitterId;
 
             if (ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id)) == null)
-                UIContext.Send(x => ConnectedDevices.Add(new ConnectedDevice() { ID = id }), null);
+                ConnectedDevices.Add(new ConnectedDevice() { ID = id });
 
             ConnectedDevice currentDevice = ConnectedDevices.First(d => d.ID.Equals(m.TransmitterId));
 
@@ -850,8 +850,8 @@ namespace AdversCan
             {
                 if (p.Var != 0)
                 {
-                    StatusVariable rp = new StatusVariable();
-                    rp.Id = p.Var;
+                    StatusVariable sv = new StatusVariable();
+                    sv.Id = p.Var;
                     int rawValue;
                     switch (p.BitLength)
                     {
@@ -865,8 +865,8 @@ namespace AdversCan
                         case 32: rawValue = m.Data[p.StartByte] * 16777216 + m.Data[p.StartByte + 1] * 65536 + m.Data[p.StartByte + 2] * 256 + m.Data[p.StartByte + 3]; break;
                         default: throw new Exception("Bad parameter size");
                     }
-                    rp.Value = rawValue;
-                    currentDevice.Status.TryToAdd(rp);
+                    sv.Value = (rawValue-p.b)/p.a;
+                    currentDevice.Status.TryToAdd(sv);
                 }
             }
             if (m.PGN == 7) //Ответ на запрос параметра
@@ -876,7 +876,7 @@ namespace AdversCan
                     int parameterId = m.Data[3] + m.Data[2] * 256;
                     uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
                     if (parameterValue != 0xFFFFFFFF)
-                        UIContext.Send(x => currentDevice.readedParameters.TryToAdd(new ReadedParameter() { Id = parameterId, Value = parameterValue }), null);
+                        UIContext.Send(x => currentDevice.readedParameters.TryToAdd(new ReadedParameter() { Id = parameterId, Value = parameterValue }), null); //TODO remove all send commands
                 }
 
             }
@@ -1224,7 +1224,7 @@ namespace AdversCan
 
         private void Adapter_GotNewMessage(object sender, EventArgs e)
         {
-            ParseCanMessage((e as GotMessageEventArgs).receivedMessage);
+            UIContext.Send(x => ParseCanMessage((e as GotMessageEventArgs).receivedMessage), null);
         }
 
         public static void SeedStaticData()
@@ -1333,10 +1333,10 @@ namespace AdversCan
             commands.Add(new CommandId(0, 70), new AC2PCommand() { firstByte = 0, secondByte = 69, name = "Включение/Выключение устройств" });
             #endregion
 
-            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, GetMeaning = i => ("Устройство: " + Devices[i].Name + ";") });
-            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 8, Meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } } });
-            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 8, Name = "Верия ПО" });
-            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 8, Name = "Модификация ПО" });
+            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, GetMeaning = i => ("Устройство: " + Devices[i].Name + ";"), AnswerOnly = true }); ;
+            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 8, Meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } }, AnswerOnly = true });
+            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 8, Name = "Верия ПО", AnswerOnly = true });
+            commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 8, Name = "Модификация ПО", AnswerOnly = true });
 
             commands[new CommandId(0, 1)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
 
@@ -1351,9 +1351,8 @@ namespace AdversCan
 
             commands[new CommandId(0, 7)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, Name = "Номер мощности" });
 
-            commands[new CommandId(0, 7)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, Name = "Номер мощности" });
-            commands[new CommandId(0, 7)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 16, Name = "Температура перехода на большую мощность" });
-            commands[new CommandId(0, 7)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 16, Name = "Температура перехода на меньшую мощность" });
+            commands[new CommandId(0, 7)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 16, Name = "Температура перехода на большую мощность", AnswerOnly = true });
+            commands[new CommandId(0, 7)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 16, Name = "Температура перехода на меньшую мощность", AnswerOnly = true });
 
             commands[new CommandId(0, 8)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 2, StartBit = 0, Name = "Состояние клапана 1", Meanings = defMeaningsOnOff });
             commands[new CommandId(0, 8)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 2, StartBit = 2, Name = "Состояние клапана 2", Meanings = defMeaningsOnOff });
@@ -1374,8 +1373,8 @@ namespace AdversCan
 
             commands[new CommandId(0, 10)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
 
-            commands[new CommandId(0, 20)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Калибровочное значение термопары 1" });
-            commands[new CommandId(0, 20)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 16, Name = "Калибровочное значение термопары 2" });
+            commands[new CommandId(0, 20)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Калибровочное значение термопары 1", AnswerOnly = true });
+            commands[new CommandId(0, 20)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 16, Name = "Калибровочное значение термопары 2", AnswerOnly = true });
 
             commands[new CommandId(0, 21)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, Name = "Предделитель" });
             commands[new CommandId(0, 21)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 8, Name = "Период ШИМ" });
@@ -1428,7 +1427,7 @@ namespace AdversCan
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 8, StartBit = 0, StartByte = 0, Meanings = { { 0, "Стереть конфигурацию" }, { 1, "Запись параметра в ОЗУ" }, { 2, "Запись всех параметров во Flash" }, { 3, "Чтение параметра по номеру" }, { 4, "Успешный ответ на запрос" }, { 5, "Невозможно выполнить" } } });
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Запрошенная команда", BitLength = 8, StartBit = 0, StartByte = 1, Meanings = { { 0, "Стереть конфигурацию" }, { 1, "Запись параметра в ОЗУ" }, { 2, "Запись всех параметров во Flash" }, { 3, "Чтение параметра по номеру" }, { 255, "" } } });
             PGNs[7].parameters.Add(new AC2PParameter() { Name = "Параметр", BitLength = 16, StartBit = 0, StartByte = 2, GetMeaning = x => configParameters[x]?.NameRu });
-            PGNs[7].parameters.Add(new AC2PParameter() { Name = "Value", BitLength = 32, StartBit = 0, StartByte = 4 });
+            PGNs[7].parameters.Add(new AC2PParameter() { Name = "Value", BitLength = 32, StartBit = 0, StartByte = 4, AnswerOnly = true });
 
             PGNs[8].parameters.Add(new AC2PParameter() { Name = "Команда", BitLength = 4, StartBit = 0, StartByte = 0, Meanings = { { 0, "Стереть ЧЯ" }, { 3, "Чтение ЧЯ" }, { 4, "Ответ" }, { 6, "Чтение параметра (из paramsname.h)" } } });
             PGNs[8].parameters.Add(new AC2PParameter() { Name = "Тип:", BitLength = 2, StartBit = 4, StartByte = 0, Meanings = { { 0, "Общие данные" }, { 1, "Неисправности" } } });
@@ -1436,7 +1435,7 @@ namespace AdversCan
             PGNs[8].parameters.Add(new AC2PParameter() { Name = "Номер параметра", CustomDecoder = d => { if ((d[0] & 0xF) == 6) return "Номер параметра:" + (d[4] * 0x100 + d[5]).ToString() + ";"; else return ""; } });
             PGNs[8].parameters.Add(new AC2PParameter() { Name = "Число пар", CustomDecoder = d => { if ((d[0] & 0xF) == 6) return "Запрошено пар:" + (d[6] * 0x100 + d[7]).ToString() + ";"; else return ""; } });
             PGNs[8].parameters.Add(new AC2PParameter() { Name = "Номер параметра", CustomDecoder = d => { if (d[0] == 4) return "Параметр:" + (d[2] * 256 + d[3]).ToString() + ";"; else return ""; } });
-            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Номер параметра", CustomDecoder = d => { if (d[0] == 4) return "Значение:" + (d[4] * 0x1000000 + d[5] * 0x10000 + d[6] * 0x100 + d[7]).ToString() + ";"; else return ""; } });
+            PGNs[8].parameters.Add(new AC2PParameter() { Name = "Значение параметра", CustomDecoder = d => { if (d[0] == 4) return "Значение:" + (d[4] * 0x1000000 + d[5] * 0x10000 + d[6] * 0x100 + d[7]).ToString() + ";"; else return ""; }, AnswerOnly = true });
 
 
             PGNs[10].parameters.Add(new AC2PParameter() { Name = "Стадия", BitLength = 8, StartByte = 0, Meanings = Stages });

@@ -41,7 +41,6 @@ namespace CAN_Tool.ViewModels
 
         public Dictionary<CommandId, AC2PCommand> Commands => AC2P.commands;
 
-        public AC2PMessage prepearedCommandMessage { get; set; }
 
         #region  CustomMessage
 
@@ -67,12 +66,12 @@ namespace CAN_Tool.ViewModels
         }
         #endregion
 
-        #region SelectedPortIndex;
-        private int _SelectedPortIndex = -1;
-        public int SelectedPortIndex
+        #region PortName;
+        private string portName = "";
+        public string PortName
         {
-            get => _SelectedPortIndex;
-            set => Set(ref _SelectedPortIndex, value);
+            get => portName;
+            set => Set(ref portName, value);
         }
         #endregion
 
@@ -136,10 +135,10 @@ namespace CAN_Tool.ViewModels
         public ICommand OpenPortCommand { get; }
         private void OnOpenPortCommandExecuted(object parameter)
         {
-            canAdapter.PortName = _PortList[SelectedPortIndex];
+            canAdapter.PortName = PortName;
             canAdapter.PortOpen();
         }
-        private bool CanOpenPortCommandExecute(object parameter) => (_SelectedPortIndex >= 0 && _PortList[_SelectedPortIndex].StartsWith("COM") && !canAdapter.PortOpened);
+        private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !canAdapter.PortOpened);
         #endregion
 
         #region ClosePortCommand

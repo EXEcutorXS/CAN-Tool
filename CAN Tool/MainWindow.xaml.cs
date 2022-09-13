@@ -18,6 +18,7 @@ using AdversCan;
 using RVC;
 using CAN_Tool.ViewModels;
 using System.Globalization;
+using ScottPlot;
 
 namespace CAN_Tool
 {
@@ -51,6 +52,26 @@ namespace CAN_Tool
                 menuLanguage.Items.Add(menuLang);
             }
             menuLanguage.SelectedIndex = 0;
+
+
+            var plt = Chart.Plot;
+
+            plt.Palette = ScottPlot.Palette.OneHalfDark;
+
+            for (int i = 0; i < plt.Palette.Count(); i++)
+            {
+                double[] xs = DataGen.Consecutive(100);
+                double[] ys = DataGen.Sin(100, phase: -i * .5 / plt.Palette.Count());
+                plt.AddScatterLines(xs, ys, lineWidth: 3);
+            }
+
+            plt.Title($"{plt.Palette}");
+            plt.AxisAuto(0, 0.1);
+            plt.Style(ScottPlot.Style.Gray1);
+            var bnColor = System.Drawing.ColorTranslator.FromHtml("#2e3440");
+            plt.Style(figureBackground: bnColor, dataBackground: bnColor);
+
+            plt.SaveFig("palette_OneHalfDark.png");
         }
 
         private void LanguageChanged(Object sender, EventArgs e)
@@ -78,6 +99,7 @@ namespace CAN_Tool
 
         }
 
+        #region Command constructor
         // Заносим изменённое значение в массив и обновляем свойство Data для CustomMessage
         private void UpdateCommand(object sender, EventArgs e)
         {
@@ -100,7 +122,7 @@ namespace CAN_Tool
             ulong firstByte = cmd.firstByte;
             ulong secondByte = cmd.secondByte;
             ulong res = firstByte<<56|secondByte<<48;
-            AC2PParameter[] pars = cmd.Parameters.ToArray();
+            AC2PParameter[] pars = cmd.Parameters.Where(p=>p.AnswerOnly==false).ToArray();
             for (int i = 0; i < pars.Length; i++)
             {
                 AC2PParameter p = pars[i];
@@ -131,10 +153,10 @@ namespace CAN_Tool
             mainWindowViewModel.CommandParametersArray = new double[cmd.Parameters.Count];
 
             int counter = 0;
-            foreach (AC2PParameter p in cmd.Parameters)
+            foreach (AC2PParameter p in cmd.Parameters.Where(p=>p.AnswerOnly==false))
             {
                 StackPanel panel = new();
-                panel.Orientation = Orientation.Horizontal;
+                panel.Orientation = System.Windows.Controls.Orientation.Horizontal;
                 Label label = new();
                 label.Content = p.Name;
                 label.Name = $"label_{counter}";
@@ -165,6 +187,7 @@ namespace CAN_Tool
 
             }
         }
+        #endregion
     }
 
 }

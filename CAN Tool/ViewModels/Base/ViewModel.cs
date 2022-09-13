@@ -43,12 +43,14 @@ namespace CAN_Tool.ViewModels.Base
         {
             if (!Equals(field, value))
             {
+                field = value;
                 //1 Вариант
-                typeof(T).GetCustomAttributes(typeof(AffectsToAttribute), true).ToList().ForEach(t => { foreach (var s in (t as AffectsToAttribute).Props) OnPropertyChanged(s); });
+                //typeof(T).GetCustomAttributes(typeof(AffectsToAttribute), true).ToList().ForEach(t => { foreach (var s in (t as AffectsToAttribute).Props) OnPropertyChanged(s); });
                 //2 Вариант
                 foreach (var property in GetType().GetProperties()) OnPropertyChanged(property.Name);
                 OnPropertyChanged(PropertyName);
                 CommandManager.InvalidateRequerySuggested();  //   Фикc необновления статуса кнопок
+
                 return true;
             }
             else
