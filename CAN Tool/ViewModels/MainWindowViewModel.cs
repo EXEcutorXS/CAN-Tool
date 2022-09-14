@@ -40,7 +40,15 @@ namespace CAN_Tool.ViewModels
         }
 
         public Dictionary<CommandId, AC2PCommand> Commands => AC2P.commands;
+        #region SelectedMessage
+        private AC2PMessage selectedMessage;
 
+        public AC2PMessage SelectedMessage
+        {
+            get => selectedMessage;
+            set => Set(ref selectedMessage, value);
+        }
+        #endregion
 
         #region  CustomMessage
 
@@ -127,6 +135,8 @@ namespace CAN_Tool.ViewModels
             PortList.Clear();
             foreach (var port in SerialPort.GetPortNames())
                 PortList.Add(port);
+            if (PortList.Count > 0)
+                PortName = PortList[0];
         }
 
         #endregion
@@ -149,6 +159,90 @@ namespace CAN_Tool.ViewModels
         }
         private bool CanClosePortCommandExecute(object parameter) => (canAdapter.PortOpened);
         #endregion
+        #endregion
+
+        #region CloseApplicationCommand
+        public ICommand CloseApplicationCommand { get; }
+        private void OnCloseApplicationCommandExecuted(object parameter)
+        {
+            App.Current.Shutdown();
+        }
+        private bool CanCloseApplicationCommandExecute(object parameter) => true;
+        #endregion
+
+        #region HeaterCommands
+
+        #region StartHeaterCommand
+        public ICommand StartHeaterCommand { get; }
+        private void OnStartHeaterCommandExecuted(object parameter)
+        {
+            executeCommand(1, 0xff, 0xff);
+        }
+        private bool CanStartHeaterCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
+        #endregion
+
+        #region StopHeaterCommand
+        public ICommand StopHeaterCommand { get; }
+        private void OnStopHeaterCommandExecuted(object parameter)
+        {
+            executeCommand(3);
+        }
+        private bool CanStopHeaterCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
+        #endregion
+
+        #region StartPumpCommand
+        public ICommand StartPumpCommand { get; }
+        private void OnStartPumpCommandExecuted(object parameter)
+        {
+            executeCommand(4, 0, 0);
+        }
+        private bool CanStartPumpCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
+        #endregion
+
+        #region ClearErrorsCommand
+        public ICommand ClearErrorsCommand { get; }
+        private void OnClearErrorsCommandExecuted(object parameter)
+        {
+            executeCommand(5);
+        }
+        private bool CanClearErrorsCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
+        #endregion
+
+        #region StartVentCommand
+        public ICommand StartVentCommand { get; }
+        private void OnStartVentCommandExecuted(object parameter)
+        {
+            executeCommand(10);
+        }
+        private bool CanStartVentCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
+        #endregion
+
+        #region CalibrateTermocouplesCommand
+
+        public ICommand CalibrateTermocouplesCommand { get; }
+        private void OnCalibrateTermocouplesCommandExecuted(object parameter)
+        {
+            executeCommand(20);
+        }
+
+
+        private bool CanCalibrateTermocouplesCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
+        #endregion
+
+        #endregion
+
+        #region ChartCommands
+
+        #region ChartStartCommand
+        public ICommand ChartStartCommand { get; }
+        private void OnChartStartCommandExecuted(object parameter)
+        {
+            
+        }
+        private bool CanChartStartCommandExecute(object parameter) => (AC2PInstance.CurrentTask.Occupied);
+        #endregion
+
+
         #endregion
 
         #region CancelOperationCommand
@@ -248,14 +342,45 @@ namespace CAN_Tool.ViewModels
             return true;
         }
 
-        #endregion
 
+        
+
+        #endregion
+        private void executeCommand(byte num, params byte[] data)
+        {
+            CustomMessage.TransmitterType = 126;
+            CustomMessage.TransmitterAddress = 6;
+            CustomMessage.ReceiverId = SelectedConnectedDevice.ID;
+            CustomMessage.PGN = 1;
+            CustomMessage.Data = new byte[8];
+            for (int i = 0; i < data.Length; i++)
+                customMessage.Data[i + 2] = data[i];
+            CustomMessage.Data[1] = num;
+            canAdapter.Transmit(customMessage);
+        }
+
+        #region Chart
+
+        DispatcherTimer dispatcherTimer = new DispatcherTimer();
+
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            foreach (var d in AC2PInstance.ConnectedDevices)
+            {
+                if (d.ChartLogging)
+                    d.ChartTick();
+            }
+        }
+
+        #endregion
         #endregion
         public MainWindowViewModel()
         {
             AC2P.ParseParamsname();
             _canAdapter = new CanAdapter();
             _AC2PInstance = new AC2P(canAdapter);
+
+            
 
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
             ClosePortCommand = new LambdaCommand(OnClosePortCommandExecuted, CanClosePortCommandExecute);
@@ -271,10 +396,21 @@ namespace CAN_Tool.ViewModels
             ResetConfigCommand = new LambdaCommand(OnResetConfigCommandExecuted, CanResetConfigCommandExecute);
             SetAdapterNormalModeCommand = new LambdaCommand(OnSetAdapterNormalModeCommandExecuted, CanSetAdapterNormalModeCommandExecute);
             SetAdapterListedModeCommand = new LambdaCommand(OnSetAdapterListedModeCommandExecuted, CanSetAdapterListedModeCommandExecute);
-            SetAdapterSelfReceptionModeCommand = new LambdaCommand(OnSetAdapterSelfReceptionModeCommandExecuted,CanSetAdapterSelfReceptionModeCommandExecute);
-            StopCanAdapterCommand = new LambdaCommand(OnStopCanAdapterCommandExecuted,CanStopCanAdapterCommandExecute);
+            SetAdapterSelfReceptionModeCommand = new LambdaCommand(OnSetAdapterSelfReceptionModeCommandExecuted, CanSetAdapterSelfReceptionModeCommandExecute);
+            StopCanAdapterCommand = new LambdaCommand(OnStopCanAdapterCommandExecuted, CanStopCanAdapterCommandExecute);
+            CloseApplicationCommand = new LambdaCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExecute);
+            StartHeaterCommand = new LambdaCommand(OnStartHeaterCommandExecuted,CanStartHeaterCommandExecute);
+            StopHeaterCommand = new LambdaCommand(OnStopHeaterCommandExecuted,CanStopHeaterCommandExecute);
+            StartPumpCommand = new LambdaCommand(OnStartPumpCommandExecuted, CanStartPumpCommandExecute);
+            StartVentCommand = new LambdaCommand(OnStartVentCommandExecuted, CanStartVentCommandExecute);
+            ClearErrorsCommand = new LambdaCommand(OnClearErrorsCommandExecuted, CanClearErrorsCommandExecute);
+            CalibrateTermocouplesCommand = new LambdaCommand(OnCalibrateTermocouplesCommandExecuted, CanCalibrateTermocouplesCommandExecute);
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;
+
+            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            dispatcherTimer.Start();
         }
     }
 }

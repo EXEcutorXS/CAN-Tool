@@ -24,75 +24,51 @@ namespace Can_Adapter
         public CanMessage receivedMessage;
     }
 
-    public class CanMessage : INotifyPropertyChanged, IUpdatable<CanMessage>
+    public class CanMessage : ViewModel, IUpdatable<CanMessage>
     {
         private bool ide;
 
+        [AffectsTo("VerboseInfo", "RvcCompatible", "IdeAsString")]
         public bool IDE
         {
-            set
-            {
-                if (ide == value) return;
-                ide = value;
-                PropChanged("IDE");
-            }
-            get { return ide; }
+            set => Set(ref ide, value);
+            get => ide;
         }
 
         private int id;
+
+        [AffectsTo("VerboseInfo", "IdAsText")]
         public int ID
         {
-            set
-            {
-                if (id == value) return;
-                id = value;
-                PropChanged("ID");
-                PropChanged("IdAsText");
-            }
-            get { return id; }
+            set => Set(ref id, value);
+            get => id;
         }
         private bool rtr;
 
+        [AffectsTo("VerboseInfo", "RtrAsString", "RvcCompatible")]
         public bool RTR
         {
-            set
-            {
-                if (rtr == value) return;
-                rtr = value;
-                PropChanged("RTR");
-            }
-            get { return rtr; }
+            set => Set(ref rtr, value);
+            get => rtr;
         }
         private int dlc;
+        [AffectsTo("VerboseInfo", "RvcCompatible")]
         public int DLC
         {
-            set
-            {
-                if (dlc == value) return;
-                dlc = value;
-                PropChanged("DLC");
-            }
-            get { return dlc; }
+            set => Set(ref dlc, value);
+            get => dlc;
         }
 
         public byte[] data = new byte[8];
 
+        [AffectsTo("VerboseInfo", "DataAsText")]
         public byte[] Data
         {
-            get { return data; }
+            get => data;
 
-            set
-            {
-                if (Enumerable.SequenceEqual(data, value))
-                    return;
-                data = value;
-                PropChanged("Data");
-                PropChanged("DataAsText");
-            }
+            set => Set(ref data, value);
         }
 
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public string DataAsText => GetDataInTextFormat("", " ");
 
@@ -118,11 +94,6 @@ namespace Can_Adapter
             return $"L:{DLC} IDE:{IdeAsString} RTR:{RtrAsString} ID:0x{IdAsText} Data:{GetDataInTextFormat(" ")}";
         }
 
-        public virtual void PropChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("VerboseInfo"));
-        }
 
         public CanMessage()
         {
@@ -233,7 +204,10 @@ namespace Can_Adapter
                 return true;
             }
             else
+            {
                 found.Update(item);
+                //SetItem(IndexOf(found), item); //TODO избавиться от updatable list
+            }
             return false;
         }
     }

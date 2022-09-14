@@ -14,7 +14,8 @@
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto" 
         Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}">
+        FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:DataToStringConverter x:Key="StringToDecConverter" />
@@ -24,7 +25,7 @@
     </Window.DataContext>
     <DockPanel>
 
-        <StatusBar DockPanel.Dock="Bottom">
+        <StatusBar DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
             <StatusBarItem Width="auto">
                 <TextBlock Text="{Binding AC2PInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
@@ -52,10 +53,15 @@
                 <Button Content="Listen" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                 <Button Content="Self Reception" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                 <Button Content="Stop" Margin="10" Command="{Binding StopCanAdapterCommand}" />
+                
             </StackPanel>
-            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Margin="5">
+            <StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal" >
                 <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5"></ComboBox>
+                <Button Content="Exit" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft"/>
             </StackPanel>
+            
+            
+            
             <TabControl Grid.Row="1">
                 <TabItem MaxWidth="1000">
                     <TabItem.Header>
@@ -72,7 +78,7 @@
                             <TextBox x:Name="CanDataField" Text="FFFFFFFFFFFFFFFF" Margin="10"></TextBox>
                             <Button Content="Send" Margin="10"></Button>
                         </StackPanel>
-                        <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="10" FontFamily="Courier New" AlternatingRowBackground="LightGray" SelectionMode="Single" GridLinesVisibility="Horizontal" ItemsSource="{Binding Path = canAdapter.Messages}">
+                        <DataGrid x:Name="CanMessageList" AutoGenerateColumns="False" Margin="10" FontFamily="Courier New" SelectionMode="Single" GridLinesVisibility="Horizontal" ItemsSource="{Binding Path = canAdapter.Messages}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path = IdAsText}" Header="ID" IsReadOnly="True">
                                 </DataGridTextColumn>
@@ -95,7 +101,7 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
-                        <ComboBox x:Name="DeviceSelector" DockPanel.Dock="Top" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}"></ComboBox>
+                        <ComboBox  Margin="3" Background="{DynamicResource MaterialDesignCardBackground}" x:Name="DeviceSelector" DockPanel.Dock="Top" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}" HorizontalAlignment="Center"></ComboBox>
                         <TabControl Margin="1">
                             <TabItem>
                                 <TabItem.Header>
@@ -129,7 +135,7 @@
 
                                     </DockPanel>
                                     <DockPanel>
-                                        <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" AlternatingRowBackground="#FFDCFFDC" SelectionMode="Single" Grid.ColumnSpan="2" ItemsSource="{Binding AC2PInstance.Messages}" ToolTip="{Binding ElementName=AC2PmessagesField,Path=SelectedItem.VerboseInfo}">
+                                        <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding AC2PInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Binding="{Binding Path = PGN}" Header="PGN" IsReadOnly="True">
                                                 </DataGridTextColumn>
@@ -145,7 +151,7 @@
                                                 </DataGridTextColumn>
                                             </DataGrid.Columns>
                                         </DataGrid>
-                                        <TextBlock DockPanel.Dock="Right" Text="{Binding ElementName=AC2PmessagesField,Path=SelectedItem.VerboseInfo}"></TextBlock>
+                                        <TextBlock DockPanel.Dock="Right" Text="{Binding SelectedMessage.VerboseInfo,Mode=OneWay}"></TextBlock>
                                     </DockPanel>
 
                                 </DockPanel>
@@ -160,19 +166,21 @@
                                 </TabItem.Header>
                                 <DockPanel>
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
-                                        <Button Margin="10">
+                                        <Button Margin="10" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
                                             <Button.Content>
                                                 <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="White" />
                                             </Button.Content>
                                         </Button>
 
-                                        <Button Margin="8">
+                                        <Button Margin="8" ToolTip="Stop Device" Command="{Binding StopHeaterCommand}">
                                             <Button.Content>
                                                 <fa:ImageAwesome Icon="Solid_Stop" Margin="2" Foreground="White" />
                                             </Button.Content>
                                         </Button>
-                                        <Button Content="Thermocouple calibrate" Margin="10" Cursor="Hand" />
-                                        <Button Content="Erase Failures" Margin="10" />
+                                        <Button Margin="8" ToolTip="Run just water pump" Command="{Binding StartPumpCommand}">Pump</Button>
+                                        <Button Margin="8" ToolTip="Run ventilation" Command="{Binding StartVentCommand}">Ventilation</Button>
+                                        <Button Content="Thermocouple calibrate" Margin="10" Command="{Binding CalibrateTermocouplesCommand}"/>
+                                        <Button Content="Erase Failures" Margin="10" Command="{Binding ClearErrorsCommand}"/>
                                     </StackPanel>
                                     <StackPanel x:Name="CommandConstructor" DockPanel.Dock="Top" Orientation="Vertical" Margin="10">
                                         <Label HorizontalAlignment="Center" Content="Choose command:" />
@@ -235,10 +243,10 @@
                                         <TextBlock Margin="5 2 2 2"> Status</TextBlock>
                                     </StackPanel>
                                 </TabItem.Header>
-                                <DataGrid ItemsSource="{Binding SelectedConnectedDevice.Status}">
+                                <DataGrid ItemsSource="{Binding SelectedConnectedDevice.Status}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"></DataGridTextColumn>
-                                        <DataGridTextColumn Header="Value" Binding="{Binding Path=Value}"></DataGridTextColumn>
+                                        <DataGridTextColumn Header="Value" Binding="{Binding Path=VerboseInfo}"></DataGridTextColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </TabItem>

@@ -17,7 +17,7 @@ namespace CAN_Tool.ViewModels.Base
 
         public string[] Props => props;
 
-        AffectsToAttribute(params string[] propName)
+        public AffectsToAttribute(params string[] propName)
         {
             props = propName;
         }
@@ -45,7 +45,7 @@ namespace CAN_Tool.ViewModels.Base
             {
                 field = value;
                 //1 Вариант
-                //typeof(T).GetCustomAttributes(typeof(AffectsToAttribute), true).ToList().ForEach(t => { foreach (var s in (t as AffectsToAttribute).Props) OnPropertyChanged(s); });
+                typeof(T).GetCustomAttributes(typeof(AffectsToAttribute), true).ToList().ForEach(t => { foreach (var s in (t as AffectsToAttribute).Props) OnPropertyChanged(s); });
                 //2 Вариант
                 foreach (var property in GetType().GetProperties()) OnPropertyChanged(property.Name);
                 OnPropertyChanged(PropertyName);

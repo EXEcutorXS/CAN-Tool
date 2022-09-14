@@ -19,6 +19,7 @@ using RVC;
 using CAN_Tool.ViewModels;
 using System.Globalization;
 using ScottPlot;
+using ScottPlot.Renderable;
 
 namespace CAN_Tool
 {
@@ -46,7 +47,7 @@ namespace CAN_Tool
             {
 
                 ComboBoxItem menuLang = new();
-                menuLang.Content = lang.DisplayName;
+                menuLang.Content = lang.NativeName;
                 menuLang.Tag = lang;
                 menuLang.Selected += ChangeLanguageClick;
                 menuLanguage.Items.Add(menuLang);
@@ -56,22 +57,20 @@ namespace CAN_Tool
 
             var plt = Chart.Plot;
 
-            plt.Palette = ScottPlot.Palette.OneHalfDark;
+            plt.Palette = Palette.OneHalfDark;
 
-            for (int i = 0; i < plt.Palette.Count(); i++)
-            {
-                double[] xs = DataGen.Consecutive(100);
-                double[] ys = DataGen.Sin(100, phase: -i * .5 / plt.Palette.Count());
-                plt.AddScatterLines(xs, ys, lineWidth: 3);
-            }
+                        // plot one set of data using the primary Y axis
+            var sigSmall = plt.AddSignal(DataGen.Sin(51, mult: 1));
+            sigSmall.YAxisIndex = 0;
+            plt.YAxis.Label("Primary Axis");
+            plt.YAxis.Color(sigSmall.Color);
 
-            plt.Title($"{plt.Palette}");
-            plt.AxisAuto(0, 0.1);
-            plt.Style(ScottPlot.Style.Gray1);
-            var bnColor = System.Drawing.ColorTranslator.FromHtml("#2e3440");
-            plt.Style(figureBackground: bnColor, dataBackground: bnColor);
-
-            plt.SaveFig("palette_OneHalfDark.png");
+            // plot another set of data using an additional axis
+            var sigBig = plt.AddSignal(DataGen.Cos(51, mult: 100));
+            var yAxis3 = plt.AddAxis(ScottPlot.Renderable.Edge.Left, axisIndex: 2);
+            sigBig.YAxisIndex = 2;
+            yAxis3.Label("Additional Axis");
+            yAxis3.Color(sigBig.Color);
         }
 
         private void LanguageChanged(Object sender, EventArgs e)
@@ -97,6 +96,10 @@ namespace CAN_Tool
                 }
             }
 
+        }
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
         }
 
         #region Command constructor
@@ -188,6 +191,16 @@ namespace CAN_Tool
             }
         }
         #endregion
+        
+        private void AC2PmessagesField_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
+            try
+            {
+                vm.SelectedMessage = (AC2PMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
+            }
+            catch { }
+        }
     }
 
 }

@@ -1052,10 +1052,7 @@ namespace RVC
         }
 
         new public event PropertyChangedEventHandler PropertyChanged;
-        public override void PropChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+
 
     }
 }
