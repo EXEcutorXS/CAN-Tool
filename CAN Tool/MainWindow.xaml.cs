@@ -55,22 +55,8 @@ namespace CAN_Tool
             menuLanguage.SelectedIndex = 0;
 
 
-            var plt = Chart.Plot;
+            
 
-            plt.Palette = Palette.OneHalfDark;
-
-                        // plot one set of data using the primary Y axis
-            var sigSmall = plt.AddSignal(DataGen.Sin(51, mult: 1));
-            sigSmall.YAxisIndex = 0;
-            plt.YAxis.Label("Primary Axis");
-            plt.YAxis.Color(sigSmall.Color);
-
-            // plot another set of data using an additional axis
-            var sigBig = plt.AddSignal(DataGen.Cos(51, mult: 100));
-            var yAxis3 = plt.AddAxis(ScottPlot.Renderable.Edge.Left, axisIndex: 2);
-            sigBig.YAxisIndex = 2;
-            yAxis3.Label("Additional Axis");
-            yAxis3.Color(sigBig.Color);
         }
 
         private void LanguageChanged(Object sender, EventArgs e)
@@ -200,6 +186,29 @@ namespace CAN_Tool
                 vm.SelectedMessage = (AC2PMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
             }
             catch { }
+        }
+
+        private void DeviceSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
+
+
+            var plt = Chart.Plot;
+
+            plt.Clear();
+            plt.AddSignal(vm.SelectedConnectedDevice.ChartData[0]);
+
+
+            plt.Palette = Palette.OneHalfDark;
+
+            // plot one set of data using the primary Y axis
+            List<double> val = new() { 1, 2, 3, 4, 3, 4, 4 };
+            plt.AddSignal(val.ToArray());
+            var sigSmall = plt.AddSignal(DataGen.Sin(51, mult: 1));
+            plt.AddSignal(DataGen.Sin(51, mult: 2));
+            plt.AddSignal(new double[] { 2, 3, 4, 5, 5, 5, 4, 3, 3, 5, 5, 5, 2, 4, 4 });
+
+            Chart.Refresh();
         }
     }
 

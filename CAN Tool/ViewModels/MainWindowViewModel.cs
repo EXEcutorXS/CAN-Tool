@@ -342,9 +342,6 @@ namespace CAN_Tool.ViewModels
             return true;
         }
 
-
-        
-
         #endregion
         private void executeCommand(byte num, params byte[] data)
         {
@@ -371,6 +368,7 @@ namespace CAN_Tool.ViewModels
                     d.ChartTick();
             }
         }
+
 
         #endregion
         #endregion

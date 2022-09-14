@@ -51,6 +51,7 @@ namespace Can_Adapter
             set => Set(ref rtr, value);
             get => rtr;
         }
+        
         private int dlc;
         [AffectsTo("VerboseInfo", "RvcCompatible")]
         public int DLC
@@ -59,7 +60,8 @@ namespace Can_Adapter
             get => dlc;
         }
 
-        public byte[] data = new byte[8];
+        
+        private byte[] data = new byte[8];
 
         [AffectsTo("VerboseInfo", "DataAsText")]
         public byte[] Data

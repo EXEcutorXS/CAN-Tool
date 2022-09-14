@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace CAN_Tool.ViewModels.Base
@@ -44,10 +46,17 @@ namespace CAN_Tool.ViewModels.Base
             if (!Equals(field, value))
             {
                 field = value;
-                //1 Вариант
-                typeof(T).GetCustomAttributes(typeof(AffectsToAttribute), true).ToList().ForEach(t => { foreach (var s in (t as AffectsToAttribute).Props) OnPropertyChanged(s); });
+                var attr = GetType().GetProperty(PropertyName)?.GetCustomAttribute(typeof(AffectsToAttribute));
+                if (attr != null)
+                {
+                    AffectsToAttribute at = (AffectsToAttribute)attr;
+                    foreach (var p in at.Props)
+                        OnPropertyChanged(p);
+                }
+
                 //2 Вариант
-                foreach (var property in GetType().GetProperties()) OnPropertyChanged(property.Name);
+                //foreach (var property in GetType().GetProperties()) OnPropertyChanged(property.Name);
+
                 OnPropertyChanged(PropertyName);
                 CommandManager.InvalidateRequerySuggested();  //   Фикc необновления статуса кнопок
 

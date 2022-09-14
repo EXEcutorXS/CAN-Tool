@@ -12,7 +12,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using CAN_Tool.ViewModels.Base;
 using System.Windows.Markup;
-
+using System.Diagnostics.Contracts;
 
 namespace AdversCan
 {
@@ -691,6 +691,14 @@ namespace AdversCan
 
     public class ConnectedDevice : ViewModel
     {
+        public ConnectedDevice()
+        {
+            foreach (var var in AC2P.Variables)
+            {
+                ChartData.Add(new double[3600]);
+            }
+        }
+
         private DeviceId id;
 
         public DeviceId ID
@@ -707,8 +715,7 @@ namespace AdversCan
             set { Set(ref chartLogging, value); }
         }
 
-
-        public double[,] ChartData = new double[AC2P.Variables.Count, 3600]; //Запас на час
+        public List<double[]> ChartData = new List<double[]>();
 
         public int ChartLength = 0;
 
@@ -749,7 +756,7 @@ namespace AdversCan
         public void ChartTick()
         {
             foreach (StatusVariable sv in Status)
-                ChartData[sv.Id, ChartLength] = sv.Value;
+                ChartData[sv.Id][ChartLength] = sv.Value;
             if (ChartLength < 1800)
                 ChartLength++;
         }

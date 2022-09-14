@@ -101,7 +101,7 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
-                        <ComboBox  Margin="3" Background="{DynamicResource MaterialDesignCardBackground}" x:Name="DeviceSelector" DockPanel.Dock="Top" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}" HorizontalAlignment="Center"></ComboBox>
+                        <ComboBox  Margin="3" Background="{DynamicResource MaterialDesignCardBackground}" x:Name="DeviceSelector" DockPanel.Dock="Top" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}" HorizontalAlignment="Center" SelectionChanged="DeviceSelector_SelectionChanged"></ComboBox>
                         <TabControl Margin="1">
                             <TabItem>
                                 <TabItem.Header>
