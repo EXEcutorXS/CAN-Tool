@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CAN_Tool.ViewModels.Base;
 using System.ComponentModel;
 using System.Windows.Input;
-using System.Windows;
 using CAN_Tool.Infrastructure.Commands;
 using System.IO.Ports;
 using Can_Adapter;
 using AdversCan;
-using System.Windows.Threading;
-using System.Threading;
-using System.Windows.Data;
-using System.Globalization;
+using ScottPlot;
+using System.Windows.Media;
 
 namespace CAN_Tool.ViewModels
 {
@@ -22,6 +18,8 @@ namespace CAN_Tool.ViewModels
     {
 
         int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
+
+        
 
         public int[] Bitrates => _Bitrates;
 
@@ -43,6 +41,7 @@ namespace CAN_Tool.ViewModels
         #region SelectedMessage
         private AC2PMessage selectedMessage;
 
+        public WpfPlot myChart;
         public AC2PMessage SelectedMessage
         {
             get => selectedMessage;
@@ -231,17 +230,47 @@ namespace CAN_Tool.ViewModels
 
         #endregion
 
-        #region ChartCommands
+        #region LogCommands
 
-        #region ChartStartCommand
-        public ICommand ChartStartCommand { get; }
-        private void OnChartStartCommandExecuted(object parameter)
+        #region LogStartCommand
+        public ICommand LogStartCommand { get; }
+        private void OnLogStartCommandExecuted(object parameter)
         {
-            
+            SelectedConnectedDevice.LogStart();
         }
-        private bool CanChartStartCommandExecute(object parameter) => (AC2PInstance.CurrentTask.Occupied);
+        private bool CanLogStartCommandExecute(object parameter) => (SelectedConnectedDevice != null && canAdapter.PortOpened);
         #endregion
 
+        #region LogStopCommand
+        public ICommand LogStopCommand { get; }
+        private void OnLogStopCommandExecuted(object parameter)
+        {
+            SelectedConnectedDevice.LogStop();
+        }
+        private bool CanLogStopCommandExecute(object parameter) => (SelectedConnectedDevice != null && canAdapter.PortOpened && SelectedConnectedDevice.IsLogWriting);
+        #endregion
+
+        #region ChartDrawCommand
+        public ICommand ChartDrawCommand { get; }
+        private void OnChartDrawCommandExecuted(object parameter)
+        {
+            Plot plt = myChart.Plot;
+
+
+            plt.Clear();
+            foreach (var v in SelectedConnectedDevice.Status)
+            {
+                if (v.Display)
+                plt.AddSignal(SelectedConnectedDevice.LogData[15].Take(SelectedConnectedDevice.LogCurrentPos).ToArray());
+                //plt.AddAxis(ScottPlot.Renderable.Edge.Left,)
+            }
+
+            plt.Palette = Palette.OneHalfDark;
+
+            myChart.Refresh();
+        }
+        private bool CanChartDrawCommandExecute(object parameter) => (SelectedConnectedDevice != null && SelectedConnectedDevice.LogCurrentPos > 0);
+        #endregion
 
         #endregion
 
@@ -358,27 +387,32 @@ namespace CAN_Tool.ViewModels
 
         #region Chart
 
-        DispatcherTimer dispatcherTimer = new DispatcherTimer();
-
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        private void TimerTick(object sender, EventArgs e)
         {
             foreach (var d in AC2PInstance.ConnectedDevices)
             {
-                if (d.ChartLogging)
-                    d.ChartTick();
+                d.LogTick();
             }
         }
 
+        #endregion
+        #endregion
 
-        #endregion
-        #endregion
+
         public MainWindowViewModel()
         {
-            AC2P.ParseParamsname();
+
             _canAdapter = new CanAdapter();
             _AC2PInstance = new AC2P(canAdapter);
 
+            System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
+
+            timer.Tick += new EventHandler(TimerTick);
+            timer.Interval = new TimeSpan(0, 0, 1);
+            timer.Start();
+
             
+
 
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
             ClosePortCommand = new LambdaCommand(OnClosePortCommandExecuted, CanClosePortCommandExecute);
@@ -397,18 +431,18 @@ namespace CAN_Tool.ViewModels
             SetAdapterSelfReceptionModeCommand = new LambdaCommand(OnSetAdapterSelfReceptionModeCommandExecuted, CanSetAdapterSelfReceptionModeCommandExecute);
             StopCanAdapterCommand = new LambdaCommand(OnStopCanAdapterCommandExecuted, CanStopCanAdapterCommandExecute);
             CloseApplicationCommand = new LambdaCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExecute);
-            StartHeaterCommand = new LambdaCommand(OnStartHeaterCommandExecuted,CanStartHeaterCommandExecute);
-            StopHeaterCommand = new LambdaCommand(OnStopHeaterCommandExecuted,CanStopHeaterCommandExecute);
+            StartHeaterCommand = new LambdaCommand(OnStartHeaterCommandExecuted, CanStartHeaterCommandExecute);
+            StopHeaterCommand = new LambdaCommand(OnStopHeaterCommandExecuted, CanStopHeaterCommandExecute);
             StartPumpCommand = new LambdaCommand(OnStartPumpCommandExecuted, CanStartPumpCommandExecute);
             StartVentCommand = new LambdaCommand(OnStartVentCommandExecuted, CanStartVentCommandExecute);
             ClearErrorsCommand = new LambdaCommand(OnClearErrorsCommandExecuted, CanClearErrorsCommandExecute);
             CalibrateTermocouplesCommand = new LambdaCommand(OnCalibrateTermocouplesCommandExecuted, CanCalibrateTermocouplesCommandExecute);
+            LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
+            LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
+            ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;
 
-            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            dispatcherTimer.Start();
         }
     }
 }

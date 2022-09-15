@@ -31,10 +31,12 @@ namespace CAN_Tool
     {
 
 
-
+        public List<Brush> Brushes; 
         public MainWindow()
         {
             InitializeComponent();
+
+            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
 
             App.LanguageChanged += LanguageChanged;
 
@@ -54,9 +56,7 @@ namespace CAN_Tool
             }
             menuLanguage.SelectedIndex = 0;
 
-
-            
-
+            vm.myChart = Chart;
         }
 
         private void LanguageChanged(Object sender, EventArgs e)
@@ -85,7 +85,11 @@ namespace CAN_Tool
         }
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.DragMove();
+            try
+            {
+                this.DragMove();
+            }
+            catch { }
         }
 
         #region Command constructor
@@ -110,8 +114,8 @@ namespace CAN_Tool
             AC2PCommand cmd = ((KeyValuePair<CommandId, AC2PCommand>)CommandSelector.SelectedItem).Value;
             ulong firstByte = cmd.firstByte;
             ulong secondByte = cmd.secondByte;
-            ulong res = firstByte<<56|secondByte<<48;
-            AC2PParameter[] pars = cmd.Parameters.Where(p=>p.AnswerOnly==false).ToArray();
+            ulong res = firstByte << 56 | secondByte << 48;
+            AC2PParameter[] pars = cmd.Parameters.Where(p => p.AnswerOnly == false).ToArray();
             for (int i = 0; i < pars.Length; i++)
             {
                 AC2PParameter p = pars[i];
@@ -121,7 +125,7 @@ namespace CAN_Tool
                 shift = (7 - p.StartByte) * 8;
                 shift -= ((p.BitLength + 7) / 8) * 8 - 8;
                 shift += p.StartBit;
-                rawValue<<=shift;
+                rawValue <<= shift;
                 res |= rawValue;
             }
             byte[] data = new byte[8];
@@ -142,7 +146,7 @@ namespace CAN_Tool
             mainWindowViewModel.CommandParametersArray = new double[cmd.Parameters.Count];
 
             int counter = 0;
-            foreach (AC2PParameter p in cmd.Parameters.Where(p=>p.AnswerOnly==false))
+            foreach (AC2PParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))
             {
                 StackPanel panel = new();
                 panel.Orientation = System.Windows.Controls.Orientation.Horizontal;
@@ -177,7 +181,7 @@ namespace CAN_Tool
             }
         }
         #endregion
-        
+
         private void AC2PmessagesField_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             MainWindowViewModel vm = (MainWindowViewModel)DataContext;
@@ -188,28 +192,6 @@ namespace CAN_Tool
             catch { }
         }
 
-        private void DeviceSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
-
-
-            var plt = Chart.Plot;
-
-            plt.Clear();
-            plt.AddSignal(vm.SelectedConnectedDevice.ChartData[0]);
-
-
-            plt.Palette = Palette.OneHalfDark;
-
-            // plot one set of data using the primary Y axis
-            List<double> val = new() { 1, 2, 3, 4, 3, 4, 4 };
-            plt.AddSignal(val.ToArray());
-            var sigSmall = plt.AddSignal(DataGen.Sin(51, mult: 1));
-            plt.AddSignal(DataGen.Sin(51, mult: 2));
-            plt.AddSignal(new double[] { 2, 3, 4, 5, 5, 5, 4, 3, 3, 5, 5, 5, 2, 4, 4 });
-
-            Chart.Refresh();
-        }
     }
 
 }

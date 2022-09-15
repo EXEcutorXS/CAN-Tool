@@ -13,6 +13,11 @@ using System.Data;
 using CAN_Tool.ViewModels.Base;
 using System.Windows.Markup;
 using System.Diagnostics.Contracts;
+using System.Reflection.Metadata.Ecma335;
+using System.Diagnostics;
+using System.Windows.Media;
+
+
 
 namespace AdversCan
 {
@@ -29,12 +34,24 @@ namespace AdversCan
         public int StartByte;   //Начальный байт в пакете
         public int StartBit;    //Начальный бит в байте
         public int BitLength;   //Длина параметра в битах
+        public bool Signed = false; //Число со знаком
         public string Name { set; get; }     //Имя параметра
         public string Unit = "";     //Единица измерения
         public double a = 1;         //коэффициент приведения
         public double b = 0;         //смещение
         //value = rawData*a+b
-        public string OutputFormat = ""; // TODO Форматвывода
+        public string OutputFormat
+        {
+            get
+            {
+                if (a == 1)
+                    return "";
+                else if (a >= 0.09)
+                    return "F1";
+                else
+                    return "F2";
+            }
+        }
         private Dictionary<int, string> meanings = new(); //Словарь с расшифровками значений параметров
         public Dictionary<int, string> Meanings { get => meanings; set => meanings = value; }
         public Func<int, string> GetMeaning; //Принимает на вход сырое значение, возвращает строку с расшифровкой значения параметра
@@ -66,10 +83,15 @@ namespace AdversCan
                 {
                     double rawDouble = (double)rawValue;
                     double value = rawDouble * a + b;
-                    retString.Append(value.ToString(OutputFormat) + Unit + '(' + rawValue.ToString() + ')');
+                    retString.Append(value.ToString(OutputFormat) + " " + Unit);
                 }
             }
             return retString.ToString();
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
     public class AC2PCommand : ViewModel
@@ -295,10 +317,10 @@ namespace AdversCan
                 receiver = AC2P.Devices[ReceiverType].Name;
             else
                 receiver = $"(неизвестное устройство №{ReceiverType})";
-            retString.Append($"{sender}({TransmitterAddress})->{receiver}({ReceiverAddress});");
+            retString.Append($"{sender}({TransmitterAddress})->{receiver}({ReceiverAddress});;");
 
 
-            retString.Append(pgn.name + ';');
+            retString.Append(pgn.name + ";;");
             if (pgn.multipack)
                 retString.Append($"Мультипакет №{Data[0]};");
             if (PGN == 1 && AC2P.commands.ContainsKey(new CommandId(Data[0], Data[1])))
@@ -461,7 +483,13 @@ namespace AdversCan
         public string enName => AC2P.configParameters[Id]?.NameEn;
 
     }
+    public class ChartBrush : ViewModel
+    {
+        public bool Occupied;
 
+        Brush brush;
+        public Brush Brush { get => brush; set => Set(ref brush, value); }
+    }
     public class StatusVariable : ViewModel, IUpdatable<StatusVariable>
     {
         public int Id { get; set; }
@@ -485,6 +513,9 @@ namespace AdversCan
 
         public string VerboseInfo => AssignedParameter.Decode(RawValue);
 
+        private bool display = false;
+
+        public bool Display { get { return display; } set { Set(ref display, value); } }
 
         public double Value
         {
@@ -501,6 +532,15 @@ namespace AdversCan
                     return $"Unknown parameter {Id}";
             }
         }
+
+        private Brush chartColor;
+
+        public Brush ChartColor
+        {
+            get => chartColor;
+            set => Set(ref chartColor, value);
+        }
+
         public bool IsSimmiliarTo(StatusVariable item)
         {
             return (Id == item.Id);
@@ -508,7 +548,7 @@ namespace AdversCan
 
         public void Update(StatusVariable item)
         {
-            Set(ref rawVal, item.rawVal);
+            RawValue = item.RawValue;
         }
 
     }
@@ -693,10 +733,7 @@ namespace AdversCan
     {
         public ConnectedDevice()
         {
-            foreach (var var in AC2P.Variables)
-            {
-                ChartData.Add(new double[3600]);
-            }
+            LogInit();
         }
 
         private DeviceId id;
@@ -707,20 +744,8 @@ namespace AdversCan
             set { Set(ref id, value); }
         }
 
-        private bool chartLogging;
-
-        public bool ChartLogging
-        {
-            get { return chartLogging; }
-            set { Set(ref chartLogging, value); }
-        }
-
-        public List<double[]> ChartData = new List<double[]>();
-
-        public int ChartLength = 0;
-
-        readonly UpdatableList<StatusVariable> _variables = new();
-        public UpdatableList<StatusVariable> Status => _variables;
+        UpdatableList<StatusVariable> status = new();
+        public UpdatableList<StatusVariable> Status => status;
 
         private readonly UpdatableList<ReadedParameter> _readedParameters = new();
         public UpdatableList<ReadedParameter> readedParameters => _readedParameters;
@@ -728,7 +753,7 @@ namespace AdversCan
         private UpdatableList<ReadedBlackBoxValue> _bbValues = new();
         public UpdatableList<ReadedBlackBoxValue> BBValues => _bbValues;
 
-        public BBError currentError { set; get; }
+        public BBError currentBBError { set; get; }
 
         private UpdatableList<BBError> _BBErrors = new();
         public UpdatableList<BBError> BBErrors => _BBErrors;
@@ -753,15 +778,83 @@ namespace AdversCan
             return ID.GetHashCode();
         }
 
-        public void ChartTick()
+        private bool isLogWriting = false;
+
+        public bool IsLogWriting
         {
-            foreach (StatusVariable sv in Status)
-                ChartData[sv.Id][ChartLength] = sv.Value;
-            if (ChartLength < 1800)
-                ChartLength++;
+            get { return isLogWriting; }
+            private set { Set(ref isLogWriting, value); }
         }
 
-            
+        public List<double[]> LogData = new List<double[]>();
+
+        private int logCurrentPos;
+
+        public int LogCurrentPos
+        {
+            get => logCurrentPos;
+            private set => Set(ref logCurrentPos, value);
+        }
+
+
+        public void LogTick()
+        {
+            if (!isLogWriting) return;
+
+            if (LogCurrentPos < LogData[0].Length)
+            {
+                foreach (StatusVariable sv in Status)
+                    LogData[sv.Id][LogCurrentPos] = sv.Value;
+                LogCurrentPos++;
+            }
+            else
+            {
+                LogStop();
+                LogDataOverrun.Invoke(this, null);
+            }
+        }
+
+        public void LogInit(int length = 86400)
+        {
+            LogCurrentPos = 0;
+            LogData = new List<double[]>();
+            foreach (var var in AC2P.Variables)
+            {
+                LogData.Add(new double[length]);
+            }
+        }
+
+        private bool[] supportedVariables = new bool[AC2P.Variables.Count];
+
+        public bool[] SupportedVariables => supportedVariables;
+
+        public int SupportedVariablesCount
+        {
+            get
+            {
+                int ret = 0;
+                foreach (var s in supportedVariables)
+                    if (s == true) ret++;
+                return ret;
+            }
+        }
+        public void LogStart()
+        {
+            LogInit();
+            IsLogWriting = true;
+        }
+        public void LogClear()
+        {
+            LogInit();
+        }
+
+        public void LogStop()
+        {
+            IsLogWriting = false;
+        }
+
+        public event EventHandler LogDataOverrun;
+
     }
     public struct CommandId
     {
@@ -882,6 +975,8 @@ namespace AdversCan
         static readonly Dictionary<int, string> defMeaningsAllow = new() { { 0, "Разрешено" }, { 1, "Запрещёно" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
         static readonly Dictionary<int, string> Stages = new() { { 0, "STAGE_Z" }, { 1, "STAGE_P" }, { 2, "STAGE_H" }, { 3, "STAGE_W" }, { 4, "STAGE_F" }, { 5, "STAGE_T" }, { 6, "STAGE_M" } };
 
+
+
         public static Dictionary<int, PGN> PGNs = new();
 
         public static Dictionary<CommandId, AC2PCommand> commands = new();
@@ -894,10 +989,15 @@ namespace AdversCan
         public static Dictionary<int, string> VariablesNames = new();
         public static Dictionary<int, string> BbParameterNames = new();
 
-        private BindingList<ConnectedDevice> _connectedDevices = new();
+
+        static BindingList<Brush> brushCollection = new BindingList<Brush>();
+
+        public static BindingList<Brush> BrushCollection => brushCollection;
+
+        private readonly BindingList<ConnectedDevice> _connectedDevices = new();
         public BindingList<ConnectedDevice> ConnectedDevices => _connectedDevices;
 
-        private UpdatableList<AC2PMessage> _messages = new();
+        private readonly UpdatableList<AC2PMessage> _messages = new();
         public UpdatableList<AC2PMessage> Messages => _messages;
 
         public static Dictionary<int, string> ErrorNames = new();
@@ -935,6 +1035,7 @@ namespace AdversCan
 
             ConnectedDevice currentDevice = ConnectedDevices.First(d => d.ID.Equals(m.TransmitterId));
 
+            if (!PGNs.ContainsKey(m.PGN)) return; //Такого PGN нет в библиотеке
             foreach (AC2PParameter p in PGNs[m.PGN].parameters)
             {
                 if (PGNs[m.PGN].multipack && p.PackNumber != m.Data[0]) continue;
@@ -956,7 +1057,9 @@ namespace AdversCan
                         case 32: rawValue = m.Data[p.StartByte] * 16777216 + m.Data[p.StartByte + 1] * 65536 + m.Data[p.StartByte + 2] * 256 + m.Data[p.StartByte + 3]; break;
                         default: throw new Exception("Bad parameter size");
                     }
+                    if (rawValue == Math.Pow(2, p.BitLength) - 1) return; //Неподдерживаемый параметр, ливаем
                     sv.RawValue = rawValue;
+                    currentDevice.SupportedVariables[sv.Id] = true;
                     currentDevice.Status.TryToAdd(sv);
                 }
             }
@@ -988,27 +1091,26 @@ namespace AdversCan
                     {
                         if (m.Data[2] == 0xFF && m.Data[3] == 0xFA) //Заголовок отчёта
                         {
-                            if (currentDevice.currentError.Variables.Count > 0)
+                            if (currentDevice.currentBBError.Variables.Count > 0)
                             {
                                 BBError e = new BBError();
-                                currentDevice.currentError = e;
+                                currentDevice.currentBBError = e;
                                 currentDevice.BBErrors.Add(e);
                             }
                         }
                         else
                         {
-                            if (currentDevice.currentError == null) return;
+                            if (currentDevice.currentBBError == null) return;
                             ReadedVariable v = new ReadedVariable();
                             v.Id = m.Data[2] * 256 + m.Data[3];
                             v.Value = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
-                            currentDevice.currentError.Variables.TryToAdd(v);
+                            currentDevice.currentBBError.Variables.TryToAdd(v);
                         }
                     }
                 }
 
             }
-
-            UIContext.Send(x => Messages.TryToAdd(m), null);
+            Messages.TryToAdd(m);
 
         }
         public static void ParseParamsname(string filePath = "paramsname.h")
@@ -1107,12 +1209,11 @@ namespace AdversCan
             if (!Capture("Чтение ошибок из чёрного ящика")) return;
             WaitingForBBErrors = true;
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
-            UIContext.Send(x =>
-            {
-                currentDevice.BBErrors.Clear();
-                currentDevice.currentError = new BBError();
-                currentDevice.BBErrors.Add(currentDevice.currentError);
-            }, null);
+
+            currentDevice.BBErrors.Clear();
+            currentDevice.currentBBError = new BBError();
+            currentDevice.BBErrors.Add(currentDevice.currentBBError);
+
 
             AC2PMessage msg = new AC2PMessage();
             msg.PGN = 8;
@@ -1311,8 +1412,20 @@ namespace AdversCan
             canAdapter = adapter;
             adapter.GotNewMessage += Adapter_GotNewMessage;
             SeedStaticData();
+            ParseParamsname();
+
         }
 
+        private static void SeedBrushes()
+        {
+            brushCollection.Clear();
+            for (int i = 0; i < 24; i++)
+            {
+                Random random = new Random(i);
+                brushCollection.Add(new SolidColorBrush(Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255))));
+            }
+
+        }
         private void Adapter_GotNewMessage(object sender, EventArgs e)
         {
             UIContext.Send(x => ParseCanMessage((e as GotMessageEventArgs).receivedMessage), null);
@@ -1320,6 +1433,8 @@ namespace AdversCan
 
         public static void SeedStaticData()
         {
+            SeedBrushes();
+
             Devices = new Dictionary<int, Device>() {
             { 0, new Device(){ID=0,Name="Любой" } } ,
             { 1, new Device(){ID=1,Name="14ТС-Мини" } } ,
@@ -1531,7 +1646,7 @@ namespace AdversCan
 
             PGNs[10].parameters.Add(new AC2PParameter() { Name = "Стадия", BitLength = 8, StartByte = 0, Meanings = Stages, Var = 1 });
             PGNs[10].parameters.Add(new AC2PParameter() { Name = "Режим", BitLength = 8, StartByte = 1, Var = 2 });
-            PGNs[10].parameters.Add(new AC2PParameter() { Name = "Код неисправности", BitLength = 8, StartByte = 2, Var = 24 });
+            PGNs[10].parameters.Add(new AC2PParameter() { Name = "Код неисправности", BitLength = 8, StartByte = 2, Var = 24, Meanings = ErrorNames });
             PGNs[10].parameters.Add(new AC2PParameter() { Name = "Помпа неисправна", BitLength = 2, StartByte = 3, Meanings = defMeaningsYesNo });
             PGNs[10].parameters.Add(new AC2PParameter() { Name = "Код предупреждения", BitLength = 8, StartByte = 4 });
             PGNs[10].parameters.Add(new AC2PParameter() { Name = "Количество морганий", BitLength = 8, StartByte = 5, Var = 25 });
