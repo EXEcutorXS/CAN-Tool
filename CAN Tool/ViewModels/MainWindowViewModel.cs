@@ -11,6 +11,7 @@ using Can_Adapter;
 using AdversCan;
 using ScottPlot;
 using System.Windows.Media;
+using ScottPlot.Renderable;
 
 namespace CAN_Tool.ViewModels
 {
@@ -19,8 +20,8 @@ namespace CAN_Tool.ViewModels
 
         int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
 
-        
 
+        public bool AutoRedraw { set; get; } = true;
         public int[] Bitrates => _Bitrates;
 
         CanAdapter _canAdapter;
@@ -255,19 +256,23 @@ namespace CAN_Tool.ViewModels
         private void OnChartDrawCommandExecuted(object parameter)
         {
             Plot plt = myChart.Plot;
-
-
+            
             plt.Clear();
+            
             foreach (var v in SelectedConnectedDevice.Status)
-            {
                 if (v.Display)
-                plt.AddSignal(SelectedConnectedDevice.LogData[15].Take(SelectedConnectedDevice.LogCurrentPos).ToArray());
-                //plt.AddAxis(ScottPlot.Renderable.Edge.Left,)
-            }
+                {
+                    ArraySegment<Double> dataToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos);
+                    var sig = plt.AddSignal(dataToDisplay.ToArray(), color: v.Color, label: v.Name);
+
+                    plt.Style(Style.Gray1);
+                    plt.Legend();
+                }
 
             plt.Palette = Palette.OneHalfDark;
 
             myChart.Refresh();
+
         }
         private bool CanChartDrawCommandExecute(object parameter) => (SelectedConnectedDevice != null && SelectedConnectedDevice.LogCurrentPos > 0);
         #endregion
@@ -393,12 +398,21 @@ namespace CAN_Tool.ViewModels
             {
                 d.LogTick();
             }
+
+            if (AutoRedraw)
+                if (CanChartDrawCommandExecute(null))
+                    OnChartDrawCommandExecuted(null);
+
         }
 
         #endregion
         #endregion
 
-
+        public void NewDeviceHandler(object sender, EventArgs e)
+        {
+            if (SelectedConnectedDevice == null || SelectedConnectedDevice.ID.Type==126) //Котлы имеют приоритет над HCU в этом плане...
+                SelectedConnectedDevice = AC2PInstance.ConnectedDevices[0];
+        }
         public MainWindowViewModel()
         {
 
@@ -411,7 +425,7 @@ namespace CAN_Tool.ViewModels
             timer.Interval = new TimeSpan(0, 0, 1);
             timer.Start();
 
-            
+            AC2PInstance.NewDeviveAquired += NewDeviceHandler;
 
 
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);

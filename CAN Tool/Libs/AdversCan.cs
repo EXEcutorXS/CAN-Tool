@@ -16,8 +16,7 @@ using System.Diagnostics.Contracts;
 using System.Reflection.Metadata.Ecma335;
 using System.Diagnostics;
 using System.Windows.Media;
-
-
+using System.Drawing;
 
 namespace AdversCan
 {
@@ -36,10 +35,11 @@ namespace AdversCan
         public int BitLength;   //Длина параметра в битах
         public bool Signed = false; //Число со знаком
         public string Name { set; get; }     //Имя параметра
-        public string Unit = "";     //Единица измерения
+        private string unit = "";     //Единица измерения
         public double a = 1;         //коэффициент приведения
         public double b = 0;         //смещение
         //value = rawData*a+b
+        public string Unit { get => unit; set => unit = value; }
         public string OutputFormat
         {
             get
@@ -483,15 +483,46 @@ namespace AdversCan
         public string enName => AC2P.configParameters[Id]?.NameEn;
 
     }
-    public class ChartBrush : ViewModel
-    {
-        public bool Occupied;
 
-        Brush brush;
-        public Brush Brush { get => brush; set => Set(ref brush, value); }
-    }
     public class StatusVariable : ViewModel, IUpdatable<StatusVariable>
     {
+
+        public StatusVariable(int var):base()
+        {
+            Id = var;
+            if (var == 5 ||
+                var == 6 ||
+                var == 7 ||
+                var == 8 ||
+                var == 9 ||
+                var == 12 ||
+                var == 13 ||
+                var == 15 ||
+                var == 16 ||
+                var == 18 ||
+                var == 21 ||
+                var == 40 ||
+                var == 41
+                )
+                Display = true;
+            switch (var)
+            {
+                case 5: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 0)); break;
+                case 15: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 255)); break;
+                case 16: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 255)); break;
+                case 18: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0)); break;
+                case 21: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 255)); break;
+                case 40: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 100, 100)); break;
+                default:
+                    Random random = new Random((int)DateTime.Now.Ticks);
+                    ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255)));
+                    break;
+            }
+        }
+        public StatusVariable()
+        {
+            
+        }
         public int Id { get; set; }
 
         private int rawVal;
@@ -502,6 +533,7 @@ namespace AdversCan
             get { return rawVal; }
             set { Set(ref rawVal, value); }
         }
+
 
         private AC2PParameter assignedParameter;
 
@@ -533,12 +565,16 @@ namespace AdversCan
             }
         }
 
-        private Brush chartColor;
+        private System.Windows.Media.Brush chartBrush;
 
-        public Brush ChartColor
+        public System.Drawing.Color Color => System.Drawing.Color.FromArgb(255, (chartBrush as SolidColorBrush).Color.R, (chartBrush as SolidColorBrush).Color.G, (chartBrush as SolidColorBrush).Color.B);
+        
+
+        [AffectsTo("Color")]
+        public System.Windows.Media.Brush ChartBrush
         {
-            get => chartColor;
-            set => Set(ref chartColor, value);
+            get => chartBrush;
+            set => Set(ref chartBrush, value);
         }
 
         public bool IsSimmiliarTo(StatusVariable item)
@@ -757,7 +793,8 @@ namespace AdversCan
 
         private UpdatableList<BBError> _BBErrors = new();
         public UpdatableList<BBError> BBErrors => _BBErrors;
-
+        public string Name => ToString();
+        public string ImagePath => $"/Images/{id.Type}.jpg";
         public override string ToString()
         {
             if (AC2P.Devices.ContainsKey(ID.Type))
@@ -968,6 +1005,9 @@ namespace AdversCan
     }
     public class AC2P : ViewModel
     {
+
+        public event EventHandler NewDeviveAquired;
+
         private SynchronizationContext UIContext;
 
         static readonly Dictionary<int, string> defMeaningsYesNo = new() { { 0, "Нет" }, { 1, "Да" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
@@ -990,9 +1030,6 @@ namespace AdversCan
         public static Dictionary<int, string> BbParameterNames = new();
 
 
-        static BindingList<Brush> brushCollection = new BindingList<Brush>();
-
-        public static BindingList<Brush> BrushCollection => brushCollection;
 
         private readonly BindingList<ConnectedDevice> _connectedDevices = new();
         public BindingList<ConnectedDevice> ConnectedDevices => _connectedDevices;
@@ -1031,7 +1068,10 @@ namespace AdversCan
             DeviceId id = m.TransmitterId;
 
             if (ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id)) == null)
+            {
                 ConnectedDevices.Add(new ConnectedDevice() { ID = id });
+                NewDeviveAquired?.Invoke(this, null);
+            }
 
             ConnectedDevice currentDevice = ConnectedDevices.First(d => d.ID.Equals(m.TransmitterId));
 
@@ -1041,8 +1081,7 @@ namespace AdversCan
                 if (PGNs[m.PGN].multipack && p.PackNumber != m.Data[0]) continue;
                 if (p.Var != 0)
                 {
-                    StatusVariable sv = new StatusVariable();
-                    sv.Id = p.Var;
+                    StatusVariable sv = new StatusVariable(p.Var);
                     sv.AssignedParameter = p;
                     int rawValue;
                     switch (p.BitLength)
@@ -1416,16 +1455,6 @@ namespace AdversCan
 
         }
 
-        private static void SeedBrushes()
-        {
-            brushCollection.Clear();
-            for (int i = 0; i < 24; i++)
-            {
-                Random random = new Random(i);
-                brushCollection.Add(new SolidColorBrush(Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255))));
-            }
-
-        }
         private void Adapter_GotNewMessage(object sender, EventArgs e)
         {
             UIContext.Send(x => ParseCanMessage((e as GotMessageEventArgs).receivedMessage), null);
@@ -1433,7 +1462,6 @@ namespace AdversCan
 
         public static void SeedStaticData()
         {
-            SeedBrushes();
 
             Devices = new Dictionary<int, Device>() {
             { 0, new Device(){ID=0,Name="Любой" } } ,

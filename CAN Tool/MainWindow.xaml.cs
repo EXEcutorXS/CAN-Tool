@@ -20,6 +20,7 @@ using CAN_Tool.ViewModels;
 using System.Globalization;
 using ScottPlot;
 using ScottPlot.Renderable;
+using CAN_Tool.Views;
 
 namespace CAN_Tool
 {
@@ -192,6 +193,17 @@ namespace CAN_Tool
             catch { }
         }
 
+        private void ColorPick(object sender, MouseButtonEventArgs e)
+        {
+            ColorPicker p = new ColorPicker(sender as Rectangle);
+            p.Show();
+        }
+
+        private void window_Loaded(object sender, RoutedEventArgs e)
+        {
+            
+            
+        }
     }
 
 }
