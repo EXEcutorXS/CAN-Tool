@@ -262,16 +262,25 @@
                         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
                             <Button Margin="10" Content="Enter Manual" />
                             <Button Margin="10" Content="Leave manual" />
+                            <Button Margin="10" Content="Air blower+" />
+                            <Button Margin="10" Content="Air blower-" />
+                            <Button Margin="10" Content="Fuel pump+" />
+                            <Button Margin="10" Content="Fuel pump-" />
+                            <Button Margin="10" Content="Glow plug+" />
+                            <Button Margin="10" Content="Glow plug-" />
+                            <Button Margin="10" Content="Pump on" />
+                            <Button Margin="10" Content="Pump off" />
+                            
                         </StackPanel>
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"></ColumnDefinition>
+                                <ColumnDefinition Width="3*"></ColumnDefinition>
                                 <ColumnDefinition Width="2*"></ColumnDefinition>
-                                <ColumnDefinition Width="2*"></ColumnDefinition>
-                                <ColumnDefinition Width="1*"></ColumnDefinition>
-                                <ColumnDefinition Width="6*"></ColumnDefinition>
+                                <ColumnDefinition Width="4*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <DockPanel Grid.Column="0">
-                                <TextBlock DockPanel.Dock="Top" Text="Air Blower" HorizontalAlignment="Center" Margin="10" FontSize="25" />
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding ManualAirBlower,StringFormat=Air blower:{0} }" HorizontalAlignment="Center" Margin="10" FontSize="20" />
                                 <Grid DockPanel.Dock="Top">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition></ColumnDefinition>
@@ -290,7 +299,7 @@
                                 </Grid>
                             </DockPanel>
                             <DockPanel Grid.Column="1">
-                                <TextBlock DockPanel.Dock="Top" Text="Fuel Pump" HorizontalAlignment="Center" Margin="10" FontSize="25" />
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding ManualFuelPump,StringFormat=Fuel pump:{0} }" HorizontalAlignment="Center" Margin="10" FontSize="20" />
                                 <Grid DockPanel.Dock="Top">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition></ColumnDefinition>
@@ -309,7 +318,7 @@
                                 </Grid>
                             </DockPanel>
                             <DockPanel Grid.Column="2">
-                                <TextBlock DockPanel.Dock="Top" Text="Glow plug" HorizontalAlignment="Center" Margin="10" FontSize="25" />
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding ManualGlowPlug,StringFormat=Glow plug:{0} }" HorizontalAlignment="Center" Margin="10" FontSize="20" />
                                 <Grid DockPanel.Dock="Top">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="1*"></RowDefinition>
@@ -322,9 +331,8 @@
                             </DockPanel>
                             <DataGrid Grid.Column="3" ItemsSource="{Binding SelectedConnectedDevice.Status}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Path=AssignedParameter.Name}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"></DataGridTextColumn>
                                     <DataGridTextColumn Header="Value" Binding="{Binding Path=Value}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Unit" Binding="{Binding Path=AssignedParameter.Unit}"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>

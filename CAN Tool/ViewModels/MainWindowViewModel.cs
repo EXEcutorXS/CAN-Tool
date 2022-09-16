@@ -20,6 +20,10 @@ namespace CAN_Tool.ViewModels
 
         int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
 
+        public int ManualAirBlower { set; get; }
+        public int ManualFuelPump { set; get; }
+        public int ManualGlowPlug { set; get; }
+        public bool ManualPump { set; get; }
 
         public bool AutoRedraw { set; get; } = true;
         public int[] Bitrates => _Bitrates;
@@ -256,9 +260,9 @@ namespace CAN_Tool.ViewModels
         private void OnChartDrawCommandExecuted(object parameter)
         {
             Plot plt = myChart.Plot;
-            
+
             plt.Clear();
-            
+
             foreach (var v in SelectedConnectedDevice.Status)
                 if (v.Display)
                 {
@@ -377,6 +381,50 @@ namespace CAN_Tool.ViewModels
         }
 
         #endregion
+
+        #region EnterManualModeCommand
+        public ICommand EnterManualModeCommand { get; }
+        private void OnEnterManualModeCommandExecuted(object parameter)
+        {
+            executeCommand(67, new byte[] { 1, 0, 0, 0, 0, 0 });
+        }
+        private bool CanEnterManualModeCommandExecute(object parameter)
+        {
+            if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
+            return true;
+        }
+
+        #endregion
+
+
+
+        #region ExitManualModeCommand
+        public ICommand ExitManualModeCommand { get; }
+        private void OnExitManualModeCommandExecuted(object parameter)
+        {
+            executeCommand(67, new byte[] { 0, 0, 0, 0, 0, 0 });
+        }
+        private bool CanExitManualModeCommandExecute(object parameter)
+        {
+            if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
+            return true;
+        }
+
+        #endregion
+
+        #region IncreaceManualAirBlower
+        public ICommand IncreaceManualAirBlowerCommand { get; }
+        private void OnIncreaceManualAirBlowerCommandExecuted(object parameter)
+        {
+            if (ManualAirBlower < 100)
+                ManualAirBlower++;
+        }
+        private bool CanIncreaceManualAirBlowerExecute(object parameter)
+        {
+            if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
+            return true;
+        }
+        #endregion
         private void executeCommand(byte num, params byte[] data)
         {
             CustomMessage.TransmitterType = 126;
@@ -410,7 +458,7 @@ namespace CAN_Tool.ViewModels
 
         public void NewDeviceHandler(object sender, EventArgs e)
         {
-            if (SelectedConnectedDevice == null || SelectedConnectedDevice.ID.Type==126) //Котлы имеют приоритет над HCU в этом плане...
+            if (SelectedConnectedDevice == null || SelectedConnectedDevice.ID.Type == 126) //Котлы имеют приоритет над HCU в этом плане...
                 SelectedConnectedDevice = AC2PInstance.ConnectedDevices[0];
         }
         public MainWindowViewModel()
