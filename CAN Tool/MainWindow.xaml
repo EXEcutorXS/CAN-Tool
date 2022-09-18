@@ -7,13 +7,13 @@
         <vm:MainWindowViewModel />
     </Window.DataContext>
     <DockPanel>
-        <StatusBar DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
+        <StatusBar x:Name="MyStatusbar" DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
             <StatusBarItem Width="auto">
                 <TextBlock Text="{Binding AC2PInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
-            <ProgressBar Width="200" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="15" Margin="10 0 10 0"></ProgressBar>
+            <ProgressBar Width="300" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0"></ProgressBar>
             <StatusBarItem>
-                <Button Content="Cancel" Command="{Binding CancelOperationCommand}"></Button>
+                <Button Content="Cancel" Command="{Binding CancelOperationCommand}" Margin="5"></Button>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
                 <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
@@ -56,7 +56,7 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="auto"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
+                                    <RowDefinition Height="auto"></RowDefinition>
                                 </Grid.RowDefinitions>
                                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                                     <TextBox ToolTip="Type" Width="40" Margin="5 10" Text="{Binding SelectedConnectedDevice.ID.Type,Mode=OneWay}" IsReadOnly="True" Cursor="Arrow" />
@@ -260,75 +260,58 @@
                     </TabItem.Header>
                     <DockPanel>
                         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-                            <Button Margin="10" Content="Enter Manual" />
-                            <Button Margin="10" Content="Leave manual" />
-                            <Button Margin="10" Content="Air blower+" />
-                            <Button Margin="10" Content="Air blower-" />
-                            <Button Margin="10" Content="Fuel pump+" />
-                            <Button Margin="10" Content="Fuel pump-" />
-                            <Button Margin="10" Content="Glow plug+" />
-                            <Button Margin="10" Content="Glow plug-" />
-                            <Button Margin="10" Content="Pump on" />
-                            <Button Margin="10" Content="Pump off" />
-                            
+                            <Button Margin="10" Content="Enter Manual" Command="{Binding EnterManualModeCommand}" />
+                            <Button Margin="10" Content="Leave manual" Command="{Binding ExitManualModeCommand}"/>
+                            <Button Margin="10" Content="Air blower+" Command="{Binding IncreaceManualAirBlowerCommand}"/>
+                            <Button Margin="10" Content="Air blower-" Command="{Binding DecreaseManualAirBlowerCommand}"/>
+                            <Button Margin="10" Content="Fuel pump+" Command="{Binding IncreaseManualFuelPumpCommand}"/>
+                            <Button Margin="10" Content="Fuel pump-" Command="{Binding DecreaseFuelPumpCommand}"/>
+                            <Button Margin="10" Content="Glow plug+" Command="{Binding IncreaseGlowPlugCommand}"/>
+                            <Button Margin="10" Content="Glow plug-" Command="{Binding DecreaseGlowPlugCommand}"/>
+                            <CheckBox Content="Water Pump" IsChecked="{Binding ManualPump}" />
+
                         </StackPanel>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*"></ColumnDefinition>
-                                <ColumnDefinition Width="3*"></ColumnDefinition>
-                                <ColumnDefinition Width="2*"></ColumnDefinition>
                                 <ColumnDefinition Width="4*"></ColumnDefinition>
+                                <ColumnDefinition Width="3*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <DockPanel Grid.Column="0">
-                                <TextBlock DockPanel.Dock="Top" Text="{Binding ManualAirBlower,StringFormat=Air blower:{0} }" HorizontalAlignment="Center" Margin="10" FontSize="20" />
-                                <Grid DockPanel.Dock="Top">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="1*"></RowDefinition>
-                                        <RowDefinition Height="8*"></RowDefinition>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Column="0" Grid.Row="0" FontSize="20" Text="Set" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                                    <TextBlock Grid.Column="1" Grid.Row="0" FontSize="20" Text="Measured" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                                    <Rectangle Grid.Column="0" Grid.Row="1" Fill="Gray" Margin="10"></Rectangle>
-                                    <Rectangle Grid.Column="0" Grid.Row="1" Fill="Blue" Margin="10" VerticalAlignment="Bottom" Height="20"></Rectangle>
-                                    <Rectangle Grid.Column="1" Grid.Row="1" Fill="Gray" Margin="10"></Rectangle>
-                                    <Rectangle Grid.Column="1" Grid.Row="1" Fill="Green" Margin="10" VerticalAlignment="Bottom" Height="20"></Rectangle>
-                                </Grid>
-                            </DockPanel>
-                            <DockPanel Grid.Column="1">
-                                <TextBlock DockPanel.Dock="Top" Text="{Binding ManualFuelPump,StringFormat=Fuel pump:{0} }" HorizontalAlignment="Center" Margin="10" FontSize="20" />
-                                <Grid DockPanel.Dock="Top">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="1*"></RowDefinition>
-                                        <RowDefinition Height="8*"></RowDefinition>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Column="0" Grid.Row="0" FontSize="20" Text="Set" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                                    <TextBlock Grid.Column="1" Grid.Row="0" FontSize="20" Text="Measured" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                                    <Rectangle Grid.Column="0" Grid.Row="1" Fill="Gray" Margin="10"></Rectangle>
-                                    <Rectangle Grid.Column="0" Grid.Row="1" Fill="Blue" Margin="10" VerticalAlignment="Bottom" Height="20"></Rectangle>
-                                    <Rectangle Grid.Column="1" Grid.Row="1" Fill="Gray" Margin="10"></Rectangle>
-                                    <Rectangle Grid.Column="1" Grid.Row="1" Fill="Green" Margin="10" VerticalAlignment="Bottom" Height="20"></Rectangle>
-                                </Grid>
-                            </DockPanel>
-                            <DockPanel Grid.Column="2">
-                                <TextBlock DockPanel.Dock="Top" Text="{Binding ManualGlowPlug,StringFormat=Glow plug:{0} }" HorizontalAlignment="Center" Margin="10" FontSize="20" />
-                                <Grid DockPanel.Dock="Top">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="1*"></RowDefinition>
-                                        <RowDefinition Height="8*"></RowDefinition>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" FontSize="20" Text="Set" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                                    <Rectangle Grid.Row="1" Fill="Gray" Margin="10"></Rectangle>
-                                    <Rectangle Grid.Row="1" Fill="Green" Margin="10" VerticalAlignment="Bottom" Height="20"></Rectangle>
-                                </Grid>
-                            </DockPanel>
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"></RowDefinition>
+                                    <RowDefinition Height="1*"></RowDefinition>
+                                    <RowDefinition Height="10*"></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Air Set" HorizontalAlignment="Center" Margin="10" FontSize="20" />
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding ManualAirBlower }" HorizontalAlignment="Center" Margin="10" FontSize="20" />
+                                <Rectangle x:Name="SetRevRect" Grid.Column="0" Grid.Row="2"  Margin="10"></Rectangle>
+                                <ProgressBar Grid.Column="0" Grid.Row="2" Value="{Binding ManualAirBlower }" Maximum="90" Orientation="Vertical" Width="{Binding ElementName=SetRevRect,Path=ActualHeight}" Height="{Binding ElementName=SetRevRect,Path=ActualWidth}"></ProgressBar>
+                                
+                                <TextBlock Grid.Column="1" Grid.Row="0" FontSize="20" Text="Air Measured" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Grid.Column="1" Grid.Row="1" FontSize="20" Text="{Binding SelectedConnectedDevice.Status[16].Value,TargetNullValue=NA}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                <Rectangle x:Name="MeasRevRect" Grid.Column="1" Grid.Row="2" Margin="10"></Rectangle>
+                                <ProgressBar Grid.Column="1" Grid.Row="2" Value="{Binding SelectedConnectedDevice.Status[16].Value,TargetNullValue=0}" Foreground="Green" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}"></ProgressBar>
+
+                                <TextBlock Grid.Column="2" Grid.Row="0" FontSize="20" Text="Pump Set" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Grid.Column="2" Grid.Row="1" FontSize="20" Text="{Binding ManualFuelPump}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                <Rectangle x:Name="SetPumpRect" Grid.Column="2" Grid.Row="2" Margin="10"></Rectangle>
+                                <ProgressBar Grid.Column="2" Grid.Row="2" Value="{Binding ManualFuelPump,TargetNullValue=0}" Foreground="Yellow" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}"></ProgressBar>
+
+                                <TextBlock Grid.Column="3" Grid.Row="0" FontSize="20" Text="Air Measured" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Grid.Column="3" Grid.Row="1" FontSize="20" Text="{Binding ManualGlowPlug}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                <Rectangle x:Name="SetPlugRect" Grid.Column="3" Grid.Row="2" Margin="10"></Rectangle>
+                                <ProgressBar Grid.Column="3" Grid.Row="2"  Value="{Binding ManualGlowPlug,TargetNullValue=0}" Foreground="Red" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}"></ProgressBar>
+                                
+                                
+                            </Grid>
+
                             <DataGrid Grid.Column="3" ItemsSource="{Binding SelectedConnectedDevice.Status}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"></DataGridTextColumn>
@@ -360,3 +343,5 @@
         </DockPanel>
     </DockPanel>
 </Window>
+
+    

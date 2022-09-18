@@ -21,7 +21,7 @@ namespace CAN_Tool.ViewModels
         int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
 
         public int ManualAirBlower { set; get; }
-        public int ManualFuelPump { set; get; }
+        public double ManualFuelPump { set; get; }
         public int ManualGlowPlug { set; get; }
         public bool ManualPump { set; get; }
 
@@ -388,14 +388,8 @@ namespace CAN_Tool.ViewModels
         {
             executeCommand(67, new byte[] { 1, 0, 0, 0, 0, 0 });
         }
-        private bool CanEnterManualModeCommandExecute(object parameter)
-        {
-            if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
-            return true;
-        }
 
         #endregion
-
 
 
         #region ExitManualModeCommand
@@ -404,12 +398,6 @@ namespace CAN_Tool.ViewModels
         {
             executeCommand(67, new byte[] { 0, 0, 0, 0, 0, 0 });
         }
-        private bool CanExitManualModeCommandExecute(object parameter)
-        {
-            if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
-            return true;
-        }
-
         #endregion
 
         #region IncreaceManualAirBlower
@@ -419,10 +407,50 @@ namespace CAN_Tool.ViewModels
             if (ManualAirBlower < 100)
                 ManualAirBlower++;
         }
-        private bool CanIncreaceManualAirBlowerExecute(object parameter)
+        #endregion
+
+        #region DecreaseManualAirBlower
+        public ICommand DecreaseManualAirBlowerCommand { get; }
+        private void OnDecreaseManualAirBlowerCommandExecuted(object parameter)
         {
-            if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
-            return true;
+            if (ManualAirBlower > 0)
+                ManualAirBlower--;
+        }
+        #endregion
+
+        #region IncreaseManualFuelPump
+        public ICommand IncreaseManualFuelPumpCommand { get; }
+        private void OnIncreaseManualFuelPumpCommandExecuted(object parameter)
+        {
+            ManualFuelPump += 0.1;
+            if (ManualFuelPump > 7) ManualFuelPump = 7;
+        }
+        #endregion
+
+        #region DecreaseManualFuelPump
+        public ICommand DecreaseFuelPumpCommand { get; }
+        private void OnDecreaseFuelPumpCommandExecuted(object parameter)
+        {
+                ManualFuelPump-=0.1;
+            if (ManualFuelPump < 0) ManualFuelPump = 0;
+        }
+        #endregion
+
+        #region IncreaseManualGlowPlug
+        public ICommand IncreaseGlowPlugCommand { get; }
+        private void OnIncreaseGlowPlugCommandExecuted(object parameter)
+        {
+            ManualGlowPlug += 5;
+            if (ManualGlowPlug > 100) ManualGlowPlug = 100;
+        }
+        #endregion
+
+        #region DecreaseManualGlowPlug
+        public ICommand DecreaseGlowPlugCommand { get; }
+        private void OnDecreaseGlowPlugCommandExecuted(object parameter)
+        {
+            ManualGlowPlug -= 5;
+            if (ManualGlowPlug < 0) ManualGlowPlug = 0;
         }
         #endregion
         private void executeCommand(byte num, params byte[] data)
@@ -456,11 +484,19 @@ namespace CAN_Tool.ViewModels
         #endregion
         #endregion
 
+
         public void NewDeviceHandler(object sender, EventArgs e)
         {
             if (SelectedConnectedDevice == null || SelectedConnectedDevice.ID.Type == 126) //Котлы имеют приоритет над HCU в этом плане...
                 SelectedConnectedDevice = AC2PInstance.ConnectedDevices[0];
         }
+
+        public bool deviceSelected(object parameter)
+        {
+            if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
+            return true;
+        }
+
         public MainWindowViewModel()
         {
 
@@ -502,6 +538,12 @@ namespace CAN_Tool.ViewModels
             LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
             LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
             ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);
+            IncreaceManualAirBlowerCommand = new LambdaCommand(OnIncreaceManualAirBlowerCommandExecuted, deviceSelected);
+            DecreaseManualAirBlowerCommand = new LambdaCommand(OnDecreaseManualAirBlowerCommandExecuted, deviceSelected);
+            IncreaseManualFuelPumpCommand = new LambdaCommand(OnIncreaseManualFuelPumpCommandExecuted, deviceSelected);
+            DecreaseFuelPumpCommand= new LambdaCommand(OnDecreaseFuelPumpCommandExecuted, deviceSelected);
+            IncreaseGlowPlugCommand = new LambdaCommand(OnIncreaseGlowPlugCommandExecuted, deviceSelected);
+            DecreaseGlowPlugCommand= new LambdaCommand(OnDecreaseGlowPlugCommandExecuted, deviceSelected);
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;
 
