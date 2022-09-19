@@ -15,7 +15,6 @@ using System.ComponentModel;
 using System.IO.Ports;
 using Can_Adapter;
 using AdversCan;
-using RVC;
 using CAN_Tool.ViewModels;
 using System.Globalization;
 using ScottPlot;
@@ -31,13 +30,14 @@ namespace CAN_Tool
     public partial class MainWindow : Window
     {
 
+        MainWindowViewModel vm;
 
-        public List<Brush> Brushes; 
+        public List<Brush> Brushes;
         public MainWindow()
         {
             InitializeComponent();
 
-            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
+            vm = (MainWindowViewModel)DataContext;
 
             App.LanguageChanged += LanguageChanged;
 
@@ -201,8 +201,51 @@ namespace CAN_Tool
 
         private void window_Loaded(object sender, RoutedEventArgs e)
         {
-            
-            
+
+
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (vm.TurnOnWaterPumpCommand.CanExecute(null))
+                vm.TurnOnWaterPumpCommand.Execute(null);
+
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (vm.TurnOffWaterPumpCommand.CanExecute(null))
+                vm.TurnOffWaterPumpCommand.Execute(null);
+        }
+
+        private void ProgressBar_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+                if (vm.IncreaceManualAirBlowerCommand.CanExecute(null))
+                    vm.IncreaceManualAirBlowerCommand.Execute(null);
+            if (e.Delta < 0)
+                if (vm.DecreaseManualAirBlowerCommand.CanExecute(null))
+                    vm.DecreaseManualAirBlowerCommand.Execute(null);
+        }
+
+        private void ProgressBar_MouseWheel_1(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+                if (vm.IncreaseManualFuelPumpCommand.CanExecute(null))
+                    vm.IncreaseManualFuelPumpCommand.Execute(null);
+            if (e.Delta < 0)
+                if (vm.DecreaseFuelPumpCommand.CanExecute(null))
+                    vm.DecreaseFuelPumpCommand.Execute(null);
+        }
+
+        private void ProgresssdfBar_MouseWheel_2(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+                if (vm.IncreaseGlowPlugCommand.CanExecute(null))
+                    vm.IncreaseGlowPlugCommand.Execute(null);
+            if (e.Delta < 0)
+                if (vm.DecreaseGlowPlugCommand.CanExecute(null))
+                    vm.DecreaseGlowPlugCommand.Execute(null);
         }
     }
 

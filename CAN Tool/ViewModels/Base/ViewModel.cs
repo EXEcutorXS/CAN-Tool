@@ -25,13 +25,6 @@ namespace CAN_Tool.ViewModels.Base
         }
     }
 
-    public class PropertyGroupAttribute : Attribute
-    {
-        string group;
-
-        PropertyGroupAttribute(string groupName) => group = groupName;
-
-    }
     public abstract class ViewModel : INotifyPropertyChanged, IDisposable
     {
 

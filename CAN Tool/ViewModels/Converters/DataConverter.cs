@@ -50,4 +50,17 @@ namespace CAN_Tool.ViewModels.Converters
             return System.Convert.ToInt32((string)value, 10);
         }
     }
+
+    public class FuelPumpIndicatorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((double)value/100);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return double.Parse(value.ToString());
+        }
+    }
 }

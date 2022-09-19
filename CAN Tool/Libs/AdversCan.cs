@@ -487,7 +487,7 @@ namespace AdversCan
     public class StatusVariable : ViewModel, IUpdatable<StatusVariable>
     {
 
-        public StatusVariable(int var):base()
+        public StatusVariable(int var) : base()
         {
             Id = var;
             if (var == 5 ||
@@ -521,7 +521,7 @@ namespace AdversCan
         }
         public StatusVariable()
         {
-            
+
         }
         public int Id { get; set; }
 
@@ -568,7 +568,7 @@ namespace AdversCan
         private System.Windows.Media.Brush chartBrush;
 
         public System.Drawing.Color Color => System.Drawing.Color.FromArgb(255, (chartBrush as SolidColorBrush).Color.R, (chartBrush as SolidColorBrush).Color.G, (chartBrush as SolidColorBrush).Color.B);
-        
+
 
         [AffectsTo("Color")]
         public System.Windows.Media.Brush ChartBrush
@@ -793,6 +793,22 @@ namespace AdversCan
 
         private UpdatableList<BBError> _BBErrors = new();
         public UpdatableList<BBError> BBErrors => _BBErrors;
+
+        private bool manualMode;
+
+        public bool ManualMode
+        {
+            get { return manualMode; }
+            set { Set(ref manualMode, value); }
+        }
+
+        private int revMeasured;
+        public int RevMeasured
+        {
+            get { return revMeasured; }
+            set { Set(ref revMeasured, value); }
+        }
+
         public string Name => ToString();
         public string ImagePath => $"/Images/{id.Type}.jpg";
         public override string ToString()
@@ -1075,9 +1091,29 @@ namespace AdversCan
 
             ConnectedDevice currentDevice = ConnectedDevices.First(d => d.ID.Equals(m.TransmitterId));
 
+
             if (!PGNs.ContainsKey(m.PGN)) return; //Такого PGN нет в библиотеке
+
+
+            if (m.PGN == 2) //Подтверждение выполненной комманды
+            {
+
+                switch (m.Data[1])
+                {
+                    case 67:
+                        if (m.Data[2] == 1)
+                            currentDevice.ManualMode = true;
+                        else
+                            currentDevice.ManualMode = false;
+                        break;
+                }
+
+
+            }
+
             foreach (AC2PParameter p in PGNs[m.PGN].parameters)
             {
+
                 if (PGNs[m.PGN].multipack && p.PackNumber != m.Data[0]) continue;
                 if (p.Var != 0)
                 {
@@ -1100,6 +1136,9 @@ namespace AdversCan
                     sv.RawValue = rawValue;
                     currentDevice.SupportedVariables[sv.Id] = true;
                     currentDevice.Status.TryToAdd(sv);
+                    
+                    if (sv.Id == 16)                                 // Измеренные обороты нагнетателя
+                        currentDevice.RevMeasured = rawValue;
                 }
             }
             if (m.PGN == 7) //Ответ на запрос параметра
@@ -1149,6 +1188,7 @@ namespace AdversCan
                 }
 
             }
+
             Messages.TryToAdd(m);
 
         }
@@ -1634,7 +1674,7 @@ namespace AdversCan
             commands[new CommandId(0, 68)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Состояние помпы", Meanings = defMeaningsOnOff });
             commands[new CommandId(0, 68)].Parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 0, BitLength = 8, Name = "Обороты нагнетателя", Unit = "об/с" });
             commands[new CommandId(0, 68)].Parameters.Add(new AC2PParameter() { StartByte = 4, StartBit = 0, BitLength = 8, Name = "Мощность свечи", Unit = "%" });
-            commands[new CommandId(0, 68)].Parameters.Add(new AC2PParameter() { StartByte = 5, StartBit = 0, BitLength = 8, Name = "Частота ТН", a = 0.01, Unit = "Гц" });
+            commands[new CommandId(0, 68)].Parameters.Add(new AC2PParameter() { StartByte = 5, StartBit = 0, BitLength = 16, Name = "Частота ТН", a = 0.01, Unit = "Гц" });
 
             commands[new CommandId(0, 68)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "Тип устройства", Meanings = { { 0, "ТН, Гц*10" }, { 1, "Реле(0/1)" }, { 2, "Свеча, %" }, { 3, "Помпа,%" }, { 4, "Шим НВ,%" }, { 23, "Обороты НВ, об/с" } } });
             commands[new CommandId(0, 68)].Parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 0, BitLength = 16, Name = "Значение" });
