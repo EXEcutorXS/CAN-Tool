@@ -6,6 +6,7 @@
     <RootNamespace>CAN_Tool</RootNamespace>
     <UseWPF>true</UseWPF>
 	<Nullable>disable</Nullable>
+	<Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

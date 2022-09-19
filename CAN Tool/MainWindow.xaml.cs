@@ -238,7 +238,7 @@ namespace CAN_Tool
                     vm.DecreaseFuelPumpCommand.Execute(null);
         }
 
-        private void ProgresssdfBar_MouseWheel_2(object sender, MouseWheelEventArgs e)
+        private void ProgressBar_MouseWheel_2(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
                 if (vm.IncreaseGlowPlugCommand.CanExecute(null))

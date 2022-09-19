@@ -55,7 +55,8 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((double)value/100);
+            double temp = System.Convert.ToDouble(value);
+            return (temp/100).ToString();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
