@@ -13,6 +13,8 @@ using ScottPlot;
 using System.Windows.Media;
 using ScottPlot.Renderable;
 using System.Windows.Markup;
+using Microsoft.Win32;
+using System.IO;
 
 namespace CAN_Tool.ViewModels
 {
@@ -23,15 +25,15 @@ namespace CAN_Tool.ViewModels
 
         private int manualAirBlower;
         public int ManualAirBlower { get { return manualAirBlower; } set { Set(ref manualAirBlower, value); } }
-        
+
         private int manualFuelPump;
-        public int ManualFuelPump { set=>Set(ref manualFuelPump,value); get=>manualFuelPump; }
+        public int ManualFuelPump { set => Set(ref manualFuelPump, value); get => manualFuelPump; }
 
         private int manualGlowPlug;
         public int ManualGlowPlug { set => Set(ref manualGlowPlug, value); get => manualGlowPlug; }
 
         private bool manualWaterPump;
-        public bool ManualWaterPump { set => Set(ref manualWaterPump,value); get => manualWaterPump; }
+        public bool ManualWaterPump { set => Set(ref manualWaterPump, value); get => manualWaterPump; }
 
         public bool AutoRedraw { set; get; } = true;
         public int[] Bitrates => _Bitrates;
@@ -403,6 +405,9 @@ namespace CAN_Tool.ViewModels
         public ICommand ExitManualModeCommand { get; }
         private void OnExitManualModeCommandExecuted(object parameter)
         {
+            ManualAirBlower = 0;
+            ManualFuelPump = 0;
+            ManualGlowPlug = 0;
             executeCommand(67, new byte[] { 0, 0, 0, 0, 0, 0 });
         }
         #endregion
@@ -486,6 +491,34 @@ namespace CAN_Tool.ViewModels
             updateManualMode();
         }
         #endregion
+
+        public ICommand SaveLogCommand { get; }
+
+        private void OnSaveLogCommandExecuted(object parameter)
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
+
+            using (StreamWriter sw = new StreamWriter(path))
+            {
+                foreach (var v in SelectedConnectedDevice.Status)
+                    sw.Write(AC2P.Variables[v.Id].ShortName + ";");
+                sw.WriteLine();
+                for (int i = 0; i < SelectedConnectedDevice.LogCurrentPos; i++)
+                {
+                    foreach (var v in SelectedConnectedDevice.Status)
+                        sw.Write(SelectedConnectedDevice.LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
+                    sw.WriteLine();
+                }
+                sw.Flush();
+                sw.Close();
+            }
+        }
+
+        private bool CanSaveLogCommandExecuted(object parameter)
+        {
+            return true;
+        }
+
         private void executeCommand(byte num, params byte[] data)
         {
             CustomMessage.TransmitterType = 126;
@@ -606,6 +639,7 @@ namespace CAN_Tool.ViewModels
             DecreaseGlowPlugCommand = new LambdaCommand(OnDecreaseGlowPlugCommandExecuted, deviceInManualMode);
             TurnOnWaterPumpCommand = new LambdaCommand(OnTurnOnWaterPumpCommandExecuted, deviceInManualMode);
             TurnOffWaterPumpCommand = new LambdaCommand(OnTurnOffWaterPumpCommandExecuted, deviceInManualMode);
+            SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;
 

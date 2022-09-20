@@ -47,9 +47,9 @@ namespace AdversCan
                 if (a == 1)
                     return "";
                 else if (a >= 0.09)
-                    return "F1";
+                    return "0.0";
                 else
-                    return "F2";
+                    return "0.00";
             }
         }
         private Dictionary<int, string> meanings = new(); //Словарь с расшифровками значений параметров
