@@ -75,6 +75,7 @@ namespace CAN_Tool.ViewModels
         public double[] CommandParametersArray;
 
 
+
         #endregion
 
         #region ErrorString
@@ -573,6 +574,22 @@ namespace CAN_Tool.ViewModels
         #endregion
         #endregion
 
+        public ICommand UpdateFirmwareCommand { get; }
+        private void OnUpdateFirmwareCommandExecuted(object parameter)
+        {
+            uint baseAdress = 0;
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Hex Files|*.hex";
+            dialog.ShowDialog();
+            using (StreamReader sr = new StreamReader(dialog.FileName))
+            {
+                while (!sr.EndOfStream)
+                { 
+                string line = sr.ReadLine();
+                   //switch
+                }
+            }
+        }
         public void NewDeviceHandler(object sender, EventArgs e)
         {
             if (SelectedConnectedDevice == null || SelectedConnectedDevice.ID.Type == 126) //Котлы имеют приоритет над HCU в этом плане...
@@ -642,6 +659,7 @@ namespace CAN_Tool.ViewModels
             TurnOnWaterPumpCommand = new LambdaCommand(OnTurnOnWaterPumpCommandExecuted, deviceInManualMode);
             TurnOffWaterPumpCommand = new LambdaCommand(OnTurnOffWaterPumpCommandExecuted, deviceInManualMode);
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
+            UpdateFirmwareCommand = new LambdaCommand(OnUpdateFirmwareCommandExecuted, deviceSelected);
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;
 

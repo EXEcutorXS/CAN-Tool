@@ -313,7 +313,7 @@
                             <Button Margin="10" Content="Enter Manual" Command="{Binding EnterManualModeCommand}" />
                             <Button Margin="10" Content="Leave manual" Command="{Binding ExitManualModeCommand}"/>
                             
-                            <CheckBox Content="Water Pump" IsChecked="{Binding ManualPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" />
+                            <CheckBox Content="Water Pump" IsChecked="{Binding ManualWaterPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" />
 
                         </StackPanel>
                         <Grid>
@@ -387,8 +387,9 @@
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                             <Button Content="Load HEX" Margin="10" />
                             <Button Content="Enter Bootloader" Margin="10" />
-                            <Button Content="Update" Margin="10" />
+                            <Button Content="Update" Margin="10" Command="{Binding UpdateFirmwareCommand}"/>
                             <Button Content="Start program" Margin="10" />
+                            <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding SelectedConnectedDevice.FirmwareAsText}"/>
                         </StackPanel>
                         <StackPanel></StackPanel>
                     </DockPanel>

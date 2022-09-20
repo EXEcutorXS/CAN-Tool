@@ -564,7 +564,7 @@ namespace AdversCan
 
         private long rawVal;
 
-        [AffectsTo(nameof(VerboseInfo), nameof(Value),nameof(FormattedValue))]
+        [AffectsTo(nameof(VerboseInfo), nameof(Value), nameof(FormattedValue))]
         public long RawValue
         {
             get { return rawVal; }
@@ -820,6 +820,27 @@ namespace AdversCan
         {
             get { return id; }
             set { Set(ref id, value); }
+        }
+
+
+        private byte[] firmware;
+
+        [AffectsTo(nameof(FirmwareAsText))]
+        public byte[] Firmware
+        {
+            get { return firmware; }
+            set { Set(ref firmware, value); }
+        }
+
+        public string FirmwareAsText
+        {
+            get
+            {
+                if (firmware != null)
+                    return $"{firmware[0]}.{firmware[1]}.{firmware[2]}.{firmware[3]}";
+                else
+                    return "No firmware data";
+            }
         }
 
         UpdatableList<StatusVariable> status = new();
@@ -1142,7 +1163,10 @@ namespace AdversCan
 
                 switch (m.Data[1])
                 {
-                    case 67:
+                    case 0:
+                        currentDevice.Firmware = new byte[] { m.Data[2], m.Data[3], m.Data[4], m.Data[5] };
+                        break;
+                    case 67:                                               //Вход в ручной режим
                         if (m.Data[2] == 1)
                             currentDevice.ManualMode = true;
                         else
@@ -1319,7 +1343,7 @@ namespace AdversCan
             WaitingForBBErrors = true;
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
-            UIContext.Send(x=> currentDevice.BBErrors.Clear(),null);
+            UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
             UIContext.Send(x => currentDevice.currentBBError = new BBError(), null);
             UIContext.Send(x => currentDevice.BBErrors.Add(currentDevice.currentBBError), null);
 
