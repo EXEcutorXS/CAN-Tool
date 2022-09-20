@@ -307,7 +307,7 @@ namespace AdversCan
                 {
                     double rawDouble = (double)rawValue;
                     double value = rawDouble * p.a + p.b;
-                    retString.Append(value.ToString(p.OutputFormat) + p.Unit + '(' + rawValue.ToString() + ')');
+                    retString.Append(value.ToString(p.OutputFormat) + p.Unit);
                 }
             }
             retString.Append(';');
@@ -564,7 +564,7 @@ namespace AdversCan
 
         private long rawVal;
 
-        [AffectsTo("VerboseInfo", "Value")]
+        [AffectsTo(nameof(VerboseInfo), nameof(Value),nameof(FormattedValue))]
         public long RawValue
         {
             get { return rawVal; }
@@ -589,6 +589,11 @@ namespace AdversCan
         public double Value
         {
             get => rawVal * assignedParameter.a + assignedParameter.b;
+        }
+
+        public string FormattedValue
+        {
+            get => Value.ToString(assignedParameter.OutputFormat);
         }
 
         public string Name

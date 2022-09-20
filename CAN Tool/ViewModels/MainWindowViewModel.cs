@@ -160,6 +160,7 @@ namespace CAN_Tool.ViewModels
         {
             canAdapter.PortName = PortName;
             canAdapter.PortOpen();
+            canAdapter.StartNormal();
         }
         private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !canAdapter.PortOpened);
         #endregion

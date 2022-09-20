@@ -14,10 +14,11 @@
         TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto"
         Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" 
         WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown"
-        Loaded="window_Loaded" MouseDoubleClick="window_MouseDoubleClick">
+        >
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
+        <c:BoolToVisibleConverter x:Key="VisibileConverter" />
     </Window.Resources>
     <Window.DataContext>
         <vm:MainWindowViewModel/>
@@ -29,26 +30,36 @@
             </StatusBarItem>
             <ProgressBar Width="300" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0"></ProgressBar>
             <StatusBarItem>
-                <Button Content="Cancel" Command="{Binding CancelOperationCommand}" Margin="5"></Button>
+                <Button Content="Cancel" Command="{Binding CancelOperationCommand}" Margin="5" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource VisibileConverter}}"></Button>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
                 <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
             </StatusBarItem>
         </StatusBar>
+        <Grid DockPanel.Dock="Top" >
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
             <Button Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" />
             <ComboBox x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
 
             <Button x:Name="PortOpenButton" Margin="10" Content="Open" Command="{Binding OpenPortCommand}" />
             <Button x:Name="PortOpenButton_Copy" Margin="10" Content="Close" Command="{Binding ClosePortCommand}" />
-            <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" />
-            <Button Content="Normal" Margin="10" Command="{Binding SetAdapterNormalModeCommand}" />
-            <Button Content="Listen" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
-            <Button Content="Self Reception" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
-            <Button Content="Stop" Margin="10" Command="{Binding StopCanAdapterCommand}" />
+            <Expander ExpandDirection="Down" Header="Adapter mode">
+                <StackPanel Orientation="Horizontal" >
+                <ComboBox x:Name="CanBitrateField"  Margin ="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" />
+                        <Button Content="Normal" Margin="10" Command="{Binding SetAdapterNormalModeCommand}" />
+                        <Button Content="Listen" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
+                        <Button Content="Self Reception" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
+                        <Button Content="Stop" Margin="10" Command="{Binding StopCanAdapterCommand}" />
+                </StackPanel>
+            </Expander>
+            
+            
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
             <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5"></ComboBox>
             <Button Content="Exit" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft" />
         </StackPanel>
+        </Grid>
 
         <DockPanel>
             <ListBox DockPanel.Dock="Top" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}">
@@ -89,8 +100,8 @@
 
                             </Grid>
                             <TextBlock DockPanel.Dock="Right" MaxHeight="200" Margin="10" Text="{Binding Path=CustomMessage.VerboseInfo, Mode=OneWay}"></TextBlock>
-
                         </DockPanel>
+                        
                         <DockPanel>
                             <DataGrid x:Name="AC2PmessagesField" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding AC2PInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged">
                                 <DataGrid.Columns>
@@ -108,8 +119,14 @@
                                     </DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
-                            <TextBlock DockPanel.Dock="Right" Text="{Binding SelectedMessage.VerboseInfo,Mode=OneWay}"></TextBlock>
+                            <DockPanel DockPanel.Dock="Right">
+                            <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedMessage.VerboseInfo,Mode=OneWay}"></TextBlock>
+                                <Expander x:Name="LogExpander" ExpandDirection="Up" Header="Message Log" DockPanel.Dock="Bottom">
+                                    <RichTextBox x:Name="LogField" IsReadOnly="True" VerticalScrollBarVisibility="Visible"/>
+                                </Expander>
+                            </DockPanel>
                         </DockPanel>
+             
 
                     </DockPanel>
 
@@ -241,7 +258,7 @@
                     <DataGrid ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Path=AssignedParameter.Name,Mode=OneWay}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Value" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Value" Binding="{Binding Path=FormattedValue,Mode=OneWay}"></DataGridTextColumn>
                             <DataGridTextColumn Header="Unit" Binding="{Binding Path=AssignedParameter.Unit,Mode=OneWay}"></DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
@@ -352,7 +369,7 @@
                             <DataGrid Grid.Column="3" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Value" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Value" Binding="{Binding Path=FormattedValue,Mode=OneWay}"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>

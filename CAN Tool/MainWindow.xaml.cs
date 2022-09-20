@@ -20,6 +20,7 @@ using System.Globalization;
 using ScottPlot;
 using ScottPlot.Renderable;
 using CAN_Tool.Views;
+using System.Threading;
 
 namespace CAN_Tool
 {
@@ -27,15 +28,19 @@ namespace CAN_Tool
     /// Interaction logic for MainWindow.xaml
     /// </summary>
 
+
     public partial class MainWindow : Window
     {
 
         MainWindowViewModel vm;
 
+        SynchronizationContext UIcontext = SynchronizationContext.Current;
+
         public List<Brush> Brushes;
         public MainWindow()
         {
             InitializeComponent();
+
 
             vm = (MainWindowViewModel)DataContext;
 
@@ -58,8 +63,23 @@ namespace CAN_Tool
             menuLanguage.SelectedIndex = 0;
 
             vm.myChart = Chart;
+
+            vm.canAdapter.GotNewMessage += MessageHandler;
         }
 
+
+        private void MessageHandler(object sender, EventArgs args)
+        {
+            UIcontext.Send(x =>
+            {
+                if (LogExpander.IsExpanded)
+                {
+                    CanMessage msg = (args as GotMessageEventArgs).receivedMessage;
+                    AC2PMessage m = new AC2PMessage(msg);
+                    LogField.AppendText(m.ToString());
+                }
+            }, null);
+        }
         private void LanguageChanged(Object sender, EventArgs e)
         {
             CultureInfo currLang = App.Language;
@@ -203,12 +223,6 @@ namespace CAN_Tool
             p.Show();
         }
 
-        private void window_Loaded(object sender, RoutedEventArgs e)
-        {
-
-
-        }
-
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             if (vm.TurnOnWaterPumpCommand.CanExecute(null))
@@ -252,14 +266,9 @@ namespace CAN_Tool
                     vm.DecreaseGlowPlugCommand.Execute(null);
         }
 
-        private void window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            
-            if (WindowState == WindowState.Maximized)
-                WindowState = WindowState.Normal;
-            else
-                WindowState = WindowState.Maximized;
-        }
+
+
+
     }
 
 }
