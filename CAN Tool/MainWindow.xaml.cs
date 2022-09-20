@@ -145,6 +145,10 @@ namespace CAN_Tool
             AC2PCommand cmd = ((KeyValuePair<CommandId, AC2PCommand>)comboBox.SelectedItem).Value;
             CommandParameterPanel.Children.Clear();
             mainWindowViewModel.CommandParametersArray = new double[cmd.Parameters.Count];
+            vm.CustomMessage.PGN = 1;
+            vm.CustomMessage.Command = cmd.Id;
+            if (vm.SelectedConnectedDevice != null)
+                vm.CustomMessage.ReceiverId = vm.SelectedConnectedDevice.ID;
 
             int counter = 0;
             foreach (AC2PParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))

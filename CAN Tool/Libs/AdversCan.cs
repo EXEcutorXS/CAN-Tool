@@ -134,7 +134,7 @@ namespace AdversCan
             return;
         }
 
-        [AffectsTo("VerboseInfo")]
+        [AffectsTo(nameof(VerboseInfo))]
         public int PGN
         {
             get { return (ID >> 20) & 0x1FF; }
@@ -151,7 +151,7 @@ namespace AdversCan
 
             }
         }
-        [AffectsTo("VerboseInfo")]
+        [AffectsTo(nameof(VerboseInfo))]
         public int ReceiverType
         {
             get { return (ID >> 13) & 0b1111111; }
@@ -167,7 +167,7 @@ namespace AdversCan
                 ID = temp;
             }
         }
-        [AffectsTo("VerboseInfo")]
+        [AffectsTo(nameof(VerboseInfo))]
         public int ReceiverAddress
         {
             get { return (ID >> 10) & 0b111; }
@@ -183,7 +183,7 @@ namespace AdversCan
                 ID = temp;
             }
         }
-        [AffectsTo("VerboseInfo")]
+        [AffectsTo(nameof(VerboseInfo))]
         public int TransmitterType
         {
             get { return (ID >> 3) & 0x7F; }
@@ -199,7 +199,7 @@ namespace AdversCan
                 ID = temp;
             }
         }
-        [AffectsTo("VerboseInfo")]
+        [AffectsTo(nameof(VerboseInfo))]
         public int TransmitterAddress
         {
             get { return ID & 0b111; }
@@ -216,22 +216,23 @@ namespace AdversCan
             }
         }
 
-        [AffectsTo("VerboseInfo")]
+        [AffectsTo(nameof(VerboseInfo))]
         public DeviceId TransmitterId
         {
             get { return new DeviceId(TransmitterType, TransmitterAddress); }
             set { TransmitterType = value.Type; TransmitterAddress = value.Address; }
         }
 
-        [AffectsTo("VerboseInfo")]
+        [AffectsTo(nameof(VerboseInfo))]
         public DeviceId ReceiverId
         {
             get { return new DeviceId(ReceiverType, ReceiverAddress); }
-            set { ReceiverType = value.Type; ReceiverAddress = value.Address; }
+            set { ReceiverType = value.Type; 
+                ReceiverAddress = value.Address; }
         }
 
-        [AffectsTo("VerboseInfo")]
-        public CommandId? Command
+        [AffectsTo(nameof(VerboseInfo),nameof(Data),nameof(DataAsText))]
+        public CommandId Command
         {
             get
             {
@@ -242,8 +243,9 @@ namespace AdversCan
             {
                 if (value == null) throw new ArgumentNullException(nameof(CommandId));
                 if (PGN != 1 && PGN != 2) throw new Exception("Use Command property only for Command PGNs (1 and 2)");
-                Data[0] = value.Value.firstByte;
-                Data[1] = value.Value.secondByte;
+                Set(ref Data[0], value.firstByte);
+                Set(ref Data[1], value.secondByte);
+
             }
 
         }
@@ -337,7 +339,7 @@ namespace AdversCan
                         retString.Append(PrintParameter(p));
             return retString.ToString();
         }
-        public string VerboseInfo => GetVerboseInfo().Replace(';', '\n');
+        public override string VerboseInfo => GetVerboseInfo().Replace(';', '\n');
 
         public void Update(AC2PMessage item)
         {
@@ -909,7 +911,7 @@ namespace AdversCan
         public event EventHandler LogDataOverrun;
 
     }
-    public struct CommandId
+    public class CommandId
     {
         public byte firstByte;
         public byte secondByte;
@@ -1612,11 +1614,11 @@ namespace AdversCan
             commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 8, Name = "Верия ПО", AnswerOnly = true });
             commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 8, Name = "Модификация ПО", AnswerOnly = true });
 
-            commands[new CommandId(0, 1)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+            commands[new CommandId(0, 1)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
 
-            commands[new CommandId(0, 4)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+            commands[new CommandId(0, 4)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
 
-            commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+            commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
             commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 4, Name = "Режим работы", Meanings = { { 0, "обычный" }, { 1, "экономичный" }, { 2, "догреватель" }, { 3, "отопление" }, { 4, "отопительные системы" } } });
             commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 4, StartBit = 4, BitLength = 4, Name = "Режим догрева", Meanings = { { 0, "отключен" }, { 1, "автоматический" }, { 2, "ручной" } } });
             commands[new CommandId(0, 6)].Parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 16, Name = "Уставка температуры", Unit = "°С" });
@@ -1638,14 +1640,14 @@ namespace AdversCan
             commands[new CommandId(0, 8)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 2, StartBit = 6, Name = "Состояние клапана 8", Meanings = defMeaningsOnOff });
             commands[new CommandId(0, 8)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 1, StartBit = 0, Meanings = { { 0, "Сбросить неисправности" } } });
 
-            commands[new CommandId(0, 9)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+            commands[new CommandId(0, 9)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
             commands[new CommandId(0, 9)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 4, Name = "Режим работы", Meanings = { { 0, "не используется" }, { 1, "работа по температуре платы" }, { 2, "работа по температуре пульта" }, { 3, "работа по температуре выносного датчика" }, { 4, "работа по мощности" } } });
             commands[new CommandId(0, 9)].Parameters.Add(new AC2PParameter() { StartByte = 4, StartBit = 4, BitLength = 2, Name = "Разрешение/запрещение ждущего режима (при работе по датчику температуры)", Meanings = defMeaningsAllow });
             commands[new CommandId(0, 9)].Parameters.Add(new AC2PParameter() { StartByte = 4, StartBit = 6, BitLength = 2, Name = "Разрешение вращения нагнетателя воздуха на ждущем режиме", Meanings = defMeaningsAllow });
             commands[new CommandId(0, 9)].Parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 16, Name = "Уставка температуры помещения", Unit = "°С" });
             commands[new CommandId(0, 9)].Parameters.Add(new AC2PParameter() { StartByte = 7, BitLength = 4, Name = "Заданное значение мощности" });
 
-            commands[new CommandId(0, 10)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "c" });
+            commands[new CommandId(0, 10)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
 
             commands[new CommandId(0, 20)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 16, Name = "Калибровочное значение термопары 1", AnswerOnly = true });
             commands[new CommandId(0, 20)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 16, Name = "Калибровочное значение термопары 2", AnswerOnly = true });

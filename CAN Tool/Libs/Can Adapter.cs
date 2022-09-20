@@ -28,7 +28,7 @@ namespace Can_Adapter
     {
         private bool ide;
 
-        [AffectsTo("VerboseInfo", "RvcCompatible", "IdeAsString")]
+        [AffectsTo(nameof(VerboseInfo), nameof(RvcCompatible), nameof(IdeAsString))]
         public bool IDE
         {
             set => Set(ref ide, value);
@@ -37,7 +37,7 @@ namespace Can_Adapter
 
         private int id;
 
-        [AffectsTo("VerboseInfo", "IdAsText")]
+        [AffectsTo(nameof(VerboseInfo), nameof(IdAsText))]
         public int ID
         {
             set => Set(ref id, value);
@@ -45,7 +45,7 @@ namespace Can_Adapter
         }
         private bool rtr;
 
-        [AffectsTo("VerboseInfo", "RtrAsString", "RvcCompatible")]
+        [AffectsTo(nameof(VerboseInfo), nameof(RtrAsString), nameof(RvcCompatible))]
         public bool RTR
         {
             set => Set(ref rtr, value);
@@ -53,7 +53,7 @@ namespace Can_Adapter
         }
         
         private int dlc;
-        [AffectsTo("VerboseInfo", "RvcCompatible")]
+        [AffectsTo(nameof(VerboseInfo), nameof(RvcCompatible))]
         public int DLC
         {
             set => Set(ref dlc, value);
@@ -63,8 +63,8 @@ namespace Can_Adapter
         
         private byte[] data = new byte[8];
 
-        [AffectsTo("VerboseInfo", "DataAsText")]
-        public byte[] Data
+        [AffectsTo(nameof(VerboseInfo), nameof(DataAsText))]
+        public virtual byte[] Data
         {
             get => data;
 
@@ -180,6 +180,7 @@ namespace Can_Adapter
             ID = m.ID;
         }
 
+        public virtual string VerboseInfo => ToString();
         public bool IsSimmiliarTo(CanMessage m)
         {
             if (m.ID != ID) return false;

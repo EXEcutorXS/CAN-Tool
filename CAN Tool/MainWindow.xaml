@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
+        xmlns:acan="clr-namespace:AdversCan"
         xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d"
         Title="Adver CAN-Tool" Height="700" Width="1400"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -205,8 +206,8 @@
                             <Button Margin="10" Content="Dataset"></Button>
                             <Button Margin="10" Content="Redraw" Command="{Binding ChartDrawCommand}"></Button>
                             <Button Margin="10" Content="Save Log"></Button>
-                            <CheckBox Content="Autoredraw" IsChecked="{Binding AutoRedraw}" />
-                            <TextBlock Text="{Binding StringFormat=Log length is {0} seconds, Path=SelectedConnectedDevice.LogCurrentPos}" VerticalAlignment="Center"></TextBlock>
+                            <CheckBox Margin="10" Content="Autoredraw" IsChecked="{Binding AutoRedraw}"  />
+                            <TextBlock Margin="10" Text="{Binding StringFormat=Log length is {0} seconds, Path=SelectedConnectedDevice.LogCurrentPos}" VerticalAlignment="Center"></TextBlock>
                         </StackPanel>
                         <Expander DockPanel.Dock="Top" Header="Dataset">
                             <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False">

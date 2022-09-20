@@ -68,7 +68,6 @@ namespace CAN_Tool.ViewModels
 
         public Dictionary<CommandId, AC2PCommand> CommandList { get; } = AC2P.commands;
 
-        public AC2PParameter SelectedParameter { set; get; } = new();
         public AC2PMessage CustomMessage { get => customMessage; set => customMessage.Update(value); }
 
         public double[] CommandParametersArray;
