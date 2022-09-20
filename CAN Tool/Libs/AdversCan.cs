@@ -17,6 +17,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Diagnostics;
 using System.Windows.Media;
 using System.Drawing;
+using System.Security.Cryptography.Pkcs;
 
 namespace AdversCan
 {
@@ -64,7 +65,7 @@ namespace AdversCan
         public double MaxValue;// Для правильного масштаба графиков
         public bool AnswerOnly = false;
 
-        public string Decode(int rawValue)
+        public string Decode(long rawValue)
         {
             StringBuilder retString = new();
             retString.Append(Name + ": ");
@@ -72,16 +73,19 @@ namespace AdversCan
                 return "Custom decoders not supported";
 
             if (GetMeaning != null)
-                return GetMeaning(rawValue);
-            if (Meanings != null && Meanings.ContainsKey(rawValue))
-                retString.Append(rawValue.ToString() + " - " + Meanings[rawValue]);
+                return GetMeaning((int)rawValue);
+            if (Meanings != null && Meanings.ContainsKey((int)rawValue))
+                retString.Append(rawValue.ToString() + " - " + Meanings[(int)rawValue]);
             else
             {
                 if (rawValue == Math.Pow(2, BitLength) - 1)
                     retString.Append($"Нет данных({rawValue})");
                 else
                 {
+
                     double rawDouble = (double)rawValue;
+                    if (Signed && rawValue > Math.Pow(2, BitLength - 1))
+                        rawDouble *= -1;
                     double value = rawDouble * a + b;
                     retString.Append(value.ToString(OutputFormat) + " " + Unit);
                 }
@@ -227,11 +231,14 @@ namespace AdversCan
         public DeviceId ReceiverId
         {
             get { return new DeviceId(ReceiverType, ReceiverAddress); }
-            set { ReceiverType = value.Type; 
-                ReceiverAddress = value.Address; }
+            set
+            {
+                ReceiverType = value.Type;
+                ReceiverAddress = value.Address;
+            }
         }
 
-        [AffectsTo(nameof(VerboseInfo),nameof(Data),nameof(DataAsText))]
+        [AffectsTo(nameof(VerboseInfo), nameof(Data), nameof(DataAsText))]
         public CommandId Command
         {
             get
@@ -250,29 +257,48 @@ namespace AdversCan
 
         }
 
+        public static long getRaw(byte[] data, int bitLength, int startBit, int startByte, bool signed)
+        {
+            long ret;
+            switch (bitLength)
+            {
+                case 1: ret = data[startByte] >> startBit & 0b1; break;
+                case 2: ret = data[startByte] >> startBit & 0b11; break;
+                case 3: ret = data[startByte] >> startBit & 0b111; break;
+                case 4: ret = data[startByte] >> startBit & 0b1111; break;
+                case 8: ret = data[startByte]; break;
+                case 16:
+                    if (!signed)
+                        ret = BitConverter.ToUInt16(new byte[] { data[startByte + 1], data[startByte] });
+                    else
+                        ret = BitConverter.ToInt16(new byte[] { data[startByte + 1], data[startByte] });
+                    break;
+
+
+                case 24: ret = data[startByte] * 65536 + data[startByte + 1] * 256 + data[startByte + 2]; break;
+
+                case 32:
+                    if (!signed)
+                        ret = BitConverter.ToUInt32(new byte[] { data[startByte + 3], data[startByte + 2], data[startByte + 1], data[startByte] });
+                    else
+                        ret = BitConverter.ToInt32(new byte[] { data[startByte + 3], data[startByte + 2], data[startByte + 1], data[startByte] });
+                    break;
+                default: throw new Exception("Bad parameter size");
+            }
+            return ret;
+        }
         public string PrintParameter(AC2PParameter p)
         {
             StringBuilder retString = new();
-            int rawValue;
+            long rawValue = getRaw(Data, p.BitLength, p.StartBit, p.StartByte, p.Signed);
             retString.Append(p.Name + ": ");
             if (p.CustomDecoder != null)
                 return p.CustomDecoder(Data);
-            switch (p.BitLength)
-            {
-                case 1: rawValue = Data[p.StartByte] >> p.StartBit & 0b1; break;
-                case 2: rawValue = Data[p.StartByte] >> p.StartBit & 0b11; break;
-                case 3: rawValue = Data[p.StartByte] >> p.StartBit & 0b111; break;
-                case 4: rawValue = Data[p.StartByte] >> p.StartBit & 0b1111; break;
-                case 8: rawValue = Data[p.StartByte]; break;
-                case 16: rawValue = Data[p.StartByte] * 256 + Data[p.StartByte + 1]; break;
-                case 24: rawValue = Data[p.StartByte] * 65536 + Data[p.StartByte + 1] * 256 + Data[p.StartByte + 2]; break;
-                case 32: rawValue = Data[p.StartByte] * 16777216 + Data[p.StartByte + 1] * 65536 + Data[p.StartByte + 2] * 256 + Data[p.StartByte + 3]; break;
-                default: throw new Exception("Bad parameter size");
-            }
+
             if (p.GetMeaning != null)
-                return p.GetMeaning(rawValue);
-            if (p.Meanings != null && p.Meanings.ContainsKey(rawValue))
-                retString.Append(rawValue.ToString() + " - " + p.Meanings[rawValue]);
+                return p.GetMeaning((int)rawValue);
+            if (p.Meanings != null && p.Meanings.ContainsKey((int)rawValue))
+                retString.Append(rawValue.ToString() + " - " + p.Meanings[(int)rawValue]);
             else
             {
                 if (rawValue == Math.Pow(2, p.BitLength) - 1)
@@ -429,7 +455,16 @@ namespace AdversCan
         }
 
 
-        public string Description => AC2P.BbParameterNames[id];
+        public string Description
+        {
+            get
+            {
+                if (AC2P.BbParameterNames.ContainsKey(id))
+                    return AC2P.BbParameterNames[id];
+                else
+                    return "No data";
+            }
+        }
 
     }
     public class ReadedParameter : INotifyPropertyChanged, IUpdatable<ReadedParameter>
@@ -527,10 +562,10 @@ namespace AdversCan
         }
         public int Id { get; set; }
 
-        private int rawVal;
+        private long rawVal;
 
         [AffectsTo("VerboseInfo", "Value")]
-        public int RawValue
+        public long RawValue
         {
             get { return rawVal; }
             set { Set(ref rawVal, value); }
@@ -1121,26 +1156,14 @@ namespace AdversCan
                 {
                     StatusVariable sv = new StatusVariable(p.Var);
                     sv.AssignedParameter = p;
-                    int rawValue;
-                    switch (p.BitLength)
-                    {
-                        case 1: rawValue = m.Data[p.StartByte] >> p.StartBit & 0b1; break;
-                        case 2: rawValue = m.Data[p.StartByte] >> p.StartBit & 0b11; break;
-                        case 3: rawValue = m.Data[p.StartByte] >> p.StartBit & 0b111; break;
-                        case 4: rawValue = m.Data[p.StartByte] >> p.StartBit & 0b1111; break;
-                        case 8: rawValue = m.Data[p.StartByte]; break;
-                        case 16: rawValue = m.Data[p.StartByte] * 256 + m.Data[p.StartByte + 1]; break;
-                        case 24: rawValue = m.Data[p.StartByte] * 65536 + m.Data[p.StartByte + 1] * 256 + m.Data[p.StartByte + 2]; break;
-                        case 32: rawValue = m.Data[p.StartByte] * 16777216 + m.Data[p.StartByte + 1] * 65536 + m.Data[p.StartByte + 2] * 256 + m.Data[p.StartByte + 3]; break;
-                        default: throw new Exception("Bad parameter size");
-                    }
+                    long rawValue = AC2PMessage.getRaw(m.Data, p.BitLength, p.StartBit, p.StartByte, p.Signed);
                     if (rawValue == Math.Pow(2, p.BitLength) - 1) return; //Неподдерживаемый параметр, ливаем
                     sv.RawValue = rawValue;
                     currentDevice.SupportedVariables[sv.Id] = true;
                     currentDevice.Status.TryToAdd(sv);
-                    
+
                     if (sv.Id == 16)                                 // Измеренные обороты нагнетателя
-                        currentDevice.RevMeasured = rawValue;
+                        currentDevice.RevMeasured = (int)rawValue;
                 }
             }
             if (m.PGN == 7) //Ответ на запрос параметра
@@ -1291,9 +1314,9 @@ namespace AdversCan
             WaitingForBBErrors = true;
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
-            currentDevice.BBErrors.Clear();
-            currentDevice.currentBBError = new BBError();
-            currentDevice.BBErrors.Add(currentDevice.currentBBError);
+            UIContext.Send(x=> currentDevice.BBErrors.Clear(),null);
+            UIContext.Send(x => currentDevice.currentBBError = new BBError(), null);
+            UIContext.Send(x => currentDevice.BBErrors.Add(currentDevice.currentBBError), null);
 
 
             AC2PMessage msg = new AC2PMessage();
@@ -1740,8 +1763,8 @@ namespace AdversCan
             PGNs[13].parameters.Add(new AC2PParameter() { Name = "Температура перегрева", BitLength = 8, StartByte = 4, b = -75, Unit = "°C", Var = 41 });
 
             PGNs[14].parameters.Add(new AC2PParameter() { Name = "Минимальная температура пламени перед розжигом", BitLength = 16, StartByte = 0, Unit = "°C", Var = 36 });
-            PGNs[14].parameters.Add(new AC2PParameter() { Name = "Граница срыва пламени", BitLength = 16, StartByte = 2, Unit = "°C", Var = 37 });
-            PGNs[14].parameters.Add(new AC2PParameter() { Name = "Граница срыва пламени на прогреве", BitLength = 16, StartByte = 4, Unit = "°C" });
+            PGNs[14].parameters.Add(new AC2PParameter() { Name = "Граница срыва пламени", BitLength = 16, StartByte = 2, Unit = "°C", Var = 37, Signed = true });
+            PGNs[14].parameters.Add(new AC2PParameter() { Name = "Граница срыва пламени на прогреве", BitLength = 16, StartByte = 4, Unit = "°C", Signed = true });
             PGNs[14].parameters.Add(new AC2PParameter() { Name = "Скорость изменения температуры ИП", BitLength = 16, StartByte = 6, Unit = "°C" });
 
 
@@ -1792,6 +1815,63 @@ namespace AdversCan
             PGNs[20].parameters.Add(new AC2PParameter() { Name = "Байт неисправностей 4", BitLength = 8, StartByte = 5 });
             PGNs[20].parameters.Add(new AC2PParameter() { Name = "Байт неисправностей 5", BitLength = 8, StartByte = 6 });
             PGNs[20].parameters.Add(new AC2PParameter() { Name = "Байт неисправностей 6", BitLength = 8, StartByte = 7 });
+
+            PGNs[21].parameters.Add(new AC2PParameter() { Name = "Опорное напряжение процессора", BitLength = 8, StartByte = 0, Unit = "В", a = 0.1 });
+            PGNs[21].parameters.Add(new AC2PParameter() { Name = "Температура процессора", BitLength = 8, StartByte = 1, Unit = "°C", b = -75 });
+            PGNs[21].parameters.Add(new AC2PParameter() { Name = "Температура бака", BitLength = 8, StartByte = 2, Unit = "°C", b = -75 });
+            PGNs[21].parameters.Add(new AC2PParameter() { Name = "Температура теплообменника", BitLength = 8, StartByte = 3, Unit = "°C", b = -75 });
+            PGNs[21].parameters.Add(new AC2PParameter() { Name = "Температура наружного воздуха", BitLength = 8, StartByte = 4, Unit = "°C", b = -75 });
+            PGNs[21].parameters.Add(new AC2PParameter() { Name = "Уровень жидкости в баке", BitLength = 8, StartByte = 6 });
+            PGNs[21].parameters.Add(new AC2PParameter() { Name = "Разбор воды", BitLength = 2, StartByte = 7, Meanings = defMeaningsYesNo });
+
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Зона 1", BitLength = 2, StartByte = 0, StartBit = 0, Meanings = defMeaningsOnOff });
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Зона 2", BitLength = 2, StartByte = 0, StartBit = 2, Meanings = defMeaningsOnOff });
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Зона 3", BitLength = 2, StartByte = 0, StartBit = 4, Meanings = defMeaningsOnOff });
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Зона 4", BitLength = 2, StartByte = 0, StartBit = 6, Meanings = defMeaningsOnOff });
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Зона 5", BitLength = 2, StartByte = 1, StartBit = 0, Meanings = defMeaningsOnOff });
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Температура зоны 1", BitLength = 8, StartByte = 2, Unit = "°C", b = -75 });
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Температура зоны 2", BitLength = 8, StartByte = 3, Unit = "°C", b = -75 });
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Температура зоны 3", BitLength = 8, StartByte = 4, Unit = "°C", b = -75 });
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Температура зоны 4", BitLength = 8, StartByte = 5, Unit = "°C", b = -75 });
+            PGNs[22].parameters.Add(new AC2PParameter() { Name = "Температура зоны 5", BitLength = 8, StartByte = 6, Unit = "°C", b = -75 });
+
+            PGNs[23].parameters.Add(new AC2PParameter() { Name = "Зад. ШИМ вентилятора зоны 1", BitLength = 8, StartByte = 0, Unit = "%" });
+            PGNs[23].parameters.Add(new AC2PParameter() { Name = "Зад. ШИМ вентилятора зоны 2", BitLength = 8, StartByte = 1, Unit = "%" });
+            PGNs[23].parameters.Add(new AC2PParameter() { Name = "Зад. ШИМ вентилятора зоны 3", BitLength = 8, StartByte = 2, Unit = "%" });
+            PGNs[23].parameters.Add(new AC2PParameter() { Name = "Зад. ШИМ вентилятора зоны 4", BitLength = 8, StartByte = 3, Unit = "%" });
+            PGNs[23].parameters.Add(new AC2PParameter() { Name = "Зад. ШИМ вентилятора зоны 5", BitLength = 8, StartByte = 4, Unit = "%" });
+
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Ступень скорости вентилятора зоны 1", BitLength = 4, StartByte = 0, });
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Ступень скорости вентилятора зоны 2", BitLength = 4, StartByte = 0, StartBit = 4 });
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Ступень скорости вентилятора зоны 3", BitLength = 4, StartByte = 1, });
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Ступень скорости вентилятора зоны 4", BitLength = 4, StartByte = 1, StartBit = 4 });
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Ступень скорости вентилятора зоны 5", BitLength = 4, StartByte = 2, });
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Тек. ШИМ вентилятора зоны 1", BitLength = 8, StartByte = 3, Unit = "%" });
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Тек. ШИМ вентилятора зоны 2", BitLength = 8, StartByte = 4, Unit = "%" });
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Тек. ШИМ вентилятора зоны 3", BitLength = 8, StartByte = 5, Unit = "%" });
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Тек. ШИМ вентилятора зоны 4", BitLength = 8, StartByte = 6, Unit = "%" });
+            PGNs[24].parameters.Add(new AC2PParameter() { Name = "Тек. ШИМ вентилятора зоны 5", BitLength = 8, StartByte = 7, Unit = "%" });
+
+            PGNs[25].parameters.Add(new AC2PParameter() { Name = "Дневная уставка зоны 1", BitLength = 8, StartByte = 0, Unit = "°C", b = -75 });
+            PGNs[25].parameters.Add(new AC2PParameter() { Name = "Дневная уставка зоны 2", BitLength = 8, StartByte = 1, Unit = "°C", b = -75 });
+            PGNs[25].parameters.Add(new AC2PParameter() { Name = "Дневная уставка зоны 3", BitLength = 8, StartByte = 2, Unit = "°C", b = -75 });
+            PGNs[25].parameters.Add(new AC2PParameter() { Name = "Дневная уставка зоны 4", BitLength = 8, StartByte = 3, Unit = "°C", b = -75 });
+            PGNs[25].parameters.Add(new AC2PParameter() { Name = "Дневная уставка зоны 5", BitLength = 8, StartByte = 4, Unit = "°C", b = -75 });
+
+            PGNs[26].parameters.Add(new AC2PParameter() { Name = "Ночная уставка зоны 1", BitLength = 8, StartByte = 0, Unit = "°C", b = -75 });
+            PGNs[26].parameters.Add(new AC2PParameter() { Name = "Ночная уставка зоны 2", BitLength = 8, StartByte = 1, Unit = "°C", b = -75 });
+            PGNs[26].parameters.Add(new AC2PParameter() { Name = "Ночная уставка зоны 3", BitLength = 8, StartByte = 2, Unit = "°C", b = -75 });
+            PGNs[26].parameters.Add(new AC2PParameter() { Name = "Ночная уставка зоны 4", BitLength = 8, StartByte = 3, Unit = "°C", b = -75 });
+            PGNs[26].parameters.Add(new AC2PParameter() { Name = "Ночная уставка зоны 5", BitLength = 8, StartByte = 4, Unit = "°C", b = -75 });
+
+            PGNs[27].parameters.Add(new AC2PParameter() { Name = "Ручная уставка ШИМ зоны 1", BitLength = 8, StartByte = 0, Unit = "%" });
+            PGNs[27].parameters.Add(new AC2PParameter() { Name = "Ручная уставка ШИМ зоны 2", BitLength = 8, StartByte = 1, Unit = "%" });
+            PGNs[27].parameters.Add(new AC2PParameter() { Name = "Ручная уставка ШИМ зоны 3", BitLength = 8, StartByte = 2, Unit = "%" });
+            PGNs[27].parameters.Add(new AC2PParameter() { Name = "Ручная уставка ШИМ зоны 4", BitLength = 8, StartByte = 3, Unit = "%" });
+            PGNs[27].parameters.Add(new AC2PParameter() { Name = "Ручная уставка ШИМ зоны 5", BitLength = 8, StartByte = 4, Unit = "%" });
+
+            PGNs[28].parameters.Add(new AC2PParameter() { Name = "Общее время на всех режимах", BitLength = 32, StartByte = 0, Unit = "с" });
+            PGNs[28].parameters.Add(new AC2PParameter() { Name = "Общее время работы (кроме ожидания команды)", BitLength = 32, StartByte = 4, Unit = "%" });
 
             PGNs[29].parameters.Add(new AC2PParameter() { Name = "Атмосферное давление", BitLength = 8, StartByte = 1, Unit = "кПа", PackNumber = 1 });
             PGNs[29].parameters.Add(new AC2PParameter() { Name = "Среднее максимальное значение давления", BitLength = 24, StartByte = 2, Unit = "кПа", a = 0.001, PackNumber = 1 });

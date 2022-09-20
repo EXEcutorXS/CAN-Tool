@@ -496,7 +496,7 @@ namespace CAN_Tool.ViewModels
 
         private void OnSaveLogCommandExecuted(object parameter)
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + SelectedConnectedDevice.ID.Type + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
 
             using (StreamWriter sw = new StreamWriter(path))
             {
@@ -516,7 +516,7 @@ namespace CAN_Tool.ViewModels
 
         private bool CanSaveLogCommandExecuted(object parameter)
         {
-            return true;
+            return SelectedConnectedDevice != null && SelectedConnectedDevice.LogCurrentPos > 0;
         }
 
         private void executeCommand(byte num, params byte[] data)
@@ -542,6 +542,7 @@ namespace CAN_Tool.ViewModels
             CustomMessage.Data = new byte[8];
             CustomMessage.Data[0] = 0;
             CustomMessage.Data[1] = 68;
+
             if (ManualWaterPump)
                 CustomMessage.Data[2] = 1;
             else

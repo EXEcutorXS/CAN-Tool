@@ -251,6 +251,15 @@ namespace CAN_Tool
                 if (vm.DecreaseGlowPlugCommand.CanExecute(null))
                     vm.DecreaseGlowPlugCommand.Execute(null);
         }
+
+        private void window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            
+            if (WindowState == WindowState.Maximized)
+                WindowState = WindowState.Normal;
+            else
+                WindowState = WindowState.Maximized;
+        }
     }
 
 }
