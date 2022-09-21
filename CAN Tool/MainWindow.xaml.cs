@@ -266,9 +266,6 @@ namespace CAN_Tool
                     vm.DecreaseGlowPlugCommand.Execute(null);
         }
 
-
-
-
     }
 
 }

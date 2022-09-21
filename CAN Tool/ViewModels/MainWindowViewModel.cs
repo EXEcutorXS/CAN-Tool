@@ -15,10 +15,15 @@ using ScottPlot.Renderable;
 using System.Windows.Markup;
 using Microsoft.Win32;
 using System.IO;
+using System.Text;
+using System.Drawing;
+using System.Windows;
+using System.Threading;
+using System.Windows.Media.Animation;
 
 namespace CAN_Tool.ViewModels
 {
-    internal class MainWindowViewModel : ViewModel
+    internal partial class MainWindowViewModel : ViewModel
     {
 
         int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
@@ -280,7 +285,7 @@ namespace CAN_Tool.ViewModels
                     ArraySegment<Double> dataToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos);
                     var sig = plt.AddSignal(dataToDisplay.ToArray(), color: v.Color, label: v.Name);
 
-                    plt.Style(Style.Gray1);
+                    plt.Style(ScottPlot.Style.Gray1);
                     plt.Legend();
                 }
 
@@ -494,6 +499,8 @@ namespace CAN_Tool.ViewModels
         }
         #endregion
 
+        #region SaveLogCommand
+
         public ICommand SaveLogCommand { get; }
 
         private void OnSaveLogCommandExecuted(object parameter)
@@ -520,8 +527,10 @@ namespace CAN_Tool.ViewModels
         {
             return SelectedConnectedDevice != null && SelectedConnectedDevice.LogCurrentPos > 0;
         }
+        #endregion
 
-        private void executeCommand(byte num, params byte[] data)
+
+        private void executeCommand(int cmdNum, params byte[] data)
         {
             CustomMessage.TransmitterType = 126;
             CustomMessage.TransmitterAddress = 6;
@@ -530,8 +539,8 @@ namespace CAN_Tool.ViewModels
             CustomMessage.Data = new byte[8];
             for (int i = 0; i < data.Length; i++)
                 customMessage.Data[i + 2] = data[i];
-            CustomMessage.Data[0] = 0;
-            CustomMessage.Data[1] = num;
+            CustomMessage.Data[0] = (byte)(cmdNum >> 8);
+            CustomMessage.Data[1] = (byte)(cmdNum & 0xFF);
             canAdapter.Transmit(customMessage);
         }
 
@@ -574,22 +583,6 @@ namespace CAN_Tool.ViewModels
         #endregion
         #endregion
 
-        public ICommand UpdateFirmwareCommand { get; }
-        private void OnUpdateFirmwareCommandExecuted(object parameter)
-        {
-            uint baseAdress = 0;
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "Hex Files|*.hex";
-            dialog.ShowDialog();
-            using (StreamReader sr = new StreamReader(dialog.FileName))
-            {
-                while (!sr.EndOfStream)
-                { 
-                string line = sr.ReadLine();
-                   //switch
-                }
-            }
-        }
         public void NewDeviceHandler(object sender, EventArgs e)
         {
             if (SelectedConnectedDevice == null || SelectedConnectedDevice.ID.Type == 126) //Котлы имеют приоритет над HCU в этом плане...
@@ -615,7 +608,7 @@ namespace CAN_Tool.ViewModels
 
             System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
 
-            timer.Tick += new EventHandler(TimerTick);
+            timer.Tick += TimerTick;
             timer.Interval = new TimeSpan(0, 0, 1);
             timer.Start();
 
@@ -660,6 +653,8 @@ namespace CAN_Tool.ViewModels
             TurnOffWaterPumpCommand = new LambdaCommand(OnTurnOffWaterPumpCommandExecuted, deviceInManualMode);
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
             UpdateFirmwareCommand = new LambdaCommand(OnUpdateFirmwareCommandExecuted, deviceSelected);
+            LoadHexCommand = new LambdaCommand(OnLoadHexCommandExecuted, CanLoadHexCommandExecute);
+            SwitchToBootloaderCommand = new LambdaCommand(OnSwitchToBootloaderCommandExecuted, deviceSelected);
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;
 

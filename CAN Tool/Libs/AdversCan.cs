@@ -872,6 +872,25 @@ namespace AdversCan
             set { Set(ref revMeasured, value); }
         }
 
+
+
+        private bool eraseDone;
+
+        public bool EraseDone
+        {
+            get => eraseDone;
+            set => Set(ref eraseDone, value);
+        }
+
+        private bool programDone;
+
+        public bool ProgramDone
+        {
+            get => programDone;
+            set => Set(ref programDone, value);
+        }
+
+
         public string Name => ToString();
         public string ImagePath => $"/Images/{id.Type}.jpg";
         public override string ToString()
@@ -1195,6 +1214,7 @@ namespace AdversCan
                         currentDevice.RevMeasured = (int)rawValue;
                 }
             }
+
             if (m.PGN == 7) //Ответ на запрос параметра
             {
                 if (m.Data[0] == 4) // Обрабатываем только упешные ответы на запросы
@@ -1240,7 +1260,14 @@ namespace AdversCan
                         }
                     }
                 }
+            }
 
+            if (m.PGN == 100)
+            {
+                if (m.Data[0] == 1 && m.Data[1] == 1)
+                    currentDevice.EraseDone = true;
+                if (m.Data[0] == 3 && m.Data[1] == 1)
+                    currentDevice.ProgramDone = true;
             }
 
             Messages.TryToAdd(m);
@@ -1708,7 +1735,7 @@ namespace AdversCan
             commands[new CommandId(0, 21)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 8, Name = "Период ШИМ" });
             commands[new CommandId(0, 21)].Parameters.Add(new AC2PParameter() { StartByte = 5, BitLength = 8, Name = "Требуемая частота", Unit = "Гц" });
 
-            commands[new CommandId(0, 22)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "Действие после перезагрузки", Meanings = { { 0, "Остаться в загрузчике" }, { 1, "Переход в основную программу без зедержки" } } });
+            commands[new CommandId(0, 22)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "Действие после перезагрузки", Meanings = { { 0, "Остаться в загрузчике" }, { 1, "Переход в основную программу без зедержки" }, { 2, "5 секунд в загрузчике" } } });
 
             commands[new CommandId(0, 45)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Игнорирование всех неисправностей", Meanings = defMeaningsYesNo });
             commands[new CommandId(0, 45)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "Игнорирование неисправностей ТН", Meanings = defMeaningsYesNo });

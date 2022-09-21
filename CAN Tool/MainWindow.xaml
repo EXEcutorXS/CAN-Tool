@@ -385,8 +385,8 @@
                     </TabItem.Header>
                     <DockPanel>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                            <Button Content="Load HEX" Margin="10" />
-                            <Button Content="Enter Bootloader" Margin="10" />
+                            <Button Content="Load HEX" Margin="10" Command="{Binding LoadHexCommand}"/>
+                            <Button Content="Enter Bootloader" Margin="10" Command="{Binding SwitchToBootloaderCommand}"/>
                             <Button Content="Update" Margin="10" Command="{Binding UpdateFirmwareCommand}"/>
                             <Button Content="Start program" Margin="10" />
                             <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding SelectedConnectedDevice.FirmwareAsText}"/>
