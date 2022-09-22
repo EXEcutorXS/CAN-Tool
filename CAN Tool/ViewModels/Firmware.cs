@@ -113,9 +113,6 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             VM.canAdapter.Transmit(msg);
             VM.SelectedConnectedDevice.EraseDone = false;
-            DateTime startTime = DateTime.Now;
-            while (!VM.SelectedConnectedDevice.EraseDone && (DateTime.Now - startTime) < new TimeSpan(0, 0, 10)) ;
-            if (!VM.SelectedConnectedDevice.EraseDone) throw new Exception("Device is not answering");
         }
 
         private void startFlashing()
@@ -140,9 +137,6 @@ namespace CAN_Tool.ViewModels
         }
         private void flashFragment(CodeFragment f)
         {
-
-            bootloaderSetAdrLen(f.StartAdress, f.Length);
-            WaitFor(ref VM.SelectedConnectedDevice.setAdrDone, 2);
             writeFragmentToRam(f);
             startFlashing();
             Thread.Sleep(100);
@@ -167,7 +161,6 @@ namespace CAN_Tool.ViewModels
             VM.canAdapter.Transmit(msg);
 
         }
-
         private void writeFragmentToRam(CodeFragment f)
         {
             AC2PMessage msg = new();
@@ -187,6 +180,26 @@ namespace CAN_Tool.ViewModels
                 msg.Data[7] = f.Data[i * 8 + 7];
                 VM.canAdapter.Transmit(msg);
             }
+
+        }
+        private void updateFirmware(List<CodeFragment> fragments)
+        {
+            VM.AC2PInstance.CurrentTask.Capture("Memory Erasing");
+            eraseFlash();
+            WaitFor(ref VM.SelectedConnectedDevice.eraseDone, 10);
+            VM.AC2PInstance.CurrentTask.onDone();
+            VM.AC2PInstance.CurrentTask.Capture("Programming...");
+            bootloaderSetAdrLen(0x8008000, 128);
+            WaitFor(ref VM.SelectedConnectedDevice.setAdrDone, 2);
+            int cnt = 0;
+            foreach (var f in fragments)
+            {
+                flashFragment(f);
+                VM.AC2PInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
+                if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested) return;
+
+            }
+            VM.AC2PInstance.CurrentTask.onDone();
 
         }
         public ICommand UpdateFirmwareCommand { get; }
@@ -244,21 +257,15 @@ namespace CAN_Tool.ViewModels
                 }
             return null;
         }
-        private void UpdateFirmware(List<CodeFragment> fragments)
-        {
-            eraseFlash();
-            foreach (var f in fragments)
-                flashFragment(f);
 
-        }
         private void OnUpdateFirmwareCommandExecuted(object parameter)
         {
-            Task.Run(() => UpdateFirmware(fragments));
+            Task.Run(() => updateFirmware(fragments));
         }
 
         private bool CanUpdateFirmwareCommandExecute(object parameter)
         {
-            return (VM.SelectedConnectedDevice != null && VM.SelectedConnectedDevice.ID.Type == 123 && fragments.Count>0);
+            return (VM.SelectedConnectedDevice != null && VM.SelectedConnectedDevice.ID.Type == 123 && fragments.Count > 0);
         }
 
         public FirmwarePage(MainWindowViewModel vm)
