@@ -41,17 +41,25 @@ namespace AdversCan
         public double b = 0;         //смещение
         //value = rawData*a+b
         public string Unit { get => unit; set => unit = value; }
+
+        private string format;
         public string OutputFormat
         {
             get
             {
-                if (a == 1)
-                    return "";
-                else if (a >= 0.09)
-                    return "0.0";
+                if (format != null)
+                    return format;
                 else
-                    return "0.00";
+                {
+                    if (a == 1)
+                        return "";
+                    else if (a >= 0.09)
+                        return "0.0";
+                    else
+                        return "0.00";
+                }
             }
+            set => Set(ref format, value);
         }
         private Dictionary<int, string> meanings = new(); //Словарь с расшифровками значений параметров
         public Dictionary<int, string> Meanings { get => meanings; set => meanings = value; }
@@ -809,9 +817,11 @@ namespace AdversCan
 
     public class ConnectedDevice : ViewModel
     {
+
         public ConnectedDevice()
         {
             LogInit();
+
         }
 
         private DeviceId id;
@@ -822,6 +832,13 @@ namespace AdversCan
             set { Set(ref id, value); }
         }
 
+        private DateOnly prodDate;
+
+        public DateOnly ProductionDate
+        {
+            get => prodDate;
+            set => Set(ref prodDate, value);
+        }
 
         private byte[] firmware;
 
@@ -874,7 +891,7 @@ namespace AdversCan
 
 
 
-        private bool eraseDone;
+        public bool eraseDone = false;
 
         public bool EraseDone
         {
@@ -882,14 +899,21 @@ namespace AdversCan
             set => Set(ref eraseDone, value);
         }
 
-        private bool programDone;
+
+        public bool setAdrDone = false;
+
+        public bool SetAdrDone
+        {
+            get => setAdrDone;
+            set => Set(ref setAdrDone, value);
+        }
+        public bool programDone = false;
 
         public bool ProgramDone
         {
             get => programDone;
             set => Set(ref programDone, value);
         }
-
 
         public string Name => ToString();
         public string ImagePath => $"/Images/{id.Type}.jpg";
@@ -1262,10 +1286,23 @@ namespace AdversCan
                 }
             }
 
+            if (m.PGN == 18) //Версия
+            {
+                currentDevice.Firmware = m.Data[0..4];
+                if (m.Data[5] != 0xff && m.Data[6] != 0xff && m.Data[7] != 0xff)
+                    try
+                    {
+                        currentDevice.ProductionDate = new DateOnly(m.Data[7], m.Data[6], m.Data[5]);
+                    }
+                    catch { }
+            }
+
             if (m.PGN == 100)
             {
                 if (m.Data[0] == 1 && m.Data[1] == 1)
                     currentDevice.EraseDone = true;
+                if (m.Data[0] == 2 && m.Data[1] == 1)
+                    currentDevice.SetAdrDone = true;
                 if (m.Data[0] == 3 && m.Data[1] == 1)
                     currentDevice.ProgramDone = true;
             }
@@ -1939,6 +1976,9 @@ namespace AdversCan
 
             PGNs[31].parameters.Add(new AC2PParameter() { Name = "Время работы", BitLength = 32, StartByte = 0, Unit = "с", Var = 3 });
             PGNs[31].parameters.Add(new AC2PParameter() { Name = "Время работы на режиме", BitLength = 32, StartByte = 4, Unit = "с", Var = 4 });
+
+            PGNs[100].parameters.Add(new AC2PParameter() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning  = r => $"Начальный адрес: 0X{r:X}" }) ;
+            PGNs[100].parameters.Add(new AC2PParameter() { Name = "Длина данных", BitLength = 32, StartByte = 4, PackNumber = 2 });
             #endregion
 
             ErrorNames = new Dictionary<int, string>() {

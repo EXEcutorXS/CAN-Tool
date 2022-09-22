@@ -86,8 +86,8 @@
                                     <RowDefinition Height="auto"></RowDefinition>
                                 </Grid.RowDefinitions>
                                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                    <TextBox ToolTip="Type" Width="40" Margin="5 10" Text="{Binding SelectedConnectedDevice.ID.Type,Mode=OneWay}" IsReadOnly="True" Cursor="Arrow" />
-                                    <TextBox ToolTip="Adress" Width="30" Margin="5 10" Text="{Binding SelectedConnectedDevice.ID.Address,Mode=OneWay}" IsReadOnly="True" />
+                                    <TextBox ToolTip="Type" Width="40" Margin="5 10" Text="{Binding CustomMessage.ReceiverType}" />
+                                    <TextBox ToolTip="Adress" Width="30" Margin="5 10" Text="{Binding CustomMessage.ReceiverAddress}"/>
                                     <TextBox ToolTip="PGN" Width="40" Margin="5 10" Text="{Binding Path=CustomMessage.PGN,UpdateSourceTrigger=PropertyChanged}" />
                                     <TextBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.Data,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource DataConverter},Mode=OneWayToSource}" />
                                     <TextBox ToolTip="Data Preview " MaxHeight="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsText,Mode=OneWay}" IsReadOnly="True" />
@@ -376,7 +376,7 @@
                     </DockPanel>
 
                 </TabItem>
-                <TabItem>
+                <TabItem DataContext="{Binding FirmwarePage}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_FileCode" Margin="2 2 5 2" Foreground="White" />
@@ -384,12 +384,14 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
                             <Button Content="Load HEX" Margin="10" Command="{Binding LoadHexCommand}"/>
                             <Button Content="Enter Bootloader" Margin="10" Command="{Binding SwitchToBootloaderCommand}"/>
                             <Button Content="Update" Margin="10" Command="{Binding UpdateFirmwareCommand}"/>
-                            <Button Content="Start program" Margin="10" />
-                            <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding SelectedConnectedDevice.FirmwareAsText}"/>
+                            <Button Content="Start program" Margin="10" Command="{Binding SwitchToMainProgramCommand}"/>
+                            <Button Content="Find Bootloader" Margin="10" Command="{Binding RequestBootloaderVersionCommand}" />
+                            <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding VM.SelectedConnectedDevice.FirmwareAsText}"/>
+                            <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding VM.SelectedConnectedDevice.ProductionDate}" />
                         </StackPanel>
                         <StackPanel></StackPanel>
                     </DockPanel>

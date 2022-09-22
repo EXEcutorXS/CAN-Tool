@@ -278,6 +278,7 @@ namespace Can_Adapter
             str.Append(msg.GetDataInTextFormat());
             str.Append('\r');
             serialPort.Write(str.ToString());
+            Thread.Sleep(5);
         }
 
         private void uartMessageProcess()

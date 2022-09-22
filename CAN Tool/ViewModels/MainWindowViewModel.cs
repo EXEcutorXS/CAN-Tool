@@ -23,8 +23,16 @@ using System.Windows.Media.Animation;
 
 namespace CAN_Tool.ViewModels
 {
-    internal partial class MainWindowViewModel : ViewModel
+    internal class MainWindowViewModel : ViewModel
     {
+
+        private FirmwarePage firmwarePage;
+
+        public FirmwarePage FirmwarePage    
+        {
+            get { return firmwarePage; }
+            set { Set(ref firmwarePage, value); }
+        }
 
         int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
 
@@ -167,6 +175,14 @@ namespace CAN_Tool.ViewModels
             canAdapter.PortName = PortName;
             canAdapter.PortOpen();
             canAdapter.StartNormal();
+
+            CustomMessage.TransmitterType = 126;
+            CustomMessage.TransmitterAddress = 6;
+            CustomMessage.ReceiverAddress = 7;
+            CustomMessage.ReceiverType = 127;
+            CustomMessage.PGN = 1;
+            CustomMessage.Data = new byte[8];
+            canAdapter.Transmit(customMessage);
         }
         private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !canAdapter.PortOpened);
         #endregion
@@ -387,12 +403,11 @@ namespace CAN_Tool.ViewModels
         private void OnSendCustomMessageCommandExecuted(object parameter)
         {
             CustomMessage.TransmitterId = new DeviceId(126, 6);
-            CustomMessage.ReceiverId = SelectedConnectedDevice.ID;
             AC2PInstance.SendMessage(CustomMessage);
         }
         private bool CanSendCustomMessageCommandExecute(object parameter)
         {
-            if (!canAdapter.PortOpened || SelectedConnectedDevice == null) return false;
+            if (!canAdapter.PortOpened) return false;
             return true;
         }
 
@@ -589,6 +604,11 @@ namespace CAN_Tool.ViewModels
                 SelectedConnectedDevice = AC2PInstance.ConnectedDevices[0];
         }
 
+
+        public bool portOpened(object parameter)
+        {
+            return canAdapter.PortOpened;
+        }
         public bool deviceSelected(object parameter)
         {
             return canAdapter.PortOpened && SelectedConnectedDevice != null;
@@ -605,6 +625,7 @@ namespace CAN_Tool.ViewModels
 
             _canAdapter = new CanAdapter();
             _AC2PInstance = new AC2P(canAdapter);
+            FirmwarePage = new(this);
 
             System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
 
@@ -652,9 +673,7 @@ namespace CAN_Tool.ViewModels
             TurnOnWaterPumpCommand = new LambdaCommand(OnTurnOnWaterPumpCommandExecuted, deviceInManualMode);
             TurnOffWaterPumpCommand = new LambdaCommand(OnTurnOffWaterPumpCommandExecuted, deviceInManualMode);
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
-            UpdateFirmwareCommand = new LambdaCommand(OnUpdateFirmwareCommandExecuted, deviceSelected);
-            LoadHexCommand = new LambdaCommand(OnLoadHexCommandExecuted, CanLoadHexCommandExecute);
-            SwitchToBootloaderCommand = new LambdaCommand(OnSwitchToBootloaderCommandExecuted, deviceSelected);
+
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;
 
