@@ -81,4 +81,20 @@ namespace CAN_Tool.ViewModels.Converters
             return ((Visibility)value == Visibility.Visible);
         }
     }
+
+    public class IntToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && (int)value != 0)
+                return Visibility.Visible;
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((Visibility)value == Visibility.Visible);
+        }
+    }
 }

@@ -28,7 +28,7 @@ namespace CAN_Tool.ViewModels
 
         private FirmwarePage firmwarePage;
 
-        public FirmwarePage FirmwarePage    
+        public FirmwarePage FirmwarePage
         {
             get { return firmwarePage; }
             set { Set(ref firmwarePage, value); }
@@ -391,7 +391,7 @@ namespace CAN_Tool.ViewModels
         public ICommand EraseBlackBoxDataCommand { get; }
         private void OnEraseBlackBoxDataCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.EraseErrorsBlackBox(_connectedDevice.ID));
+            Task.Run(() => AC2PInstance.EraseCommonBlackBox(_connectedDevice.ID));
         }
         private bool CanEraseBlackBoxDataExecute(object parameter) =>
             (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
@@ -584,15 +584,24 @@ namespace CAN_Tool.ViewModels
 
         private void TimerTick(object sender, EventArgs e)
         {
-            foreach (var d in AC2PInstance.ConnectedDevices)
+            foreach (var d in AC2PInstance.ConnectedDevices) //Источник токов для ведения лога
             {
                 d.LogTick();
             }
 
-            if (AutoRedraw)
+            if (AutoRedraw)                                 //Перерисовк графиков
                 if (CanChartDrawCommandExecute(null))
                     OnChartDrawCommandExecuted(null);
 
+            foreach (ConnectedDevice d in AC2PInstance.ConnectedDevices) //Поддержание связи
+            {
+                AC2PMessage msg = new();
+                msg.TransmitterAddress = 6;
+                msg.TransmitterType = 126;
+                msg.PGN = 0;
+                msg.ReceiverId = d.ID;
+                canAdapter.Transmit(msg);
+            }
         }
 
         #endregion
@@ -601,7 +610,9 @@ namespace CAN_Tool.ViewModels
         public void NewDeviceHandler(object sender, EventArgs e)
         {
             if (SelectedConnectedDevice == null || SelectedConnectedDevice.ID.Type == 126) //Котлы имеют приоритет над HCU в этом плане...
-                SelectedConnectedDevice = AC2PInstance.ConnectedDevices[0];
+                SelectedConnectedDevice = AC2PInstance.ConnectedDevices[^1];
+            if (deviceSelected(null))
+                firmwarePage.GetVersionCommand.Execute(null);
         }
 
 

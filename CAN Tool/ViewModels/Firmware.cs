@@ -102,6 +102,23 @@ namespace CAN_Tool.ViewModels
 
         #endregion
 
+        #region GetVersionCommand
+        public ICommand GetVersionCommand { get; }
+
+        private void OnGetVersionCommandExecuted(object parameter)
+        {
+            AC2PMessage msg = new();
+            msg.PGN = 6;
+            msg.TransmitterAddress = 6;
+            msg.TransmitterType = 126;
+            msg.ReceiverId = VM.SelectedConnectedDevice.ID;
+            msg.Data[0] = 0;
+            msg.Data[1] = 18;
+            VM.canAdapter.Transmit(msg);
+        }
+
+        #endregion
+
         private void eraseFlash()
         {
             AC2PMessage msg = new();
@@ -277,6 +294,7 @@ namespace CAN_Tool.ViewModels
             SwitchToBootloaderCommand = new LambdaCommand(OnSwitchToBootloaderCommandExecuted, VM.deviceSelected);
             SwitchToMainProgramCommand = new LambdaCommand(OnSwitchToMainProgramCommandExecuted, VM.deviceSelected);
             RequestBootloaderVersionCommand = new LambdaCommand(OnRequestBootloaderVersioExecuted, VM.portOpened);
+            GetVersionCommand = new LambdaCommand(OnGetVersionCommandExecuted, VM.deviceSelected);
         }
     }
 }

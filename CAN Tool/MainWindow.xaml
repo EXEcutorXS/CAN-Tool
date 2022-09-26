@@ -1,28 +1,29 @@
-﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow"
-        xmlns:fa="http://schemas.fontawesome.com/icons/" 
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
-        xmlns:acan="clr-namespace:AdversCan"
-        xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d"
-        Title="Adver CAN-Tool" Height="700" Width="1400"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
-        TextElement.FontWeight="Regular" TextElement.FontSize="13" 
-        TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" 
-        WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown"
-        >
+﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:acan="clr-namespace:AdversCan" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" Title="Adver CAN-Tool" Height="700" Width="1500" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
-        <c:BoolToVisibleConverter x:Key="VisibileConverter" />
+        <c:BoolToVisibleConverter x:Key="BoolToVisibileConverter" />
+        <c:IntToVisibleConverter x:Key="IntToVisibileConverter" />
     </Window.Resources>
     <Window.DataContext>
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Window.DataContext>
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <EventTrigger.Actions>
+                <BeginStoryboard>
+                    <Storyboard TargetProperty="Opacity" TargetName="StageTextBlock">
+                        <DoubleAnimation From="0.3" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:3" />
+                    </Storyboard>
+                    </BeginStoryboard>
+                <BeginStoryboard>
+                    <Storyboard TargetProperty="Opacity" TargetName="ErrorButton">
+                        <DoubleAnimation From="0" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:1" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger.Actions>
+        </EventTrigger>
+    </Window.Triggers>
     <DockPanel>
         <StatusBar x:Name="MyStatusbar" DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
             <StatusBarItem Width="auto">
@@ -30,35 +31,34 @@
             </StatusBarItem>
             <ProgressBar Width="300" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0"></ProgressBar>
             <StatusBarItem>
-                <Button Content="Cancel" Command="{Binding CancelOperationCommand}" Margin="5" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource VisibileConverter}}"></Button>
+                <Button Content="Cancel" Command="{Binding CancelOperationCommand}" Margin="5" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></Button>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
                 <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
             </StatusBarItem>
         </StatusBar>
-        <Grid DockPanel.Dock="Top" >
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
-            <Button Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" />
-            <ComboBox x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
+        <Grid DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
+                <Button Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" />
+                <ComboBox x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
 
-            <Button x:Name="PortOpenButton" Margin="10" Content="Open" Command="{Binding OpenPortCommand}" />
-            <Button x:Name="PortOpenButton_Copy" Margin="10" Content="Close" Command="{Binding ClosePortCommand}" />
-            <Expander ExpandDirection="Down" Header="Adapter mode">
-                <StackPanel Orientation="Horizontal" >
-                <ComboBox x:Name="CanBitrateField"  Margin ="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" />
+                <Button x:Name="PortOpenButton" Margin="10" Content="Open" Command="{Binding OpenPortCommand}" />
+                <Button x:Name="PortOpenButton_Copy" Margin="10" Content="Close" Command="{Binding ClosePortCommand}" />
+                <Expander ExpandDirection="Down" Header="Adapter mode">
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" />
                         <Button Content="Normal" Margin="10" Command="{Binding SetAdapterNormalModeCommand}" />
                         <Button Content="Listen" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                         <Button Content="Self Reception" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                         <Button Content="Stop" Margin="10" Command="{Binding StopCanAdapterCommand}" />
-                </StackPanel>
-            </Expander>
-            
-            
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
-            <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5"></ComboBox>
-            <Button Content="Exit" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft" />
-        </StackPanel>
+                    </StackPanel>
+                </Expander>
+
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
+                <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5"></ComboBox>
+                <Button Content="Exit" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft" />
+            </StackPanel>
         </Grid>
 
         <DockPanel>
@@ -70,7 +70,66 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
-            <TabControl Margin="1">
+            <TabControl>
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Solid_IdCardAlt" Margin="2 2 5 2" Foreground="White" />
+                            <TextBlock Margin="5 2 2 2">General</TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <DockPanel>
+                        <TextBlock  Margin="10" x:Name="StageTextBlock" DockPanel.Dock="Top" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" HorizontalAlignment="Center" FontSize="20" />
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                            <Border Margin="20" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="10">
+                                <Image Height="200" Width="200" Source="{Binding SelectedConnectedDevice.Img}" Stretch="Fill" />
+                            </Border>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"></ColumnDefinition>
+                                    <ColumnDefinition Width="5*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" Text="{Binding SelectedConnectedDevice.Name}" VerticalAlignment="Center" FontSize="30" />
+                                <TextBlock Grid.Row="1" Text="{Binding SelectedConnectedDevice.FirmwareAsText}" VerticalAlignment="Center" FontSize="30" />
+                                <TextBlock Grid.Row="2" Text="{Binding SelectedConnectedDevice.ProductionDate}" VerticalAlignment="Center" FontSize="30" />
+                                <Button x:Name="ErrorButton" Grid.Column="1" Grid.Row="0"  Background="Red" Visibility="{Binding SelectedConnectedDevice.Parameters.Error,Converter={StaticResource IntToVisibileConverter},TargetNullValue=Hidden}" Command="{Binding ClearErrorsCommand}">
+                                    
+                                    <StackPanel Orientation="Horizontal" ToolTip="Press to clean error code">
+                                        <fa:FontAwesome Margin="10 0 10 0" Icon="Solid_ExclamationTriangle"></fa:FontAwesome>
+                                        <TextBlock Text="{Binding Path=SelectedConnectedDevice.Parameters.ErrorString}" />
+                                    </StackPanel>
+                                </Button>
+                              
+                            </Grid>
+                        </StackPanel >
+                        <Border BorderThickness="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" DockPanel.Dock="Top" HorizontalAlignment="Left" CornerRadius="20" Margin="20">
+                            <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Left">
+                                <Button Margin="10" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
+                                    <Button.Content>
+                                        <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="White" />
+                                    </Button.Content>
+                                </Button>
+
+                                <Button Margin="8" ToolTip="Stop Device" Command="{Binding StopHeaterCommand}">
+                                    <Button.Content>
+                                        <fa:ImageAwesome Icon="Solid_Stop" Margin="2" Foreground="White" />
+                                    </Button.Content>
+                                </Button>
+                                <Button Margin="8" ToolTip="Run just water pump" Command="{Binding StartPumpCommand}">Pump</Button>
+                                <Button Margin="8" ToolTip="Run ventilation" Command="{Binding StartVentCommand}">Ventilation</Button>
+                                <Button Content="Thermocouple calibrate" Margin="10" Command="{Binding CalibrateTermocouplesCommand}" />
+                                <Button Content="Erase Failures" Margin="10" Command="{Binding ClearErrorsCommand}" />
+
+                            </StackPanel>
+                        </Border>
+                        <Grid />
+                    </DockPanel>
+                </TabItem>
                 <TabItem>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
@@ -87,7 +146,7 @@
                                 </Grid.RowDefinitions>
                                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                                     <TextBox ToolTip="Type" Width="40" Margin="5 10" Text="{Binding CustomMessage.ReceiverType}" />
-                                    <TextBox ToolTip="Adress" Width="30" Margin="5 10" Text="{Binding CustomMessage.ReceiverAddress}"/>
+                                    <TextBox ToolTip="Adress" Width="30" Margin="5 10" Text="{Binding CustomMessage.ReceiverAddress}" />
                                     <TextBox ToolTip="PGN" Width="40" Margin="5 10" Text="{Binding Path=CustomMessage.PGN,UpdateSourceTrigger=PropertyChanged}" />
                                     <TextBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.Data,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource DataConverter},Mode=OneWayToSource}" />
                                     <TextBox ToolTip="Data Preview " MaxHeight="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsText,Mode=OneWay}" IsReadOnly="True" />
@@ -101,7 +160,7 @@
                             </Grid>
                             <TextBlock DockPanel.Dock="Right" MaxHeight="200" Margin="10" Text="{Binding Path=CustomMessage.VerboseInfo, Mode=OneWay}"></TextBlock>
                         </DockPanel>
-                        
+
                         <DockPanel>
                             <DataGrid x:Name="AC2PmessagesField" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding AC2PInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged">
                                 <DataGrid.Columns>
@@ -120,13 +179,12 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                             <DockPanel DockPanel.Dock="Right">
-                            <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedMessage.VerboseInfo,Mode=OneWay}"></TextBlock>
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedMessage.VerboseInfo,Mode=OneWay}"></TextBlock>
                                 <Expander x:Name="LogExpander" ExpandDirection="Up" Header="Message Log" DockPanel.Dock="Bottom">
-                                    <RichTextBox x:Name="LogField" IsReadOnly="True" VerticalScrollBarVisibility="Visible"/>
+                                    <RichTextBox x:Name="LogField" IsReadOnly="True" VerticalScrollBarVisibility="Visible" />
                                 </Expander>
                             </DockPanel>
                         </DockPanel>
-             
 
                     </DockPanel>
 
@@ -139,45 +197,24 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
-                            <Button Margin="10" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
-                                <Button.Content>
-                                    <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="White" />
-                                </Button.Content>
-                            </Button>
 
-                            <Button Margin="8" ToolTip="Stop Device" Command="{Binding StopHeaterCommand}">
-                                <Button.Content>
-                                    <fa:ImageAwesome Icon="Solid_Stop" Margin="2" Foreground="White" />
-                                </Button.Content>
-                            </Button>
-                            <Button Margin="8" ToolTip="Run just water pump" Command="{Binding StartPumpCommand}">Pump</Button>
-                            <Button Margin="8" ToolTip="Run ventilation" Command="{Binding StartVentCommand}">Ventilation</Button>
-                            <Button Content="Thermocouple calibrate" Margin="10" Command="{Binding CalibrateTermocouplesCommand}" />
-                            <Button Content="Erase Failures" Margin="10" Command="{Binding ClearErrorsCommand}" />
-
-            
-
-                        </StackPanel>
-                        
                         <StackPanel x:Name="CommandConstructor" DockPanel.Dock="Top" Orientation="Vertical" Margin="10">
-                            
+
                             <ComboBox x:Name="CommandSelector" Margin="10" ItemsSource="{Binding CommandList}" SelectionChanged="ComboBox_SelectionChanged" />
-                            
+
                             <Border HorizontalAlignment="Center" Margin="5" CornerRadius="10" BorderBrush="Gainsboro" BorderThickness="1">
                                 <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="CommandPrevirew" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="10" Text="{Binding CustomMessage.DataAsText,Mode=OneWay}"></TextBlock>
-                                <Button Margin="10" Command="{Binding Path=SendCustomMessageCommand}">
-                                    <Button.Content>
-                                        <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="White" />
-                                    </Button.Content>
-                                </Button>
-                            </StackPanel>
+                                    <TextBlock x:Name="CommandPrevirew" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="10" Text="{Binding CustomMessage.DataAsText,Mode=OneWay}"></TextBlock>
+                                    <Button Margin="10" Command="{Binding Path=SendCustomMessageCommand}">
+                                        <Button.Content>
+                                            <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="White" />
+                                        </Button.Content>
+                                    </Button>
+                                </StackPanel>
                             </Border>
-                            
 
                         </StackPanel>
-                        
+
                         <StackPanel x:Name="CommandParameterPanel" Orientation="Vertical"></StackPanel>
                     </DockPanel>
                 </TabItem>
@@ -195,7 +232,7 @@
                             <Button Content="Save" Margin="10" Command="{Binding SaveConfigCommand}" />
                             <Button Content="Reset" Margin="10" Command="{Binding ResetConfigCommand}" />
                         </StackPanel>
-                        <DataGrid DockPanel.Dock="Top" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}"  x:Name="ConfigParameterField" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.readedParameters}">
+                        <DataGrid DockPanel.Dock="Top" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" x:Name="ConfigParameterField" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.readedParameters}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path = Id}" Header="ID" IsReadOnly="True">
                                 </DataGridTextColumn>
@@ -223,7 +260,7 @@
                             <Button Margin="10" Content="Dataset"></Button>
                             <Button Margin="10" Content="Redraw" Command="{Binding ChartDrawCommand}"></Button>
                             <Button Margin="10" Content="Save Log" Command="{Binding SaveLogCommand}"></Button>
-                            <CheckBox Margin="10" Content="Autoredraw" IsChecked="{Binding AutoRedraw}"  />
+                            <CheckBox Margin="10" Content="Autoredraw" IsChecked="{Binding AutoRedraw}" />
                             <TextBlock Margin="10" Text="{Binding StringFormat=Log length is {0} seconds, Path=SelectedConnectedDevice.LogCurrentPos}" VerticalAlignment="Center"></TextBlock>
                         </StackPanel>
                         <Expander DockPanel.Dock="Top" Header="Dataset">
@@ -311,8 +348,8 @@
                     <DockPanel>
                         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
                             <Button Margin="10" Content="Enter Manual" Command="{Binding EnterManualModeCommand}" />
-                            <Button Margin="10" Content="Leave manual" Command="{Binding ExitManualModeCommand}"/>
-                            
+                            <Button Margin="10" Content="Leave manual" Command="{Binding ExitManualModeCommand}" />
+
                             <CheckBox Content="Water Pump" IsChecked="{Binding ManualWaterPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" />
 
                         </StackPanel>
@@ -342,16 +379,16 @@
                                 <Button Grid.Column="2" Grid.Row="4" Margin="10" Content="-" Command="{Binding DecreaseFuelPumpCommand}" />
                                 <Button Grid.Column="3" Grid.Row="2" Margin="10" Content="+" Command="{Binding IncreaseGlowPlugCommand}" />
                                 <Button Grid.Column="3" Grid.Row="4" Margin="10" Content="-" Command="{Binding DecreaseGlowPlugCommand}" />
-                                
+
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Air Set" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" />
-                                <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding ManualAirBlower,Mode=OneWay}" HorizontalAlignment="Center"  FontSize="20" />
-                                <Rectangle x:Name="SetRevRect" Grid.Column="0" Grid.Row="3"  Margin="10"></Rectangle>
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding ManualAirBlower,Mode=OneWay}" HorizontalAlignment="Center" FontSize="20" />
+                                <Rectangle x:Name="SetRevRect" Grid.Column="0" Grid.Row="3" Margin="10"></Rectangle>
                                 <ProgressBar Grid.Column="0" Grid.Row="3" Value="{Binding ManualAirBlower,Mode=OneWay }" Maximum="90" Orientation="Vertical" Width="{Binding ElementName=SetRevRect,Path=ActualHeight}" Height="{Binding ElementName=SetRevRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel"></ProgressBar>
-                                
+
                                 <TextBlock Grid.Column="1" Grid.Row="0" FontSize="20" Text="Air Measured" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                                <TextBlock Grid.Column="1" Grid.Row="1" FontSize="20" Text="{Binding SelectedConnectedDevice.RevMeasured,TargetNullValue=0,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Grid.Column="1" Grid.Row="1" FontSize="20" Text="{Binding SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <Rectangle x:Name="MeasRevRect" Grid.Column="1" Grid.Row="3" Margin="10"></Rectangle>
-                                <ProgressBar Grid.Column="1" Grid.Row="3" Maximum="90"  Margin="10" Value="{Binding SelectedConnectedDevice.RevMeasured,TargetNullValue=0,Mode=OneWay}" Foreground="Green" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}"></ProgressBar>
+                                <ProgressBar Grid.Column="1" Grid.Row="3" Maximum="90" Margin="10" Value="{Binding SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0,Mode=OneWay}" Foreground="Green" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}"></ProgressBar>
 
                                 <TextBlock Grid.Column="2" Grid.Row="0" FontSize="20" Text="Pump Set" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <TextBlock Grid.Column="2" Grid.Row="1" FontSize="20" Text="{Binding ManualFuelPump,Mode=OneWay,Converter={StaticResource FuelPumpConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
@@ -362,8 +399,7 @@
                                 <TextBlock Grid.Column="3" Grid.Row="1" FontSize="20" Text="{Binding ManualGlowPlug,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <Rectangle x:Name="SetPlugRect" Grid.Column="3" Grid.Row="3" Margin="10"></Rectangle>
                                 <ProgressBar Grid.Column="3" Grid.Row="3" Value="{Binding ManualGlowPlug,TargetNullValue=0,Mode=OneWay}" Foreground="Red" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel_2"></ProgressBar>
-                                
-                                
+
                             </Grid>
 
                             <DataGrid Grid.Column="3" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
@@ -384,13 +420,14 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                            <Button Content="Load HEX" Margin="10" Command="{Binding LoadHexCommand}"/>
-                            <Button Content="Enter Bootloader" Margin="10" Command="{Binding SwitchToBootloaderCommand}"/>
-                            <Button Content="Update" Margin="10" Command="{Binding UpdateFirmwareCommand}"/>
-                            <Button Content="Start program" Margin="10" Command="{Binding SwitchToMainProgramCommand}"/>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                            <Button Content="Load HEX" Margin="10" Command="{Binding LoadHexCommand}" />
+                            <Button Content="Enter Bootloader" Margin="10" Command="{Binding SwitchToBootloaderCommand}" />
+                            <Button Content="Update" Margin="10" Command="{Binding UpdateFirmwareCommand}" />
+                            <Button Content="Start program" Margin="10" Command="{Binding SwitchToMainProgramCommand}" />
                             <Button Content="Find Bootloader" Margin="10" Command="{Binding RequestBootloaderVersionCommand}" />
-                            <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding VM.SelectedConnectedDevice.FirmwareAsText}"/>
+                            <Button Content="Get Version" Margin="10" Command="{Binding GetVersionCommand}" />
+                            <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding VM.SelectedConnectedDevice.FirmwareAsText}" />
                             <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding VM.SelectedConnectedDevice.ProductionDate}" />
                         </StackPanel>
                         <StackPanel></StackPanel>

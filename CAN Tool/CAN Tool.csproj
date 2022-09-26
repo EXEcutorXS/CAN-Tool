@@ -10,6 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\126.jpg" />
+    <None Remove="Images\23.jpg" />
+    <None Remove="Images\34.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FontAwesome5" Version="2.1.11" />
     <PackageReference Include="MaterialDesignThemes" Version="4.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -22,6 +28,12 @@
     <Folder Include="Data\" />
     <Folder Include="Models\" />
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\126.jpg" />
+    <Resource Include="Images\23.jpg" />
+    <Resource Include="Images\34.jpg" />
   </ItemGroup>
 
   <ItemGroup>
