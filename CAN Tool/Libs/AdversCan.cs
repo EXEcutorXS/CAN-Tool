@@ -625,7 +625,7 @@ namespace AdversCan
         public System.Drawing.Color Color => System.Drawing.Color.FromArgb(255, (chartBrush as SolidColorBrush).Color.R, (chartBrush as SolidColorBrush).Color.G, (chartBrush as SolidColorBrush).Color.B);
 
 
-        [AffectsTo("Color")]
+        [AffectsTo(nameof(Color))]
         public System.Windows.Media.Brush ChartBrush
         {
             get => chartBrush;
@@ -906,7 +906,10 @@ namespace AdversCan
             set { Set(ref error, value); }
         }
 
-        public string StageString { get {
+        public string StageString
+        {
+            get
+            {
                 if (Stage == 0)
                 {
                     if (Mode == 1) return "Ожидание комманды";
@@ -971,7 +974,7 @@ namespace AdversCan
                     if (Mode == 32) return "Розжиг по датчику давления после срыва пламени во время работы ";
                     if (Mode == 34) return "Автокаллибровка перед вентиляцией ";
                     if (Mode == 35) return "Вентиляция";
-                    
+
                     if (Mode == 40) return "Вентиляция на 0 мощности ";
                     if (Mode == 41) return "Вентиляция на 1 мощности";
                     if (Mode == 42) return "Вентиляция на 2 мощности";
@@ -1012,9 +1015,11 @@ namespace AdversCan
                 if (Stage == 6)
                 {
                     if (Mode == 0) return "Ручной режим работы";
-                    
+
                 }
-                return "Unknown mode"; } }
+                return "Unknown mode";
+            }
+        }
         public string ErrorString => AC2P.ErrorNames.GetValueOrDefault(error, $"Unknown error: {error}");
 
     }
@@ -1065,6 +1070,36 @@ namespace AdversCan
                     return "No firmware data";
             }
         }
+
+
+        private uint serial1 = 0;
+
+        [AffectsTo(nameof(SerialAsString))]
+        public uint Serial1
+        {
+            get => serial1;
+            set => Set(ref serial1, value);
+        }
+
+        private uint serial2 = 0;
+
+        [AffectsTo(nameof(SerialAsString))]
+        public uint Serial2
+        {
+            get => serial2;
+            set => Set(ref serial2, value);
+        }
+
+        private uint serial3 = 0;
+
+        [AffectsTo(nameof(SerialAsString))]
+        public uint Serial3
+        {
+            get => serial3;
+            set => Set(ref serial3, value);
+        }
+
+        public string SerialAsString => $"{serial1}.{serial2}.{serial3}";
 
         UpdatableList<StatusVariable> status = new();
         public UpdatableList<StatusVariable> Status => status;
@@ -1446,7 +1481,14 @@ namespace AdversCan
                     int parameterId = m.Data[3] + m.Data[2] * 256;
                     uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
                     if (parameterValue != 0xFFFFFFFF)
-                        currentDevice.readedParameters.TryToAdd(new ReadedParameter() { Id = parameterId, Value = parameterValue }); //TODO remove all send commands
+                        currentDevice.readedParameters.TryToAdd(new() { Id = parameterId, Value = parameterValue }); //TODO remove all send commands
+                    //Серийник в отдельной переменной
+                    if (parameterId == 12)
+                        currentDevice.Serial1 = parameterValue;
+                    if (parameterId == 13)
+                        currentDevice.Serial2 = parameterValue;
+                    if (parameterId == 14)
+                        currentDevice.Serial3 = parameterValue;
                 }
 
             }
@@ -1496,7 +1538,7 @@ namespace AdversCan
 
             if (m.PGN == 11)
             {
-                currentDevice.Parameters.Voltage = (m.Data[0] * 256 + m.Data[1])/10;
+                currentDevice.Parameters.Voltage = (m.Data[0] * 256 + m.Data[1]) / 10;
             }
 
             if (m.PGN == 12)
@@ -1516,6 +1558,25 @@ namespace AdversCan
                         currentDevice.ProductionDate = new DateOnly(m.Data[7] + 2000, m.Data[6], m.Data[5]);
                     }
                     catch { }
+            }
+
+            if (m.PGN == 33)
+            {
+                switch (m.Data[0])
+                {
+                    case 1:
+                        currentDevice.Serial1 = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                        break;
+                    case 2:
+                        currentDevice.Serial2 = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                        break;
+                    case 3:
+                        currentDevice.Serial3 = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                        break;
+                    default:
+                        break;
+                }
+
             }
 
             if (m.PGN == 100)

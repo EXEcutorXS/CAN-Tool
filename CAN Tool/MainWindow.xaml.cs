@@ -21,6 +21,9 @@ using ScottPlot;
 using ScottPlot.Renderable;
 using CAN_Tool.Views;
 using System.Threading;
+using System.Windows.Data;
+using CAN_Tool.ViewModels.Converters;
+using System.Windows.Media.Animation;
 
 namespace CAN_Tool
 {
@@ -266,6 +269,14 @@ namespace CAN_Tool
                     vm.DecreaseGlowPlugCommand.Execute(null);
         }
 
+        private void Disappear(object sender, EventArgs e)
+        {
+            AirArrow.Visibility = Visibility.Hidden;
+            PlugArrow.Visibility = Visibility.Hidden;
+            PumpArrow.Visibility = Visibility.Hidden;
+        }
+
     }
+
 
 }

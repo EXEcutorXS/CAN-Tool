@@ -580,6 +580,27 @@ namespace CAN_Tool.ViewModels
             canAdapter.Transmit(customMessage);
         }
 
+        private async void requestSerial()
+        {
+            AC2PMessage m = new();
+            m.TransmitterType = 126;
+            m.TransmitterAddress = 6;
+            m.ReceiverId = SelectedConnectedDevice.ID;
+            m.PGN = 7;
+            m.Data = new byte[8];
+            m.Data[0] = 3;
+            m.Data[1] = 0;
+            m.Data[2] = 0;
+            m.Data[3] = 12;
+            canAdapter.Transmit(m);
+            await Task.Delay(100);
+            m.Data[3] = 13;
+            canAdapter.Transmit(m);
+            await Task.Delay(100);
+            m.Data[3] = 14;
+            canAdapter.Transmit(m);
+        }
+
         #region Chart
 
         private void TimerTick(object sender, EventArgs e)
@@ -609,10 +630,9 @@ namespace CAN_Tool.ViewModels
 
         public void NewDeviceHandler(object sender, EventArgs e)
         {
-            if (SelectedConnectedDevice == null || SelectedConnectedDevice.ID.Type == 126) //Котлы имеют приоритет над HCU в этом плане...
                 SelectedConnectedDevice = AC2PInstance.ConnectedDevices[^1];
-            if (deviceSelected(null))
                 firmwarePage.GetVersionCommand.Execute(null);
+                Task.Run(()=> requestSerial());
         }
 
 

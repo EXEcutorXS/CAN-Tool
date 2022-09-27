@@ -13,12 +13,12 @@
             <EventTrigger.Actions>
                 <BeginStoryboard>
                     <Storyboard TargetProperty="Opacity" TargetName="StageTextBlock">
-                        <DoubleAnimation From="0.3" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:3" />
+                        <DoubleAnimation From="0.3" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:1" />
                     </Storyboard>
-                    </BeginStoryboard>
+                </BeginStoryboard>
                 <BeginStoryboard>
                     <Storyboard TargetProperty="Opacity" TargetName="ErrorButton">
-                        <DoubleAnimation From="0" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:1" />
+                        <DoubleAnimation From="0" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:0.5" />
                     </Storyboard>
                 </BeginStoryboard>
             </EventTrigger.Actions>
@@ -56,6 +56,7 @@
 
             </StackPanel>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
+                <CheckBox x:Name="ExpertMode" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="Expert" FontSize="20"></CheckBox>
                 <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5"></ComboBox>
                 <Button Content="Exit" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft" />
             </StackPanel>
@@ -79,13 +80,14 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
-                        <TextBlock  Margin="10" x:Name="StageTextBlock" DockPanel.Dock="Top" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" HorizontalAlignment="Center" FontSize="20" />
+                        <TextBlock Margin="10" x:Name="StageTextBlock" DockPanel.Dock="Top" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" HorizontalAlignment="Center" FontSize="20" />
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                             <Border Margin="20" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="10">
                                 <Image Height="200" Width="200" Source="{Binding SelectedConnectedDevice.Img}" Stretch="Fill" />
                             </Border>
                             <Grid>
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*" />
                                     <RowDefinition Height="1*" />
                                     <RowDefinition Height="1*" />
                                     <RowDefinition Height="1*" />
@@ -97,14 +99,15 @@
                                 <TextBlock Grid.Row="0" Text="{Binding SelectedConnectedDevice.Name}" VerticalAlignment="Center" FontSize="30" />
                                 <TextBlock Grid.Row="1" Text="{Binding SelectedConnectedDevice.FirmwareAsText}" VerticalAlignment="Center" FontSize="30" />
                                 <TextBlock Grid.Row="2" Text="{Binding SelectedConnectedDevice.ProductionDate}" VerticalAlignment="Center" FontSize="30" />
-                                <Button x:Name="ErrorButton" Grid.Column="1" Grid.Row="0"  Background="Red" Visibility="{Binding SelectedConnectedDevice.Parameters.Error,Converter={StaticResource IntToVisibileConverter},TargetNullValue=Hidden}" Command="{Binding ClearErrorsCommand}">
-                                    
+                                <TextBlock Grid.Row="3" Text="{Binding SelectedConnectedDevice.SerialAsString}" VerticalAlignment="Center" FontSize="30" />
+                                <Button x:Name="ErrorButton" Grid.Column="1" Grid.Row="0" Background="Red" Visibility="{Binding SelectedConnectedDevice.Parameters.Error,Converter={StaticResource IntToVisibileConverter},Mode=OneWay,TargetNullValue=Hidden}" Command="{Binding ClearErrorsCommand}">
+
                                     <StackPanel Orientation="Horizontal" ToolTip="Press to clean error code">
                                         <fa:FontAwesome Margin="10 0 10 0" Icon="Solid_ExclamationTriangle"></fa:FontAwesome>
                                         <TextBlock Text="{Binding Path=SelectedConnectedDevice.Parameters.ErrorString}" />
                                     </StackPanel>
                                 </Button>
-                              
+
                             </Grid>
                         </StackPanel >
                         <Border BorderThickness="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" DockPanel.Dock="Top" HorizontalAlignment="Left" CornerRadius="20" Margin="20">
@@ -130,7 +133,7 @@
                         <Grid />
                     </DockPanel>
                 </TabItem>
-                <TabItem>
+                <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_MailBulk" Margin="2 2 5 2" Foreground="White" />
@@ -189,7 +192,7 @@
                     </DockPanel>
 
                 </TabItem>
-                <TabItem>
+                <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Regular_Keyboard" Margin="2 2 5 2" Foreground="White" />
@@ -257,10 +260,9 @@
                         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
                             <Button Margin="10" Content="Start" Command="{Binding LogStartCommand}"></Button>
                             <Button Margin="10" Content="Stop" Command="{Binding LogStopCommand}"></Button>
-                            <Button Margin="10" Content="Dataset"></Button>
                             <Button Margin="10" Content="Redraw" Command="{Binding ChartDrawCommand}"></Button>
                             <Button Margin="10" Content="Save Log" Command="{Binding SaveLogCommand}"></Button>
-                            <CheckBox Margin="10" Content="Autoredraw" IsChecked="{Binding AutoRedraw}" />
+                            <CheckBox Margin="10" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="Autoredraw" IsChecked="{Binding AutoRedraw}" />
                             <TextBlock Margin="10" Text="{Binding StringFormat=Log length is {0} seconds, Path=SelectedConnectedDevice.LogCurrentPos}" VerticalAlignment="Center"></TextBlock>
                         </StackPanel>
                         <Expander DockPanel.Dock="Top" Header="Dataset">
@@ -319,11 +321,11 @@
                                 <Button Content="Erase Data" Margin="10" Command="{Binding EraseBlackBoxDataCommand}"></Button>
                                 <Button Content="Erase Errors" Margin="10" Command="{Binding EraseBlackBoxErrorsCommand}"></Button>
                             </StackPanel>
-                            <DataGrid ItemsSource="{Binding SelectedConnectedDevice.BBValues,Mode=OneWay}" AutoGenerateColumns="False" Margin="10" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
+                            <DataGrid ItemsSource="{Binding SelectedConnectedDevice.BBValues,Mode=OneWay}" AutoGenerateColumns="False" Margin="10" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" >
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="ID" Binding="{Binding Path=Id}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="VALUE" Binding="{Binding Path=Value}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Path=Description}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Path=Id,Mode=OneWay}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="VALUE" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Path=Description,Mode=OneWay}"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
@@ -339,6 +341,27 @@
                     </Grid>
                 </TabItem>
                 <TabItem>
+                    <TabItem.Triggers>
+                        <EventTrigger RoutedEvent="Selector.Selected">
+                            <EventTrigger.Actions>
+                                <BeginStoryboard>
+                                    <Storyboard TargetProperty="Opacity" TargetName="AirArrow">
+                                        <DoubleAnimation From="0" To="1" AutoReverse="True" Completed="Disappear" RepeatBehavior="2x" Duration="0:0:0.4" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                                <BeginStoryboard>
+                                <Storyboard TargetProperty="Opacity" TargetName="PumpArrow">
+                                        <DoubleAnimation From="0" To="1" AutoReverse="True" RepeatBehavior="2x" Duration="0:0:0.4" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                                <BeginStoryboard>
+                                    <Storyboard TargetProperty="Opacity" TargetName="PlugArrow">
+                                        <DoubleAnimation From="0" To="1" AutoReverse="True" RepeatBehavior="2x" Duration="0:0:0.4" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger.Actions>
+                        </EventTrigger>
+                    </TabItem.Triggers>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_Cog" Margin="2 2 5 2" Foreground="White" />
@@ -350,7 +373,8 @@
                             <Button Margin="10" Content="Enter Manual" Command="{Binding EnterManualModeCommand}" />
                             <Button Margin="10" Content="Leave manual" Command="{Binding ExitManualModeCommand}" />
 
-                            <CheckBox Content="Water Pump" IsChecked="{Binding ManualWaterPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" />
+                            <CheckBox Margin="5" Style="{StaticResource MaterialDesignSwitchDarkToggleButton }" IsChecked="{Binding ManualWaterPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" IsEnabled="{Binding SelectedConnectedDevice.ManualMode,Mode=OneWay,TargetNullValue=false}" />
+                            <TextBlock Margin="5" FontSize="25" VerticalAlignment="Center">Water pump</TextBlock>
 
                         </StackPanel>
                         <Grid>
@@ -399,6 +423,10 @@
                                 <TextBlock Grid.Column="3" Grid.Row="1" FontSize="20" Text="{Binding ManualGlowPlug,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <Rectangle x:Name="SetPlugRect" Grid.Column="3" Grid.Row="3" Margin="10"></Rectangle>
                                 <ProgressBar Grid.Column="3" Grid.Row="3" Value="{Binding ManualGlowPlug,TargetNullValue=0,Mode=OneWay}" Foreground="Red" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel_2"></ProgressBar>
+
+                                <fa:FontAwesome x:Name="AirArrow" Grid.Column="0" Grid.Row="3" Icon="Solid_ArrowsAltV" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="70"></fa:FontAwesome>
+                                <fa:FontAwesome x:Name="PumpArrow" Grid.Column="2" Grid.Row="3" Icon="Solid_ArrowsAltV" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="70"></fa:FontAwesome>
+                                <fa:FontAwesome x:Name="PlugArrow" Grid.Column="3" Grid.Row="3" Icon="Solid_ArrowsAltV" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="70"></fa:FontAwesome>
 
                             </Grid>
 
