@@ -11,7 +11,7 @@ using Can_Adapter;
 using AdversCan;
 using ScottPlot;
 using System.IO;
-
+using System.Drawing;
 
 namespace CAN_Tool.ViewModels
 {
@@ -289,9 +289,11 @@ namespace CAN_Tool.ViewModels
                     var sig = plt.AddSignal(arrayToDisplay, color: v.Color, label: v.Name);
                     if (arrayToDisplay.Max() < 5)
                         sig.YAxisIndex = 2;
-
-                    plt.Style(ScottPlot.Style.Gray1);
+                    plt.Grid(color: Color.FromArgb(50, 200,200,200));
+                    plt.Grid(lineStyle: LineStyle.Dot);
+                    plt.Style(dataBackground: Color.FromArgb(255,40,40,40),figureBackground: System.Drawing.Color.DimGray);
                     plt.Legend();
+
                 }
 
             plt.Palette = Palette.OneHalfDark;

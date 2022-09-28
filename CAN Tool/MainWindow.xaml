@@ -29,7 +29,7 @@
             <StatusBarItem Width="auto">
                 <TextBlock FontSize="20" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
-            <ProgressBar Width="300" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0"></ProgressBar>
+            <ProgressBar Width="300" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></ProgressBar>
             <StatusBarItem>
                 <Button Content="{DynamicResource b_cancel}" Command="{Binding CancelOperationCommand}" Margin="5" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></Button>
             </StatusBarItem>
@@ -44,15 +44,15 @@
 
                 <Button x:Name="PortOpenButton" Margin="10" Content="{DynamicResource b_open}" Command="{Binding OpenPortCommand}" />
                 <Button x:Name="PortOpenButton_Copy" Margin="10" Content="{DynamicResource b_close}" Command="{Binding ClosePortCommand}" />
-                
-                    <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" />
+
+                <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" />
                     <Button Content="{DynamicResource b_normal}" Margin="10" Command="{Binding SetAdapterNormalModeCommand}" />
                     <Button Content="{DynamicResource b_listen}" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                     <Button Content="{DynamicResource b_self_reception}" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                     <Button Content="{DynamicResource b_stop}" Margin="10" Command="{Binding StopCanAdapterCommand}" />
-                    </StackPanel>
-                
+                </StackPanel>
+
             </StackPanel>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
                 <CheckBox x:Name="ExpertMode" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="{DynamicResource b_expert}" FontSize="20"></CheckBox>
@@ -79,10 +79,12 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullableToVisibilityConverter}}">
-                        <TextBlock Margin="10" x:Name="StageTextBlock" DockPanel.Dock="Top" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" HorizontalAlignment="Center" FontSize="20" />
+                        
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                            <Border Margin="20" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="10">
-                                <Image Height="200" Width="200" Source="{Binding SelectedConnectedDevice.Img}" Stretch="Fill" />
+                            <Border Width="200" Height="200" CornerRadius="30"  Margin="15" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="3">
+                                <Border.Background>
+                                    <ImageBrush  ImageSource="{Binding SelectedConnectedDevice.Img}" Stretch="Fill" />
+                                </Border.Background>
                             </Border>
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -103,14 +105,15 @@
                                     <Button x:Name="ErrorButton" Style="{StaticResource MaterialDesignFloatingActionButton}" Margin="10" Grid.Column="1" Grid.Row="0" Background="Red" Command="{Binding ClearErrorsCommand}" ToolTip="Press to clean error code">
                                         <fa:FontAwesome Icon="Solid_ExclamationTriangle" FontSize="30"></fa:FontAwesome>
                                     </Button>
-                                    <TextBlock Text="{Binding Path=SelectedConnectedDevice.Parameters.ErrorString}" FontSize="30" VerticalAlignment="Center" Margin="10 0 10 0"/>
+                                    <TextBlock Text="{Binding Path=SelectedConnectedDevice.Parameters.ErrorString}" FontSize="30" VerticalAlignment="Center" Margin="10 0 10 0" />
                                 </StackPanel>
 
                             </Grid>
                         </StackPanel >
-                        <Border BorderThickness="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" DockPanel.Dock="Top" HorizontalAlignment="Left" CornerRadius="20" Margin="20">
-                            <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Left">
-                                <Button Margin="10" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
+                        <TextBlock Margin="10" x:Name="StageTextBlock" DockPanel.Dock="Top" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" HorizontalAlignment="Center" FontSize="20" />
+                        <Border BorderThickness="2" BorderBrush="{DynamicResource MaterialDesignDivider}" DockPanel.Dock="Top" HorizontalAlignment="Left" CornerRadius="10" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Left">
+                                <Button Margin="8" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
                                     <Button.Content>
                                         <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="White" />
                                     </Button.Content>
@@ -135,7 +138,7 @@
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_MailBulk" Margin="2 2 5 2" Foreground="White" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_messages}"> </TextBlock>
+                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_messages}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
@@ -247,7 +250,7 @@
                         </DataGrid>
                     </DockPanel>
                 </TabItem>
-                <TabItem>
+                <TabItem x:Name="GraphTab">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_ChartLine" Margin="2 2 5 2" Foreground="White" />
@@ -291,7 +294,7 @@
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_InfoCircle" Margin="2 2 5 2" Foreground="White" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_status}"> </TextBlock>
+                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_status}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
                     <DataGrid ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
@@ -423,7 +426,7 @@
                                 <TextBlock Grid.Column="3" Grid.Row="1" FontSize="20" Text="{Binding ManualGlowPlug,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <Rectangle x:Name="SetPlugRect" Grid.Column="3" Grid.Row="3" Margin="10"></Rectangle>
                                 <ProgressBar Grid.Column="3" Grid.Row="3" Value="{Binding ManualGlowPlug,TargetNullValue=0,Mode=OneWay}" Foreground="Red" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel_2"></ProgressBar>
-                                <Image x:Name="AirArrow" Grid.Column="0" Grid.Row="3"  HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Images/mouseWheel.png" Width="70"></Image>
+                                <Image x:Name="AirArrow" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Images/mouseWheel.png" Width="70"></Image>
                                 <Image x:Name="PumpArrow" Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Images/mouseWheel.png" Width="70"></Image>
                                 <Image x:Name="PlugArrow" Grid.Column="3" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Images/mouseWheel.png" Width="70"></Image>
                                 <!--
@@ -448,7 +451,7 @@
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_FileCode" Margin="2 2 5 2" Foreground="White" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_firmware}"> </TextBlock>
+                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_firmware}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>

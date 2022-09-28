@@ -66,7 +66,7 @@ namespace CAN_Tool
 
             vm.myChart = Chart;
 
-            Chart.Plot.AddAxis(Edge.Right, 2, color: System.Drawing.Color.Yellow);
+            Chart.Plot.AddAxis(Edge.Right, 2, color: System.Drawing.Color.LightGreen);
 
             vm.canAdapter.GotNewMessage += MessageHandler;
         }
@@ -112,7 +112,8 @@ namespace CAN_Tool
         {
             try
             {
-                this.DragMove();
+                if (!GraphTab.IsSelected)     //Костыль, решает проблему неправильной интерпретации мыши графиком
+                    DragMove();
             }
             catch { }
         }
@@ -223,7 +224,7 @@ namespace CAN_Tool
 
         private void ColorPick(object sender, MouseButtonEventArgs e)
         {
-            
+
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
