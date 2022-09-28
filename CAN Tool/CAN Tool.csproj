@@ -12,7 +12,9 @@
   <ItemGroup>
     <None Remove="Images\126.jpg" />
     <None Remove="Images\23.jpg" />
+    <None Remove="Images\27.jpg" />
     <None Remove="Images\34.jpg" />
+    <None Remove="Images\mouseWheel.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,12 +30,15 @@
     <Folder Include="Data\" />
     <Folder Include="Models\" />
     <Folder Include="Services\" />
+    <Folder Include="Views\" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Images\126.jpg" />
     <Resource Include="Images\23.jpg" />
+    <Resource Include="Images\27.jpg" />
     <Resource Include="Images\34.jpg" />
+    <Resource Include="Images\mouseWheel.png" />
   </ItemGroup>
 
   <ItemGroup>

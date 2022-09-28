@@ -94,7 +94,8 @@ namespace CAN_Tool.ViewModels.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return 0;
+            throw new NotImplementedException("This is one way converter!");
         }
     }
+
 }

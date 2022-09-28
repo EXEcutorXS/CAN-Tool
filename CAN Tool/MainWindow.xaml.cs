@@ -19,7 +19,6 @@ using CAN_Tool.ViewModels;
 using System.Globalization;
 using ScottPlot;
 using ScottPlot.Renderable;
-using CAN_Tool.Views;
 using System.Threading;
 using System.Windows.Data;
 using CAN_Tool.ViewModels.Converters;
@@ -66,6 +65,8 @@ namespace CAN_Tool
             menuLanguage.SelectedIndex = 0;
 
             vm.myChart = Chart;
+
+            Chart.Plot.AddAxis(Edge.Right, 2, color: System.Drawing.Color.Yellow);
 
             vm.canAdapter.GotNewMessage += MessageHandler;
         }
@@ -222,8 +223,7 @@ namespace CAN_Tool
 
         private void ColorPick(object sender, MouseButtonEventArgs e)
         {
-            ColorPicker p = new ColorPicker(sender as Rectangle);
-            p.Show();
+            
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)

@@ -10,16 +10,8 @@ using System.IO.Ports;
 using Can_Adapter;
 using AdversCan;
 using ScottPlot;
-using System.Windows.Media;
-using ScottPlot.Renderable;
-using System.Windows.Markup;
-using Microsoft.Win32;
 using System.IO;
-using System.Text;
-using System.Drawing;
-using System.Windows;
-using System.Threading;
-using System.Windows.Media.Animation;
+
 
 namespace CAN_Tool.ViewModels
 {
@@ -214,7 +206,6 @@ namespace CAN_Tool.ViewModels
         {
             executeCommand(1, 0xff, 0xff);
         }
-        private bool CanStartHeaterCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
         #endregion
 
         #region StopHeaterCommand
@@ -223,7 +214,6 @@ namespace CAN_Tool.ViewModels
         {
             executeCommand(3);
         }
-        private bool CanStopHeaterCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
         #endregion
 
         #region StartPumpCommand
@@ -232,7 +222,7 @@ namespace CAN_Tool.ViewModels
         {
             executeCommand(4, 0, 0);
         }
-        private bool CanStartPumpCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
+
         #endregion
 
         #region ClearErrorsCommand
@@ -241,7 +231,6 @@ namespace CAN_Tool.ViewModels
         {
             executeCommand(5);
         }
-        private bool CanClearErrorsCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
         #endregion
 
         #region StartVentCommand
@@ -250,7 +239,6 @@ namespace CAN_Tool.ViewModels
         {
             executeCommand(10);
         }
-        private bool CanStartVentCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
         #endregion
 
         #region CalibrateTermocouplesCommand
@@ -261,10 +249,9 @@ namespace CAN_Tool.ViewModels
             executeCommand(20);
         }
 
-
-        private bool CanCalibrateTermocouplesCommandExecute(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null;
         #endregion
 
+        private bool DeviceConnectedAndNotInManual(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null && !SelectedConnectedDevice.ManualMode;
         #endregion
 
         #region LogCommands
@@ -294,12 +281,14 @@ namespace CAN_Tool.ViewModels
             Plot plt = myChart.Plot;
 
             plt.Clear();
-
+            
             foreach (var v in SelectedConnectedDevice.Status)
                 if (v.Display)
                 {
-                    ArraySegment<Double> dataToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos);
-                    var sig = plt.AddSignal(dataToDisplay.ToArray(), color: v.Color, label: v.Name);
+                    double[] arrayToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos).ToArray();
+                    var sig = plt.AddSignal(arrayToDisplay, color: v.Color, label: v.Name);
+                    if (arrayToDisplay.Max() < 5)
+                        sig.YAxisIndex = 2;
 
                     plt.Style(ScottPlot.Style.Gray1);
                     plt.Legend();
@@ -332,7 +321,7 @@ namespace CAN_Tool.ViewModels
             AC2PInstance.ReadAllParameters(_connectedDevice.ID);
         }
         private bool CanReadConfigCommandExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region SaveConfigCommand
@@ -342,7 +331,7 @@ namespace CAN_Tool.ViewModels
             AC2PInstance.SaveParameters(_connectedDevice.ID);
         }
         private bool CanSaveConfigCommandExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count > 0);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count > 0 && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region ResetConfigCommand
@@ -352,11 +341,12 @@ namespace CAN_Tool.ViewModels
             AC2PInstance.ResetParameters(_connectedDevice.ID);
         }
         private bool CanResetConfigCommandExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage==0);
         #endregion
         #endregion
 
         #region BlackBoxCommands
+
         #region ReadBlackBoxDataCommand
         public ICommand ReadBlackBoxDataCommand { get; }
         private void OnReadBlackBoxDataCommandExecuted(object parameter)
@@ -364,7 +354,7 @@ namespace CAN_Tool.ViewModels
             AC2PInstance.ReadBlackBoxData(_connectedDevice.ID);
         }
         private bool CanReadBlackBoxDataExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region ReadBlackBoxErrorsCommand
@@ -374,7 +364,7 @@ namespace CAN_Tool.ViewModels
             Task.Run(() => AC2PInstance.ReadErrorsBlackBox(_connectedDevice.ID));
         }
         private bool CanReadBlackBoxErrorsExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region EraseBlackBoxErrorsCommand
@@ -384,7 +374,7 @@ namespace CAN_Tool.ViewModels
             Task.Run(() => AC2PInstance.EraseErrorsBlackBox(_connectedDevice.ID));
         }
         private bool CanEraseBlackBoxErrorsExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region EraseBlackBoxDataCommand
@@ -394,9 +384,10 @@ namespace CAN_Tool.ViewModels
             Task.Run(() => AC2PInstance.EraseCommonBlackBox(_connectedDevice.ID));
         }
         private bool CanEraseBlackBoxDataExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied);
+            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
         #endregion
+
 
         #region SendCustomMessageCommand
         public ICommand SendCustomMessageCommand { get; }
@@ -582,6 +573,7 @@ namespace CAN_Tool.ViewModels
 
         private async void requestSerial()
         {
+            await Task.Delay(200);
             AC2PMessage m = new();
             m.TransmitterType = 126;
             m.TransmitterAddress = 6;
@@ -593,10 +585,10 @@ namespace CAN_Tool.ViewModels
             m.Data[2] = 0;
             m.Data[3] = 12;
             canAdapter.Transmit(m);
-            await Task.Delay(100);
+            await Task.Delay(200);
             m.Data[3] = 13;
             canAdapter.Transmit(m);
-            await Task.Delay(100);
+            await Task.Delay(200);
             m.Data[3] = 14;
             canAdapter.Transmit(m);
         }
@@ -626,13 +618,14 @@ namespace CAN_Tool.ViewModels
         }
 
         #endregion
+
         #endregion
 
         public void NewDeviceHandler(object sender, EventArgs e)
         {
-                SelectedConnectedDevice = AC2PInstance.ConnectedDevices[^1];
-                firmwarePage.GetVersionCommand.Execute(null);
-                Task.Run(()=> requestSerial());
+            SelectedConnectedDevice = AC2PInstance.ConnectedDevices[^1];
+            firmwarePage.GetVersionCommand.Execute(null);
+            Task.Run(() => requestSerial());
         }
 
 
@@ -684,16 +677,16 @@ namespace CAN_Tool.ViewModels
             SetAdapterSelfReceptionModeCommand = new LambdaCommand(OnSetAdapterSelfReceptionModeCommandExecuted, CanSetAdapterSelfReceptionModeCommandExecute);
             StopCanAdapterCommand = new LambdaCommand(OnStopCanAdapterCommandExecuted, CanStopCanAdapterCommandExecute);
             CloseApplicationCommand = new LambdaCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExecute);
-            StartHeaterCommand = new LambdaCommand(OnStartHeaterCommandExecuted, CanStartHeaterCommandExecute);
-            StopHeaterCommand = new LambdaCommand(OnStopHeaterCommandExecuted, CanStopHeaterCommandExecute);
-            StartPumpCommand = new LambdaCommand(OnStartPumpCommandExecuted, CanStartPumpCommandExecute);
-            StartVentCommand = new LambdaCommand(OnStartVentCommandExecuted, CanStartVentCommandExecute);
-            ClearErrorsCommand = new LambdaCommand(OnClearErrorsCommandExecuted, CanClearErrorsCommandExecute);
-            CalibrateTermocouplesCommand = new LambdaCommand(OnCalibrateTermocouplesCommandExecuted, CanCalibrateTermocouplesCommandExecute);
+            StartHeaterCommand = new LambdaCommand(OnStartHeaterCommandExecuted, DeviceConnectedAndNotInManual);
+            StopHeaterCommand = new LambdaCommand(OnStopHeaterCommandExecuted, DeviceConnectedAndNotInManual);
+            StartPumpCommand = new LambdaCommand(OnStartPumpCommandExecuted, DeviceConnectedAndNotInManual);
+            StartVentCommand = new LambdaCommand(OnStartVentCommandExecuted, DeviceConnectedAndNotInManual);
+            ClearErrorsCommand = new LambdaCommand(OnClearErrorsCommandExecuted, deviceSelected);
+            CalibrateTermocouplesCommand = new LambdaCommand(OnCalibrateTermocouplesCommandExecuted, DeviceConnectedAndNotInManual);
             LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
             LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
             ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);
-            EnterManualModeCommand = new LambdaCommand(OnEnterManualModeCommandExecuted, deviceSelected);
+            EnterManualModeCommand = new LambdaCommand(OnEnterManualModeCommandExecuted, DeviceConnectedAndNotInManual);
             ExitManualModeCommand = new LambdaCommand(OnExitManualModeCommandExecuted, deviceInManualMode);
             IncreaceManualAirBlowerCommand = new LambdaCommand(OnIncreaceManualAirBlowerCommandExecuted, deviceInManualMode);
             DecreaseManualAirBlowerCommand = new LambdaCommand(OnDecreaseManualAirBlowerCommandExecuted, deviceInManualMode);

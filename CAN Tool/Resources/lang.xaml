@@ -1,5 +1,52 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-                    xmlns:v="clr-namespace:System;assembly=mscorlib">
-    <v:String x:Key="b_refreshPorts">Refresh Ports</v:String>
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:v="clr-namespace:System;assembly=mscorlib">
+    <v:String x:Key="b_refreshPorts">Refresh ports</v:String>
+    <v:String x:Key="b_open">Open</v:String>
+    <v:String x:Key="b_close">Close</v:String>
+    <v:String x:Key="b_normal">Normal</v:String>
+    <v:String x:Key="b_listen">Listen</v:String>
+    <v:String x:Key="b_self_reception">Self reception</v:String>
+    <v:String x:Key="b_stop">Stop</v:String>
+    <v:String x:Key="b_exit">Exit</v:String>
+    <v:String x:Key="b_common">Common</v:String>
+    <v:String x:Key="b_water_pump">Water pump</v:String>
+    <v:String x:Key="b_vent">Ventilation</v:String>
+    <v:String x:Key="b_calibrate">Calibrate termocouples</v:String>
+    <v:String x:Key="b_clear_errors">Clear errors</v:String>
+    <v:String x:Key="b_read">Read</v:String>
+    <v:String x:Key="b_save">Save</v:String>
+    <v:String x:Key="b_reset">Reset</v:String>
+    <v:String x:Key="b_start_log">Start</v:String>
+    <v:String x:Key="b_stop_log">Stop</v:String>
+    <v:String x:Key="b_redraw">Redraw</v:String>
+    <v:String x:Key="b_save_log">Save log</v:String>
+    <v:String x:Key="b_autoredraw">Autoredraw</v:String>
+    <v:String x:Key="b_log_length">Log length:</v:String>
+    <v:String x:Key="b_dataset">Dataset:</v:String>
+    <v:String x:Key="b_messages">Messages</v:String>
+    <v:String x:Key="b_commands">Commands</v:String>
+    <v:String x:Key="b_config">Config</v:String>
+    <v:String x:Key="b_log_chart">Log &amp; Chart</v:String>
+    <v:String x:Key="b_status">Status</v:String>
+    <v:String x:Key="b_black_box">Black Box</v:String>
+    <v:String x:Key="b_read_bb_data">Read Data</v:String>
+    <v:String x:Key="b_read_bb_errors">Read Errors</v:String>
+    <v:String x:Key="b_clear_bb_data">Clear Data</v:String>
+    <v:String x:Key="b_clear_bb_errors">Clear Errors</v:String>
+    <v:String x:Key="b_enter_manual">Enter Manual</v:String>
+    <v:String x:Key="b_leave_manual">Leave Manual</v:String>
+    <v:String x:Key="b_air_set">Blower set</v:String>
+    <v:String x:Key="b_air_measured">Blower real</v:String>
+    <v:String x:Key="b_fuel_pump_set">Fuel Pump</v:String>
+    <v:String x:Key="b_glow_plug_set">Glow Plug</v:String>
+    <v:String x:Key="b_manual">Manual</v:String>
+    <v:String x:Key="b_firmware">Firmware</v:String>
+    <v:String x:Key="b_load_hex">Load HEX</v:String>
+    <v:String x:Key="b_burn">Write to Flash</v:String>
+    <v:String x:Key="b_find_boot">Ping Bootloader</v:String>
+    <v:String x:Key="b_switch_to_boot">to Bootloader</v:String>
+    <v:String x:Key="b_switch_to_main_program">to Main Program</v:String>
+    <v:String x:Key="b_get_version">Get Version</v:String>
+    <v:String x:Key="b_cancel">Cancel</v:String>
+    <v:String x:Key="b_expert">Expert</v:String>
 </ResourceDictionary>
+    
