@@ -16,6 +16,8 @@ namespace Can_Adapter
         public void Update(T item);
 
         public bool IsSimmiliarTo(T item);
+
+        public int Id { get; }
     }
 
 
@@ -38,7 +40,7 @@ namespace Can_Adapter
         private int id;
 
         [AffectsTo(nameof(VerboseInfo), nameof(IdAsText))]
-        public int ID
+        public int Id
         {
             set => Set(ref id, value);
             get => id;
@@ -51,7 +53,7 @@ namespace Can_Adapter
             set => Set(ref rtr, value);
             get => rtr;
         }
-        
+
         private int dlc;
         [AffectsTo(nameof(VerboseInfo), nameof(RvcCompatible))]
         public int DLC
@@ -60,7 +62,7 @@ namespace Can_Adapter
             get => dlc;
         }
 
-        
+
         private byte[] data = new byte[8];
 
         [AffectsTo(nameof(VerboseInfo), nameof(DataAsText))]
@@ -76,7 +78,7 @@ namespace Can_Adapter
 
         public string GetDataInTextFormat(string beforeString = "", string afterString = "")
         {
-            StringBuilder sb = new StringBuilder("");
+            StringBuilder sb = new("");
             foreach (var item in Data)
                 sb.Append($"{beforeString}{item:X02}{afterString}");
             return sb.ToString();
@@ -88,7 +90,7 @@ namespace Can_Adapter
 
         public bool RvcCompatible => IDE && DLC == 8 && !RTR;
 
-        public string IdAsText => IDE ? string.Format("{0:X08}", ID) : string.Format("{0:X03}", ID);
+        public string IdAsText => IDE ? string.Format("{0:X08}", Id) : string.Format("{0:X03}", Id);
 
 
         public override string ToString()
@@ -132,9 +134,9 @@ namespace Can_Adapter
                 throw new FormatException($"Can't parse. Message length cant be {DLC}, max length is 8");
 
             if (IDE)
-                ID = Convert.ToInt32(str.Substring(1, 8), 16);
+                Id = Convert.ToInt32(str.Substring(1, 8), 16);
             else
-                ID = Convert.ToInt32(str.Substring(1, 3), 16);
+                Id = Convert.ToInt32(str.Substring(1, 3), 16);
             Data = new byte[DLC];
 
             int shift;
@@ -152,10 +154,10 @@ namespace Can_Adapter
                 return false;
             if (ReferenceEquals(obj, this))
                 return true;
-            if (!(obj is CanMessage))
+            if (obj is not CanMessage)
                 return false;
             CanMessage toCompare = (CanMessage)obj;
-            if (toCompare.ID != ID || toCompare.DLC != DLC || toCompare.IDE != IDE || toCompare.RTR != RTR)
+            if (toCompare.Id != Id || toCompare.DLC != DLC || toCompare.IDE != IDE || toCompare.RTR != RTR)
                 return false;
             for (int i = 0; i < toCompare.DLC; i++)
                 if (toCompare.Data[i] != Data[i])
@@ -165,7 +167,7 @@ namespace Can_Adapter
 
         public override int GetHashCode()
         {
-            int ret = ID;
+            int ret = Id;
             for (int i = 0; i < DLC; i++)
             {
                 ret ^= Data[i] << (8 * (i % 4));
@@ -177,13 +179,13 @@ namespace Can_Adapter
             Data = m.Data;
             IDE = m.IDE;
             RTR = m.RTR;
-            ID = m.ID;
+            Id = m.Id;
         }
 
         public virtual string VerboseInfo => ToString();
         public bool IsSimmiliarTo(CanMessage m)
         {
-            if (m.ID != ID) return false;
+            if (m.Id != Id) return false;
             if (m.DLC != DLC) return false;
             if (m.IDE != IDE) return false;
             if (m.RTR != RTR) return false;
@@ -204,32 +206,56 @@ namespace Can_Adapter
             if (found == null)
             {
                 Add(item);
+                Sort();
                 return true;
             }
             else
             {
                 found.Update(item);
-                //SetItem(IndexOf(found), item); //TODO избавиться от updatable list
             }
             return false;
+        }
+
+        public void Sort()
+        {
+            for (int i = 0; i < Count - 1; i++)
+                for (int j = 0; j < Count - 1; j++)
+                    if (Items[j].Id > Items[j + 1].Id)
+                        (Items[j], Items[j + 1]) = (Items[j + 1], Items[j]);
         }
     }
     public class CanAdapter : ViewModel
     {
 
-        char[] currentBuf = new char[1024];
-        int ptr = 0;
+        private readonly char[] currentBuf = new char[1024];
+
+        private int ptr = 0;
+
+        private string lastMessageString = "";
 
         public UInt32 Version = 0;
 
         public int Bitrate = 250;
         public bool PortOpened => serialPort.IsOpen;
 
-        private SynchronizationContext UIContext;
+        private bool txDone = true;
+        public bool TxDone { private set => Set(ref txDone, value); get => txDone; }
 
-        SerialPort serialPort;
+        private int errorCounter = 0;
+        public int ErrorCounter { private set => Set(ref errorCounter, value); get => errorCounter; }
 
-        private UpdatableList<CanMessage> _messages = new UpdatableList<CanMessage>();
+        private int currentErrorCounter = 0;
+        public int CurrentErrorCounter { private set => Set(ref currentErrorCounter, value); get => currentErrorCounter; }
+
+        private int failedMessagesCounter = 0;
+        public int FailedMessagesCounter { private set => Set(ref failedMessagesCounter, value); get => failedMessagesCounter; }
+
+
+        private readonly SynchronizationContext UIContext;
+
+        private readonly SerialPort serialPort;
+
+        private readonly UpdatableList<CanMessage> _messages = new();
 
         public UpdatableList<CanMessage> Messages { get => _messages; }
 
@@ -260,11 +286,12 @@ namespace Can_Adapter
         public void Stop() => serialPort.Write("C\r");
         public void SetBitrate(int bitrate) => serialPort.Write($"S{bitrate}\r");
 
+
         public void Transmit(CanMessage msg)
         {
             if (serialPort.IsOpen == false)
                 return;
-            StringBuilder str = new StringBuilder("");
+            StringBuilder str = new("");
             if (msg.IDE && msg.RTR)
                 str.Append('R');
             if (!msg.IDE && msg.RTR)
@@ -274,14 +301,37 @@ namespace Can_Adapter
             if (!msg.IDE && !msg.RTR)
                 str.Append('t');
             str.Append(msg.IdAsText);
-            str.Append(msg.DLC.ToString());
+            str.Append(msg.DLC);
+            str.Append(msg.GetDataInTextFormat());
+            str.Append('\r');
+            TxDone = false;
+            lastMessageString = str.ToString();
+            currentErrorCounter = 0;
+            serialPort.Write(str.ToString());
+            
+        }
+
+        public void TransmitAsync(CanMessage msg)
+        {
+            if (serialPort.IsOpen == false)
+                return;
+            StringBuilder str = new("");
+            if (msg.IDE && msg.RTR)
+                str.Append('R');
+            if (!msg.IDE && msg.RTR)
+                str.Append('r');
+            if (msg.IDE && !msg.RTR)
+                str.Append('T');
+            if (!msg.IDE && !msg.RTR)
+                str.Append('t');
+            str.Append(msg.IdAsText);
+            str.Append(msg.DLC);
             str.Append(msg.GetDataInTextFormat());
             str.Append('\r');
             serialPort.Write(str.ToString());
-            Thread.Sleep(5);
         }
 
-        private void uartMessageProcess()
+        private void UartMessageProcess()
         {
             switch (currentBuf[0])
             {
@@ -293,11 +343,24 @@ namespace Can_Adapter
                     GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = m });
                     UIContext.Send((x) => Messages.TryToAdd(m), null);
                     break;
+                case 'z':
                 case 'Z':
-                    TransmissionSuccess?.Invoke(this, new EventArgs());
+                    TxDone = true;
+                    TransmissionSuccess?.Invoke(this, new());
                     break;
                 case '\a':
-                    ErrorReported?.Invoke(this, new EventArgs());
+                    CurrentErrorCounter++;
+                    ErrorCounter++;
+                    if (CurrentErrorCounter > 2)
+                    {
+                        lastMessageString = "";
+                        FailedMessagesCounter++;
+                        TxDone = true;
+                    }
+                    if (lastMessageString.Length > 0)
+                        serialPort.Write(lastMessageString);
+
+                    ErrorReported?.Invoke(this, new());
                     break;
                 default:
                     break;
@@ -311,10 +374,13 @@ namespace Can_Adapter
             while (serialPort.IsOpen && serialPort.BytesToRead > 0)
             {
                 int newByte = serialPort.ReadByte();
-                if (newByte == 13 || newByte == 0)
+                if (newByte == 13 || newByte == 0 || newByte == 7 || newByte == 'Z' || newByte == 'z')
                 {
-                    currentBuf[ptr] = '\0';
-                    uartMessageProcess();
+                    if (newByte == 13)
+                        currentBuf[ptr] = '\0';
+                    else
+                        currentBuf[ptr] = (char)newByte;
+                    UartMessageProcess();
                     ptr = 0;
                 }
                 else

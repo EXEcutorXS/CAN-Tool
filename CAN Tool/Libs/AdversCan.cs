@@ -16,7 +16,6 @@ using System.Diagnostics.Contracts;
 using System.Reflection.Metadata.Ecma335;
 using System.Diagnostics;
 using System.Windows.Media;
-using System.Drawing;
 using System.Security.Cryptography.Pkcs;
 
 namespace AdversCan
@@ -133,6 +132,8 @@ namespace AdversCan
     {
         public AC2PMessage() : base()
         {
+            Fresh = true;
+            Task.Run(() => { Task.Delay(300); Fresh = false; });
             DLC = 8;
             RTR = false;
             IDE = true;
@@ -142,89 +143,93 @@ namespace AdversCan
             if (m.DLC != 8 || m.RTR || !m.IDE)
                 throw new ArgumentException("CAN message is not compliant with AC2P");
             Data = m.Data;
-            ID = m.ID;
+            Id = m.Id;
             return;
         }
+
+        private bool fresh;
+        
+        public bool Fresh { get => fresh; set => Set(ref fresh, value); }
 
         [AffectsTo(nameof(VerboseInfo))]
         public int PGN
         {
-            get { return (ID >> 20) & 0x1FF; }
+            get { return (Id >> 20) & 0x1FF; }
             set
             {
                 if (value > 511)
                     throw new ArgumentException("PGN can't be over 511");
-                if (ID == value)
+                if (Id == value)
                     return;
-                int temp = ID;
+                int temp = Id;
                 temp &= ~(0x1FF << 20);
                 temp |= value << 20;
-                ID = temp;
+                Id = temp;
 
             }
         }
         [AffectsTo(nameof(VerboseInfo))]
         public int ReceiverType
         {
-            get { return (ID >> 13) & 0b1111111; }
+            get { return (Id >> 13) & 0b1111111; }
             set
             {
                 if (value > 127)
                     throw new ArgumentException("ReceiverType can't be over 127");
                 if (ReceiverType == value)
                     return;
-                int temp = ID;
+                int temp = Id;
                 temp &= ~(0x7F << 13);
                 temp |= value << 13;
-                ID = temp;
+                Id = temp;
             }
         }
         [AffectsTo(nameof(VerboseInfo))]
         public int ReceiverAddress
         {
-            get { return (ID >> 10) & 0b111; }
+            get { return (Id >> 10) & 0b111; }
             set
             {
                 if (value > 7)
                     throw new ArgumentException("ReceiverAddress can't be over 7");
                 if (ReceiverAddress == value)
                     return;
-                int temp = ID;
+                int temp = Id;
                 temp &= ~(0x7 << 10);
                 temp |= value << 10;
-                ID = temp;
+                Id = temp;
             }
         }
         [AffectsTo(nameof(VerboseInfo))]
         public int TransmitterType
         {
-            get { return (ID >> 3) & 0x7F; }
+            get { return (Id >> 3) & 0x7F; }
             set
             {
                 if (value > 127)
                     throw new ArgumentException("TransmitterType can't be over 127");
                 if (TransmitterType == value)
                     return;
-                int temp = ID;
+                int temp = Id;
                 temp &= ~(0x7F << 3);
                 temp |= value << 3;
-                ID = temp;
+                Id = temp;
             }
         }
         [AffectsTo(nameof(VerboseInfo))]
         public int TransmitterAddress
         {
-            get { return ID & 0b111; }
+            get { return Id & 0b111; }
             set
             {
                 if (value > 7)
                     throw new ArgumentException("TransmitterAddress can't be over 7");
                 if (TransmitterAddress == value)
                     return;
-                int temp = ID;
+                int temp = Id;
                 temp &= ~(0x3);
                 temp |= value;
-                ID = temp;
+                Id = temp;
             }
         }
 
@@ -381,6 +386,8 @@ namespace AdversCan
             TransmitterId = item.TransmitterId;
             ReceiverId = item.ReceiverId;
             Data = item.Data;
+            Fresh = true;
+            Task.Run(() => { Thread.Sleep(300); Fresh = false; });
         }
 
 
@@ -410,10 +417,10 @@ namespace AdversCan
     {
         public int ID;
         public string Name;
-        public List<CommandId> SupportedCommands;
-        public ImageSource image;
-        public DeviceType DevType;
+        public DeviceType DevType { set; get; }
 
+        public int MaxBlower { get; set; } = 130;
+        public double MaxFuelPump { get; set; } = 4;
 
         public override string ToString()
         {
@@ -555,6 +562,19 @@ namespace AdversCan
                 var == 41
                 )
                 Display = true;
+
+            Id = var;
+            if (var == 1 ||
+                var == 2 ||
+                var == 7 ||
+                var == 15 ||
+                var == 16 ||
+                var == 17 ||
+                var == 18 ||
+                var == 21
+                )
+                commonView = false; ;
+
             switch (var)
             {
                 case 5: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 0)); break;
@@ -598,6 +618,10 @@ namespace AdversCan
         private bool display = false;
 
         public bool Display { get { return display; } set { Set(ref display, value); } }
+
+        private bool commonView = true;
+
+        public bool CommonView { get { return commonView; } set { Set(ref commonView, value); } }
 
         public double Value
         {
@@ -698,6 +722,9 @@ namespace AdversCan
             return false;
         }
 
+
+
+        public int Id { get => 0; }
         public BBError()
         {
             _variables.ListChanged += (s, a) => onChange("Name");
@@ -850,6 +877,7 @@ namespace AdversCan
             set { Set(ref fuelPumpMeasured, value); }
         }
 
+
         private int glowPlug = 0;
         public int GlowPlug
         {
@@ -905,6 +933,57 @@ namespace AdversCan
             get { return error; }
             set { Set(ref error, value); }
         }
+
+        private int workTime;
+
+        public int WorkTime
+        {
+            get { return workTime; }
+            set { Set(ref workTime, value); }
+        }
+
+        private int flameSensor;
+        public int FlameSensor
+        {
+            get { return flameSensor; }
+            set { Set(ref flameSensor, value); }
+        }
+
+        private int bodyTemp;
+        public int BodyTemp
+        {
+            get { return bodyTemp; }
+            set { Set(ref bodyTemp, value); }
+        }
+
+        private int liquidTemp;
+        public int LiquidTemp
+        {
+            get { return liquidTemp; }
+            set { Set(ref liquidTemp, value); }
+        }
+
+        private int overheatTemp;
+        public int OverheatTemp
+        {
+            get { return overheatTemp; }
+            set { Set(ref overheatTemp, value); }
+        }
+
+        private int panelTemp;
+        public int PanelTemp
+        {
+            get { return panelTemp; }
+            set { Set(ref panelTemp, value); }
+        }
+
+        private int inletTemp;
+        public int InletTemp
+        {
+            get { return inletTemp; }
+            set { Set(ref inletTemp, value); }
+        }
+
 
         public string StageString
         {
@@ -1027,10 +1106,12 @@ namespace AdversCan
     public class ConnectedDevice : ViewModel
     {
 
-        public ConnectedDevice()
+        public ConnectedDevice(DeviceId newId)
         {
             LogInit();
-
+            id = newId;
+            if (AC2P.Devices.ContainsKey(ID.Type))
+                deviceReference = AC2P.Devices[ID.Type];
         }
 
         public MainParameters Parameters { get; set; } = new();
@@ -1104,6 +1185,9 @@ namespace AdversCan
         UpdatableList<StatusVariable> status = new();
         public UpdatableList<StatusVariable> Status => status;
 
+        UpdatableList<StatusVariable> commonView = new();
+        public UpdatableList<StatusVariable> CommonView => commonView;
+
         private readonly UpdatableList<ReadedParameter> _readedParameters = new();
         public UpdatableList<ReadedParameter> readedParameters => _readedParameters;
 
@@ -1150,14 +1234,17 @@ namespace AdversCan
 
         public string Name => ToString();
 
+        private Device deviceReference;
 
+        public Device DeviceReference => deviceReference;
         public string Img => $"~\\..\\Images\\{id.Type}.jpg";
         public override string ToString()
         {
-            if (AC2P.Devices.ContainsKey(ID.Type))
-                return AC2P.Devices[ID.Type].Name;
+            if (deviceReference != null)
+                return deviceReference.Name;
             else
                 return $"No device <{ID.Type}> in list";
+
         }
 
         public override bool Equals(object obj)
@@ -1426,7 +1513,7 @@ namespace AdversCan
 
             if (ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id)) == null)
             {
-                ConnectedDevices.Add(new ConnectedDevice() { ID = id });
+                ConnectedDevices.Add(new ConnectedDevice(id));
                 NewDeviveAquired?.Invoke(this, null);
             }
 
@@ -1468,9 +1555,42 @@ namespace AdversCan
                     sv.RawValue = rawValue;
                     currentDevice.SupportedVariables[sv.Id] = true;
                     currentDevice.Status.TryToAdd(sv);
+                    if (sv.CommonView)
+                        currentDevice.CommonView.TryToAdd(sv);
 
-                    if (sv.Id == 16)                                 // Измеренные обороты нагнетателя
+                    if (sv.Id == 1)
+                        currentDevice.Parameters.Stage = (int)rawValue;
+                    if (sv.Id == 2)
+                        currentDevice.Parameters.Mode = (int)rawValue;
+                    if (sv.Id == 3)
+                        currentDevice.Parameters.WorkTime = (int)rawValue;
+                    if (sv.Id == 4)
+                        currentDevice.Parameters.StageTime = (int)rawValue;
+                    if (sv.Id == 5)
+                        currentDevice.Parameters.Voltage = rawValue / 10.0;
+                    if (sv.Id == 6)
+                        currentDevice.Parameters.FlameSensor = (int)rawValue;
+                    if (sv.Id == 7)
+                        currentDevice.Parameters.BodyTemp = (int)rawValue;
+                    if (sv.Id == 8)
+                        currentDevice.Parameters.PanelTemp = (int)rawValue;
+                    if (sv.Id == 10)
+                        currentDevice.Parameters.InletTemp = (int)rawValue;
+                    if (sv.Id == 15)
+                        currentDevice.Parameters.RevSet = (int)rawValue;
+                    if (sv.Id == 16)
                         currentDevice.Parameters.RevMeasured = (int)rawValue;
+                    if (sv.Id == 18)
+                        currentDevice.Parameters.FuelPumpMeasured = rawValue / 100.0;
+                    if (sv.Id == 21)
+                        currentDevice.Parameters.GlowPlug = (int)rawValue;
+                    if (sv.Id == 24)
+                        currentDevice.Parameters.Error = (int)rawValue;
+
+
+
+
+
                 }
             }
 
@@ -1481,7 +1601,7 @@ namespace AdversCan
                     int parameterId = m.Data[3] + m.Data[2] * 256;
                     uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
                     if (parameterValue != 0xFFFFFFFF)
-                        currentDevice.readedParameters.TryToAdd(new() { Id = parameterId, Value = parameterValue }); //TODO remove all send commands
+                        currentDevice.readedParameters.TryToAdd(new() { Id = parameterId, Value = parameterValue });
                     //Серийник в отдельной переменной
                     if (parameterId == 12)
                         currentDevice.Serial1 = parameterValue;
@@ -1528,29 +1648,8 @@ namespace AdversCan
                 }
             }
 
-            if (m.PGN == 10)
-            {
-                currentDevice.Parameters.Stage = m.Data[0];
-                currentDevice.Parameters.Mode = m.Data[1];
-                currentDevice.Parameters.Error = m.Data[2];
-                currentDevice.ManualMode = currentDevice.Parameters.Stage == 6;
-                
-            }
 
-
-            if (m.PGN == 11)
-            {
-                currentDevice.Parameters.Voltage = (m.Data[0] * 256 + m.Data[1]) / 10;
-            }
-
-            if (m.PGN == 12)
-            {
-                currentDevice.Parameters.RevSet = m.Data[0];
-                currentDevice.Parameters.RevMeasured = m.Data[1];
-                currentDevice.Parameters.FuelPumpMeasured = (m.Data[4] * 256 + m.Data[5]) / 100d;
-                currentDevice.Parameters.GlowPlug = m.Data[7];
-            }
-
+            //Переменные без VAR в paramsname.h
             if (m.PGN == 18) //Версия
             {
                 currentDevice.Firmware = m.Data[0..4];
@@ -1690,7 +1789,7 @@ namespace AdversCan
             if (!Capture("Чтение ошибок из чёрного ящика")) return;
             WaitingForBBErrors = true;
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
-            
+
             UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
             UIContext.Send(x => currentDevice.currentBBError = new BBError(), null);
             UIContext.Send(x => currentDevice.BBErrors.Add(currentDevice.currentBBError), null);
@@ -1929,14 +2028,14 @@ namespace AdversCan
             { 20, new (){ID=20,Name="Планар-6Д" ,DevType=DeviceType.Planar}} ,
             { 21, new (){ID=21,Name="14ТС-10" , DevType=DeviceType.Binar}} ,
             { 22, new (){ID=22,Name="30SP (впрысковый)" , DevType=DeviceType.Binar}} ,
-            { 23, new (){ID=23,Name="Бинар 5Б-Компакт" , DevType=DeviceType.Binar}} ,
+            { 23, new (){ID=23,Name="Бинар 5Б-Компакт" , DevType=DeviceType.Binar,MaxBlower=90,MaxFuelPump=4}} ,
             { 25, new (){ID=25,Name="35SP (впрысковый)", DevType=DeviceType.Binar }} ,
-            { 27, new (){ID=27,Name="Бинар 5Д-Компакт", DevType=DeviceType.Binar }} ,
+            { 27, new (){ID=27,Name="Бинар 5Д-Компакт", DevType=DeviceType.Binar, MaxBlower=90,MaxFuelPump=4}} ,
             { 29, new (){ID=29,Name="Бинар 6Г-Компакт" , DevType=DeviceType.Binar}} ,
             { 31, new (){ID=31,Name="14ТСГ-Мини", DevType=DeviceType.Binar }} ,
             { 32, new (){ID=32,Name="30SPG (на базе 30SP)", DevType=DeviceType.Binar }} ,
-            { 34, new (){ID=34,Name="Binar-10Д" , DevType=DeviceType.Binar}} ,
-            { 35, new (){ID=35,Name="Binar-10Б" , DevType=DeviceType.Binar}} ,
+            { 34, new (){ID=34,Name="Binar-10Д" , DevType=DeviceType.Binar, MaxBlower=90}} ,
+            { 35, new (){ID=35,Name="Binar-10Б" , DevType=DeviceType.Binar, MaxBlower=90}} ,
             { 123, new (){ID=123,Name="Bootloader", DevType=DeviceType.Bootloader }} ,
             { 126, new (){ID=126,Name="Устройство управления", DevType=DeviceType.HCU }},
             { 255, new (){ID=255,Name="Не задано" }}

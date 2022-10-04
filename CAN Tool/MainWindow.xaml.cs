@@ -69,6 +69,10 @@ namespace CAN_Tool
             Chart.Plot.AddAxis(Edge.Right, 2, color: System.Drawing.Color.LightGreen);
 
             vm.canAdapter.GotNewMessage += MessageHandler;
+
+            vm.RefreshPortListCommand.Execute(null);
+
+            menuLanguage.SelectedIndex = menuLanguage.Items.Count - 1;
         }
 
 

@@ -1,9 +1,12 @@
-﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:acan="clr-namespace:AdversCan" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" Title="Adver CAN-Tool" Height="700" Width="1500" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:acan="clr-namespace:AdversCan" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" Title="Adver CAN-Tool" Height="820" Width="1500" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
         <c:BoolToVisibleConverter x:Key="BoolToVisibileConverter" />
         <c:IntToVisibleConverter x:Key="IntToVisibileConverter" />
+        <c:HeaterToVisibleConverter x:Key="OnlyForHeaters" />
+        <c:BinarToVisibleConverter x:Key="OnlyForBinars" />
+        <c:PlanarToVisibleConverter x:Key="OnlyForPlanars" />
     </Window.Resources>
     <Window.DataContext>
         <vm:MainWindowViewModel />
@@ -35,6 +38,13 @@
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
                 <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
+                
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="{Binding canAdapter.ErrorCounter,StringFormat=Errors:{0}}" Margin="10" FontSize="20" VerticalAlignment="Center"></TextBlock>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+            <TextBlock Text="{Binding canAdapter.FailedMessagesCounter,StringFormat=Faulted messages:{0}}" Margin="10" FontSize="20" VerticalAlignment="Center"></TextBlock>
             </StatusBarItem>
         </StatusBar>
         <Grid DockPanel.Dock="Top">
@@ -51,6 +61,7 @@
                     <Button Content="{DynamicResource b_listen}" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                     <Button Content="{DynamicResource b_self_reception}" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                     <Button Content="{DynamicResource b_stop}" Margin="10" Command="{Binding StopCanAdapterCommand}" />
+                    
                 </StackPanel>
 
             </StackPanel>
@@ -79,60 +90,176 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullableToVisibilityConverter}}">
-                        
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                            <Border Width="200" Height="200" CornerRadius="30"  Margin="15" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="3">
-                                <Border.Background>
-                                    <ImageBrush  ImageSource="{Binding SelectedConnectedDevice.Img}" Stretch="Fill" />
-                                </Border.Background>
-                            </Border>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="1*" />
-                                    <RowDefinition Height="1*" />
-                                    <RowDefinition Height="1*" />
-                                    <RowDefinition Height="1*" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"></ColumnDefinition>
-                                    <ColumnDefinition Width="5*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Row="0" Text="{Binding SelectedConnectedDevice.Name}" VerticalAlignment="Center" FontSize="30" />
-                                <TextBlock Grid.Row="1" Text="{Binding SelectedConnectedDevice.FirmwareAsText}" VerticalAlignment="Center" FontSize="30" />
-                                <TextBlock Grid.Row="2" Text="{Binding SelectedConnectedDevice.ProductionDate}" VerticalAlignment="Center" FontSize="30" />
-                                <TextBlock Grid.Row="3" Text="{Binding SelectedConnectedDevice.SerialAsString}" VerticalAlignment="Center" FontSize="30" />
-                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Visibility="{Binding SelectedConnectedDevice.Parameters.Error,Converter={StaticResource IntToVisibileConverter},Mode=OneWay,TargetNullValue=Hidden}">
-                                    <Button x:Name="ErrorButton" Style="{StaticResource MaterialDesignFloatingActionButton}" Margin="10" Grid.Column="1" Grid.Row="0" Background="Red" Command="{Binding ClearErrorsCommand}" ToolTip="Press to clean error code">
-                                        <fa:FontAwesome Icon="Solid_ExclamationTriangle" FontSize="30"></fa:FontAwesome>
+                        <DockPanel DockPanel.Dock="Left">
+                            <TextBlock Grid.Row="4" x:Name="StageTextBlock" DockPanel.Dock="Top" HorizontalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" FontSize="30" Margin="8" TextWrapping="WrapWithOverflow"/>
+                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                                <Border Width="150" Height="150" CornerRadius="20" Margin="10" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2">
+                                    <Button x:Name="ErrorButton" Style="{StaticResource MaterialDesignFloatingActionButton}" Background="Red" Command="{Binding ClearErrorsCommand}" ToolTip="Press to clean error code" Visibility="{Binding SelectedConnectedDevice.Parameters.Error, Converter={StaticResource IntToVisibileConverter}}">
+                                        <StackPanel Orientation="Horizontal">
+                                        <fa:FontAwesome Icon="Solid_ExclamationTriangle" FontSize="25"></fa:FontAwesome>
+                                        <TextBlock FontSize="20"  VerticalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.Error}" />
+                                        </StackPanel>
                                     </Button>
-                                    <TextBlock Text="{Binding Path=SelectedConnectedDevice.Parameters.ErrorString}" FontSize="30" VerticalAlignment="Center" Margin="10 0 10 0" />
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding SelectedConnectedDevice.Img}" Stretch="Fill" />
+                                    </Border.Background>
+                                </Border>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="1*" />
+                                        <RowDefinition Height="1*" />
+                                        <RowDefinition Height="1*" />
+                                        <RowDefinition Height="1*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding SelectedConnectedDevice.FirmwareAsText}" VerticalAlignment="Center" FontSize="25" />
+                                    <TextBlock Grid.Row="1" Text="{Binding SelectedConnectedDevice.ProductionDate}" VerticalAlignment="Center" FontSize="25" />
+                                    <TextBlock Grid.Row="2" Text="{Binding SelectedConnectedDevice.SerialAsString}" VerticalAlignment="Center" FontSize="25" />
+                                    <TextBlock Grid.Row="3" Text="{Binding Path=SelectedConnectedDevice.Parameters.ErrorString}" FontSize="25" VerticalAlignment="Center" Visibility="{Binding SelectedConnectedDevice.Parameters.Error, Converter={StaticResource IntToVisibileConverter}}" />
+
+                                        
+
+
+                                </Grid>
+                            </StackPanel >
+
+                            <Border BorderThickness="2" BorderBrush="{DynamicResource MaterialDesignDivider}" DockPanel.Dock="Top" HorizontalAlignment="Left" CornerRadius="10" Margin="10">
+                                <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Left" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
+                                    <Button Margin="8" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
+                                        <Button.Content>
+                                            <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="White" />
+                                        </Button.Content>
+                                    </Button>
+
+                                    <Button Margin="8" ToolTip="Stop Device" Command="{Binding StopHeaterCommand}">
+                                        <Button.Content>
+                                            <fa:ImageAwesome Icon="Solid_Stop" Margin="2" Foreground="White" />
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Margin="8" ToolTip="Run just water pump" Command="{Binding StartPumpCommand}" Content="{DynamicResource b_water_pump}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"></Button>
+                                    <Button Margin="8" ToolTip="Run ventilation" Command="{Binding StartVentCommand}" Content="{DynamicResource b_vent}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForPlanars}}"></Button>
+                                    <Button Content="{DynamicResource b_calibrate}" Margin="10" Command="{Binding CalibrateTermocouplesCommand}" />
+                                    <Button Content="{DynamicResource b_clear_errors}" Margin="10" Command="{Binding ClearErrorsCommand}" />
+
                                 </StackPanel>
+                            </Border>
+                            <Grid />
+                            <Grid DockPanel.Dock="Top" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="10" BorderThickness="1" Margin="10" RenderTransformOrigin="0.8,0.871">
+                                        <Border.Background>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF303050" Offset="0.003" />
+                                                <GradientStop Color="#FF303030" Offset="0.349" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <StackPanel>
+                                            <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}" Text="{DynamicResource b_air_set}" HorizontalAlignment="Center" Margin="4"></TextBlock>
+                                            <Grid>
+                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightGray" Width="40" Height="40" Value="100" Maximum="100" Opacity="0.5">
+                                                    <ProgressBar.LayoutTransform>
+                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
+                                                    </ProgressBar.LayoutTransform>
+                                                </ProgressBar>
+                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightGray" Width="50" Height="50" Value="100" Maximum="100" Opacity="0.5">
+                                                    <ProgressBar.LayoutTransform>
+                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
+                                                    </ProgressBar.LayoutTransform>
+                                                </ProgressBar>
+                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightBlue" Width="50" Height="50" Value="{Binding SelectedConnectedDevice.Parameters.RevSet,TargetNullValue=0}" Maximum="{Binding SelectedConnectedDevice.DeviceReference.MaxBlower}">
+                                                    <ProgressBar.LayoutTransform>
+                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
+                                                    </ProgressBar.LayoutTransform>
+                                                </ProgressBar>
+                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightCyan" Width="40" Height="40" Value="{Binding SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0}" Maximum="{Binding SelectedConnectedDevice.DeviceReference.MaxBlower}">
+                                                    <ProgressBar.LayoutTransform>
+                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
+                                                    </ProgressBar.LayoutTransform>
+                                                </ProgressBar>
+                                                <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.RevSet,TargetNullValue=0}" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline3TextBlock}"></TextBlock>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
 
+                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="10" BorderThickness="1" Margin="10" RenderTransformOrigin="0.8,0.871">
+                                        <Border.Background>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF505030" Offset="0.003" />
+                                                <GradientStop Color="#FF303030" Offset="0.349" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <StackPanel>
+                                            <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}" Text="{DynamicResource b_fuel_pump_set}" HorizontalAlignment="Center" Margin="4"></TextBlock>
+                                            <Grid>
+                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightGray" Width="50" Height="50" Value="100" Maximum="100" Opacity="0.5">
+                                                    <ProgressBar.LayoutTransform>
+                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
+                                                    </ProgressBar.LayoutTransform>
+                                                </ProgressBar>
+                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="Yellow" Width="50" Height="50" Value="{Binding SelectedConnectedDevice.Parameters.FuelPumpMeasured,TargetNullValue=0}" Maximum="{Binding SelectedConnectedDevice.DeviceReference.MaxFuelPump}">
+                                                    <ProgressBar.LayoutTransform>
+                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
+                                                    </ProgressBar.LayoutTransform>
+                                                </ProgressBar>
+                                                <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.FuelPumpMeasured,TargetNullValue=0}" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline3TextBlock}"></TextBlock>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="10" BorderThickness="1" Margin="10" RenderTransformOrigin="0.8,0.871">
+                                        <Border.Background>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF504040" Offset="0.003" />
+                                                <GradientStop Color="#FF303030" Offset="0.349" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <StackPanel>
+                                            <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}" Text="{DynamicResource b_glow_plug_set}" HorizontalAlignment="Center" Margin="4"></TextBlock>
+                                            <Grid>
+                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightGray" Width="50" Height="50" Value="100" Maximum="100" Opacity="0.5">
+                                                    <ProgressBar.LayoutTransform>
+                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
+                                                    </ProgressBar.LayoutTransform>
+                                                </ProgressBar>
+                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="Crimson" Width="50" Height="50" Value="{Binding SelectedConnectedDevice.Parameters.GlowPlug,TargetNullValue=0}" Maximum="100">
+                                                    <ProgressBar.LayoutTransform>
+                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
+                                                    </ProgressBar.LayoutTransform>
+                                                </ProgressBar>
+                                                <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.GlowPlug,TargetNullValue=0}" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline3TextBlock}"></TextBlock>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                </StackPanel>
                             </Grid>
-                        </StackPanel >
-                        <TextBlock Margin="10" x:Name="StageTextBlock" DockPanel.Dock="Top" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" HorizontalAlignment="Center" FontSize="20" />
-                        <Border BorderThickness="2" BorderBrush="{DynamicResource MaterialDesignDivider}" DockPanel.Dock="Top" HorizontalAlignment="Left" CornerRadius="10" Margin="10">
-                            <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Left">
-                                <Button Margin="8" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
-                                    <Button.Content>
-                                        <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="White" />
-                                    </Button.Content>
-                                </Button>
-
-                                <Button Margin="8" ToolTip="Stop Device" Command="{Binding StopHeaterCommand}">
-                                    <Button.Content>
-                                        <fa:ImageAwesome Icon="Solid_Stop" Margin="2" Foreground="White" />
-                                    </Button.Content>
-                                </Button>
-                                <Button Margin="8" ToolTip="Run just water pump" Command="{Binding StartPumpCommand}" Content="{DynamicResource b_water_pump}"></Button>
-                                <Button Margin="8" ToolTip="Run ventilation" Command="{Binding StartVentCommand}" Content="{DynamicResource b_vent}"></Button>
-                                <Button Content="{DynamicResource b_calibrate}" Margin="10" Command="{Binding CalibrateTermocouplesCommand}" />
-                                <Button Content="{DynamicResource b_clear_errors}" Margin="10" Command="{Binding ClearErrorsCommand}" />
-
-                            </StackPanel>
-                        </Border>
-                        <Grid />
+                        </DockPanel>
+                        <DockPanel DockPanel.Dock="Right">
+                            <ListBox ItemsSource="{Binding SelectedConnectedDevice.CommonView}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel  IsItemsHost="True" Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="5" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignBody}" MinWidth="180" Margin="10" >
+                                        <Border.Background>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF303030" />
+                                                <GradientStop Color="#FF505050" Offset="1" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <StackPanel>
+                                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="{Binding Name}" HorizontalAlignment="Center" />
+                                            <TextBlock Style="{DynamicResource MaterialDesignBody2TextBlock}" Margin="5" Text="{Binding FormattedValue}" HorizontalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
                     </DockPanel>
+
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
@@ -166,7 +293,19 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <DataGrid x:Name="AC2PmessagesField" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding AC2PInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged">
+                            <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding AC2PInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged">
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Fresh}" Value="true">
+                                                <Setter Property="Background" Value="Green"></Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Fresh}" Value="false">
+                                                <Setter Property="Background" Value="{DynamicResource MaterialDesignDarkBackground}"></Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.RowStyle>
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding Path = PGN}" Header="PGN" IsReadOnly="True">
                                     </DataGridTextColumn>
@@ -290,7 +429,7 @@
                         </Grid>
                     </DockPanel>
                 </TabItem>
-                <TabItem>
+                <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_InfoCircle" Margin="2 2 5 2" Foreground="White" />
@@ -376,8 +515,8 @@
                             <Button Margin="10" Content="{DynamicResource b_enter_manual}" Command="{Binding EnterManualModeCommand}" />
                             <Button Margin="10" Content="{DynamicResource b_leave_manual}" Command="{Binding ExitManualModeCommand}" />
 
-                            <CheckBox Margin="5" Style="{StaticResource MaterialDesignSwitchDarkToggleButton }" IsChecked="{Binding ManualWaterPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" IsEnabled="{Binding SelectedConnectedDevice.ManualMode,Mode=OneWay,TargetNullValue=false}" />
-                            <TextBlock Margin="5" FontSize="25" VerticalAlignment="Center" Text="{DynamicResource b_water_pump}"></TextBlock>
+                            <CheckBox Margin="5" Style="{StaticResource MaterialDesignSwitchDarkToggleButton }" IsChecked="{Binding ManualWaterPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" IsEnabled="{Binding SelectedConnectedDevice.ManualMode,Mode=OneWay,TargetNullValue=false}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"/>
+                            <TextBlock Margin="5" FontSize="25" VerticalAlignment="Center" Text="{DynamicResource b_water_pump}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"></TextBlock>
 
                         </StackPanel>
                         <Grid>
@@ -410,7 +549,7 @@
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="{DynamicResource b_air_set}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" />
                                 <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding ManualAirBlower,Mode=OneWay}" HorizontalAlignment="Center" FontSize="20" />
                                 <Rectangle x:Name="SetRevRect" Grid.Column="0" Grid.Row="3" Margin="10"></Rectangle>
-                                <ProgressBar Grid.Column="0" Grid.Row="3" Value="{Binding ManualAirBlower,Mode=OneWay }" Maximum="90" Orientation="Vertical" Width="{Binding ElementName=SetRevRect,Path=ActualHeight}" Height="{Binding ElementName=SetRevRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel"></ProgressBar>
+                                <ProgressBar Style="{DynamicResource MaterialDesignLinearProgressBar}" Grid.Column="0" Grid.Row="3" Value="{Binding ManualAirBlower,Mode=OneWay }" Maximum="90" Orientation="Vertical" Width="{Binding ElementName=SetRevRect,Path=ActualHeight}" Height="{Binding ElementName=SetRevRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel"></ProgressBar>
 
                                 <TextBlock Grid.Column="1" Grid.Row="0" FontSize="20" Text="{DynamicResource b_air_measured}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <TextBlock Grid.Column="1" Grid.Row="1" FontSize="20" Text="{Binding SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>

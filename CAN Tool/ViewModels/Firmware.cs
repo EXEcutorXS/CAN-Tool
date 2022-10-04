@@ -96,7 +96,7 @@ namespace CAN_Tool.ViewModels
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "Hex Files|*.hex";
             dialog.ShowDialog();
-            fragments = parseHexFile(dialog.FileName, 128);
+            fragments = parseHexFile(dialog.FileName, 16);
             MessageBox.Show($"Hex is loaded, contains {fragments.Count} fragments.");
         }
 
@@ -156,8 +156,8 @@ namespace CAN_Tool.ViewModels
         {
             writeFragmentToRam(f);
             startFlashing();
-            Thread.Sleep(100);
-            //WaitFor(ref VM.SelectedConnectedDevice.programDone, 2);
+            Thread.Sleep(50);
+            //WaitFor(ref VM.SelectedConnectedDevice.programDone, 20);
         }
         private void bootloaderSetAdrLen(uint adress, int len)
         {
@@ -203,11 +203,11 @@ namespace CAN_Tool.ViewModels
         {
             VM.AC2PInstance.CurrentTask.Capture("Memory Erasing");
             eraseFlash();
-            WaitFor(ref VM.SelectedConnectedDevice.eraseDone, 10);
+            WaitFor(ref VM.SelectedConnectedDevice.eraseDone, 15);
             VM.AC2PInstance.CurrentTask.onDone();
             VM.AC2PInstance.CurrentTask.Capture("Programming...");
-            bootloaderSetAdrLen(0x8008000, 128);
-            WaitFor(ref VM.SelectedConnectedDevice.setAdrDone, 2);
+            bootloaderSetAdrLen(0x8008000, 16);
+            WaitFor(ref VM.SelectedConnectedDevice.setAdrDone, 10);
             int cnt = 0;
             foreach (var f in fragments)
             {
@@ -259,7 +259,6 @@ namespace CAN_Tool.ViewModels
                                 {
                                     fragments.Add(current);
                                     current = new(maxFragment);
-
                                 }
                                 pageAdress = (uint)(bytes[4] * 256 + bytes[5]) << 16;
                                 break;

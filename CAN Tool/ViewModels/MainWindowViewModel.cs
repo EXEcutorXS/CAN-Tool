@@ -12,6 +12,7 @@ using AdversCan;
 using ScottPlot;
 using System.IO;
 using System.Drawing;
+using System.Threading;
 
 namespace CAN_Tool.ViewModels
 {
@@ -166,15 +167,17 @@ namespace CAN_Tool.ViewModels
         {
             canAdapter.PortName = PortName;
             canAdapter.PortOpen();
+            Thread.Sleep(20);
             canAdapter.StartNormal();
-
-            CustomMessage.TransmitterType = 126;
-            CustomMessage.TransmitterAddress = 6;
-            CustomMessage.ReceiverAddress = 7;
-            CustomMessage.ReceiverType = 127;
-            CustomMessage.PGN = 1;
-            CustomMessage.Data = new byte[8];
-            canAdapter.Transmit(customMessage);
+            Thread.Sleep(20);
+            AC2PMessage msg = new();
+            msg.TransmitterType = 126;
+            msg.TransmitterAddress = 6;
+            msg.ReceiverAddress = 7;
+            msg.ReceiverType = 127;
+            msg.PGN = 1;
+            msg.Data = new byte[8];
+            canAdapter.Transmit(msg);
         }
         private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !canAdapter.PortOpened);
         #endregion
@@ -540,37 +543,40 @@ namespace CAN_Tool.ViewModels
 
         private void executeCommand(int cmdNum, params byte[] data)
         {
-            CustomMessage.TransmitterType = 126;
-            CustomMessage.TransmitterAddress = 6;
-            CustomMessage.ReceiverId = SelectedConnectedDevice.ID;
-            CustomMessage.PGN = 1;
-            CustomMessage.Data = new byte[8];
+            AC2PMessage msg = new();
+            msg.TransmitterType = 126;
+            msg.TransmitterAddress = 6;
+            msg.ReceiverId = SelectedConnectedDevice.ID;
+            msg.PGN = 1;
+            msg.Data = new byte[8];
+            msg.Data[0] = (byte)(cmdNum >> 8);
+            msg.Data[1] = (byte)(cmdNum & 0xFF);
             for (int i = 0; i < data.Length; i++)
-                customMessage.Data[i + 2] = data[i];
-            CustomMessage.Data[0] = (byte)(cmdNum >> 8);
-            CustomMessage.Data[1] = (byte)(cmdNum & 0xFF);
-            canAdapter.Transmit(customMessage);
+                msg.Data[i + 2] = data[i];
+            
+            canAdapter.Transmit(msg);
         }
 
         private void updateManualMode()
         {
-            CustomMessage.TransmitterType = 126;
-            CustomMessage.TransmitterAddress = 6;
-            CustomMessage.ReceiverId = SelectedConnectedDevice.ID;
-            CustomMessage.PGN = 1;
-            CustomMessage.Data = new byte[8];
-            CustomMessage.Data[0] = 0;
-            CustomMessage.Data[1] = 68;
+            AC2PMessage msg = new();
+            msg.TransmitterType = 126;
+            msg.TransmitterAddress = 6;
+            msg.ReceiverId = SelectedConnectedDevice.ID;
+            msg.PGN = 1;
+            msg.Data = new byte[8];
+            msg.Data[0] = 0;
+            msg.Data[1] = 68;
 
             if (ManualWaterPump)
-                CustomMessage.Data[2] = 1;
+                msg.Data[2] = 1;
             else
-                CustomMessage.Data[2] = 0;
-            CustomMessage.Data[3] = (byte)ManualAirBlower;
-            CustomMessage.Data[4] = (byte)ManualGlowPlug;
-            CustomMessage.Data[5] = (byte)(ManualFuelPump / 256);
-            CustomMessage.Data[6] = (byte)ManualFuelPump;
-            canAdapter.Transmit(customMessage);
+                msg.Data[2] = 0;
+            msg.Data[3] = (byte)ManualAirBlower;
+            msg.Data[4] = (byte)ManualGlowPlug;
+            msg.Data[5] = (byte)(ManualFuelPump / 256);
+            msg.Data[6] = (byte)ManualFuelPump;
+            canAdapter.Transmit(msg);
         }
 
         private async void requestSerial()
