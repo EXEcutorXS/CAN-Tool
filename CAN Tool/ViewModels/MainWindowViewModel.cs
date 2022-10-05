@@ -187,6 +187,7 @@ namespace CAN_Tool.ViewModels
         private void OnClosePortCommandExecuted(object parameter)
         {
             canAdapter.PortClose();
+            AC2PInstance.ConnectedDevices.Clear();
         }
         private bool CanClosePortCommandExecute(object parameter) => (canAdapter.PortOpened);
         #endregion
