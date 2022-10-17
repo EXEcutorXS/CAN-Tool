@@ -48,5 +48,21 @@
     <v:String x:Key="b_get_version">Get Version</v:String>
     <v:String x:Key="b_cancel">Cancel</v:String>
     <v:String x:Key="b_expert">Expert</v:String>
+    <v:String x:Key="b_list_mode">Mode</v:String>
+    <v:String x:Key="b_list_stage">Stage</v:String>
+    <v:String x:Key="b_list_rev_set">Rev.Set</v:String>
+    <v:String x:Key="b_list_rev_meas">Rev.Meas</v:String>
+    <v:String x:Key="b_list_fuel">F Pump Meas</v:String>
+    <v:String x:Key="b_list_glowplug">Glow Plug</v:String>
+    <v:String x:Key="b_list_flamesensor">Flame Sens</v:String>
+    <v:String x:Key="b_list_stagetime">Stage time</v:String>
+    <v:String x:Key="b_list_worktime">Work time</v:String>
+    <v:String x:Key="b_list_voltage">Voltage</v:String>
+    <v:String x:Key="b_list_liqtemp">Liq.Temp</v:String>
+    <v:String x:Key="b_list_bodytemp">Body Temp</v:String>
+    <v:String x:Key="b_list_overheattemp">Ov.Temp</v:String>
+    <v:String x:Key="b_list_paneltemp">Pan.Temp</v:String>
+    <v:String x:Key="b_list_inlettemp">In.Temp</v:String>
+    <v:String x:Key="b_list_error">Err.code</v:String>
 </ResourceDictionary>
     

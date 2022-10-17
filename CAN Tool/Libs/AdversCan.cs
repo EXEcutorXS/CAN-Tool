@@ -846,7 +846,7 @@ namespace AdversCan
         }
 
     }
-    public class MainParameters : ViewModel
+    public class MainParameters : ViewModel,ICloneable
     {
 
         private int revMeasured = 0;
@@ -861,13 +861,6 @@ namespace AdversCan
         {
             get { return revSet; }
             set { Set(ref revSet, value); }
-        }
-
-        private int flameIndicator = 0;
-        public int FlameIndicator
-        {
-            get { return flameIndicator; }
-            set { Set(ref flameIndicator, value); }
         }
 
         private double fuelPumpMeasured = 0;
@@ -1101,6 +1094,10 @@ namespace AdversCan
         }
         public string ErrorString => AC2P.ErrorNames.GetValueOrDefault(error, $"Unknown error: {error}");
 
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 
     public class ConnectedDevice : ViewModel
@@ -1199,6 +1196,9 @@ namespace AdversCan
         private UpdatableList<BBError> _BBErrors = new();
         public UpdatableList<BBError> BBErrors => _BBErrors;
 
+        private readonly BindingList<MainParameters> log = new();
+        public BindingList<MainParameters> Log => log;
+
         private bool manualMode;
 
         public bool ManualMode
@@ -1280,6 +1280,8 @@ namespace AdversCan
 
         public void LogTick()
         {
+            Log.Insert(0,(MainParameters)Parameters.Clone());
+
             if (!isLogWriting) return;
 
             if (LogCurrentPos < LogData[0].Length)
@@ -1287,6 +1289,7 @@ namespace AdversCan
                 foreach (StatusVariable sv in Status)
                     LogData[sv.Id][LogCurrentPos] = sv.Value;
                 LogCurrentPos++;
+                
             }
             else
             {
@@ -1506,7 +1509,7 @@ namespace AdversCan
 
         private void UpdatePercent(int p) => CurrentTask.UpdatePercent(p);
 
-        private void ParseCanMessage(CanMessage msg)
+        private void ProcessCanMessage(CanMessage msg)
         {
             AC2PMessage m = new AC2PMessage(msg);
             DeviceId id = m.TransmitterId;
@@ -1559,33 +1562,37 @@ namespace AdversCan
                         currentDevice.CommonView.TryToAdd(sv);
 
                     if (sv.Id == 1)
-                        currentDevice.Parameters.Stage = (int)rawValue;
+                        currentDevice.Parameters.Stage = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 2)
-                        currentDevice.Parameters.Mode = (int)rawValue;
+                        currentDevice.Parameters.Mode = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 3)
-                        currentDevice.Parameters.WorkTime = (int)rawValue;
+                        currentDevice.Parameters.WorkTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 4)
-                        currentDevice.Parameters.StageTime = (int)rawValue;
+                        currentDevice.Parameters.StageTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 5)
-                        currentDevice.Parameters.Voltage = rawValue / 10.0;
+                        currentDevice.Parameters.Voltage = rawValue * sv.AssignedParameter.a+sv.AssignedParameter.b;
                     if (sv.Id == 6)
-                        currentDevice.Parameters.FlameSensor = (int)rawValue;
+                        currentDevice.Parameters.FlameSensor = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 7)
-                        currentDevice.Parameters.BodyTemp = (int)rawValue;
+                        currentDevice.Parameters.BodyTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 8)
-                        currentDevice.Parameters.PanelTemp = (int)rawValue;
+                        currentDevice.Parameters.PanelTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 10)
-                        currentDevice.Parameters.InletTemp = (int)rawValue;
+                        currentDevice.Parameters.InletTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 15)
-                        currentDevice.Parameters.RevSet = (int)rawValue;
+                        currentDevice.Parameters.RevSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 16)
-                        currentDevice.Parameters.RevMeasured = (int)rawValue;
+                        currentDevice.Parameters.RevMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 18)
-                        currentDevice.Parameters.FuelPumpMeasured = rawValue / 100.0;
+                        currentDevice.Parameters.FuelPumpMeasured = (rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 21)
-                        currentDevice.Parameters.GlowPlug = (int)rawValue;
+                        currentDevice.Parameters.GlowPlug = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 24)
-                        currentDevice.Parameters.Error = (int)rawValue;
+                        currentDevice.Parameters.Error = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                    if (sv.Id == 40)
+                        currentDevice.Parameters.LiquidTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                    if (sv.Id == 41)
+                        currentDevice.Parameters.OverheatTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
 
 
 
@@ -1998,7 +2005,7 @@ namespace AdversCan
 
         private void Adapter_GotNewMessage(object sender, EventArgs e)
         {
-            UIContext.Send(x => ParseCanMessage((e as GotMessageEventArgs).receivedMessage), null);
+            UIContext.Send(x => ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null);
         }
 
         public static void SeedStaticData()

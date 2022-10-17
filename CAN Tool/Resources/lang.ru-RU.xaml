@@ -48,4 +48,20 @@
     <v:String x:Key="b_get_version">Запросить версию</v:String>
     <v:String x:Key="b_cancel">Отмена</v:String>
     <v:String x:Key="b_expert">Эксперт</v:String>
+    <v:String x:Key="b_list_mode">Реж</v:String>
+    <v:String x:Key="b_list_stage">Уч</v:String>
+    <v:String x:Key="b_list_rev_set">Об.Зад</v:String>
+    <v:String x:Key="b_list_rev_meas">Об.Изм</v:String>
+    <v:String x:Key="b_list_fuel">ТН изм</v:String>
+    <v:String x:Key="b_list_glowplug">Свеча</v:String>
+    <v:String x:Key="b_list_flamesensor">Инд.плам</v:String>
+    <v:String x:Key="b_list_stagetime">Вр.на реж</v:String>
+    <v:String x:Key="b_list_worktime">Время раб</v:String>
+    <v:String x:Key="b_list_voltage">Напр.</v:String>
+    <v:String x:Key="b_list_liqtemp">Т жид.</v:String>
+    <v:String x:Key="b_list_bodytemp">Т корп</v:String>
+    <v:String x:Key="b_list_overheattemp">Т перег.</v:String>
+    <v:String x:Key="b_list_paneltemp">Т пульта</v:String>
+    <v:String x:Key="b_list_inlettemp">Т вход</v:String>
+    <v:String x:Key="b_list_error">Код.ош.</v:String>
 </ResourceDictionary>
