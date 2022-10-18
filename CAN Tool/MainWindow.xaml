@@ -299,7 +299,7 @@
                                                 <Setter Property="Background" Value="Green"></Setter>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Fresh}" Value="false">
-                                                <Setter Property="Background" Value="{DynamicResource MaterialDesignDarkBackground}"></Setter>
+                                                <Setter Property="Background" Value="{DynamicResource MaterialDesignBackground}"></Setter>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
