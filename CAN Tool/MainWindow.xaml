@@ -29,23 +29,22 @@
     </Window.Triggers>
     <DockPanel>
         <StatusBar x:Name="MyStatusbar" DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
-            <StatusBarItem Width="auto">
-                <TextBlock FontSize="20" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
+            <StatusBarItem HorizontalAlignment="Left">
+                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
             <ProgressBar Width="300" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></ProgressBar>
-            <StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Left">
                 <Button Content="{DynamicResource b_cancel}" Command="{Binding CancelOperationCommand}" Margin="5" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></Button>
             </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
 
+            <StatusBarItem HorizontalAlignment="Right" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
+                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="15" Text="{Binding canAdapter.ErrorCounter,StringFormat=Errors:{0}}" Margin="10" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="15" Text="{Binding canAdapter.FailedMessagesCounter,StringFormat=Faulted messages:{0}}" Margin="10" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
             </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock Text="{Binding canAdapter.ErrorCounter,StringFormat=Errors:{0}}" Margin="10" FontSize="20" VerticalAlignment="Center"></TextBlock>
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock Text="{Binding canAdapter.FailedMessagesCounter,StringFormat=Faulted messages:{0}}" Margin="10" FontSize="20" VerticalAlignment="Center"></TextBlock>
-            </StatusBarItem>
+            
         </StatusBar>
         <Grid DockPanel.Dock="Top">
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
@@ -67,6 +66,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
                 <CheckBox x:Name="ExpertMode" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="{DynamicResource b_expert}" FontSize="20"></CheckBox>
+                <CheckBox x:Name="DarkMode" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="Dark" FontSize="20" Cursor="Hand" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
                 <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5"></ComboBox>
                 <Button Content="{DynamicResource b_exit}" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft" />
             </StackPanel>
@@ -146,13 +146,8 @@
                             </StackPanel>
                             <Grid Margin="10" DockPanel.Dock="Top" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="10" BorderThickness="1" Margin="10" RenderTransformOrigin="0.8,0.871">
-                                        <Border.Background>
-                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                <GradientStop Color="#FF303050" Offset="0.003" />
-                                                <GradientStop Color="#FF303030" Offset="0.349" />
-                                            </LinearGradientBrush>
-                                        </Border.Background>
+                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
+
                                         <StackPanel>
                                             <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}" Text="{DynamicResource b_air_set}" HorizontalAlignment="Center" Margin="4"></TextBlock>
                                             <Grid>
@@ -181,13 +176,8 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="10" BorderThickness="1" Margin="10" RenderTransformOrigin="0.8,0.871">
-                                        <Border.Background>
-                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                <GradientStop Color="#FF505030" Offset="0.003" />
-                                                <GradientStop Color="#FF303030" Offset="0.349" />
-                                            </LinearGradientBrush>
-                                        </Border.Background>
+                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
+
                                         <StackPanel>
                                             <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}" Text="{DynamicResource b_fuel_pump_set}" HorizontalAlignment="Center" Margin="4"></TextBlock>
                                             <Grid>
@@ -206,13 +196,8 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="10" BorderThickness="1" Margin="10" RenderTransformOrigin="0.8,0.871">
-                                        <Border.Background>
-                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                <GradientStop Color="#FF504040" Offset="0.003" />
-                                                <GradientStop Color="#FF303030" Offset="0.349" />
-                                            </LinearGradientBrush>
-                                        </Border.Background>
+                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
+
                                         <StackPanel>
                                             <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}" Text="{DynamicResource b_glow_plug_set}" HorizontalAlignment="Center" Margin="4"></TextBlock>
                                             <Grid>
@@ -235,7 +220,25 @@
 
                             </Grid>
                         </StackPanel>
-                        <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.Log}" AutoGenerateColumns="False" >
+                        <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.Log}" AutoGenerateColumns="False" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Path = Mode}" Header="{DynamicResource b_list_mode}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = Stage}" Header="{DynamicResource b_list_stage}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = StageTime}" Header="{DynamicResource b_list_stagetime}" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding Path = WorkTime}" Header="{DynamicResource b_list_worktime}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = Voltage,StringFormat={}{0:F1}}" Header="{DynamicResource b_list_voltage}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = RevSet}" Header="{DynamicResource b_list_rev_set}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = RevMeasured}" Header="{DynamicResource b_list_rev_meas}" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding Path = FuelPumpMeasured,StringFormat={}{0:F2}}" Header="{DynamicResource b_list_fuel}" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding Path = GlowPlug}" Header="{DynamicResource b_list_glowplug}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = FlameSensor}" Header="{DynamicResource b_list_flamesensor}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = LiquidTemp}" Header="{DynamicResource b_list_liqtemp}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = OverheatTemp}" Header="{DynamicResource b_list_overheattemp}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = Error}" Header="{DynamicResource b_list_error}" IsReadOnly="True" />
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.Log}" AutoGenerateColumns="False" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForPlanars}}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path = Mode}" Header="{DynamicResource b_list_mode}" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path = Stage}" Header="{DynamicResource b_list_stage}" IsReadOnly="True" />
@@ -248,8 +251,6 @@
                                 <DataGridTextColumn Binding="{Binding Path = GlowPlug}" Header="{DynamicResource b_list_glowplug}" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path = FlameSensor}" Header="{DynamicResource b_list_flamesensor}" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path = BodyTemp}" Header="{DynamicResource b_list_bodytemp}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = LiquidTemp}" Header="{DynamicResource b_list_liqtemp}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = OverheatTemp}" Header="{DynamicResource b_list_overheattemp}" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path = InletTemp}" Header="{DynamicResource b_list_inlettemp}" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path = PanelTemp}" Header="{DynamicResource b_list_paneltemp}" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path = Error}" Header="{DynamicResource b_list_error}" IsReadOnly="True" />

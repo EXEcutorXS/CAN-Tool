@@ -23,6 +23,7 @@ using System.Threading;
 using System.Windows.Data;
 using CAN_Tool.ViewModels.Converters;
 using System.Windows.Media.Animation;
+using System.Text.RegularExpressions;
 
 namespace CAN_Tool
 {
@@ -281,6 +282,22 @@ namespace CAN_Tool
             PumpArrow.Visibility = Visibility.Hidden;
         }
 
+        private void DarkMode_Checked(object sender, RoutedEventArgs e)
+        {
+            bool isDark = (bool)(sender as CheckBox).IsChecked;
+            var resources = Application.Current.Resources.MergedDictionaries;
+
+            var existingResourceDictionary = Application.Current.Resources.MergedDictionaries
+                                            .Where(rd => rd.Source != null)
+                                            .SingleOrDefault(rd => Regex.Match(rd.Source.OriginalString, @"(\/Themes\/MaterialDesign((Light)|(Dark))Theme)").Success);
+
+            var source = $"pack://application:,,,/Themes/MaterialDesign{(isDark ? "Dark" : "Light")}Theme.xaml";
+            var newResourceDictionary = new ResourceDictionary() { Source = new Uri(source) };
+
+            Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
+            Application.Current.Resources.MergedDictionaries.Add(newResourceDictionary);
+
+        }
     }
 
 
