@@ -244,9 +244,6 @@ namespace Can_Adapter
         private int errorCounter = 0;
         public int ErrorCounter { private set => Set(ref errorCounter, value); get => errorCounter; }
 
-        private int currentErrorCounter = 0;
-        public int CurrentErrorCounter { private set => Set(ref currentErrorCounter, value); get => currentErrorCounter; }
-
         private int failedMessagesCounter = 0;
         public int FailedMessagesCounter { private set => Set(ref failedMessagesCounter, value); get => failedMessagesCounter; }
 
@@ -256,6 +253,11 @@ namespace Can_Adapter
         private readonly SerialPort serialPort;
 
         private readonly UpdatableList<CanMessage> _messages = new();
+
+        private List<CanMessage> messagesToSend = new();
+
+        private int maxQueue = 0;
+        public int MaxQueue => maxQueue;
 
         public UpdatableList<CanMessage> Messages { get => _messages; }
 
@@ -286,49 +288,45 @@ namespace Can_Adapter
         public void Stop() => serialPort.Write("C\r");
         public void SetBitrate(int bitrate) => serialPort.Write($"S{bitrate}\r");
 
-
+        private void checkBuffer()
+        {
+            if (messagesToSend.Count > 0)
+            {
+                Transmit(messagesToSend.Last());
+                messagesToSend.RemoveAt(messagesToSend.Count - 1);
+            }
+        }
         public void Transmit(CanMessage msg)
         {
-            if (serialPort.IsOpen == false)
-                return;
-            StringBuilder str = new("");
-            if (msg.IDE && msg.RTR)
-                str.Append('R');
-            if (!msg.IDE && msg.RTR)
-                str.Append('r');
-            if (msg.IDE && !msg.RTR)
-                str.Append('T');
-            if (!msg.IDE && !msg.RTR)
-                str.Append('t');
-            str.Append(msg.IdAsText);
-            str.Append(msg.DLC);
-            str.Append(msg.GetDataInTextFormat());
-            str.Append('\r');
-            TxDone = false;
-            lastMessageString = str.ToString();
-            currentErrorCounter = 0;
-            serialPort.Write(str.ToString());
-            
-        }
+            if (TxDone)
+            {
+                TxDone = false;
 
-        public void TransmitAsync(CanMessage msg)
-        {
-            if (serialPort.IsOpen == false)
-                return;
-            StringBuilder str = new("");
-            if (msg.IDE && msg.RTR)
-                str.Append('R');
-            if (!msg.IDE && msg.RTR)
-                str.Append('r');
-            if (msg.IDE && !msg.RTR)
-                str.Append('T');
-            if (!msg.IDE && !msg.RTR)
-                str.Append('t');
-            str.Append(msg.IdAsText);
-            str.Append(msg.DLC);
-            str.Append(msg.GetDataInTextFormat());
-            str.Append('\r');
-            serialPort.Write(str.ToString());
+                if (serialPort.IsOpen == false)
+                    return;
+                StringBuilder str = new("");
+                if (msg.IDE && msg.RTR)
+                    str.Append('R');
+                if (!msg.IDE && msg.RTR)
+                    str.Append('r');
+                if (msg.IDE && !msg.RTR)
+                    str.Append('T');
+                if (!msg.IDE && !msg.RTR)
+                    str.Append('t');
+                str.Append(msg.IdAsText);
+                str.Append(msg.DLC);
+                str.Append(msg.GetDataInTextFormat());
+                str.Append('\r');
+                lastMessageString = str.ToString();
+                
+                serialPort.Write(str.ToString());
+            }
+            else
+            {
+                messagesToSend.Add(msg);
+                if (messagesToSend.Count > maxQueue)
+                    maxQueue = messagesToSend.Count;
+            }
         }
 
         private void UartMessageProcess()
@@ -347,19 +345,11 @@ namespace Can_Adapter
                 case 'Z':
                     TxDone = true;
                     TransmissionSuccess?.Invoke(this, new());
+                    checkBuffer();
                     break;
                 case '\a':
-                    CurrentErrorCounter++;
                     ErrorCounter++;
-                    if (CurrentErrorCounter > 2)
-                    {
-                        lastMessageString = "";
-                        FailedMessagesCounter++;
-                        TxDone = true;
-                    }
-                    if (lastMessageString.Length > 0)
-                        serialPort.Write(lastMessageString);
-
+                    checkBuffer();
                     ErrorReported?.Invoke(this, new());
                     break;
                 default:

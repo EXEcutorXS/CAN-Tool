@@ -40,6 +40,7 @@
             <StatusBarItem HorizontalAlignment="Right" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
+                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="15" Text="{Binding canAdapter.MaxQueue,StringFormat=MaxQ:{0}}" Margin="10" VerticalAlignment="Center"></TextBlock>
                     <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="15" Text="{Binding canAdapter.ErrorCounter,StringFormat=Errors:{0}}" Margin="10" VerticalAlignment="Center"></TextBlock>
                     <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="15" Text="{Binding canAdapter.FailedMessagesCounter,StringFormat=Faulted messages:{0}}" Margin="10" VerticalAlignment="Center"></TextBlock>
                 </StackPanel>

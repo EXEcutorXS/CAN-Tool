@@ -148,7 +148,7 @@ namespace AdversCan
         }
 
         private bool fresh;
-        
+
         public bool Fresh { get => fresh; set => Set(ref fresh, value); }
 
         [AffectsTo(nameof(VerboseInfo))]
@@ -846,7 +846,7 @@ namespace AdversCan
         }
 
     }
-    public class MainParameters : ViewModel,ICloneable
+    public class MainParameters : ViewModel, ICloneable
     {
 
         private int revMeasured = 0;
@@ -1232,6 +1232,31 @@ namespace AdversCan
             set => Set(ref programDone, value);
         }
 
+        public bool checkDone = false;
+
+        public bool CheckDone
+        {
+            get => checkDone;
+            set => Set(ref checkDone, value);
+        }
+
+        public int dataLength = 0;
+
+        public int DataLength
+        {
+            get => dataLength;
+            set => Set(ref dataLength, value);
+        }
+
+        public int crc = 0;
+
+        public int Crc
+        {
+            get => crc;
+            set => Set(ref crc, value);
+        }
+
+
         public string Name => ToString();
 
         private Device deviceReference;
@@ -1280,7 +1305,7 @@ namespace AdversCan
 
         public void LogTick()
         {
-            Log.Insert(0,(MainParameters)Parameters.Clone());
+            Log.Insert(0, (MainParameters)Parameters.Clone());
 
             if (!isLogWriting) return;
 
@@ -1289,7 +1314,7 @@ namespace AdversCan
                 foreach (StatusVariable sv in Status)
                     LogData[sv.Id][LogCurrentPos] = sv.Value;
                 LogCurrentPos++;
-                
+
             }
             else
             {
@@ -1570,7 +1595,7 @@ namespace AdversCan
                     if (sv.Id == 4)
                         currentDevice.Parameters.StageTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 5)
-                        currentDevice.Parameters.Voltage = rawValue * sv.AssignedParameter.a+sv.AssignedParameter.b;
+                        currentDevice.Parameters.Voltage = rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b;
                     if (sv.Id == 6)
                         currentDevice.Parameters.FlameSensor = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 7)
@@ -1695,6 +1720,12 @@ namespace AdversCan
                     currentDevice.SetAdrDone = true;
                 if (m.Data[0] == 3 && m.Data[1] == 1)
                     currentDevice.ProgramDone = true;
+                if (m.Data[0] == 4)
+                {
+                    currentDevice.CheckDone = true;
+                    currentDevice.Crc = (m.Data[4] << 24 + m.Data[5] << 16 + m.Data[6] << 8 + m.Data[7]);
+                    currentDevice.DataLength = (m.Data[1] << 16 + m.Data[2] << 8 + m.Data[3]);
+                }
             }
 
             Messages.TryToAdd(m);
@@ -2010,7 +2041,7 @@ namespace AdversCan
 
         public static void SeedStaticData()
         {
-
+            #region Device names init
             Devices = new Dictionary<int, Device>() {
             { 0, new (){ID=0,Name="Любой" } } ,
             { 1, new (){ID=1,Name="14ТС-Мини",DevType=DeviceType.Binar } } ,
@@ -2047,8 +2078,9 @@ namespace AdversCan
             { 126, new (){ID=126,Name="Устройство управления", DevType=DeviceType.HCU }},
             { 255, new (){ID=255,Name="Не задано" }}
         };
+            #endregion
 
-            #region PGN initialise
+            #region PGN names init
             PGNs.Add(0, new() { id = 0, name = "Пустая команда" });
             PGNs.Add(1, new() { id = 1, name = "Комманда управления" });
             PGNs.Add(2, new() { id = 2, name = "Подтверждение на принятую комманду" });
@@ -2092,7 +2124,7 @@ namespace AdversCan
             PGNs.Add(101, new() { id = 101, name = "Заполнение буферного массива для последующей записи во флэш" });
             #endregion
 
-            #region Commands initialise
+            #region Commands init
             commands.Add(new CommandId(0, 0), new AC2PCommand() { firstByte = 0, secondByte = 0, name = "Кто здесь?" });
             commands.Add(new CommandId(0, 1), new AC2PCommand() { firstByte = 0, secondByte = 1, name = "пуск устройства" });
             commands.Add(new CommandId(0, 3), new AC2PCommand() { firstByte = 0, secondByte = 3, name = "остановка устройства" });
@@ -2115,6 +2147,7 @@ namespace AdversCan
             commands.Add(new CommandId(0, 70), new AC2PCommand() { firstByte = 0, secondByte = 69, name = "Включение/Выключение устройств" });
             #endregion
 
+            #region Command parameters init
             commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 2, BitLength = 8, GetMeaning = i => ("Устройство: " + Devices[i].Name + ";"), AnswerOnly = true }); ;
             commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 3, BitLength = 8, Meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } }, AnswerOnly = true });
             commands[new CommandId(0, 0)].Parameters.Add(new AC2PParameter() { StartByte = 4, BitLength = 8, Name = "Верия ПО", AnswerOnly = true });
@@ -2192,7 +2225,7 @@ namespace AdversCan
             commands[new CommandId(0, 70)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 4, BitLength = 2, Name = "Состояние свечи", Meanings = defMeaningsOnOff });
             commands[new CommandId(0, 70)].Parameters.Add(new AC2PParameter() { StartByte = 2, StartBit = 6, BitLength = 2, Name = "Состояние помпы", Meanings = defMeaningsOnOff });
             commands[new CommandId(0, 70)].Parameters.Add(new AC2PParameter() { StartByte = 3, StartBit = 0, BitLength = 2, Name = "Состояние НВ", Meanings = defMeaningsOnOff });
-
+            #endregion
 
             #region PGN parameters initialise
 
@@ -2367,71 +2400,80 @@ namespace AdversCan
             PGNs[31].parameters.Add(new() { Name = "Время работы", BitLength = 32, StartByte = 0, Unit = "с", Var = 3 });
             PGNs[31].parameters.Add(new() { Name = "Время работы на режиме", BitLength = 32, StartByte = 4, Unit = "с", Var = 4 });
 
-            PGNs[100].parameters.Add(new() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning = r => $"Начальный адрес: 0X{r:X}" });
+            PGNs[100].parameters.Add(new() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning = r => $"Начальный адрес: 0X{(r + 0x8000000):X}" });
             PGNs[100].parameters.Add(new() { Name = "Длина данных", BitLength = 32, StartByte = 4, PackNumber = 2 });
+            PGNs[100].parameters.Add(new() { Name = "Длина данных", BitLength = 24, StartByte = 1, PackNumber = 4 });
+            PGNs[100].parameters.Add(new() { Name = "CRC", BitLength = 32, StartByte = 4, PackNumber = 4, GetMeaning = r => $"CRC: 0X{(r):X}" });
+            PGNs[100].parameters.Add(new() { Name = "Адрес фрагмента", BitLength = 32, StartByte = 2, PackNumber = 5 , GetMeaning = r => $"Адрес фрагмента: 0X{r:X}" });
+
+            PGNs[101].parameters.Add(new() { Name = "Первое слово", BitLength = 32, StartByte = 0, GetMeaning = r => $"1st: 0X{(r):X}" });
+            PGNs[101].parameters.Add(new() { Name = "Второе слово", BitLength = 32, StartByte = 4, GetMeaning = r => $"2nd: 0X{(r):X}" });
+
             #endregion
 
+            #region Error names init
             ErrorNames = new Dictionary<int, string>() {
-              {0,"No error" },
-              {1  , "Overheat"},
-{2  , "Overheat"},
-{3  , "Error of the overheat temp. sensor"},
-{4  , "Error of the liquid temp. sensor"},
-{5  , "Open circuit of the flame temp. sensor"},
-{9  , "Glow plug error"},
-{10 , "Fan speed does not correspond to the defined"},
-{12 , "High supply voltage"},
-{13 , "No ignition"},
-{14 , "Water pump error"},
-{15 , "Low supply voltage"},
-{16 , "Body temp.sensor does not cool down"},
-{17 , "Short circuit of the fuel pump"},
-{22 , "Open circuit of the fuel pump"},
-{27 , "Fan does not rotate"},
-{28 , "Fan self-rotation"},
-{29 , "Exceeding the limit of flame blowout"},
-{36 , "Overheating of the flame indicator"},
-{40 , "No connection with the heater"},
-{45 , "Open circuit of the tank temp. sensor"},
-{46 , "Short circuit of the tank temp. sensor"},
-{53 , "Open circuit of the flow sensor"},
-{54 , "Short circuit of the flow sensor"},
-{55 , "Open circuit of the air temp. sensor"},
-{56 , "Short circuit of the air temp. sensor"},
-{57 , "Short circuit of the zone 1 temp. sensor"},
-{58 , "Open circuit of the zone 1 temp. sensor"},
-{59 , "Short circuit of the zone 2 temp. sensor"},
-{60 , "Open circuit of the zone 2 temp. sensor"},
-{61 , "Short circuit of the zone 3 temp. sensor"},
-{62 , "Open circuit of the zone 3 temp. sensor"},
-{63 , "Short circuit of the zone 4 temp. sensor"},
-{64 , "Open circuit of the zone 4 temp. sensor"},
-{65 , "Short circuit of the zone 5 temp. sensor"},
-{66 , "Open circuit of the zone 5 temp. sensor"},
-{69 , "Short circuit of the pump 1"},
-{70 , "Open circuit of the pump 1"},
-{71 , "Short circuit of the pump 2"},
-{72 , "Open circuit of the pump 2"},
-{73 , "Short circuit of the pump 3"},
-{74 , "Open circuit of the pump 3"},
-{75 , "Short circuit of the pump 4"},
-{76 , "Open circuit of the pump 4"},
-{77 , "Short circuit of the pump 5"},
-{78 , "Open circuit of the pump 5"},
-{79 , "Short circuit of the fan 1"},
-{80 , "Open circuit of the fan 1"},
-{81 , "Short circuit of the fan 2"},
-{82 , "Open circuit of the fan 2"},
-{83 , "Short circuit of the fan 3"},
-{84 , "Open circuit of the fan 3"},
-{85 , "Short circuit of the fan 4"},
-{86 , "Open circuit of the fan 4"},
-{87 , "Short circuit of the fan 5"},
-{88 , "Open circuit of the fan 5"},
-{91 , "Liquid level too low"},
-{92 , "Liquid level too high"},
-{93 , "Level sensor short circuit"},
-{94 , "Level sensor open circuit"} };
+                 {0,"No error" },
+                 {1  , "Overheat"},
+                 {2  , "Overheat"},
+                 {3  , "Error of the overheat temp. sensor"},
+                 {4  , "Error of the liquid temp. sensor"},
+                 {5  , "Open circuit of the flame temp. sensor"},
+                 {9  , "Glow plug error"},
+                 {10 , "Fan speed does not correspond to the defined"},
+                 {12 , "High supply voltage"},
+                 {13 , "No ignition"},
+                 {14 , "Water pump error"},
+                 {15 , "Low supply voltage"},
+                 {16 , "Body temp.sensor does not cool down"},
+                 {17 , "Short circuit of the fuel pump"},
+                 {22 , "Open circuit of the fuel pump"},
+                 {27 , "Fan does not rotate"},
+                 {28 , "Fan self-rotation"},
+                 {29 , "Exceeding the limit of flame blowout"},
+                 {36 , "Overheating of the flame indicator"},
+                 {40 , "No connection with the heater"},
+                 {45 , "Open circuit of the tank temp. sensor"},
+                 {46 , "Short circuit of the tank temp. sensor"},
+                 {53 , "Open circuit of the flow sensor"},
+                 {54 , "Short circuit of the flow sensor"},
+                 {55 , "Open circuit of the air temp. sensor"},
+                 {56 , "Short circuit of the air temp. sensor"},
+                 {57 , "Short circuit of the zone 1 temp. sensor"},
+                 {58 , "Open circuit of the zone 1 temp. sensor"},
+                 {59 , "Short circuit of the zone 2 temp. sensor"},
+                 {60 , "Open circuit of the zone 2 temp. sensor"},
+                 {61 , "Short circuit of the zone 3 temp. sensor"},
+                 {62 , "Open circuit of the zone 3 temp. sensor"},
+                 {63 , "Short circuit of the zone 4 temp. sensor"},
+                 {64 , "Open circuit of the zone 4 temp. sensor"},
+                 {65 , "Short circuit of the zone 5 temp. sensor"},
+                 {66 , "Open circuit of the zone 5 temp. sensor"},
+                 {69 , "Short circuit of the pump 1"},
+                 {70 , "Open circuit of the pump 1"},
+                 {71 , "Short circuit of the pump 2"},
+                 {72 , "Open circuit of the pump 2"},
+                 {73 , "Short circuit of the pump 3"},
+                 {74 , "Open circuit of the pump 3"},
+                 {75 , "Short circuit of the pump 4"},
+                 {76 , "Open circuit of the pump 4"},
+                 {77 , "Short circuit of the pump 5"},
+                 {78 , "Open circuit of the pump 5"},
+                 {79 , "Short circuit of the fan 1"},
+                 {80 , "Open circuit of the fan 1"},
+                 {81 , "Short circuit of the fan 2"},
+                 {82 , "Open circuit of the fan 2"},
+                 {83 , "Short circuit of the fan 3"},
+                 {84 , "Open circuit of the fan 3"},
+                 {85 , "Short circuit of the fan 4"},
+                 {86 , "Open circuit of the fan 4"},
+                 {87 , "Short circuit of the fan 5"},
+                 {88 , "Open circuit of the fan 5"},
+                 {91 , "Liquid level too low"},
+                 {92 , "Liquid level too high"},
+                 {93 , "Level sensor short circuit"},
+                 {94 , "Level sensor open circuit"} };
+            #endregion
 
         }
 

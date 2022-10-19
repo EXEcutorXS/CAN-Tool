@@ -27,6 +27,14 @@ namespace CAN_Tool.ViewModels
     }
     internal class FirmwarePage : ViewModel
     {
+        private int fragmentSize = 128;
+
+        public int FragmentSize
+        {
+            get { return fragmentSize; }
+            set { Set(ref fragmentSize, value); }
+        }
+
         public MainWindowViewModel VM { set; get; }
 
         #region SwitchToBootloaderCommand
@@ -96,7 +104,7 @@ namespace CAN_Tool.ViewModels
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "Hex Files|*.hex";
             dialog.ShowDialog();
-            fragments = parseHexFile(dialog.FileName, 16);
+            fragments = parseHexFile(dialog.FileName, fragmentSize);
             MessageBox.Show($"Hex is loaded, contains {fragments.Count} fragments.");
         }
 
@@ -147,7 +155,8 @@ namespace CAN_Tool.ViewModels
         private void WaitFor(ref bool flag, int delay)
         {
             DateTime startTime = DateTime.Now;
-            while (!flag && (DateTime.Now - startTime) < new TimeSpan(0, 0, delay)) ;
+            while (!flag && (DateTime.Now - startTime) < new TimeSpan(0, 0, delay))
+                Task.Delay(10);
             if (!flag) throw new Exception("Device is not answering");
             flag = false;
             return;
@@ -156,8 +165,8 @@ namespace CAN_Tool.ViewModels
         {
             writeFragmentToRam(f);
             startFlashing();
-            Thread.Sleep(50);
-            //WaitFor(ref VM.SelectedConnectedDevice.programDone, 20);
+            //Thread.Sleep(50);
+            WaitFor(ref VM.SelectedConnectedDevice.programDone, 20);
         }
         private void bootloaderSetAdrLen(uint adress, int len)
         {
@@ -167,36 +176,75 @@ namespace CAN_Tool.ViewModels
             msg.TransmitterType = 126;
             msg.ReceiverAddress = 0;
             msg.ReceiverType = 123;
-            msg.Data[0] = 2;
-            msg.Data[1] = (byte)((adress >> 0) & 0xFF);
-            msg.Data[2] = (byte)((adress >> 8) & 0xFF);
+            msg.Data[0] = 5;
+            msg.Data[1] = 0xFF;
+            msg.Data[2] = (byte)((adress >> 24) & 0xFF);
             msg.Data[3] = (byte)((adress >> 16) & 0xFF);
-            msg.Data[4] = (byte)((len >> 0) & 0xFF);
-            msg.Data[5] = (byte)((len >> 8) & 0xFF);
-            msg.Data[6] = (byte)((len >> 16) & 0xFF);
-            msg.Data[7] = (byte)((len >> 24) & 0xFF);
+            msg.Data[4] = (byte)((adress >> 8) & 0xFF);
+            msg.Data[5] = (byte)((adress >> 0) & 0xFF);
+            msg.Data[6] = 0xff;
+            msg.Data[7] = 0xff;
+
             VM.canAdapter.Transmit(msg);
 
         }
+
+        private bool checkTransmittedData(int len, int crc)
+        {
+            AC2PMessage msg = new();
+            msg.PGN = 100;
+            msg.TransmitterAddress = 6;
+            msg.TransmitterType = 126;
+            msg.ReceiverId = VM.SelectedConnectedDevice.ID;
+            msg.Data[0] = 4;
+            VM.canAdapter.Transmit(msg);
+            Task.Delay(50);
+            WaitFor(ref VM.SelectedConnectedDevice.checkDone, 100);
+            if (crc == VM.SelectedConnectedDevice.crc && len == VM.SelectedConnectedDevice.dataLength)
+                return true;
+            else
+                return false;
+        }
         private void writeFragmentToRam(CodeFragment f)
         {
+            int crc;
+            int len;
+            int watchDog = 0;
             AC2PMessage msg = new();
             msg.PGN = 101;
             msg.TransmitterAddress = 6;
             msg.TransmitterType = 126;
             msg.ReceiverId = VM.SelectedConnectedDevice.ID;
-            for (int i = 0; i < (f.Length + 7) / 8; i++)
+            do
             {
-                msg.Data[0] = f.Data[i * 8];
-                msg.Data[1] = f.Data[i * 8 + 1];
-                msg.Data[2] = f.Data[i * 8 + 2];
-                msg.Data[3] = f.Data[i * 8 + 3];
-                msg.Data[4] = f.Data[i * 8 + 4];
-                msg.Data[5] = f.Data[i * 8 + 5];
-                msg.Data[6] = f.Data[i * 8 + 6];
-                msg.Data[7] = f.Data[i * 8 + 7];
-                VM.canAdapter.Transmit(msg);
-            }
+                bootloaderSetAdrLen(f.StartAdress, f.Length);
+                crc = 0;
+                len = 0;
+                VM.SelectedConnectedDevice.Crc = 0;
+                VM.SelectedConnectedDevice.DataLength = 0;
+                watchDog++;
+                for (int i = 0; i < (f.Length + 7) / 8; i++)
+                {
+                    for (int j = 0; j < 8; j++)
+                    {
+                        msg.Data[j] = f.Data[i * 8 + j];
+                        crc += f.Data[i * 8 + j] * 170771;
+                        crc = crc ^ (crc >> 16);
+                        len++;
+                    }
+                    msg.Data[0] = f.Data[i * 8];
+                    msg.Data[1] = f.Data[i * 8 + 1];
+                    msg.Data[2] = f.Data[i * 8 + 2];
+                    msg.Data[3] = f.Data[i * 8 + 3];
+                    msg.Data[4] = f.Data[i * 8 + 4];
+                    msg.Data[5] = f.Data[i * 8 + 5];
+                    msg.Data[6] = f.Data[i * 8 + 6];
+                    msg.Data[7] = f.Data[i * 8 + 7];
+                    VM.canAdapter.Transmit(msg);
+                }
+
+            } while (!checkTransmittedData(len, crc) && watchDog < 10);
+            if (watchDog >= 10) throw new Exception("Too many transmission errors");
 
         }
         private void updateFirmware(List<CodeFragment> fragments)
@@ -206,8 +254,6 @@ namespace CAN_Tool.ViewModels
             WaitFor(ref VM.SelectedConnectedDevice.eraseDone, 15);
             VM.AC2PInstance.CurrentTask.onDone();
             VM.AC2PInstance.CurrentTask.Capture("Programming...");
-            bootloaderSetAdrLen(0x8008000, 16);
-            WaitFor(ref VM.SelectedConnectedDevice.setAdrDone, 10);
             int cnt = 0;
             foreach (var f in fragments)
             {
