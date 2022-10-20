@@ -8,6 +8,9 @@ using System.Threading;
 using System.ComponentModel;
 using System.Windows.Threading;
 using CAN_Tool.ViewModels.Base;
+using System.Diagnostics;
+using System.Windows.Interop;
+using AdversCan;
 
 namespace Can_Adapter
 {
@@ -288,45 +291,47 @@ namespace Can_Adapter
         public void Stop() => serialPort.Write("C\r");
         public void SetBitrate(int bitrate) => serialPort.Write($"S{bitrate}\r");
 
-        private void checkBuffer()
-        {
-            if (messagesToSend.Count > 0)
-            {
-                Transmit(messagesToSend.Last());
-                messagesToSend.RemoveAt(messagesToSend.Count - 1);
-            }
-        }
+
         public void Transmit(CanMessage msg)
         {
-            if (TxDone)
-            {
-                TxDone = false;
 
-                if (serialPort.IsOpen == false)
-                    return;
-                StringBuilder str = new("");
-                if (msg.IDE && msg.RTR)
-                    str.Append('R');
-                if (!msg.IDE && msg.RTR)
-                    str.Append('r');
-                if (msg.IDE && !msg.RTR)
-                    str.Append('T');
-                if (!msg.IDE && !msg.RTR)
-                    str.Append('t');
-                str.Append(msg.IdAsText);
-                str.Append(msg.DLC);
-                str.Append(msg.GetDataInTextFormat());
-                str.Append('\r');
-                lastMessageString = str.ToString();
-                
-                serialPort.Write(str.ToString());
-            }
-            else
+            TxDone = false;
+
+            if (serialPort.IsOpen == false)
+                return;
+            StringBuilder str = new("");
+            if (msg.IDE && msg.RTR)
+                str.Append('R');
+            if (!msg.IDE && msg.RTR)
+                str.Append('r');
+            if (msg.IDE && !msg.RTR)
+                str.Append('T');
+            if (!msg.IDE && !msg.RTR)
+                str.Append('t');
+            str.Append(msg.IdAsText);
+            str.Append(msg.DLC);
+            str.Append(msg.GetDataInTextFormat());
+            str.Append('\r');
+            lastMessageString = str.ToString();
+
+            serialPort.Write(str.ToString());
+            Debug.WriteLine("-> " + (new AC2PMessage(msg)).ToString());
+            Thread.Sleep(10);
+            /*
+            int watchdog = 0;
+            while (!TxDone)
             {
-                messagesToSend.Add(msg);
-                if (messagesToSend.Count > maxQueue)
-                    maxQueue = messagesToSend.Count;
+                Task.Delay(1);
+                watchdog++;
+                if (watchdog > 200)
+                {
+                    FailedMessagesCounter++;
+                    TxDone = true;
+                    return;
+
+                }
             }
+            */
         }
 
         private void UartMessageProcess()
@@ -345,11 +350,11 @@ namespace Can_Adapter
                 case 'Z':
                     TxDone = true;
                     TransmissionSuccess?.Invoke(this, new());
-                    checkBuffer();
                     break;
                 case '\a':
                     ErrorCounter++;
-                    checkBuffer();
+                    Debug.WriteLine("<<ERROR,RESEND>>","CAN");
+                    serialPort.WriteLine(lastMessageString);
                     ErrorReported?.Invoke(this, new());
                     break;
                 default:

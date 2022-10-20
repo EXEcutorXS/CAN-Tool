@@ -288,15 +288,30 @@ namespace CAN_Tool
             var resources = Application.Current.Resources.MergedDictionaries;
 
             var existingResourceDictionary = Application.Current.Resources.MergedDictionaries
-                                            .Where(rd => rd.Source != null)
-                                            .SingleOrDefault(rd => Regex.Match(rd.Source.OriginalString, @"(\/Themes\/MaterialDesign((Light)|(Dark))Theme)").Success);
+                                            .FirstOrDefault(rd => rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" ||
+                                            rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml");
 
-            var source = $"pack://application:,,,/Themes/MaterialDesign{(isDark ? "Dark" : "Light")}Theme.xaml";
+
+            var source = isDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
             var newResourceDictionary = new ResourceDictionary() { Source = new Uri(source) };
 
             Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
             Application.Current.Resources.MergedDictionaries.Add(newResourceDictionary);
 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            AC2PMessage msg = new();
+            msg.PGN = 101;
+            msg.TransmitterAddress = 6;
+            msg.TransmitterType = 126;
+            msg.ReceiverAddress = 0;
+            msg.ReceiverType = 123;
+            for (int i = 0; i < 16; i++)
+            {
+                vm.canAdapter.Transmit(msg);
+            }
         }
     }
 

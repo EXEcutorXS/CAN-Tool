@@ -67,7 +67,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
                 <CheckBox x:Name="ExpertMode" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="{DynamicResource b_expert}" FontSize="20"></CheckBox>
-                <CheckBox x:Name="DarkMode" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="Dark" FontSize="20" Cursor="Hand" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
+                <CheckBox x:Name="DarkMode"  IsChecked="True" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="Dark" FontSize="20" Cursor="Hand" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
                 <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5"></ComboBox>
                 <Button Content="{DynamicResource b_exit}" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft" />
             </StackPanel>
@@ -593,13 +593,14 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
                             <Button Content="{DynamicResource b_load_hex}" Margin="10" Command="{Binding LoadHexCommand}" />
                             <Button Content="{DynamicResource b_switch_to_boot}" Margin="10" Command="{Binding SwitchToBootloaderCommand}" />
                             <Button Content="{DynamicResource b_burn}" Margin="10" Command="{Binding UpdateFirmwareCommand}" />
                             <Button Content="{DynamicResource b_switch_to_main_program}" Margin="10" Command="{Binding SwitchToMainProgramCommand}" />
                             <Button Content="{DynamicResource b_find_boot}" Margin="10" Command="{Binding RequestBootloaderVersionCommand}" />
                             <Button Content="{DynamicResource b_get_version}" Margin="10" Command="{Binding GetVersionCommand}" />
+                            <Button Content="Data transfer test" Margin="10" Click="Button_Click" />
                             <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding VM.SelectedConnectedDevice.FirmwareAsText}" />
                             <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding VM.SelectedConnectedDevice.ProductionDate}" />
                         </StackPanel>

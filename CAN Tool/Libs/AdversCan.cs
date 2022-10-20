@@ -1539,6 +1539,7 @@ namespace AdversCan
             AC2PMessage m = new AC2PMessage(msg);
             DeviceId id = m.TransmitterId;
 
+            Debug.WriteLine("<-" + m.ToString());
             if (ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id)) == null)
             {
                 ConnectedDevices.Add(new ConnectedDevice(id));
@@ -1715,16 +1716,32 @@ namespace AdversCan
             if (m.PGN == 100)
             {
                 if (m.Data[0] == 1 && m.Data[1] == 1)
+                {
+                    Debug.WriteLine("Memory erase confirmed");
                     currentDevice.EraseDone = true;
+                }
                 if (m.Data[0] == 2 && m.Data[1] == 1)
+                {
+                    Debug.WriteLine("Adress set confirmed");
                     currentDevice.SetAdrDone = true;
+                }
+
                 if (m.Data[0] == 3 && m.Data[1] == 1)
+                {
+                    Debug.WriteLine("Flash program confirmed");
                     currentDevice.ProgramDone = true;
+                }
                 if (m.Data[0] == 4)
                 {
+                    currentDevice.Crc = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
+                    currentDevice.DataLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
                     currentDevice.CheckDone = true;
-                    currentDevice.Crc = (m.Data[4] << 24 + m.Data[5] << 16 + m.Data[6] << 8 + m.Data[7]);
-                    currentDevice.DataLength = (m.Data[1] << 16 + m.Data[2] << 8 + m.Data[3]);
+                }
+                if (m.Data[0] == 5)
+                {
+                    int adr = m.Data[2] * 0x1000000 + m.Data[3] * 0x10000 + m.Data[4] * 0x100 + m.Data[5];
+                    Debug.WriteLine($"Adress set to 0X{adr:X}");
+                    currentDevice.SetAdrDone = true;
                 }
             }
 
@@ -1811,7 +1828,7 @@ namespace AdversCan
                 msg.Data[4] = (byte)(p.Key / 256);
                 msg.Data[5] = (byte)(p.Key % 256);
                 canAdapter.Transmit(msg);
-                await Task.Run(() => Thread.Sleep(100));
+                await Task.Delay(50);
                 if (CancellationRequested)
                 {
                     Cancel();
@@ -1849,7 +1866,7 @@ namespace AdversCan
                 msg.Data[7] = 0x01; //Pair count LSB
 
                 canAdapter.Transmit(msg);
-                await Task.Run(() => Thread.Sleep(40));
+                await Task.Delay(10);
                 if (CancellationRequested)
                 {
                     Cancel();
@@ -1918,7 +1935,7 @@ namespace AdversCan
                 msg.Data[2] = (byte)(p.Key / 256);
                 msg.Data[3] = (byte)(p.Key % 256);
                 canAdapter.Transmit(msg);
-                await Task.Run(() => Thread.Sleep(100));
+                await Task.Delay(20);
                 UpdatePercent(cnt++ * 100 / configParameters.Count);
                 if (CancellationRequested)
                 {
