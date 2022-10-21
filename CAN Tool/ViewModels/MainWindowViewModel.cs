@@ -13,12 +13,17 @@ using ScottPlot;
 using System.IO;
 using System.Drawing;
 using System.Threading;
+using System.Security.Principal;
+using System.Windows.Media;
 
 namespace CAN_Tool.ViewModels
 {
     internal class MainWindowViewModel : ViewModel
     {
 
+        private readonly List<System.Windows.Media.SolidColorBrush> brushes = new();
+
+        public List<System.Windows.Media.SolidColorBrush> Brushes => brushes;
         private FirmwarePage firmwarePage;
 
         public FirmwarePage FirmwarePage
@@ -156,7 +161,7 @@ namespace CAN_Tool.ViewModels
             foreach (var port in SerialPort.GetPortNames())
                 PortList.Add(port);
             if (PortList.Count > 0)
-                PortName = PortList[0];
+                PortName = PortList[^1];
         }
 
         #endregion
@@ -293,9 +298,9 @@ namespace CAN_Tool.ViewModels
                     var sig = plt.AddSignal(arrayToDisplay, color: v.Color, label: v.Name);
                     if (arrayToDisplay.Max() < 5)
                         sig.YAxisIndex = 2;
-                    plt.Grid(color: Color.FromArgb(50, 200,200,200));
+                    plt.Grid(color: System.Drawing.Color.FromArgb(50, 200,200,200));
                     plt.Grid(lineStyle: LineStyle.Dot);
-                    plt.Style(dataBackground: Color.FromArgb(255,40,40,40),figureBackground: System.Drawing.Color.DimGray);
+                    plt.Style(dataBackground: System.Drawing.Color.FromArgb(255,40,40,40),figureBackground: System.Drawing.Color.DimGray);
                     plt.Legend();
 
                 }
@@ -394,6 +399,15 @@ namespace CAN_Tool.ViewModels
         #endregion
         #endregion
 
+        #region SaveReportCommand
+        public ICommand SaveReportCommand { get; }
+        private void OnSaveReportCommandExecuted(object parameter)
+        {
+            Task.Run(() => AC2PInstance.EraseCommonBlackBox(_connectedDevice.ID));
+        }
+        private bool CanSaveReportCommandExecute(object parameter) =>
+            (SelectedConnectedDevice.BBErrors.Count>0 || SelectedConnectedDevice.BBValues.Count>0);
+        #endregion
 
         #region SendCustomMessageCommand
         public ICommand SendCustomMessageCommand { get; }
@@ -713,6 +727,25 @@ namespace CAN_Tool.ViewModels
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;
 
+            brushes.Add(new SolidColorBrush(Colors.Red));
+            brushes.Add(new SolidColorBrush(Colors.DeepPink));
+            brushes.Add(new SolidColorBrush(Colors.MediumPurple));
+            brushes.Add(new SolidColorBrush(Colors.BlueViolet));
+            brushes.Add(new SolidColorBrush(Colors.DarkSlateBlue));
+            brushes.Add(new SolidColorBrush(Colors.PowderBlue));
+            brushes.Add(new SolidColorBrush(Colors.LightSkyBlue));
+            brushes.Add(new SolidColorBrush(Colors.Cyan));
+            brushes.Add(new SolidColorBrush(Colors.Teal));
+            brushes.Add(new SolidColorBrush(Colors.Green));
+            brushes.Add(new SolidColorBrush(Colors.LightGreen));
+            brushes.Add(new SolidColorBrush(Colors.YellowGreen));
+            brushes.Add(new SolidColorBrush(Colors.Yellow));
+            brushes.Add(new SolidColorBrush(Colors.Gold));
+            brushes.Add(new SolidColorBrush(Colors.Orange));
+            brushes.Add(new SolidColorBrush(Colors.OrangeRed));
+            brushes.Add(new SolidColorBrush(Colors.Peru));
+            brushes.Add(new SolidColorBrush(Colors.Gray));
+            brushes.Add(new SolidColorBrush(Colors.SlateGray));
         }
     }
 }

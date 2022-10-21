@@ -28,8 +28,8 @@
     <v:String x:Key="b_log_chart">Отчёт</v:String>
     <v:String x:Key="b_status">Статус</v:String>
     <v:String x:Key="b_black_box">ЧЯ</v:String>
-    <v:String x:Key="b_read_bb_data">Данные</v:String>
-    <v:String x:Key="b_read_bb_errors">Ошибки</v:String>
+    <v:String x:Key="b_read_bb_data">Считать данные</v:String>
+    <v:String x:Key="b_read_bb_errors">Считать ошибки</v:String>
     <v:String x:Key="b_clear_bb_data">Стереть данные</v:String>
     <v:String x:Key="b_clear_bb_errors">Стереть ошибки</v:String>
     <v:String x:Key="b_enter_manual">Вкл</v:String>

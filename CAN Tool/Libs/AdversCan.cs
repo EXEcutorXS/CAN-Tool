@@ -1398,6 +1398,10 @@ namespace AdversCan
             IsLogWriting = false;
         }
 
+        public void SaveReport()
+        { 
+        
+        }
         public event EventHandler LogDataOverrun;
 
     }

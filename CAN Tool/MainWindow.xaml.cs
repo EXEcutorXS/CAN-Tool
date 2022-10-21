@@ -24,6 +24,8 @@ using System.Windows.Data;
 using CAN_Tool.ViewModels.Converters;
 using System.Windows.Media.Animation;
 using System.Text.RegularExpressions;
+using System.Text.Json;
+using System.IO;
 
 namespace CAN_Tool
 {
@@ -32,16 +34,47 @@ namespace CAN_Tool
     /// </summary>
 
 
+    public class Settings
+    {
+        public bool isDark { get; set; }
+        public int themeNumber { get; set; }
+        public int langaugeNumber { get; set; }
+    }
+
+
     public partial class MainWindow : Window
     {
-
-        public bool isDark;
+        private Settings settings = new();
 
         MainWindowViewModel vm;
 
         SynchronizationContext UIcontext = SynchronizationContext.Current;
 
         public List<Brush> Brushes;
+        private void SaveSettings()
+        {
+            string serialized = JsonSerializer.Serialize(settings);
+            StreamWriter sw = new("settings.json", false);
+            sw.Write(serialized);
+            sw.Flush();
+            sw.Dispose();
+
+        }
+
+        private void TryToLoadSettings()
+        {
+            try
+            {
+                using (FileStream fs = new FileStream("settings.json", FileMode.OpenOrCreate))
+                {
+                    settings = JsonSerializer.Deserialize<Settings>(fs);
+                }
+            }
+            catch
+            {
+                SaveSettings();
+            }
+        }
         public MainWindow()
         {
             InitializeComponent();
@@ -65,7 +98,6 @@ namespace CAN_Tool
                 menuLang.Selected += ChangeLanguageClick;
                 menuLanguage.Items.Add(menuLang);
             }
-            menuLanguage.SelectedIndex = 0;
 
             vm.myChart = Chart;
 
@@ -75,7 +107,11 @@ namespace CAN_Tool
 
             vm.RefreshPortListCommand.Execute(null);
 
-            menuLanguage.SelectedIndex = menuLanguage.Items.Count - 1;
+            TryToLoadSettings();
+
+            menuLanguage.SelectedIndex = settings.langaugeNumber;
+            menuColor.SelectedIndex = settings.themeNumber;
+            DarkModeCheckBox.IsChecked = settings.isDark;
         }
 
 
@@ -100,6 +136,8 @@ namespace CAN_Tool
             {
                 i.IsSelected = i.Tag is CultureInfo ci && ci.Equals(currLang);
             }
+
+            
         }
 
         private void ChangeLanguageClick(Object sender, EventArgs e)
@@ -286,7 +324,7 @@ namespace CAN_Tool
 
         private void DarkMode_Checked(object sender, RoutedEventArgs e)
         {
-            isDark = (bool)(sender as CheckBox).IsChecked;
+            settings.isDark = (bool)(sender as CheckBox).IsChecked;
             var resources = Application.Current.Resources.MergedDictionaries;
 
             var existingResourceDictionary = Application.Current.Resources.MergedDictionaries
@@ -294,7 +332,7 @@ namespace CAN_Tool
                                             rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml");
 
 
-            var source = isDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
+            var source = settings.isDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
             var newResourceDictionary = new ResourceDictionary() { Source = new Uri(source) };
 
             Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
@@ -302,17 +340,67 @@ namespace CAN_Tool
 
         }
 
+
+        private void menuColor_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var resources = Application.Current.Resources.MergedDictionaries;
+
+            var existingResourceDictionary = Application.Current.Resources.MergedDictionaries
+                                            .FirstOrDefault(rd => rd.Source.ToString().Contains("component/Themes/Recommended/Primary"));
+
+            string source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.LightGreen.xaml";
+
+            switch (menuColor.SelectedIndex)
+            {
+                case 0: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Red.xaml"; break;
+                case 1: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Pink.xaml"; break;
+                case 2: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Purple.xaml"; break;
+                case 3: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml"; break;
+                case 4: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Indigo.xaml"; break;
+                case 5: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml"; break;
+                case 6: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.LightBlue.xaml"; break;
+                case 7: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Cyan.xaml"; break;
+                case 8: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Teal.xaml"; break;
+                case 9: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Green.xaml"; break;
+                case 10: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.LightGreen.xaml"; break;
+                case 11: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Lime.xaml"; break;
+                case 12: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Yellow.xaml"; break;
+                case 13: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Amber.xaml"; break;
+                case 14: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Orange.xaml"; break;
+                case 15: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepOrange.xaml"; break;
+                case 16: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Brown.xaml"; break;
+                case 17: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Grey.xaml"; break;
+                case 18: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml"; break;
+                default: break;
+            }
+
+            var newResourceDictionary = new ResourceDictionary() { Source = new Uri(source) };
+
+            Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
+            Application.Current.Resources.MergedDictionaries.Add(newResourceDictionary);
+            settings.themeNumber = menuColor.SelectedIndex;
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            AC2PMessage msg = new();
-            msg.PGN = 101;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
-            msg.ReceiverAddress = 0;
-            msg.ReceiverType = 123;
-            for (int i = 0; i < 16; i++)
+            SaveSettings();
+            App.Current.Shutdown();
+        }
+
+        private void menuLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            settings.langaugeNumber = menuLanguage.SelectedIndex;
+        }
+
+        private void CanBitrateField_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
             {
-                vm.canAdapter.Transmit(msg);
+                vm?.canAdapter.SetBitrate(CanBitrateField.SelectedIndex);
+            }
+            catch(Exception ex)
+            {
+                vm.Error = ex.Message;
             }
         }
     }

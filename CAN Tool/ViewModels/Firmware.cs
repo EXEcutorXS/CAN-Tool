@@ -156,10 +156,10 @@ namespace CAN_Tool.ViewModels
         private bool WaitForFlag(ref bool flag, int delay)
         {
             int wd = 0;
-            while (!flag && wd < (delay * 100))
+            while (!flag && wd < delay)
             {
                 wd++;
-                Thread.Sleep(10);
+                Thread.Sleep(1);
             }
             if (!flag)
             {
