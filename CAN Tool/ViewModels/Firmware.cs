@@ -153,7 +153,7 @@ namespace CAN_Tool.ViewModels
             VM.canAdapter.Transmit(msg);
         }
 
-        private void WaitFor(ref bool flag, int delay)
+        private bool WaitForFlag(ref bool flag, int delay)
         {
             int wd = 0;
             while (!flag && wd < (delay * 100))
@@ -161,15 +161,26 @@ namespace CAN_Tool.ViewModels
                 wd++;
                 Thread.Sleep(10);
             }
-            if (!flag) throw new Exception("Device is not answering");
-            flag = false;
-            return;
+            if (!flag)
+            {
+                flag = false;
+                return false;
+            }
+            else
+            {
+                flag = false;
+                return true;
+            }
         }
         private void flashFragment(CodeFragment f)
         {
             writeFragmentToRam(f);
-            startFlashing();
-            WaitFor(ref VM.SelectedConnectedDevice.programDone, 20);
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't flash memory"); return; }
+                startFlashing();
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.programDone, 20)) break;
+            }
         }
         private void bootloaderSetAdrLen(uint adress, int len)
         {
@@ -189,8 +200,12 @@ namespace CAN_Tool.ViewModels
             msg.Data[6] = 0xff;
             msg.Data[7] = 0xff;
 
-            VM.canAdapter.Transmit(msg);
-            WaitFor(ref VM.SelectedConnectedDevice.setAdrDone, 10);
+            for (int i = 0; i < 6; i++)
+            {
+                if (i == 5) { VM.AC2PInstance.CurrentTask.onFail("Can't set start adress"); return; }
+                VM.canAdapter.Transmit(msg);
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.setAdrDone, 100)) break;
+            }
         }
 
         private bool checkTransmittedData(int len, int crc)
@@ -201,11 +216,17 @@ namespace CAN_Tool.ViewModels
             msg.TransmitterType = 126;
             msg.ReceiverId = VM.SelectedConnectedDevice.ID;
             msg.Data[0] = 4;
-            VM.canAdapter.Transmit(msg);
-
             Debug.WriteLine("Waiting for check info");
-            Thread.Sleep(20);
-            WaitFor(ref VM.SelectedConnectedDevice.checkDone, 5);
+            for (int i = 0; i < 6; i++)
+            {
+                if (i == 5)
+                {
+                    VM.AC2PInstance.CurrentTask.onFail("Can't check transmission result");
+                    return false;
+                }
+                VM.canAdapter.Transmit(msg);
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.checkDone, 100)) break;
+            }
             Debug.WriteLine($"Len:{VM.SelectedConnectedDevice.DataLength}/{len},CRC:0x{VM.SelectedConnectedDevice.crc:X}/0X{crc:X}");
             if (crc == VM.SelectedConnectedDevice.crc && len == VM.SelectedConnectedDevice.dataLength)
                 return true;
@@ -219,23 +240,24 @@ namespace CAN_Tool.ViewModels
         {
             int crc;
             int len;
-            int watchDog = 0;
             AC2PMessage msg = new();
             msg.PGN = 101;
             msg.TransmitterAddress = 6;
             msg.TransmitterType = 126;
             msg.ReceiverAddress = 0;
             msg.ReceiverType = 123;
-            Debug.WriteLine($"Starting {f.StartAdress:X} fragment");
-            do
+
+            Debug.WriteLine($"Starting {f.StartAdress:X} fragment transmission");
+            for (int k = 0; k < 16; k++)
             {
+                if (k == 15) { VM.AC2PInstance.CurrentTask.onFail("Can't transmit data pack"); return; }
+                Debug.WriteLine($"Try: {k}");
                 bootloaderSetAdrLen(f.StartAdress, f.Length);
                 crc = 0;
                 len = 0;
                 VM.SelectedConnectedDevice.Crc = 0;
                 VM.SelectedConnectedDevice.DataLength = 0;
-                watchDog++;
-                Debug.WriteLine($"Try: {watchDog:X}");
+
                 for (int i = 0; i < (f.Length + 7) / 8; i++)
                 {
                     for (int j = 0; j < 8; j++)
@@ -256,27 +278,31 @@ namespace CAN_Tool.ViewModels
                     VM.canAdapter.Transmit(msg);
 
                 }
-
-            } while (!checkTransmittedData(len, crc) && watchDog < 10);
-            if (watchDog >= 10) throw new Exception("Too many transmission errors");
-
+                if (checkTransmittedData(len, crc)) break;
+            }
         }
         private void updateFirmware(List<CodeFragment> fragments)
         {
             Debug.WriteLine("Starting Firmware updating procedure");
             VM.AC2PInstance.CurrentTask.Capture("Memory Erasing");
             Debug.WriteLine("Starting flash erasing");
-            eraseFlash();
-            WaitFor(ref VM.SelectedConnectedDevice.eraseDone, 15);
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't erase memory"); return; }
+                eraseFlash();
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.eraseDone, 5000)) break;
+            }
+
             VM.AC2PInstance.CurrentTask.onDone();
+
             VM.AC2PInstance.CurrentTask.Capture("Programming...");
+
             int cnt = 0;
             foreach (var f in fragments)
             {
                 flashFragment(f);
                 VM.AC2PInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
                 if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested) return;
-
             }
             Debug.WriteLine("Firmware updating success");
             VM.AC2PInstance.CurrentTask.onDone();

@@ -64,7 +64,7 @@ namespace CAN_Tool
 				//3. Находим старую ResourceDictionary и удаляем его и добавляем новую ResourceDictionary
 				ResourceDictionary oldDict = (from d in Application.Current.Resources.MergedDictionaries
 											  where d.Source != null && d.Source.OriginalString.StartsWith("Resources/lang.")
-											  select d).First();
+											  select d).FirstOrDefault();
 				if (oldDict != null)
 				{
 					int ind = Application.Current.Resources.MergedDictionaries.IndexOf(oldDict);

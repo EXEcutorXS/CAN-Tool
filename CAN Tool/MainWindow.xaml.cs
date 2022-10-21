@@ -35,6 +35,8 @@ namespace CAN_Tool
     public partial class MainWindow : Window
     {
 
+        public bool isDark;
+
         MainWindowViewModel vm;
 
         SynchronizationContext UIcontext = SynchronizationContext.Current;
@@ -58,7 +60,7 @@ namespace CAN_Tool
             {
 
                 ComboBoxItem menuLang = new();
-                menuLang.Content = lang.NativeName;
+                menuLang.Content = lang.Name;
                 menuLang.Tag = lang;
                 menuLang.Selected += ChangeLanguageClick;
                 menuLanguage.Items.Add(menuLang);
@@ -284,7 +286,7 @@ namespace CAN_Tool
 
         private void DarkMode_Checked(object sender, RoutedEventArgs e)
         {
-            bool isDark = (bool)(sender as CheckBox).IsChecked;
+            isDark = (bool)(sender as CheckBox).IsChecked;
             var resources = Application.Current.Resources.MergedDictionaries;
 
             var existingResourceDictionary = Application.Current.Resources.MergedDictionaries

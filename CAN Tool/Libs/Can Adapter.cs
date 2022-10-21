@@ -316,7 +316,11 @@ namespace Can_Adapter
 
             serialPort.Write(str.ToString());
             Debug.WriteLine("-> " + (new AC2PMessage(msg)).ToString());
-            Thread.Sleep(10);
+            for (int i = 0; i < 10; i++)
+            {
+                Thread.Sleep(1);
+                if (txDone) break;
+            }
             /*
             int watchdog = 0;
             while (!TxDone)

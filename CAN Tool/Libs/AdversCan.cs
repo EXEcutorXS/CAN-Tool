@@ -767,6 +767,16 @@ namespace AdversCan
     public class AC2PTask : ViewModel
     {
         int percentComplete;
+
+        private DateTime capturedTime;
+
+        private TimeSpan? lastOperationDuration;
+        public TimeSpan? LastOperationDuration
+        {
+            set => Set(ref lastOperationDuration, value);
+            get => lastOperationDuration;
+        }
+
         public int PercentComplete
         {
             get => percentComplete;
@@ -803,6 +813,7 @@ namespace AdversCan
 
         public void onDone()
         {
+            LastOperationDuration = DateTime.Now - capturedTime;
             Occupied = false;
             PercentComplete = 100;
             Done = true;
@@ -817,12 +828,36 @@ namespace AdversCan
             TaskCancelled?.Invoke(null, null);
         }
 
+        public void onFail(string reason = "")
+        {
+            CTS.Cancel();
+            Occupied = false;
+            Failed = true;
+            TaskCancelled?.Invoke(null, null);
+        }
+
         private bool occupied;
 
         public bool Occupied
         {
             get { return occupied; }
             set { Set(ref occupied, value); }
+        }
+
+        private string failReason;
+
+        public string FailReason
+        {
+            get { return failReason; }
+            set { Set(ref failReason, value); }
+        }
+
+        private bool failed;
+
+        public bool Failed
+        {
+            get { return failed; }
+            set { Set(ref failed, value); }
         }
         /// <summary>
         /// Captures current task instance
@@ -838,6 +873,7 @@ namespace AdversCan
             Done = false;
             Cancelled = false;
             CTS = new CancellationTokenSource();
+            capturedTime = DateTime.Now;
             return true;
         }
         public void UpdatePercent(int p)
@@ -2421,7 +2457,7 @@ namespace AdversCan
             PGNs[100].parameters.Add(new() { Name = "Длина данных", BitLength = 32, StartByte = 4, PackNumber = 2 });
             PGNs[100].parameters.Add(new() { Name = "Длина данных", BitLength = 24, StartByte = 1, PackNumber = 4 });
             PGNs[100].parameters.Add(new() { Name = "CRC", BitLength = 32, StartByte = 4, PackNumber = 4, GetMeaning = r => $"CRC: 0X{(r):X}" });
-            PGNs[100].parameters.Add(new() { Name = "Адрес фрагмента", BitLength = 32, StartByte = 2, PackNumber = 5 , GetMeaning = r => $"Адрес фрагмента: 0X{r:X}" });
+            PGNs[100].parameters.Add(new() { Name = "Адрес фрагмента", BitLength = 32, StartByte = 2, PackNumber = 5, GetMeaning = r => $"Адрес фрагмента: 0X{r:X}" });
 
             PGNs[101].parameters.Add(new() { Name = "Первое слово", BitLength = 32, StartByte = 0, GetMeaning = r => $"1st: 0X{(r):X}" });
             PGNs[101].parameters.Add(new() { Name = "Второе слово", BitLength = 32, StartByte = 4, GetMeaning = r => $"2nd: 0X{(r):X}" });
