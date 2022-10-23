@@ -351,14 +351,14 @@
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Regular_Keyboard" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
-                            <TextBlock Margin="5 2 2 2"> Commands</TextBlock>
+                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_commands}" ></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
 
                         <StackPanel x:Name="CommandConstructor" DockPanel.Dock="Top" Orientation="Vertical" Margin="10">
 
-                            <ComboBox x:Name="CommandSelector" Margin="10" ItemsSource="{Binding CommandList}" SelectionChanged="ComboBox_SelectionChanged" />
+                            <ComboBox x:Name="CommandSelector" Style="{DynamicResource MaterialDesignOutlinedComboBox}" Margin="10" ItemsSource="{Binding CommandList}" SelectionChanged="ComboBox_SelectionChanged" />
 
                             <Border HorizontalAlignment="Center" Margin="5" CornerRadius="10" BorderBrush="Gainsboro" BorderThickness="1">
                                 <StackPanel Orientation="Horizontal">

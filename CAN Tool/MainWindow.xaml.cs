@@ -227,6 +227,7 @@ namespace CAN_Tool
                 label.Content = p.Name;
                 label.Name = $"label_{counter}";
                 label.Margin = new Thickness(10);
+                label.VerticalAlignment = System.Windows.VerticalAlignment.Center;
                 panel.Children.Add(label);
                 if (p.Meanings != null && p.Meanings.Count > 0)
                 {
@@ -237,6 +238,7 @@ namespace CAN_Tool
                     cb.Name = $"field_{counter}";
                     cb.SelectedIndex = (int)p.DefaultValue;
                     cb.Margin = new Thickness(10);
+                    cb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
                     panel.Children.Add(cb);
                 }
                 else
@@ -246,6 +248,7 @@ namespace CAN_Tool
                     tb.Text = p.DefaultValue.ToString();
                     tb.TextChanged += UpdateCommand;
                     tb.Margin = new Thickness(10);
+                    tb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
                     panel.Children.Add(tb);
                 }
                 mainWindowViewModel.CommandParametersArray[counter++] = p.DefaultValue;
