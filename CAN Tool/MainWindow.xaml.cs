@@ -103,7 +103,7 @@ namespace CAN_Tool
 
             Chart.Plot.AddAxis(Edge.Right, 2, color: System.Drawing.Color.LightGreen);
 
-            vm.canAdapter.GotNewMessage += MessageHandler;
+            vm.CanAdapter.GotNewMessage += MessageHandler;
 
             vm.RefreshPortListCommand.Execute(null);
 
@@ -167,7 +167,6 @@ namespace CAN_Tool
         // Заносим изменённое значение в массив и обновляем свойство Data для CustomMessage
         private void UpdateCommand(object sender, EventArgs e)
         {
-            MainWindowViewModel mainWindowViewModel = (MainWindowViewModel)DataContext;
             double value = 0;
             if (sender is ComboBox)
                 value = ((KeyValuePair<int, string>)((sender as ComboBox).SelectedItem)).Key;
@@ -181,17 +180,16 @@ namespace CAN_Tool
                     value = 0;
                 }
 
-            mainWindowViewModel.CommandParametersArray[Convert.ToInt32((sender as Control).Name.Substring(6))] = value;
-            AC2PCommand cmd = ((KeyValuePair<CommandId, AC2PCommand>)CommandSelector.SelectedItem).Value;
-            ulong firstByte = cmd.firstByte;
-            ulong secondByte = cmd.secondByte;
-            ulong res = firstByte << 56 | secondByte << 48;
+            vm.CommandParametersArray[Convert.ToInt32((sender as Control).Name.Substring(6))] = value;
+            AC2PCommand cmd = ((KeyValuePair<int, AC2PCommand>)CommandSelector.SelectedItem).Value;
+            ulong id = (ulong)cmd.Id;
+            ulong res =  id << 48;
             AC2PParameter[] pars = cmd.Parameters.Where(p => p.AnswerOnly == false).ToArray();
             for (int i = 0; i < pars.Length; i++)
             {
                 AC2PParameter p = pars[i];
                 ulong rawValue;
-                rawValue = (ulong)((mainWindowViewModel.CommandParametersArray[i] - p.b) / p.a);
+                rawValue = (ulong)((vm.CommandParametersArray[i] - p.b) / p.a);
                 int shift = 0;
                 shift = (7 - p.StartByte) * 8;
                 shift -= ((p.BitLength + 7) / 8) * 8 - 8;
@@ -204,7 +202,7 @@ namespace CAN_Tool
             {
                 data[i] = (byte)((res >> (7 - i) * 8) & 0xFF);
             }
-            mainWindowViewModel.CustomMessage.Data = data;
+            vm.CustomMessage.Data = data;
         }
 
         //Рисуем новые элементы управления и инициализируем в модели массив значений
@@ -212,11 +210,11 @@ namespace CAN_Tool
         {
             MainWindowViewModel mainWindowViewModel = (MainWindowViewModel)DataContext;
             ComboBox comboBox = sender as ComboBox;
-            AC2PCommand cmd = ((KeyValuePair<CommandId, AC2PCommand>)comboBox.SelectedItem).Value;
+            AC2PCommand cmd = ((KeyValuePair<int, AC2PCommand>)comboBox.SelectedItem).Value;
             CommandParameterPanel.Children.Clear();
             mainWindowViewModel.CommandParametersArray = new double[cmd.Parameters.Count];
             vm.CustomMessage.PGN = 1;
-            vm.CustomMessage.Command = cmd.Id;
+            vm.CustomMessage.Data[1] = (byte)cmd.Id;
             if (vm.SelectedConnectedDevice != null)
                 vm.CustomMessage.ReceiverId = vm.SelectedConnectedDevice.ID;
 
@@ -396,7 +394,7 @@ namespace CAN_Tool
         {
             try
             {
-                vm?.canAdapter.SetBitrate(CanBitrateField.SelectedIndex);
+                vm?.CanAdapter.SetBitrate(CanBitrateField.SelectedIndex);
             }
             catch(Exception ex)
             {

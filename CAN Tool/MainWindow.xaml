@@ -43,43 +43,49 @@
             <StatusBarItem HorizontalAlignment="Right" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
-                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="15" Text="{Binding canAdapter.FailedMessagesCounter,StringFormat=Faulted messages:{0}}" Margin="10" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="15" Text="{Binding CanAdapter.FailedMessagesCounter,StringFormat=Faulted messages:{0}}" Margin="10" VerticalAlignment="Center"></TextBlock>
                 </StackPanel>
             </StatusBarItem>
 
         </StatusBar>
         <Grid DockPanel.Dock="Top">
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
-                <Button Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" />
-                <ComboBox x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
+            <StackPanel>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="5">
+                <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
+                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
 
-                <Button x:Name="PortOpenButton" Margin="10" Content="{DynamicResource b_open}" Command="{Binding OpenPortCommand}" />
-                <Button x:Name="PortOpenButton_Copy" Margin="10" Content="{DynamicResource b_close}" Command="{Binding ClosePortCommand}" />
+                <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton" Margin="10" Content="{DynamicResource b_open}" Command="{Binding OpenPortCommand}" />
+                <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton_Copy" Margin="10" Content="{DynamicResource b_close}" Command="{Binding ClosePortCommand}" />
 
                 <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
+ 
+                </StackPanel>
+
+            </StackPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
+                        <CheckBox x:Name="ExpertMode" Margin="10" Style="{StaticResource MaterialDesignOutlinedDarkButton}" Content="{DynamicResource b_expert}" FontSize="20" Cursor="Hand"></CheckBox>
+                        <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignOutlinedDarkButton}" Content="Dark" FontSize="20" Cursor="Hand" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
+                        <ComboBox Style="{DynamicResource MaterialDesignComboBox}" x:Name="menuColor" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuColor_SelectionChanged" ItemsSource="{Binding Brushes}">
+                            <ComboBox.ItemTemplate>
+                                <ItemContainerTemplate>
+                                    <Rectangle Width="30" Height="10" Fill="{Binding}" />
+                                </ItemContainerTemplate>
+
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <ComboBox Style="{DynamicResource MaterialDesignComboBox}" x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuLanguage_SelectionChanged"></ComboBox>
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_exit}" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft" Click="Button_Click" />
+                    </StackPanel>
+                </DockPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" SelectionChanged="CanBitrateField_SelectionChanged" />
                     <Button Content="{DynamicResource b_normal}" Margin="10" Command="{Binding SetAdapterNormalModeCommand}" />
                     <Button Content="{DynamicResource b_listen}" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                     <Button Content="{DynamicResource b_self_reception}" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                     <Button Content="{DynamicResource b_stop}" Margin="10" Command="{Binding StopCanAdapterCommand}" />
-
                 </StackPanel>
-
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
-                <CheckBox x:Name="ExpertMode" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="{DynamicResource b_expert}" FontSize="20"></CheckBox>
-                <CheckBox x:Name="DarkModeCheckBox" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="Dark" FontSize="20" Cursor="Hand" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
-                <ComboBox x:Name="menuColor" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuColor_SelectionChanged" ItemsSource="{Binding Brushes}">
-
-                    <ComboBox.ItemTemplate>
-                        <ItemContainerTemplate>
-                            <Rectangle Width="30" Height="10" Fill="{Binding}"/>
-                        </ItemContainerTemplate>
-
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <ComboBox x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuLanguage_SelectionChanged"></ComboBox>
-                <Button Content="{DynamicResource b_exit}" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft" Click="Button_Click" />
+                
             </StackPanel>
         </Grid>
 
@@ -302,12 +308,12 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding AC2PInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged">
+                            <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding AC2PInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
                                 <DataGrid.RowStyle>
                                     <Style TargetType="DataGridRow">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Fresh}" Value="true">
-                                                <Setter Property="Background" Value="Green"></Setter>
+                                                <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}"></Setter>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Fresh}" Value="false">
                                                 <Setter Property="Background" Value="{DynamicResource MaterialDesignBackground}"></Setter>
@@ -482,7 +488,7 @@
                             </DataGrid>
                         </DockPanel>
                         <DockPanel Grid.Column="1">
-                            <ComboBox DockPanel.Dock="Top" x:Name="ErrorSelector" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BBErrors, Mode=OneWay}"></ComboBox>
+                            <ComboBox Style="{DynamicResource MaterialDesignOutlinedComboBox}" DockPanel.Dock="Top" x:Name="ErrorSelector" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BBErrors, Mode=OneWay}"></ComboBox>
                             <DataGrid ItemsSource="{Binding ElementName=ErrorSelector, Path=SelectedItem.Variables,Mode=OneWay}" AutoGenerateColumns="False" Margin="10" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>

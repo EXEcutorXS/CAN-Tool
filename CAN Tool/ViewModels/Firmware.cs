@@ -16,7 +16,7 @@ using System.Diagnostics;
 namespace CAN_Tool.ViewModels
 {
 
-    class CodeFragment
+    internal class CodeFragment
     {
         public CodeFragment(int len)
         {
@@ -26,6 +26,7 @@ namespace CAN_Tool.ViewModels
         public int Length;
         public byte[] Data;
     }
+
     internal class FirmwarePage : ViewModel
     {
         private int fragmentSize = 512;
@@ -52,7 +53,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 0;
             msg.Data[1] = 22;
             msg.Data[2] = 0;
-            VM.canAdapter.Transmit(msg);
+            VM.CanAdapter.Transmit(msg);
         }
 
         #endregion
@@ -71,7 +72,7 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverType = 123;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
-            VM.canAdapter.Transmit(msg);
+            VM.CanAdapter.Transmit(msg);
         }
 
         #endregion
@@ -91,7 +92,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 0;
             msg.Data[1] = 22;
             msg.Data[2] = 1;
-            VM.canAdapter.Transmit(msg);
+            VM.CanAdapter.Transmit(msg);
         }
 
         #endregion
@@ -123,7 +124,7 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverId = VM.SelectedConnectedDevice.ID;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
-            VM.canAdapter.Transmit(msg);
+            VM.CanAdapter.Transmit(msg);
         }
 
         #endregion
@@ -137,7 +138,7 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverAddress = 0;
             msg.ReceiverType = 123;
             msg.Data[0] = 1;
-            VM.canAdapter.Transmit(msg);
+            VM.CanAdapter.Transmit(msg);
             VM.SelectedConnectedDevice.EraseDone = false;
         }
 
@@ -150,7 +151,7 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverAddress = 0;
             msg.ReceiverType = 123;
             msg.Data[0] = 3;
-            VM.canAdapter.Transmit(msg);
+            VM.CanAdapter.Transmit(msg);
         }
 
         private bool WaitForFlag(ref bool flag, int delay)
@@ -203,7 +204,7 @@ namespace CAN_Tool.ViewModels
             for (int i = 0; i < 6; i++)
             {
                 if (i == 5) { VM.AC2PInstance.CurrentTask.onFail("Can't set start adress"); return; }
-                VM.canAdapter.Transmit(msg);
+                VM.CanAdapter.Transmit(msg);
                 if (WaitForFlag(ref VM.SelectedConnectedDevice.setAdrDone, 100)) break;
             }
         }
@@ -224,7 +225,7 @@ namespace CAN_Tool.ViewModels
                     VM.AC2PInstance.CurrentTask.onFail("Can't check transmission result");
                     return false;
                 }
-                VM.canAdapter.Transmit(msg);
+                VM.CanAdapter.Transmit(msg);
                 if (WaitForFlag(ref VM.SelectedConnectedDevice.checkDone, 100)) break;
             }
             Debug.WriteLine($"Len:{VM.SelectedConnectedDevice.DataLength}/{len},CRC:0x{VM.SelectedConnectedDevice.crc:X}/0X{crc:X}");
@@ -275,7 +276,7 @@ namespace CAN_Tool.ViewModels
                     msg.Data[5] = f.Data[i * 8 + 5];
                     msg.Data[6] = f.Data[i * 8 + 6];
                     msg.Data[7] = f.Data[i * 8 + 7];
-                    VM.canAdapter.Transmit(msg);
+                    VM.CanAdapter.Transmit(msg);
 
                 }
                 if (checkTransmittedData(len, crc)) break;

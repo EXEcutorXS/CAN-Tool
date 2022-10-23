@@ -32,10 +32,10 @@ namespace CAN_Tool.ViewModels
             set { Set(ref firmwarePage, value); }
         }
 
-        int[] _Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
+        public int[] Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
 
         private int manualAirBlower;
-        public int ManualAirBlower { get { return manualAirBlower; } set { Set(ref manualAirBlower, value); } }
+        public int ManualAirBlower { set => Set(ref manualAirBlower, value); get => manualAirBlower; }
 
         private int manualFuelPump;
         public int ManualFuelPump { set => Set(ref manualFuelPump, value); get => manualFuelPump; }
@@ -47,27 +47,29 @@ namespace CAN_Tool.ViewModels
         public bool ManualWaterPump { set => Set(ref manualWaterPump, value); get => manualWaterPump; }
 
         public bool AutoRedraw { set; get; } = true;
-        public int[] Bitrates => _Bitrates;
+
 
         CanAdapter _canAdapter;
-        public CanAdapter canAdapter { get => _canAdapter; }
+        public CanAdapter CanAdapter { get => _canAdapter; }
 
         AC2P _AC2PInstance;
         public AC2P AC2PInstance => _AC2PInstance;
 
-        ConnectedDevice _connectedDevice;
+        ConnectedDevice selectedConnectedDevice;
         public ConnectedDevice SelectedConnectedDevice
         {
-            set =>
-                Set(ref _connectedDevice, value);
-            get => _connectedDevice;
+            set => Set(ref selectedConnectedDevice, value);
+            get => selectedConnectedDevice;
         }
 
-        public Dictionary<CommandId, AC2PCommand> Commands => AC2P.commands;
-        #region SelectedMessage
-        private AC2PMessage selectedMessage;
+        public Dictionary<int, AC2PCommand> Commands => AC2P.commands;
 
         public WpfPlot myChart;
+
+        #region SelectedMessage
+
+        private AC2PMessage selectedMessage;
+
         public AC2PMessage SelectedMessage
         {
             get => selectedMessage;
@@ -79,7 +81,7 @@ namespace CAN_Tool.ViewModels
 
         AC2PMessage customMessage = new AC2PMessage();
 
-        public Dictionary<CommandId, AC2PCommand> CommandList { get; } = AC2P.commands;
+        public Dictionary<int, AC2PCommand> CommandList { get; } = AC2P.commands;
 
         public AC2PMessage CustomMessage { get => customMessage; set => customMessage.Update(value); }
 
@@ -125,32 +127,32 @@ namespace CAN_Tool.ViewModels
 
         public ICommand SetAdapterNormalModeCommand { get; }
 
-        private void OnSetAdapterNormalModeCommandExecuted(object Parameter) => canAdapter.StartNormal();
-        private bool CanSetAdapterNormalModeCommandExecute(object Parameter) => canAdapter.PortOpened;
+        private void OnSetAdapterNormalModeCommandExecuted(object Parameter) => CanAdapter.StartNormal();
+        private bool CanSetAdapterNormalModeCommandExecute(object Parameter) => CanAdapter.PortOpened;
         #endregion
 
         #region SetAdapterListedModeCommand
 
         public ICommand SetAdapterListedModeCommand { get; }
 
-        private void OnSetAdapterListedModeCommandExecuted(object Parameter) => canAdapter.StartListen();
-        private bool CanSetAdapterListedModeCommandExecute(object Parameter) => canAdapter.PortOpened;
+        private void OnSetAdapterListedModeCommandExecuted(object Parameter) => CanAdapter.StartListen();
+        private bool CanSetAdapterListedModeCommandExecute(object Parameter) => CanAdapter.PortOpened;
         #endregion
 
         #region SetAdapterSelfReceptionModeCommand
 
         public ICommand SetAdapterSelfReceptionModeCommand { get; }
 
-        private void OnSetAdapterSelfReceptionModeCommandExecuted(object Parameter) => canAdapter.StartSelfReception();
-        private bool CanSetAdapterSelfReceptionModeCommandExecute(object Parameter) => canAdapter.PortOpened;
+        private void OnSetAdapterSelfReceptionModeCommandExecuted(object Parameter) => CanAdapter.StartSelfReception();
+        private bool CanSetAdapterSelfReceptionModeCommandExecute(object Parameter) => CanAdapter.PortOpened;
         #endregion
 
         #region StopCanAdapterCommand
 
         public ICommand StopCanAdapterCommand { get; }
 
-        private void OnStopCanAdapterCommandExecuted(object Parameter) => canAdapter.Stop();
-        private bool CanStopCanAdapterCommandExecute(object Parameter) => canAdapter.PortOpened;
+        private void OnStopCanAdapterCommandExecuted(object Parameter) => CanAdapter.Stop();
+        private bool CanStopCanAdapterCommandExecute(object Parameter) => CanAdapter.PortOpened;
         #endregion
 
         #region RefreshPortsCommand
@@ -170,10 +172,10 @@ namespace CAN_Tool.ViewModels
         public ICommand OpenPortCommand { get; }
         private void OnOpenPortCommandExecuted(object parameter)
         {
-            canAdapter.PortName = PortName;
-            canAdapter.PortOpen();
+            CanAdapter.PortName = PortName;
+            CanAdapter.PortOpen();
             Thread.Sleep(20);
-            canAdapter.StartNormal();
+            CanAdapter.StartNormal();
             Thread.Sleep(20);
             AC2PMessage msg = new();
             msg.TransmitterType = 126;
@@ -182,19 +184,19 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverType = 127;
             msg.PGN = 1;
             msg.Data = new byte[8];
-            canAdapter.Transmit(msg);
+            CanAdapter.Transmit(msg);
         }
-        private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !canAdapter.PortOpened);
+        private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !CanAdapter.PortOpened);
         #endregion
 
         #region ClosePortCommand
         public ICommand ClosePortCommand { get; }
         private void OnClosePortCommandExecuted(object parameter)
         {
-            canAdapter.PortClose();
+            CanAdapter.PortClose();
             AC2PInstance.ConnectedDevices.Clear();
         }
-        private bool CanClosePortCommandExecute(object parameter) => (canAdapter.PortOpened);
+        private bool CanClosePortCommandExecute(object parameter) => (CanAdapter.PortOpened);
         #endregion
         #endregion
 
@@ -260,7 +262,7 @@ namespace CAN_Tool.ViewModels
 
         #endregion
 
-        private bool DeviceConnectedAndNotInManual(object parameter) => canAdapter.PortOpened && SelectedConnectedDevice != null && !SelectedConnectedDevice.ManualMode;
+        private bool DeviceConnectedAndNotInManual(object parameter) => CanAdapter.PortOpened && SelectedConnectedDevice != null && !SelectedConnectedDevice.ManualMode;
         #endregion
 
         #region LogCommands
@@ -271,7 +273,7 @@ namespace CAN_Tool.ViewModels
         {
             SelectedConnectedDevice.LogStart();
         }
-        private bool CanLogStartCommandExecute(object parameter) => (SelectedConnectedDevice != null && canAdapter.PortOpened);
+        private bool CanLogStartCommandExecute(object parameter) => (SelectedConnectedDevice != null && CanAdapter.PortOpened);
         #endregion
 
         #region LogStopCommand
@@ -280,7 +282,7 @@ namespace CAN_Tool.ViewModels
         {
             SelectedConnectedDevice.LogStop();
         }
-        private bool CanLogStopCommandExecute(object parameter) => (SelectedConnectedDevice != null && canAdapter.PortOpened && SelectedConnectedDevice.IsLogWriting);
+        private bool CanLogStopCommandExecute(object parameter) => (SelectedConnectedDevice != null && CanAdapter.PortOpened && SelectedConnectedDevice.IsLogWriting);
         #endregion
 
         #region ChartDrawCommand
@@ -290,7 +292,7 @@ namespace CAN_Tool.ViewModels
             Plot plt = myChart.Plot;
 
             plt.Clear();
-            
+
             foreach (var v in SelectedConnectedDevice.Status)
                 if (v.Display)
                 {
@@ -298,9 +300,9 @@ namespace CAN_Tool.ViewModels
                     var sig = plt.AddSignal(arrayToDisplay, color: v.Color, label: v.Name);
                     if (arrayToDisplay.Max() < 5)
                         sig.YAxisIndex = 2;
-                    plt.Grid(color: System.Drawing.Color.FromArgb(50, 200,200,200));
+                    plt.Grid(color: System.Drawing.Color.FromArgb(50, 200, 200, 200));
                     plt.Grid(lineStyle: LineStyle.Dot);
-                    plt.Style(dataBackground: System.Drawing.Color.FromArgb(255,40,40,40),figureBackground: System.Drawing.Color.DimGray);
+                    plt.Style(dataBackground: System.Drawing.Color.FromArgb(255, 40, 40, 40), figureBackground: System.Drawing.Color.DimGray);
                     plt.Legend();
 
                 }
@@ -329,30 +331,30 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadConfigCommand { get; }
         private void OnReadConfigCommandExecuted(object parameter)
         {
-            AC2PInstance.ReadAllParameters(_connectedDevice.ID);
+            AC2PInstance.ReadAllParameters(selectedConnectedDevice.ID);
         }
         private bool CanReadConfigCommandExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region SaveConfigCommand
         public ICommand SaveConfigCommand { get; }
         private void OnSaveConfigCommandExecuted(object parameter)
         {
-            AC2PInstance.SaveParameters(_connectedDevice.ID);
+            AC2PInstance.SaveParameters(selectedConnectedDevice.ID);
         }
         private bool CanSaveConfigCommandExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count > 0 && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count > 0 && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region ResetConfigCommand
         public ICommand ResetConfigCommand { get; }
         private void OnResetConfigCommandExecuted(object parameter)
         {
-            AC2PInstance.ResetParameters(_connectedDevice.ID);
+            AC2PInstance.ResetParameters(selectedConnectedDevice.ID);
         }
         private bool CanResetConfigCommandExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage==0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
         #endregion
 
@@ -362,40 +364,40 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadBlackBoxDataCommand { get; }
         private void OnReadBlackBoxDataCommandExecuted(object parameter)
         {
-            AC2PInstance.ReadBlackBoxData(_connectedDevice.ID);
+            AC2PInstance.ReadBlackBoxData(selectedConnectedDevice.ID);
         }
         private bool CanReadBlackBoxDataExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region ReadBlackBoxErrorsCommand
         public ICommand ReadBlackBoxErrorsCommand { get; }
         private void OnReadBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.ReadErrorsBlackBox(_connectedDevice.ID));
+            Task.Run(() => AC2PInstance.ReadErrorsBlackBox(selectedConnectedDevice.ID));
         }
         private bool CanReadBlackBoxErrorsExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region EraseBlackBoxErrorsCommand
         public ICommand EraseBlackBoxErrorsCommand { get; }
         private void OnEraseBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.EraseErrorsBlackBox(_connectedDevice.ID));
+            Task.Run(() => AC2PInstance.EraseErrorsBlackBox(selectedConnectedDevice.ID));
         }
         private bool CanEraseBlackBoxErrorsExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region EraseBlackBoxDataCommand
         public ICommand EraseBlackBoxDataCommand { get; }
         private void OnEraseBlackBoxDataCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.EraseCommonBlackBox(_connectedDevice.ID));
+            Task.Run(() => AC2PInstance.EraseCommonBlackBox(selectedConnectedDevice.ID));
         }
         private bool CanEraseBlackBoxDataExecute(object parameter) =>
-            (canAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
         #endregion
 
@@ -403,10 +405,10 @@ namespace CAN_Tool.ViewModels
         public ICommand SaveReportCommand { get; }
         private void OnSaveReportCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.EraseCommonBlackBox(_connectedDevice.ID));
+            Task.Run(() => AC2PInstance.EraseCommonBlackBox(selectedConnectedDevice.ID));
         }
         private bool CanSaveReportCommandExecute(object parameter) =>
-            (SelectedConnectedDevice.BBErrors.Count>0 || SelectedConnectedDevice.BBValues.Count>0);
+            (SelectedConnectedDevice.BBErrors.Count > 0 || SelectedConnectedDevice.BBValues.Count > 0);
         #endregion
 
         #region SendCustomMessageCommand
@@ -418,7 +420,7 @@ namespace CAN_Tool.ViewModels
         }
         private bool CanSendCustomMessageCommandExecute(object parameter)
         {
-            if (!canAdapter.PortOpened) return false;
+            if (!CanAdapter.PortOpened) return false;
             return true;
         }
 
@@ -568,8 +570,8 @@ namespace CAN_Tool.ViewModels
             msg.Data[1] = (byte)(cmdNum & 0xFF);
             for (int i = 0; i < data.Length; i++)
                 msg.Data[i + 2] = data[i];
-            
-            canAdapter.Transmit(msg);
+
+            CanAdapter.Transmit(msg);
         }
 
         private void updateManualMode()
@@ -591,7 +593,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[4] = (byte)ManualGlowPlug;
             msg.Data[5] = (byte)(ManualFuelPump / 256);
             msg.Data[6] = (byte)ManualFuelPump;
-            canAdapter.Transmit(msg);
+            CanAdapter.Transmit(msg);
         }
 
         private async void requestSerial()
@@ -607,13 +609,13 @@ namespace CAN_Tool.ViewModels
             m.Data[1] = 0;
             m.Data[2] = 0;
             m.Data[3] = 12;
-            canAdapter.Transmit(m);
+            CanAdapter.Transmit(m);
             await Task.Delay(200);
             m.Data[3] = 13;
-            canAdapter.Transmit(m);
+            CanAdapter.Transmit(m);
             await Task.Delay(200);
             m.Data[3] = 14;
-            canAdapter.Transmit(m);
+            CanAdapter.Transmit(m);
         }
 
         #region Chart
@@ -638,7 +640,7 @@ namespace CAN_Tool.ViewModels
                     msg.TransmitterType = 126;
                     msg.PGN = 0;
                     msg.ReceiverId = d.ID;
-                    canAdapter.Transmit(msg);
+                    CanAdapter.Transmit(msg);
                 }
             }
         }
@@ -657,16 +659,16 @@ namespace CAN_Tool.ViewModels
 
         public bool portOpened(object parameter)
         {
-            return canAdapter.PortOpened;
+            return CanAdapter.PortOpened;
         }
         public bool deviceSelected(object parameter)
         {
-            return canAdapter.PortOpened && SelectedConnectedDevice != null;
+            return CanAdapter.PortOpened && SelectedConnectedDevice != null;
         }
 
         public bool deviceInManualMode(object parameter)
         {
-            return (canAdapter.PortOpened && SelectedConnectedDevice != null && SelectedConnectedDevice.ManualMode);
+            return (CanAdapter.PortOpened && SelectedConnectedDevice != null && SelectedConnectedDevice.ManualMode);
 
         }
 
@@ -674,7 +676,7 @@ namespace CAN_Tool.ViewModels
         {
 
             _canAdapter = new CanAdapter();
-            _AC2PInstance = new AC2P(canAdapter);
+            _AC2PInstance = new AC2P(CanAdapter);
             FirmwarePage = new(this);
 
             System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();

@@ -7,6 +7,18 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Globalization;
 
+//TODO: Жёстко рефакторить
+//TODO: Раскидать MainWindowViewModel на файлы по табам
+//TODO: Табу с начтройками запилить
+//TODO: График покрасивше
+//TODO: Создание файла отчёта
+//TODO: Оформить ручник посолидней
+//TODO: Победить старый загрузчик
+//TODO: Создание файла отчёта
+//TODO: Вынести Can Adapter в отдельныю dll
+
+
+
 namespace CAN_Tool
 {
     /// <summary>
