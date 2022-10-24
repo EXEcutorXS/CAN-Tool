@@ -21,6 +21,7 @@ namespace Can_Adapter
         public bool IsSimmiliarTo(T item);
 
         public int Id { get; }
+
     }
 
 
@@ -29,7 +30,7 @@ namespace Can_Adapter
         public CanMessage receivedMessage;
     }
 
-    public class CanMessage : ViewModel, IUpdatable<CanMessage>
+    public class CanMessage : ViewModel, IUpdatable<CanMessage>, IComparable
     {
         private bool ide;
 
@@ -194,9 +195,14 @@ namespace Can_Adapter
             if (m.RTR != RTR) return false;
             return true;
         }
+
+        public int CompareTo(object obj)
+        {
+            return id - (obj as CanMessage).id;
+        }
     }
 
-    public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>
+    public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>, IComparable
     {
         /// <summary>
         /// 
@@ -208,9 +214,23 @@ namespace Can_Adapter
             var found = Items.FirstOrDefault(i => i.IsSimmiliarTo(item));
             if (found == null)
             {
-                Add(item);
-                Sort();
-                return true;
+                if (Count > 0)
+                {
+                    for (int i = 0; i < Count; i++)
+                    {
+                        if (item.CompareTo(Items[i]) <= 0)
+                        {
+                            Insert(i,item);
+                            return true;
+                        }
+                    }
+                    //Sort();
+                    return true;
+                }
+                else
+                {
+                    Add(item);
+                }
             }
             else
             {
@@ -357,7 +377,7 @@ namespace Can_Adapter
                     break;
                 case '\a':
                     ErrorCounter++;
-                    Debug.WriteLine("<<ERROR,RESEND>>","CAN");
+                    Debug.WriteLine("<<ERROR,RESEND>>", "CAN");
                     serialPort.WriteLine(lastMessageString);
                     ErrorReported?.Invoke(this, new());
                     break;

@@ -371,13 +371,7 @@ namespace AdversCan
             if (PGN != m.PGN)
                 return false;
             if (PGN == 1 || PGN == 2)
-                if (Id!=m.Id)
-                    return false;
-            if (PGN == 3 || PGN == 4)
-                if (Data[0] != m.Data[0] || Data[1] != m.Data[1]) //Другой SPN
-                    return false;
-            if (PGN == 7)
-                if (Data[0] != m.Data[0] || Data[2] != m.Data[2] || Data[3] != m.Data[3]) //Другой Параметр Конфигурации или команда
+                if (Data[1] != m.Data[1])
                     return false;
             if (AC2P.PGNs[PGN].multipack && Data[0] != m.Data[0]) //Другой номер мультипакета
                 return false;
@@ -403,7 +397,7 @@ namespace AdversCan
         }
 
     }
-    public class ReadedBlackBoxValue : INotifyPropertyChanged, IUpdatable<ReadedBlackBoxValue>
+    public class ReadedBlackBoxValue : INotifyPropertyChanged, IUpdatable<ReadedBlackBoxValue>,IComparable
     {
         private int id;
 
@@ -449,6 +443,10 @@ namespace AdversCan
             return (id == item.id);
         }
 
+        public int CompareTo(object obj)
+        {
+            return id - (obj as ReadedBlackBoxValue).id;
+        }
 
         public string Description
         {
@@ -462,7 +460,7 @@ namespace AdversCan
         }
 
     }
-    public class ReadedParameter : INotifyPropertyChanged, IUpdatable<ReadedParameter>
+    public class ReadedParameter : INotifyPropertyChanged, IUpdatable<ReadedParameter>, IComparable
     {
 
         private int id;
@@ -510,13 +508,18 @@ namespace AdversCan
             return (id == item.id);
         }
 
+        public int CompareTo(object obj)
+        {
+            return id - (obj as ReadedParameter).id;
+        }
+
         public string idString => AC2P.configParameters[Id]?.StringId;
         public string rusName => AC2P.configParameters[Id]?.NameRu;
         public string enName => AC2P.configParameters[Id]?.NameEn;
 
     }
 
-    public class StatusVariable : ViewModel, IUpdatable<StatusVariable>
+    public class StatusVariable : ViewModel, IUpdatable<StatusVariable>,IComparable
     {
 
         public StatusVariable(int var) : base()
@@ -641,8 +644,12 @@ namespace AdversCan
             RawValue = item.RawValue;
         }
 
+        public int CompareTo(object obj)
+        {
+            return Id - (obj as StatusVariable).Id;
+        }
     }
-    public class ReadedVariable : ViewModel, IUpdatable<ReadedVariable>
+    public class ReadedVariable : ViewModel, IUpdatable<ReadedVariable>, IComparable
     {
         int id;
         public int Id { get => id; set => id = value; }
@@ -682,6 +689,11 @@ namespace AdversCan
                 return $"{AC2P.VariablesNames[id]}: {_value}";
             else
                 return "";
+        }
+
+        public int CompareTo(object obj)
+        {
+            return id - (obj as ReadedVariable).id;
         }
     }
     public class BBError : IUpdatable<BBError>, INotifyPropertyChanged
