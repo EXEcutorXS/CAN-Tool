@@ -224,7 +224,7 @@ namespace Can_Adapter
                             return true;
                         }
                     }
-                    //Sort();
+                    Add(item);
                     return true;
                 }
                 else
@@ -237,14 +237,6 @@ namespace Can_Adapter
                 found.Update(item);
             }
             return false;
-        }
-
-        public void Sort()
-        {
-            for (int i = 0; i < Count - 1; i++)
-                for (int j = 0; j < Count - 1; j++)
-                    if (Items[j].Id > Items[j + 1].Id)
-                        (Items[j], Items[j + 1]) = (Items[j + 1], Items[j]);
         }
     }
     public class CanAdapter : ViewModel
@@ -335,27 +327,12 @@ namespace Can_Adapter
             lastMessageString = str.ToString();
 
             serialPort.Write(str.ToString());
-            Debug.WriteLine("-> " + (new AC2PMessage(msg)).ToString());
-            for (int i = 0; i < 10; i++)
+            
+            for (int i = 0; i < 100; i++)
             {
                 Thread.Sleep(1);
                 if (txDone) break;
             }
-            /*
-            int watchdog = 0;
-            while (!TxDone)
-            {
-                Task.Delay(1);
-                watchdog++;
-                if (watchdog > 200)
-                {
-                    FailedMessagesCounter++;
-                    TxDone = true;
-                    return;
-
-                }
-            }
-            */
         }
 
         private void UartMessageProcess()

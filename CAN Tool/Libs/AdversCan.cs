@@ -397,40 +397,22 @@ namespace AdversCan
         }
 
     }
-    public class ReadedBlackBoxValue : INotifyPropertyChanged, IUpdatable<ReadedBlackBoxValue>,IComparable
+    public class ReadedBlackBoxValue : ViewModel, INotifyPropertyChanged, IUpdatable<ReadedBlackBoxValue>,IComparable
     {
         private int id;
 
         public int Id
         {
-            get { return id; }
-            set
-            {
-                if (id == value)
-                    return;
-                onChange("Id");
-                id = value;
-            }
+            get => id;
+            set => Set(ref id, value);
         }
         private uint val;
 
-        public uint Value
+        public uint Value 
         {
-            get { return val; }
-            set
-            {
-                if (val == value)
-                    return;
-                val = value;
-                onChange("Value");
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        void onChange(string propName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+            get => val;
+            set => Set(ref val, value);
+            
         }
 
         public void Update(ReadedBlackBoxValue item)
@@ -460,42 +442,24 @@ namespace AdversCan
         }
 
     }
-    public class ReadedParameter : INotifyPropertyChanged, IUpdatable<ReadedParameter>, IComparable
+    public class ReadedParameter : ViewModel, INotifyPropertyChanged, IUpdatable<ReadedParameter>, IComparable
     {
 
         private int id;
 
         public int Id
         {
-            get { return id; }
-            set
-            {
-                if (id == value)
-                    return;
-                onChange("Id");
-                id = value;
-            }
+            get => id;
+            set => Set(ref id, value);
         }
 
-        private uint val;
+        private uint _value;
 
         public uint Value
         {
-            get { return val; }
-            set
-            {
-                if (val == value)
-                    return;
-                val = value;
-                onChange("Value");
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        void onChange(string propName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+            get => _value;
+            set => Set(ref _value, value);
+            
         }
 
         public void Update(ReadedParameter item)
@@ -696,7 +660,7 @@ namespace AdversCan
             return id - (obj as ReadedVariable).id;
         }
     }
-    public class BBError : IUpdatable<BBError>, INotifyPropertyChanged
+    public class BBError : IUpdatable<BBError>, INotifyPropertyChanged,IComparable
     {
         private readonly UpdatableList<ReadedVariable> _variables = new();
 
@@ -748,6 +712,11 @@ namespace AdversCan
         void onChange(string propName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+
+        public int CompareTo(object obj)
+        {
+            return Id - (obj as BBError).Id;
         }
     }
 
@@ -1230,55 +1199,23 @@ namespace AdversCan
             set { Set(ref manualMode, value); }
         }
 
+        public bool flagEraseDone = false;
 
-        public bool eraseDone = false;
+        public bool flagSetAdrDone = false;
 
-        public bool EraseDone
-        {
-            get => eraseDone;
-            set => Set(ref eraseDone, value);
-        }
+        public bool flagProgramDone = false;
 
+        public bool flagCheckDone = false;
 
-        public bool setAdrDone = false;
+        public bool flagGetParamDone = false;
 
-        public bool SetAdrDone
-        {
-            get => setAdrDone;
-            set => Set(ref setAdrDone, value);
-        }
-        public bool programDone = false;
+        public bool flagGetBBDone = false;
 
-        public bool ProgramDone
-        {
-            get => programDone;
-            set => Set(ref programDone, value);
-        }
-
-        public bool checkDone = false;
-
-        public bool CheckDone
-        {
-            get => checkDone;
-            set => Set(ref checkDone, value);
-        }
+        public bool waitForBB = false;
 
         public int dataLength = 0;
 
-        public int DataLength
-        {
-            get => dataLength;
-            set => Set(ref dataLength, value);
-        }
-
         public int crc = 0;
-
-        public int Crc
-        {
-            get => crc;
-            set => Set(ref crc, value);
-        }
-
 
         public string Name => ToString();
 
@@ -1477,7 +1414,7 @@ namespace AdversCan
     public class AC2P : ViewModel
     {
 
-        public event EventHandler NewDeviveAquired;
+        public event EventHandler NewDeviceAquired;
 
         private SynchronizationContext UIContext;
 
@@ -1518,10 +1455,9 @@ namespace AdversCan
 
         public AC2PTask CurrentTask
         {
-            get { return currentTask; }
-            set { Set(ref currentTask, value); }
+            get => currentTask; 
+            set => Set(ref currentTask, value);
         }
-
 
         private bool CancellationRequested => CurrentTask.CTS.IsCancellationRequested;
 
@@ -1541,11 +1477,17 @@ namespace AdversCan
             Debug.WriteLine("<-" + m.ToString());
             if (ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id)) == null)
             {
-                ConnectedDevices.Add(new ConnectedDevice(id));
-                NewDeviveAquired?.Invoke(this, null);
+                
             }
+            
+            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(m.TransmitterId));
 
-            ConnectedDevice currentDevice = ConnectedDevices.First(d => d.ID.Equals(m.TransmitterId));
+            if (currentDevice == null)
+            {
+                currentDevice = new ConnectedDevice(id);
+                ConnectedDevices.Add(currentDevice);
+                NewDeviceAquired?.Invoke(this, null);
+            }
 
 
             if (!PGNs.ContainsKey(m.PGN)) return; //Такого PGN нет в библиотеке
@@ -1633,7 +1575,12 @@ namespace AdversCan
                     int parameterId = m.Data[3] + m.Data[2] * 256;
                     uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
                     if (parameterValue != 0xFFFFFFFF)
+                    {
                         currentDevice.readedParameters.TryToAdd(new() { Id = parameterId, Value = parameterValue });
+                        Debug.WriteLine($"{AC2P.ParamtersNames[parameterId]}={parameterValue}");
+                    }
+                    else
+                        Debug.WriteLine($"Parameter \"{AC2P.ParamtersNames[parameterId]}\" not supported");
                     //Серийник в отдельной переменной
                     if (parameterId == 12)
                         currentDevice.Serial1 = parameterValue;
@@ -1641,6 +1588,8 @@ namespace AdversCan
                         currentDevice.Serial2 = parameterValue;
                     if (parameterId == 14)
                         currentDevice.Serial3 = parameterValue;
+
+                    currentDevice.flagGetParamDone = true;
                 }
 
             }
@@ -1677,6 +1626,7 @@ namespace AdversCan
                             currentDevice.currentBBError.Variables.TryToAdd(v);
                         }
                     }
+                    currentDevice.flagGetBBDone = true;
                 }
             }
 
@@ -1717,30 +1667,30 @@ namespace AdversCan
                 if (m.Data[0] == 1 && m.Data[1] == 1)
                 {
                     Debug.WriteLine("Memory erase confirmed");
-                    currentDevice.EraseDone = true;
+                    currentDevice.flagEraseDone = true;
                 }
                 if (m.Data[0] == 2 && m.Data[1] == 1)
                 {
                     Debug.WriteLine("Adress set confirmed");
-                    currentDevice.SetAdrDone = true;
+                    currentDevice.flagSetAdrDone = true;
                 }
 
                 if (m.Data[0] == 3 && m.Data[1] == 1)
                 {
                     Debug.WriteLine("Flash program confirmed");
-                    currentDevice.ProgramDone = true;
+                    currentDevice.flagProgramDone = true;
                 }
                 if (m.Data[0] == 4)
                 {
-                    currentDevice.Crc = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
-                    currentDevice.DataLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
-                    currentDevice.CheckDone = true;
+                    currentDevice.crc = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
+                    currentDevice.dataLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
+                    currentDevice.flagCheckDone = true;
                 }
                 if (m.Data[0] == 5)
                 {
                     int adr = m.Data[2] * 0x1000000 + m.Data[3] * 0x10000 + m.Data[4] * 0x100 + m.Data[5];
                     Debug.WriteLine($"Adress set to 0X{adr:X}");
-                    currentDevice.SetAdrDone = true;
+                    currentDevice.flagSetAdrDone = true;
                 }
             }
 
@@ -1810,13 +1760,17 @@ namespace AdversCan
         public async void ReadBlackBoxData(DeviceId id)
         {
             if (!Capture("Чтение параметров чёрного ящика")) return;
+            ConnectedDevice currentDevice = _connectedDevices.FirstOrDefault(d => d.ID == id);
+            if (currentDevice == null)   return;
             WaitingForBBErrors = false;
-            AC2PMessage msg = new();
-            msg.PGN = 8;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
-            msg.ReceiverAddress = id.Address;
-            msg.ReceiverType = id.Type;
+            AC2PMessage msg = new()
+            {
+                PGN = 8,
+                TransmitterAddress = 6,
+                TransmitterType = 126,
+                ReceiverAddress = id.Address,
+                ReceiverType = id.Type,
+            };
             msg.Data[0] = 6; //Read Single Param
             msg.Data[1] = 0xFF; //Read Param
 
@@ -1826,8 +1780,15 @@ namespace AdversCan
 
                 msg.Data[4] = (byte)(p.Key / 256);
                 msg.Data[5] = (byte)(p.Key % 256);
-                canAdapter.Transmit(msg);
-                await Task.Delay(50);
+                currentDevice.flagGetBBDone = false;
+                SendMessage(msg);
+                Debug.WriteLine($"Requesting BB parameter {p.Key}");
+                for (int i = 0; i < 100; i++)
+                {
+                    if (currentDevice.flagGetBBDone) break;
+                    await Task.Delay(1);
+                    Debug.WriteLineIf(i==99, $"Error reading parameter {p.Key} ({AC2P.BbParameterNames[p.Key]})");
+                }
                 if (CancellationRequested)
                 {
                     Cancel();
@@ -1842,6 +1803,7 @@ namespace AdversCan
         {
             if (!Capture("Чтение ошибок из чёрного ящика")) return;
             WaitingForBBErrors = true;
+
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
             UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
@@ -1849,29 +1811,38 @@ namespace AdversCan
             UIContext.Send(x => currentDevice.BBErrors.Add(currentDevice.currentBBError), null);
 
 
-            AC2PMessage msg = new AC2PMessage();
-            msg.PGN = 8;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
-            msg.ReceiverAddress = id.Address;
-            msg.ReceiverType = id.Type;
+            AC2PMessage msg = new AC2PMessage
+            {
+                PGN = 8,
+                TransmitterAddress = 6,
+                TransmitterType = 126,
+                ReceiverAddress = id.Address,
+                ReceiverType = id.Type
+            };
             msg.Data[0] = 0x13; //Read Errors
             msg.Data[1] = 0xFF;
-            for (int i = 0; i < 1024; i++)
+            for (int i = 0; i < 512; i++)
             {
                 msg.Data[4] = (byte)(i / 256);  //Pair count
                 msg.Data[5] = (byte)(i % 256);  //Pair count
                 msg.Data[6] = 0x00; //Pair count MSB
                 msg.Data[7] = 0x01; //Pair count LSB
 
-                canAdapter.Transmit(msg);
-                await Task.Delay(10);
+                currentDevice.flagGetBBDone = false;
+                SendMessage(msg);
+
+                for (int j = 0; j < 100; j++)
+                {
+                    if (currentDevice.flagGetBBDone) break;
+                    await Task.Delay(1);
+                    Debug.WriteLineIf(j == 99, $"Error reading BB adress {i}");
+                }
                 if (CancellationRequested)
                 {
                     Cancel();
                     return;
                 }
-                UpdatePercent(100 * i / 1024);
+                UpdatePercent(100 * i / 512);
             }
             Done();
         }
@@ -1892,7 +1863,7 @@ namespace AdversCan
             msg.Data[5] = 0xFF;
             msg.Data[6] = 0xFF;
             msg.Data[7] = 0xFF;
-            canAdapter.Transmit(msg);
+            SendMessage(msg);
 
             Done();
         }
@@ -1913,7 +1884,7 @@ namespace AdversCan
             msg.Data[5] = 0xFF;
             msg.Data[6] = 0xFF;
             msg.Data[7] = 0xFF;
-            canAdapter.Transmit(msg);
+            SendMessage(msg);
 
             Done();
         }
@@ -1921,9 +1892,12 @@ namespace AdversCan
         {
             if (!Capture("Чтение параметров из Flash")) return;
             int cnt = 0;
+
+            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
+
             foreach (var p in configParameters)
             {
-                AC2PMessage msg = new AC2PMessage();
+                AC2PMessage msg = new();
                 msg.PGN = 7;
                 msg.TransmitterAddress = 6;
                 msg.TransmitterType = 126;
@@ -1933,8 +1907,18 @@ namespace AdversCan
                 msg.Data[1] = 0xFF; //Read Param
                 msg.Data[2] = (byte)(p.Key / 256);
                 msg.Data[3] = (byte)(p.Key % 256);
-                canAdapter.Transmit(msg);
-                await Task.Delay(20);
+
+                currentDevice.flagGetParamDone = false;
+                SendMessage(msg);
+
+                
+                for (int j = 0; j < 100; j++)
+                {
+                    if (currentDevice.flagGetParamDone)
+                        break;
+                    await Task.Delay(1);
+                    Debug.WriteLineIf(j == 99, $"Error reading parameter {p.Key} ({AC2P.ParamtersNames[p.Key]})");
+                }
                 UpdatePercent(cnt++ * 100 / configParameters.Count);
                 if (CancellationRequested)
                 {
@@ -1970,7 +1954,7 @@ namespace AdversCan
                 msg.Data[5] = (byte)((p.Value >> 16) & 0xFF);
                 msg.Data[6] = (byte)((p.Value >> 8) & 0xFF);
                 msg.Data[7] = (byte)((p.Value) & 0xFF);
-                canAdapter.Transmit(msg);
+                SendMessage(msg);
                 await Task.Run(() => Thread.Sleep(100));
                 UpdatePercent(cnt++ * 100 / tempCollection.Count);
                 if (CancellationRequested)
@@ -1981,7 +1965,7 @@ namespace AdversCan
             }
             await Task.Run(() => Thread.Sleep(100));
             msg.Data[0] = 2;
-            canAdapter.Transmit(msg);
+            SendMessage(msg);
             Done();
         }
 
@@ -1999,12 +1983,13 @@ namespace AdversCan
             msg.ReceiverType = id.Type;
             msg.Data[0] = 0; //Erase 
             msg.Data[1] = 0xFF;
-            canAdapter.Transmit(msg);
+            SendMessage(msg);
             Done();
         }
 
         public void SendMessage(AC2PMessage m)
         {
+            Debug.WriteLine("-> " + (new AC2PMessage(m)).ToString());
             canAdapter.Transmit(m);
         }
         public void SendMessage(DeviceId from, DeviceId to, int pgn, byte[] data)
@@ -2016,7 +2001,7 @@ namespace AdversCan
             msg.ReceiverAddress = to.Address;
             msg.ReceiverType = to.Type;
             data.CopyTo(msg.Data, 0);
-            canAdapter.Transmit(msg);
+            SendMessage(msg);
         }
         public void SendCommand(int com, DeviceId dev, byte[] data = null)
         {
@@ -2034,7 +2019,7 @@ namespace AdversCan
                 else
                     message.Data[i + 2] = 0xFF;
             }
-            canAdapter.Transmit(message);
+            SendMessage(message);
         }
 
         public static Dictionary<int, Device> Devices;

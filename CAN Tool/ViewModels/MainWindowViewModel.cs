@@ -685,7 +685,7 @@ namespace CAN_Tool.ViewModels
             timer.Interval = new TimeSpan(0, 0, 1);
             timer.Start();
 
-            AC2PInstance.NewDeviveAquired += NewDeviceHandler;
+            AC2PInstance.NewDeviceAquired += NewDeviceHandler;
 
 
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);

@@ -139,7 +139,7 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverType = 123;
             msg.Data[0] = 1;
             VM.CanAdapter.Transmit(msg);
-            VM.SelectedConnectedDevice.EraseDone = false;
+            VM.SelectedConnectedDevice.flagEraseDone = false;
         }
 
         private void startFlashing()
@@ -180,7 +180,7 @@ namespace CAN_Tool.ViewModels
             {
                 if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't flash memory"); return; }
                 startFlashing();
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.programDone, 20)) break;
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagProgramDone, 20)) break;
             }
         }
         private void bootloaderSetAdrLen(uint adress, int len)
@@ -205,7 +205,7 @@ namespace CAN_Tool.ViewModels
             {
                 if (i == 5) { VM.AC2PInstance.CurrentTask.onFail("Can't set start adress"); return; }
                 VM.CanAdapter.Transmit(msg);
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.setAdrDone, 100)) break;
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagSetAdrDone, 100)) break;
             }
         }
 
@@ -226,9 +226,9 @@ namespace CAN_Tool.ViewModels
                     return false;
                 }
                 VM.CanAdapter.Transmit(msg);
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.checkDone, 100)) break;
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagCheckDone, 100)) break;
             }
-            Debug.WriteLine($"Len:{VM.SelectedConnectedDevice.DataLength}/{len},CRC:0x{VM.SelectedConnectedDevice.crc:X}/0X{crc:X}");
+            Debug.WriteLine($"Len:{VM.SelectedConnectedDevice.dataLength}/{len},CRC:0x{VM.SelectedConnectedDevice.crc:X}/0X{crc:X}");
             if (crc == VM.SelectedConnectedDevice.crc && len == VM.SelectedConnectedDevice.dataLength)
                 return true;
             else
@@ -241,12 +241,14 @@ namespace CAN_Tool.ViewModels
         {
             int crc;
             int len;
-            AC2PMessage msg = new();
-            msg.PGN = 101;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
-            msg.ReceiverAddress = 0;
-            msg.ReceiverType = 123;
+            AC2PMessage msg = new()
+            {
+                PGN = 101,
+                TransmitterAddress = 6,
+                TransmitterType = 126,
+                ReceiverAddress = 0,
+                ReceiverType = 123
+            };
 
             Debug.WriteLine($"Starting {f.StartAdress:X} fragment transmission");
             for (int k = 0; k < 16; k++)
@@ -256,8 +258,8 @@ namespace CAN_Tool.ViewModels
                 bootloaderSetAdrLen(f.StartAdress, f.Length);
                 crc = 0;
                 len = 0;
-                VM.SelectedConnectedDevice.Crc = 0;
-                VM.SelectedConnectedDevice.DataLength = 0;
+                VM.SelectedConnectedDevice.crc = 0;
+                VM.SelectedConnectedDevice.dataLength = 0;
 
                 for (int i = 0; i < (f.Length + 7) / 8; i++)
                 {
@@ -291,7 +293,7 @@ namespace CAN_Tool.ViewModels
             {
                 if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't erase memory"); return; }
                 eraseFlash();
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.eraseDone, 5000)) break;
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagEraseDone, 5000)) break;
             }
 
             VM.AC2PInstance.CurrentTask.onDone();
