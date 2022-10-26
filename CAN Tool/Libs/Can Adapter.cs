@@ -387,6 +387,7 @@ namespace Can_Adapter
         public CanAdapter()
         {
             serialPort = new SerialPort();
+            serialPort.BaudRate = 1000000;
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             UIContext = SynchronizationContext.Current;
         }
