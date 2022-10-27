@@ -14,6 +14,9 @@ using AdversCan;
 
 namespace Can_Adapter
 {
+    public interface IUpdatable<T>
+    {
+        public void Update(T item);
 
         public bool IsSimmiliarTo(T item);
 
@@ -85,13 +88,18 @@ namespace Can_Adapter
             return sb.ToString();
         }
 
+        public string RtrAsString => RTR ? "1" : "0";
+
+        public string IdeAsString => IDE ? "1" : "0";
+
         public bool RvcCompatible => IDE && DLC == 8 && !RTR;
 
         public string IdAsText => IDE ? string.Format("{0:X08}", Id) : string.Format("{0:X03}", Id);
 
+
         public override string ToString()
         {
-            return $"L:{DLC} IDE:{IDE} RTR:{RTR} ID:0x{id:X08} Data:{GetDataInTextFormat(" ")}";
+            return $"L:{DLC} IDE:{IdeAsString} RTR:{RtrAsString} ID:0x{IdAsText} Data:{GetDataInTextFormat(" ")}";
         }
 
 
@@ -135,13 +143,13 @@ namespace Can_Adapter
                 Id = Convert.ToInt32(str.Substring(1, 3), 16);
             Data = new byte[DLC];
 
-
             int shift;
             if (!IDE)
                 shift = 5;
             else
                 shift = 10;
-            data += Convert.ToUInt64((str.Substring(shift, 8), 16));
+            for (int i = 0; i < DLC; i++)
+                Data[i] = Convert.ToByte(str.Substring(shift + i * 2, 2), 16);
         }
 
         public override bool Equals(object obj)
@@ -155,7 +163,9 @@ namespace Can_Adapter
             CanMessage toCompare = (CanMessage)obj;
             if (toCompare.Id != Id || toCompare.DLC != DLC || toCompare.IDE != IDE || toCompare.RTR != RTR)
                 return false;
-            if (data != toCompare.data) return false;
+            for (int i = 0; i < toCompare.DLC; i++)
+                if (toCompare.Data[i] != Data[i])
+                    return false;
             return true;
         }
 
@@ -210,7 +220,7 @@ namespace Can_Adapter
                     {
                         if (item.CompareTo(Items[i]) <= 0)
                         {
-                            Insert(i,item);
+                            Insert(i, item);
                             return true;
                         }
                     }
@@ -317,7 +327,7 @@ namespace Can_Adapter
             lastMessageString = str.ToString();
 
             serialPort.Write(str.ToString());
-            
+
             for (int i = 0; i < 100; i++)
             {
                 Thread.Sleep(1);
