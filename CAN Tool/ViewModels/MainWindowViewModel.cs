@@ -54,7 +54,7 @@ namespace CAN_Tool.ViewModels
         new SolidColorBrush(Colors.Gray),
         new SolidColorBrush(Colors.SlateGray) 
         };
-        List<Brush> Brushes => brushes;
+        public List<Brush> Brushes => brushes;
 
         public bool AutoRedraw { set; get; } = true;
 
@@ -387,37 +387,8 @@ namespace CAN_Tool.ViewModels
 
         #endregion
 
-        #region SaveLogCommand
 
-        public ICommand SaveLogCommand { get; }
-
-        private void OnSaveLogCommandExecuted(object parameter)
-        {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + SelectedConnectedDevice.ID.Type + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
-
-            using (StreamWriter sw = new StreamWriter(path))
-            {
-                /*
-                foreach (var v in SelectedConnectedDevice.Status)
-                    sw.Write(AC2P.Variables[v.Id].ShortName + ";");
-                sw.WriteLine();
-                for (int i = 0; i < SelectedConnectedDevice.LogCurrentPos; i++)
-                {
-                    foreach (var v in SelectedConnectedDevice.Status)
-                        sw.Write(SelectedConnectedDevice.LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
-                    sw.WriteLine();
-                }
-                sw.Flush();
-                sw.Close();
-                */
-            }
-        }
-
-        private bool CanSaveLogCommandExecuted(object parameter)
-        {
-            return SelectedConnectedDevice != null;
-        }
-        #endregion
+     
 
 
         public void ExecuteCommand(int cmdNum, params byte[] data)
@@ -516,6 +487,9 @@ namespace CAN_Tool.ViewModels
             _canAdapter = new CanAdapter();
             _AC2PInstance = new AC2P(CanAdapter);
             FirmwarePage = new(this);
+            ManualControlPage = new(this);
+            LogPage = new(this);
+
 
             System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
 
@@ -551,7 +525,7 @@ namespace CAN_Tool.ViewModels
             CalibrateTermocouplesCommand = new LambdaCommand(OnCalibrateTermocouplesCommandExecuted, DeviceConnectedAndNotInManual);
 
 
-            SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
+
 
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;

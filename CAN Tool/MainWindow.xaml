@@ -413,10 +413,10 @@
                     </TabItem.Header>
                     <DockPanel>
                         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-                            <Button Margin="10" Content="{DynamicResource b_start_log}" Command="{Binding LogStartCommand}"></Button>
-                            <Button Margin="10" Content="{DynamicResource b_stop_log}" Command="{Binding LogStopCommand}"></Button>
-                            <Button Margin="10" Content="{DynamicResource b_redraw}" Command="{Binding ChartDrawCommand}"></Button>
-                            <Button Margin="10" Content="{DynamicResource b_save_log}" Command="{Binding SaveLogCommand}"></Button>
+                            <Button Margin="10" Content="{DynamicResource b_start_log}" Command="{Binding LogPage.LogStartCommand}"></Button>
+                            <Button Margin="10" Content="{DynamicResource b_stop_log}" Command="{Binding LogPage.LogStopCommand}"></Button>
+                            <Button Margin="10" Content="{DynamicResource b_redraw}" Command="{Binding LogPage.ChartDrawCommand}"></Button>
+                            <Button Margin="10" Content="{DynamicResource b_save_log}" Command="{Binding LogPage.SaveLogCommand}"></Button>
                             <CheckBox Margin="10" FontSize="20" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="{DynamicResource b_autoredraw}" IsChecked="{Binding AutoRedraw}" />
                             <TextBlock Margin="10" FontSize="20" Text="{DynamicResource b_log_length}" VerticalAlignment="Center"></TextBlock>
                             
@@ -439,12 +439,12 @@
                             </DataGrid>
                         </Expander>
                         <Grid>
-                            <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Right">
+                            <lvc:CartesianChart Series="{Binding LogPage.SeriesCollection}" LegendLocation="Right">
                                 <lvc:CartesianChart.AxisY>
-                                    <lvc:Axis Title="Sales" LabelFormatter="{Binding YFormatter}"></lvc:Axis>
+                                    <lvc:Axis Title="Sales" LabelFormatter="{Binding LogPage.YFormatter}"></lvc:Axis>
                                 </lvc:CartesianChart.AxisY>
                                 <lvc:CartesianChart.AxisX>
-                                    <lvc:Axis Title="Month" Labels="{Binding Labels}"></lvc:Axis>
+                                    <lvc:Axis Title="Month" Labels="{Binding LogPage.Labels}"></lvc:Axis>
                                 </lvc:CartesianChart.AxisX>
                             </lvc:CartesianChart>
 
@@ -535,10 +535,10 @@
                     </TabItem.Header>
                     <DockPanel>
                         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-                            <Button Margin="10" Content="{DynamicResource b_enter_manual}" Command="{Binding EnterManualModeCommand}" />
-                            <Button Margin="10" Content="{DynamicResource b_leave_manual}" Command="{Binding ExitManualModeCommand}" />
+                            <Button Margin="10" Content="{DynamicResource b_enter_manual}" Command="{Binding ManualControlPage.EnterManualModeCommand}" />
+                            <Button Margin="10" Content="{DynamicResource b_leave_manual}" Command="{Binding ManualControlPage.ExitManualModeCommand}" />
 
-                            <CheckBox Margin="5" Style="{StaticResource MaterialDesignSwitchDarkToggleButton }" IsChecked="{Binding ManualWaterPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" IsEnabled="{Binding SelectedConnectedDevice.ManualMode,Mode=OneWay,TargetNullValue=false}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" />
+                            <CheckBox Margin="5" Style="{StaticResource MaterialDesignSwitchDarkToggleButton }" IsChecked="{Binding ManualControlPage.ManualWaterPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" IsEnabled="{Binding SelectedConnectedDevice.ManualMode,Mode=OneWay,TargetNullValue=false}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" />
                             <TextBlock Margin="5" FontSize="25" VerticalAlignment="Center" Text="{DynamicResource b_water_pump}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"></TextBlock>
 
                         </StackPanel>
@@ -562,17 +562,17 @@
                                     <RowDefinition Height="2*"></RowDefinition>
                                 </Grid.RowDefinitions>
 
-                                <Button Grid.Column="0" Grid.Row="2" Margin="10" Content="+" Command="{Binding IncreaceManualAirBlowerCommand}" />
-                                <Button Grid.Column="0" Grid.Row="4" Margin="10" Content="-" Command="{Binding DecreaseManualAirBlowerCommand}" />
-                                <Button Grid.Column="2" Grid.Row="2" Margin="10" Content="+" Command="{Binding IncreaseManualFuelPumpCommand}" />
-                                <Button Grid.Column="2" Grid.Row="4" Margin="10" Content="-" Command="{Binding DecreaseFuelPumpCommand}" />
-                                <Button Grid.Column="3" Grid.Row="2" Margin="10" Content="+" Command="{Binding IncreaseGlowPlugCommand}" />
-                                <Button Grid.Column="3" Grid.Row="4" Margin="10" Content="-" Command="{Binding DecreaseGlowPlugCommand}" />
+                                <Button Grid.Column="0" Grid.Row="2" Margin="10" Content="+" Command="{Binding ManualControlPage.IncreaceManualAirBlowerCommand}" />
+                                <Button Grid.Column="0" Grid.Row="4" Margin="10" Content="-" Command="{Binding ManualControlPage.DecreaseManualAirBlowerCommand}" />
+                                <Button Grid.Column="2" Grid.Row="2" Margin="10" Content="+" Command="{Binding ManualControlPage.IncreaseManualFuelPumpCommand}" />
+                                <Button Grid.Column="2" Grid.Row="4" Margin="10" Content="-" Command="{Binding ManualControlPage.DecreaseFuelPumpCommand}" />
+                                <Button Grid.Column="3" Grid.Row="2" Margin="10" Content="+" Command="{Binding ManualControlPage.IncreaseGlowPlugCommand}" />
+                                <Button Grid.Column="3" Grid.Row="4" Margin="10" Content="-" Command="{Binding ManualControlPage.DecreaseGlowPlugCommand}" />
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="{DynamicResource b_air_set}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" />
-                                <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding ManualAirBlower,Mode=OneWay}" HorizontalAlignment="Center" FontSize="20" />
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding ManualControlPage.ManualAirBlower,Mode=OneWay}" HorizontalAlignment="Center" FontSize="20" />
                                 <Rectangle x:Name="SetRevRect" Grid.Column="0" Grid.Row="3" Margin="10"></Rectangle>
-                                <ProgressBar Style="{DynamicResource MaterialDesignLinearProgressBar}" Grid.Column="0" Grid.Row="3" Value="{Binding ManualAirBlower,Mode=OneWay }" Maximum="90" Orientation="Vertical" Width="{Binding ElementName=SetRevRect,Path=ActualHeight}" Height="{Binding ElementName=SetRevRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel"></ProgressBar>
+                                <ProgressBar Style="{DynamicResource MaterialDesignLinearProgressBar}" Grid.Column="0" Grid.Row="3" Value="{Binding ManualControlPage.ManualAirBlower,Mode=OneWay }" Maximum="90" Orientation="Vertical" Width="{Binding ElementName=SetRevRect,Path=ActualHeight}" Height="{Binding ElementName=SetRevRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel"></ProgressBar>
 
                                 <TextBlock Grid.Column="1" Grid.Row="0" FontSize="20" Text="{DynamicResource b_air_measured}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <TextBlock Grid.Column="1" Grid.Row="1" FontSize="20" Text="{Binding SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
@@ -580,14 +580,14 @@
                                 <ProgressBar Grid.Column="1" Grid.Row="3" Maximum="90" Margin="10" Value="{Binding SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0,Mode=OneWay}" Foreground="Green" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}"></ProgressBar>
 
                                 <TextBlock Grid.Column="2" Grid.Row="0" FontSize="20" Text="{DynamicResource b_fuel_pump_set}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                                <TextBlock Grid.Column="2" Grid.Row="1" FontSize="20" Text="{Binding ManualFuelPump,Mode=OneWay,Converter={StaticResource FuelPumpConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Grid.Column="2" Grid.Row="1" FontSize="20" Text="{Binding ManualControlPage.ManualFuelPump,Mode=OneWay,Converter={StaticResource FuelPumpConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <Rectangle x:Name="SetPumpRect" Grid.Column="2" Grid.Row="3" Margin="10"></Rectangle>
-                                <ProgressBar Grid.Column="2" Grid.Row="3" Value="{Binding ManualFuelPump,TargetNullValue=0,Mode=OneWay}" Maximum="700" Foreground="Yellow" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel_1"></ProgressBar>
+                                <ProgressBar Grid.Column="2" Grid.Row="3" Value="{Binding ManualControlPage.ManualFuelPump,TargetNullValue=0,Mode=OneWay}" Maximum="700" Foreground="Yellow" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel_1"></ProgressBar>
 
                                 <TextBlock Grid.Column="3" Grid.Row="0" FontSize="20" Text="{DynamicResource b_glow_plug_set}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                                <TextBlock Grid.Column="3" Grid.Row="1" FontSize="20" Text="{Binding ManualGlowPlug,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Grid.Column="3" Grid.Row="1" FontSize="20" Text="{Binding ManualControlPage.ManualGlowPlug,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <Rectangle x:Name="SetPlugRect" Grid.Column="3" Grid.Row="3" Margin="10"></Rectangle>
-                                <ProgressBar Grid.Column="3" Grid.Row="3" Value="{Binding ManualGlowPlug,TargetNullValue=0,Mode=OneWay}" Foreground="Red" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel_2"></ProgressBar>
+                                <ProgressBar Grid.Column="3" Grid.Row="3" Value="{Binding ManualControlPage.ManualGlowPlug,TargetNullValue=0,Mode=OneWay}" Foreground="Red" Orientation="Vertical" Width="{Binding ElementName=SetPumpRect,Path=ActualHeight}" Height="{Binding ElementName=SetPumpRect,Path=ActualWidth}" MouseWheel="ProgressBar_MouseWheel_2"></ProgressBar>
                                 <Image x:Name="AirArrow" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Images/mouseWheel.png" Width="70"></Image>
                                 <Image x:Name="PumpArrow" Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Images/mouseWheel.png" Width="70"></Image>
                                 <Image x:Name="PlugArrow" Grid.Column="3" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Images/mouseWheel.png" Width="70"></Image>

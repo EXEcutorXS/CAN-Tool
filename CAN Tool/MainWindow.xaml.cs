@@ -154,7 +154,6 @@ namespace CAN_Tool
         {
             try
             {
-                if (!GraphTab.IsSelected)     //Костыль, решает проблему неправильной интерпретации мыши графиком
                     DragMove();
             }
             catch { }

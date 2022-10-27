@@ -836,9 +836,17 @@ namespace AdversCan
 
     }
     public class Log
-    { 
-    Dictionary<int,LineSeries> parameters = new();
-    
+    {
+        private SeriesCollection parameters;
+
+        public Log()
+        {
+            parameters = new();
+            foreach (var p in )
+            { 
+            parameters.Add(new LineSeries)
+            }
+        }
     }
     public class MainParameters : ViewModel, ICloneable
     {
@@ -1172,9 +1180,6 @@ namespace AdversCan
 
         UpdatableList<StatusVariable> status = new();
         public UpdatableList<StatusVariable> Status => status;
-
-        UpdatableList<StatusVariable> commonView = new();
-        public UpdatableList<StatusVariable> CommonView => commonView;
 
         private readonly UpdatableList<ReadedParameter> _readedParameters = new();
         public UpdatableList<ReadedParameter> readedParameters => _readedParameters;
