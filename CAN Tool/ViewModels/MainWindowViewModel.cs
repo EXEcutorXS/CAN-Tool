@@ -24,15 +24,36 @@ namespace CAN_Tool.ViewModels
     internal class MainWindowViewModel : ViewModel
     {
         private FirmwarePage firmwarePage;
-        public FirmwarePage FirmwarePage
-        {
-            get { return firmwarePage; }
-            set { Set(ref firmwarePage, value); }
-        }
-        
+        public FirmwarePage FirmwarePage { get => firmwarePage; set => Set(ref firmwarePage, value); }
+
+        private ManualControlPage manualControlPage;
+        public ManualControlPage ManualControlPage { get => manualControlPage; set => Set(ref manualControlPage, value); }
+
+        private LogPage logPage;
+        public LogPage LogPage { get => logPage; set => Set(ref logPage, value); }
         public int[] Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
 
-        List<Brush> brushes = new();
+        List<Brush> brushes = new() {
+        new SolidColorBrush(Colors.Red),
+        new SolidColorBrush(Colors.DeepPink),
+        new SolidColorBrush(Colors.MediumPurple),
+        new SolidColorBrush(Colors.BlueViolet),
+        new SolidColorBrush(Colors.DarkSlateBlue),
+        new SolidColorBrush(Colors.PowderBlue),
+        new SolidColorBrush(Colors.LightSkyBlue),
+        new SolidColorBrush(Colors.Cyan),
+        new SolidColorBrush(Colors.Teal),
+        new SolidColorBrush(Colors.Green),
+        new SolidColorBrush(Colors.LightGreen),
+        new SolidColorBrush(Colors.YellowGreen),
+        new SolidColorBrush(Colors.Yellow),
+        new SolidColorBrush(Colors.Gold),
+        new SolidColorBrush(Colors.Orange),
+        new SolidColorBrush(Colors.OrangeRed),
+        new SolidColorBrush(Colors.Peru),
+        new SolidColorBrush(Colors.Gray),
+        new SolidColorBrush(Colors.SlateGray) 
+        };
         List<Brush> Brushes => brushes;
 
         public bool AutoRedraw { set; get; } = true;
@@ -254,33 +275,6 @@ namespace CAN_Tool.ViewModels
 
         #region LogCommands
 
-        #region LogStartCommand
-        public ICommand LogStartCommand { get; }
-        private void OnLogStartCommandExecuted(object parameter)
-        {
-            SelectedConnectedDevice.LogStart();
-        }
-        private bool CanLogStartCommandExecute(object parameter) => (SelectedConnectedDevice != null && CanAdapter.PortOpened);
-        #endregion
-
-        #region LogStopCommand
-        public ICommand LogStopCommand { get; }
-        private void OnLogStopCommandExecuted(object parameter)
-        {
-            SelectedConnectedDevice.LogStop();
-        }
-        private bool CanLogStopCommandExecute(object parameter) => (SelectedConnectedDevice != null && CanAdapter.PortOpened && SelectedConnectedDevice.IsLogWriting);
-        #endregion
-
-        #region ChartDrawCommand
-        public ICommand ChartDrawCommand { get; }
-        private void OnChartDrawCommandExecuted(object parameter)
-        {
-
-
-        }
-        private bool CanChartDrawCommandExecute(object parameter) => (SelectedConnectedDevice != null && SelectedConnectedDevice.Log.Count>0);
-        #endregion
 
         #endregion
 
@@ -442,7 +436,7 @@ namespace CAN_Tool.ViewModels
             CanAdapter.Transmit(msg);
         }
 
-      
+
 
         private async void requestSerial()
         {
@@ -476,8 +470,8 @@ namespace CAN_Tool.ViewModels
             }
 
             if (AutoRedraw)                                 //Перерисовк графиков
-                if (CanChartDrawCommandExecute(null))
-                    OnChartDrawCommandExecuted(null);
+                if (LogPage.CanChartDrawCommandExecute(null))
+                    LogPage.OnChartDrawCommandExecuted(null);
 
             foreach (ConnectedDevice d in AC2PInstance.ConnectedDevices) //Поддержание связи
             {
@@ -555,9 +549,7 @@ namespace CAN_Tool.ViewModels
             StartVentCommand = new LambdaCommand(OnStartVentCommandExecuted, DeviceConnectedAndNotInManual);
             ClearErrorsCommand = new LambdaCommand(OnClearErrorsCommandExecuted, deviceSelected);
             CalibrateTermocouplesCommand = new LambdaCommand(OnCalibrateTermocouplesCommandExecuted, DeviceConnectedAndNotInManual);
-            LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
-            LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
-            ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);
+
 
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
 

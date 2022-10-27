@@ -272,45 +272,45 @@ namespace CAN_Tool
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            if (vm.TurnOnWaterPumpCommand.CanExecute(null))
-                vm.TurnOnWaterPumpCommand.Execute(null);
+            if (vm.ManualControlPage.TurnOnWaterPumpCommand.CanExecute(null))
+                vm.ManualControlPage.TurnOnWaterPumpCommand.Execute(null);
 
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (vm.TurnOffWaterPumpCommand.CanExecute(null))
-                vm.TurnOffWaterPumpCommand.Execute(null);
+            if (vm.ManualControlPage.TurnOffWaterPumpCommand.CanExecute(null))
+                vm.ManualControlPage.TurnOffWaterPumpCommand.Execute(null);
         }
 
         private void ProgressBar_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
-                if (vm.IncreaceManualAirBlowerCommand.CanExecute(null))
-                    vm.IncreaceManualAirBlowerCommand.Execute(null);
+                if (vm.ManualControlPage.IncreaceManualAirBlowerCommand.CanExecute(null))
+                    vm.ManualControlPage.IncreaceManualAirBlowerCommand.Execute(null);
             if (e.Delta < 0)
-                if (vm.DecreaseManualAirBlowerCommand.CanExecute(null))
-                    vm.DecreaseManualAirBlowerCommand.Execute(null);
+                if (vm.ManualControlPage.DecreaseManualAirBlowerCommand.CanExecute(null))
+                    vm.ManualControlPage.DecreaseManualAirBlowerCommand.Execute(null);
         }
 
         private void ProgressBar_MouseWheel_1(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
-                if (vm.IncreaseManualFuelPumpCommand.CanExecute(null))
-                    vm.IncreaseManualFuelPumpCommand.Execute(null);
+                if (vm.ManualControlPage.IncreaseManualFuelPumpCommand.CanExecute(null))
+                    vm.ManualControlPage.IncreaseManualFuelPumpCommand.Execute(null);
             if (e.Delta < 0)
-                if (vm.DecreaseFuelPumpCommand.CanExecute(null))
-                    vm.DecreaseFuelPumpCommand.Execute(null);
+                if (vm.ManualControlPage.DecreaseFuelPumpCommand.CanExecute(null))
+                    vm.ManualControlPage.DecreaseFuelPumpCommand.Execute(null);
         }
 
         private void ProgressBar_MouseWheel_2(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
-                if (vm.IncreaseGlowPlugCommand.CanExecute(null))
-                    vm.IncreaseGlowPlugCommand.Execute(null);
+                if (vm.ManualControlPage.IncreaseGlowPlugCommand.CanExecute(null))
+                    vm.ManualControlPage.IncreaseGlowPlugCommand.Execute(null);
             if (e.Delta < 0)
-                if (vm.DecreaseGlowPlugCommand.CanExecute(null))
-                    vm.DecreaseGlowPlugCommand.Execute(null);
+                if (vm.ManualControlPage.DecreaseGlowPlugCommand.CanExecute(null))
+                    vm.ManualControlPage.DecreaseGlowPlugCommand.Execute(null);
         }
 
         private void Disappear(object sender, EventArgs e)
