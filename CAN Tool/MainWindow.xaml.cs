@@ -100,10 +100,6 @@ namespace CAN_Tool
                 menuLanguage.Items.Add(menuLang);
             }
 
-            vm.myChart = Chart;
-
-            Chart.Plot.AddAxis(Edge.Right, 2, color: System.Drawing.Color.LightGreen);
-
             vm.CanAdapter.GotNewMessage += MessageHandler;
 
             vm.RefreshPortListCommand.Execute(null);
