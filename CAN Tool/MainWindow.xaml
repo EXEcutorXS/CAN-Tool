@@ -423,15 +423,15 @@
                             
                         </StackPanel>
                         <Expander DockPanel.Dock="Top" Header="{DynamicResource b_dataset}">
-                            <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.ChartCollection,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
+                            <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.Status}" AutoGenerateColumns="False" CanUserReorderColumns="False" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Variable" Binding="{Binding Path=Title}" IsReadOnly="True"></DataGridTextColumn>
-                                    <DataGridCheckBoxColumn Header="Show" Binding="{Binding Path=IsSeriesVisible, Mode=OneWay}"></DataGridCheckBoxColumn>
+                                    <DataGridTextColumn Header="Variable" Binding="{Binding Path=Name}" IsReadOnly="True"></DataGridTextColumn>
+                                    <DataGridCheckBoxColumn Header="Show" Binding="{Binding Path=Display}"></DataGridCheckBoxColumn>
                                     <DataGridTemplateColumn Header="Color">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Rectangle Width="30" Height="10" MouseLeftButtonDown="ColorPick" />
+                                                    <Rectangle Width="30" Height="10" Fill="{Binding Path=ChartBrush}" MouseLeftButtonDown="ColorPick" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
@@ -440,7 +440,7 @@
                             </DataGrid>
                         </Expander>
                         <Grid>
-                            <lvc:CartesianChart Series="{Binding SelectedConnectedDevice.ChartCollection}" LegendLocation="Right">
+                            <lvc:CartesianChart Series="{Binding SelectedConnectedDevice.ChartCollection}" LegendLocation="Right" DisableAnimations="True" Hoverable="False">
                                 
                             </lvc:CartesianChart>
                         </Grid>

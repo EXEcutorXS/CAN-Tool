@@ -1088,7 +1088,7 @@ namespace AdversCan
 
         public ConnectedDevice(DeviceId newId)
         {
-           
+
             id = newId;
             if (AC2P.Devices.ContainsKey(ID.Type))
                 deviceReference = AC2P.Devices[ID.Type];
@@ -1262,12 +1262,17 @@ namespace AdversCan
             chartCollection.Clear();
             foreach (var v in Status)
             {
-                LineSeries ls = new();
-                ls.Fill = v.ChartBrush;
-                ls.Title = v.Name;
-                ls.Values = v.Log;
-                ls.LineSmoothness = 0.2;
-                chartCollection.Add(ls);
+                if (v.Display)
+                {
+                    LineSeries ls = new()
+                    {
+                        Stroke = v.ChartBrush,
+                        Title = v.Name,
+                        Values = v.Log,
+                        LineSmoothness = 0
+                    };
+                    chartCollection.Add(ls);
+                }
             }
         }
         public void LogStop()
