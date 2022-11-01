@@ -17,6 +17,7 @@
     <v:String x:Key="b_reset">Сбросить</v:String>
     <v:String x:Key="b_start_log">Начать</v:String>
     <v:String x:Key="b_stop_log">Остановить</v:String>
+    <v:String x:Key="b_clear_log">Очистить</v:String>
     <v:String x:Key="b_redraw">Отрисовать</v:String>
     <v:String x:Key="b_save_log">Сохранить отчёт</v:String>
     <v:String x:Key="b_autoredraw">Автоотрисовка</v:String>

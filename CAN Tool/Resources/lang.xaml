@@ -17,6 +17,7 @@
     <v:String x:Key="b_reset">Reset</v:String>
     <v:String x:Key="b_start_log">Start</v:String>
     <v:String x:Key="b_stop_log">Stop</v:String>
+    <v:String x:Key="b_clear_log">Clear</v:String>
     <v:String x:Key="b_redraw">Redraw</v:String>
     <v:String x:Key="b_save_log">Save log</v:String>
     <v:String x:Key="b_autoredraw">Autoredraw</v:String>

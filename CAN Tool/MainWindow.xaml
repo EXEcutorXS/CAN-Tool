@@ -415,6 +415,7 @@
                         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
                             <Button Margin="10" Content="{DynamicResource b_start_log}" Command="{Binding LogPage.LogStartCommand}"></Button>
                             <Button Margin="10" Content="{DynamicResource b_stop_log}" Command="{Binding LogPage.LogStopCommand}"></Button>
+                            <Button Margin="10" Content="{DynamicResource b_clear_log}" Command="{Binding LogPage.LogClearCommand}"></Button>
                             <Button Margin="10" Content="{DynamicResource b_redraw}" Command="{Binding LogPage.ChartDrawCommand}"></Button>
                             <Button Margin="10" Content="{DynamicResource b_save_log}" Command="{Binding LogPage.SaveLogCommand}"></Button>
                             <CheckBox Margin="10" FontSize="20" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="{DynamicResource b_autoredraw}" IsChecked="{Binding AutoRedraw}" />
@@ -422,15 +423,15 @@
                             
                         </StackPanel>
                         <Expander DockPanel.Dock="Top" Header="{DynamicResource b_dataset}">
-                            <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
+                            <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.ChartCollection,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Variable" Binding="{Binding Path=Name}" IsReadOnly="True"></DataGridTextColumn>
-                                    <DataGridCheckBoxColumn Header="Show" Binding="{Binding Path=Display}"></DataGridCheckBoxColumn>
+                                    <DataGridTextColumn Header="Variable" Binding="{Binding Path=Title}" IsReadOnly="True"></DataGridTextColumn>
+                                    <DataGridCheckBoxColumn Header="Show" Binding="{Binding Path=IsSeriesVisible, Mode=OneWay}"></DataGridCheckBoxColumn>
                                     <DataGridTemplateColumn Header="Color">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Rectangle Width="30" Height="10" Fill="{Binding Path=ChartBrush}" MouseLeftButtonDown="ColorPick" />
+                                                    <Rectangle Width="30" Height="10" MouseLeftButtonDown="ColorPick" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
@@ -439,15 +440,9 @@
                             </DataGrid>
                         </Expander>
                         <Grid>
-                            <lvc:CartesianChart Series="{Binding LogPage.SeriesCollection}" LegendLocation="Right">
-                                <lvc:CartesianChart.AxisY>
-                                    <lvc:Axis Title="Sales" LabelFormatter="{Binding LogPage.YFormatter}"></lvc:Axis>
-                                </lvc:CartesianChart.AxisY>
-                                <lvc:CartesianChart.AxisX>
-                                    <lvc:Axis Title="Month" Labels="{Binding LogPage.Labels}"></lvc:Axis>
-                                </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart Series="{Binding SelectedConnectedDevice.ChartCollection}" LegendLocation="Right">
+                                
                             </lvc:CartesianChart>
-
                         </Grid>
                     </DockPanel>
                 </TabItem>

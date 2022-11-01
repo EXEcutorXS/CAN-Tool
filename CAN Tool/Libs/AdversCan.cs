@@ -19,6 +19,8 @@ using System.Windows.Media;
 using System.Security.Cryptography.Pkcs;
 using LiveCharts;
 using LiveCharts.Wpf;
+using LiveCharts.Helpers;
+using System.Windows.Data;
 
 namespace AdversCan
 {
@@ -505,36 +507,28 @@ namespace AdversCan
                 )
                 Display = true;
 
-            Id = var;
-            if (var == 1 ||
-                var == 2 ||
-                var == 7 ||
-                var == 15 ||
-                var == 16 ||
-                var == 17 ||
-                var == 18 ||
-                var == 21
-                )
-                commonView = false; ;
-
             switch (var)
             {
-                case 5: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 0)); break;
-                case 15: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 255)); break;
-                case 16: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 255)); break;
-                case 18: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0)); break;
-                case 21: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 255)); break;
-                case 40: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 100, 100)); break;
+                case 5: ChartBrush = new SolidColorBrush(Color.FromRgb(255, 255, 0)); break;
+                case 15: ChartBrush = new SolidColorBrush(Color.FromRgb(0, 0, 255)); break;
+                case 16: ChartBrush = new SolidColorBrush(Color.FromRgb(0, 255, 255)); break;
+                case 18: ChartBrush = new SolidColorBrush(Color.FromRgb(0, 255, 0)); break;
+                case 21: ChartBrush = new SolidColorBrush(Color.FromRgb(255, 0, 255)); break;
+                case 40: ChartBrush = new SolidColorBrush(Color.FromRgb(255, 100, 100)); break;
                 default:
                     Random random = new Random((int)DateTime.Now.Ticks);
-                    ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255)));
+                    ChartBrush = new SolidColorBrush(Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255)));
                     break;
             }
         }
         public StatusVariable()
         {
-
+            log = new ChartValues<double>();
         }
+
+        ChartValues<Double> log = new();
+
+        public ChartValues<double> Log => log;
         public int Id { get; set; }
 
         private long rawVal;
@@ -559,10 +553,6 @@ namespace AdversCan
         private bool display = false;
 
         public bool Display { get { return display; } set { Set(ref display, value); } }
-
-        private bool commonView = true;
-
-        public bool CommonView { get { return commonView; } set { Set(ref commonView, value); } }
 
         public double Value
         {
@@ -608,6 +598,11 @@ namespace AdversCan
         public int CompareTo(object obj)
         {
             return Id - (obj as StatusVariable).Id;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
     public class ReadedVariable : ViewModel, IUpdatable<ReadedVariable>, IComparable
@@ -835,19 +830,7 @@ namespace AdversCan
         }
 
     }
-    public class Log
-    {
-        private SeriesCollection parameters;
 
-        public Log()
-        {
-            parameters = new();
-            foreach (var p in )
-            { 
-            parameters.Add(new LineSeries)
-            }
-        }
-    }
     public class MainParameters : ViewModel, ICloneable
     {
 
@@ -1105,6 +1088,7 @@ namespace AdversCan
 
         public ConnectedDevice(DeviceId newId)
         {
+           
             id = newId;
             if (AC2P.Devices.ContainsKey(ID.Type))
                 deviceReference = AC2P.Devices[ID.Type];
@@ -1181,6 +1165,9 @@ namespace AdversCan
         UpdatableList<StatusVariable> status = new();
         public UpdatableList<StatusVariable> Status => status;
 
+        private SeriesCollection chartCollection = new();
+        public SeriesCollection ChartCollection => chartCollection;
+
         private readonly UpdatableList<ReadedParameter> _readedParameters = new();
         public UpdatableList<ReadedParameter> readedParameters => _readedParameters;
 
@@ -1192,8 +1179,7 @@ namespace AdversCan
         private UpdatableList<BBError> _BBErrors = new();
         public UpdatableList<BBError> BBErrors => _BBErrors;
 
-        private readonly BindingList<MainParameters> log = new();
-        public BindingList<MainParameters> Log => log;
+        public BindingList<MainParameters> Log { set; get; } = new();
 
         private bool manualMode;
 
@@ -1256,12 +1242,6 @@ namespace AdversCan
             private set { Set(ref isLogWriting, value); }
         }
 
-        public void LogTick()
-        {
-            if (isLogWriting)
-                Log.Insert(0, (MainParameters)Parameters.Clone());
-        }
-
         private bool[] supportedVariables = new bool[AC2P.Variables.Count];
 
         public bool[] SupportedVariables => supportedVariables;
@@ -1279,6 +1259,16 @@ namespace AdversCan
         public void LogStart()
         {
             IsLogWriting = true;
+            chartCollection.Clear();
+            foreach (var v in Status)
+            {
+                LineSeries ls = new();
+                ls.Fill = v.ChartBrush;
+                ls.Title = v.Name;
+                ls.Values = v.Log;
+                ls.LineSmoothness = 0.2;
+                chartCollection.Add(ls);
+            }
         }
         public void LogStop()
         {
@@ -1286,7 +1276,16 @@ namespace AdversCan
         }
         public void LogClear()
         {
-            Log.Clear();
+            foreach (var v in status)
+                v.Log.Clear();
+        }
+
+        public void LogTick()
+        {
+
+            foreach (var s in status)
+                s.Log.Add(s.Value);
+            Log.Insert(0, (MainParameters)Parameters.Clone());
         }
 
 
@@ -1403,7 +1402,7 @@ namespace AdversCan
         public static Dictionary<int, BbParameter> BbParameters = new();
 
         public static Dictionary<int, string> ParamtersNames = new();
-        
+
         public static Dictionary<int, string> BbParameterNames = new();
 
 
@@ -1493,9 +1492,12 @@ namespace AdversCan
                     if (rawValue == Math.Pow(2, p.BitLength) - 1) return; //Неподдерживаемый параметр, ливаем
                     sv.RawValue = rawValue;
                     currentDevice.SupportedVariables[sv.Id] = true;
-                    currentDevice.Status.TryToAdd(sv);
-                    if (sv.CommonView)
-                        currentDevice.CommonView.TryToAdd(sv);
+                    if (currentDevice.Status.TryToAdd(sv)) //Если появляется новая переменная все логи очищаются, чтобы всё шло синхронно
+                    {
+                        foreach (var s in currentDevice.Status)
+                            s.Log.Clear();
+                    }
+
 
                     if (sv.Id == 1)
                         currentDevice.Parameters.Stage = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);

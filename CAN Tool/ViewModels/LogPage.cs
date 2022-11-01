@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AdversCan;
 
 namespace CAN_Tool.ViewModels
 {
@@ -41,13 +42,22 @@ namespace CAN_Tool.ViewModels
         private bool CanLogStopCommandExecute(object parameter) => (VM.SelectedConnectedDevice != null && VM.CanAdapter.PortOpened && VM.SelectedConnectedDevice.IsLogWriting);
         #endregion
 
-        
+
+        #region LogClearCommand
+        public ICommand LogClearCommand { get; }
+        private void OnLogClearCommandExecuted(object parameter)
+        {
+            VM.SelectedConnectedDevice.LogClear();
+        }
+        private bool CanLogClearCommandExecute(object parameter) => (VM.SelectedConnectedDevice != null);
+        #endregion
+
         public ICommand ChartDrawCommand { get; }
         public void OnChartDrawCommandExecuted(object parameter)
         {
 
         }
-        public bool CanChartDrawCommandExecute(object parameter) => (VM.SelectedConnectedDevice != null && VM.SelectedConnectedDevice.Log.Count > 0);
+        public bool CanChartDrawCommandExecute(object parameter) => (VM.SelectedConnectedDevice != null);
 
         public ICommand SaveLogCommand { get; }
 
@@ -57,19 +67,22 @@ namespace CAN_Tool.ViewModels
 
             using (StreamWriter sw = new StreamWriter(path))
             {
-                /*
-                foreach (var v in SelectedConnectedDevice.Status)
+
+                foreach (var v in vm.SelectedConnectedDevice.Status)
                     sw.Write(AC2P.Variables[v.Id].ShortName + ";");
                 sw.WriteLine();
-                for (int i = 0; i < SelectedConnectedDevice.LogCurrentPos; i++)
+
+                if (vm.SelectedConnectedDevice.Status.Count == 0) return;
+
+                for (int i = 0; i < vm.SelectedConnectedDevice.Status[0].Log.Count; i++)
                 {
-                    foreach (var v in SelectedConnectedDevice.Status)
-                        sw.Write(SelectedConnectedDevice.LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
+                    foreach (var v in vm.SelectedConnectedDevice.Status)
+                        sw.Write(v.Log[i].ToString(v.AssignedParameter.OutputFormat) + ";");
                     sw.WriteLine();
                 }
                 sw.Flush();
                 sw.Close();
-                */
+
             }
         }
         public LogPage(MainWindowViewModel vm)
@@ -80,18 +93,18 @@ namespace CAN_Tool.ViewModels
             {
                 new LineSeries
                 {
-                    Title = "Series 1",
+                    Title = "Cool",
                     Values = new ChartValues<double> { 4, 6, 5, 2 ,4 }
                 },
                 new LineSeries
                 {
-                    Title = "Series 2",
+                    Title = "Very cool",
                     Values = new ChartValues<double> { 6, 7, 3, 4 ,6 },
                     PointGeometry = null
                 },
                 new LineSeries
                 {
-                    Title = "Series 3",
+                    Title = "Awesome",
                     Values = new ChartValues<double> { 4,2,7,2,7 },
                     PointGeometry = DefaultGeometries.Square,
                     PointGeometrySize = 15
@@ -99,12 +112,14 @@ namespace CAN_Tool.ViewModels
             };
 
             Labels = new[] { "1", "2", "Mar", "Apr", "May" };
-            
+
 
             LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
             LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
+            LogClearCommand = new LambdaCommand(OnLogClearCommandExecuted, CanLogClearCommandExecute);
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, vm.deviceSelected);
             ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);
+
         }
     }
 }
