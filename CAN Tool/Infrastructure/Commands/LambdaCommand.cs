@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CAN_Tool.Infrastructure.Commands.Base;
+﻿using CAN_Tool.Infrastructure.Commands.Base;
+using System;
 
 namespace CAN_Tool.Infrastructure.Commands
 {

@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CAN_Tool.ViewModels.Base;
-using System.ComponentModel;
-using System.Windows.Input;
-using CAN_Tool.Infrastructure.Commands;
-using System.IO.Ports;
+﻿using AdversCan;
 using Can_Adapter;
-using AdversCan;
+using CAN_Tool.Infrastructure.Commands;
+using CAN_Tool.ViewModels.Base;
 using ScottPlot;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Drawing;
+using System.IO.Ports;
+using System.Linq;
 using System.Threading;
-using System.Security.Principal;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace CAN_Tool.ViewModels
@@ -316,7 +314,7 @@ namespace CAN_Tool.ViewModels
                 plt.Palette = Palette.Aurora;
             */
             myChart.Refresh();
-            
+
         }
         private bool CanChartDrawCommandExecute(object parameter) => (SelectedConnectedDevice != null && SelectedConnectedDevice.LogCurrentPos > 0);
         #endregion

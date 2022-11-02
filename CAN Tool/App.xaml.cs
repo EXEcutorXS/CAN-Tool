@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Globalization;
+using System.Linq;
+using System.Windows;
 
 //TODO: Жёстко рефакторить
 //TODO: Раскидать MainWindowViewModel на файлы по табам
@@ -24,9 +22,9 @@ using System.Globalization;
 
 namespace CAN_Tool
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
+	/// <summary>
+	/// Interaction logic for App.xaml
+	/// </summary>
 
 
 	public partial class App : Application
@@ -34,7 +32,7 @@ namespace CAN_Tool
 		private static List<CultureInfo> m_Languages = new List<CultureInfo>();
 
 		public static Settings Settings { set; get; } = new();
-        public static List<CultureInfo> Languages
+		public static List<CultureInfo> Languages
 		{
 			get
 			{

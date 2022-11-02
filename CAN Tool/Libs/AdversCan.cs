@@ -1,22 +1,16 @@
-﻿using System;
+﻿using Can_Adapter;
+using CAN_Tool.ViewModels.Base;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Threading;
-using System.ComponentModel;
-using Can_Adapter;
-using System.Diagnostics.CodeAnalysis;
-using System.Collections.ObjectModel;
-using System.Data;
-using CAN_Tool.ViewModels.Base;
-using System.Windows.Markup;
-using System.Diagnostics.Contracts;
-using System.Reflection.Metadata.Ecma335;
-using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Media;
-using System.Security.Cryptography.Pkcs;
 
 namespace AdversCan
 {
@@ -394,7 +388,7 @@ namespace AdversCan
         }
 
     }
-    public class ReadedBlackBoxValue : ViewModel, INotifyPropertyChanged, IUpdatable<ReadedBlackBoxValue>,IComparable
+    public class ReadedBlackBoxValue : ViewModel, INotifyPropertyChanged, IUpdatable<ReadedBlackBoxValue>, IComparable
     {
         private int id;
 
@@ -405,11 +399,11 @@ namespace AdversCan
         }
         private uint val;
 
-        public uint Value 
+        public uint Value
         {
             get => val;
             set => Set(ref val, value);
-            
+
         }
 
         public void Update(ReadedBlackBoxValue item)
@@ -456,7 +450,7 @@ namespace AdversCan
         {
             get => _value;
             set => Set(ref _value, value);
-            
+
         }
 
         public void Update(ReadedParameter item)
@@ -480,7 +474,7 @@ namespace AdversCan
 
     }
 
-    public class StatusVariable : ViewModel, IUpdatable<StatusVariable>,IComparable
+    public class StatusVariable : ViewModel, IUpdatable<StatusVariable>, IComparable
     {
 
         public StatusVariable(int var) : base()
@@ -656,7 +650,7 @@ namespace AdversCan
             return id - (obj as ReadedVariable).id;
         }
     }
-    public class BBError : IUpdatable<BBError>, INotifyPropertyChanged,IComparable
+    public class BBError : IUpdatable<BBError>, INotifyPropertyChanged, IComparable
     {
         private readonly UpdatableList<ReadedVariable> _variables = new();
 
@@ -1325,7 +1319,7 @@ namespace AdversCan
         public event EventHandler LogDataOverrun;
 
     }
-    
+
     public class DeviceId : ViewModel
     {
         private int type;
@@ -1451,7 +1445,7 @@ namespace AdversCan
 
         public AC2PTask CurrentTask
         {
-            get => currentTask; 
+            get => currentTask;
             set => Set(ref currentTask, value);
         }
 
@@ -1473,9 +1467,9 @@ namespace AdversCan
             Debug.WriteLine("<-" + m.ToString());
             if (ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id)) == null)
             {
-                
+
             }
-            
+
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(m.TransmitterId));
 
             if (currentDevice == null)
@@ -1757,7 +1751,7 @@ namespace AdversCan
         {
             if (!Capture("Чтение параметров чёрного ящика")) return;
             ConnectedDevice currentDevice = _connectedDevices.FirstOrDefault(d => d.ID == id);
-            if (currentDevice == null)   return;
+            if (currentDevice == null) return;
             WaitingForBBErrors = false;
             AC2PMessage msg = new()
             {
@@ -1783,7 +1777,7 @@ namespace AdversCan
                 {
                     if (currentDevice.flagGetBBDone) break;
                     await Task.Delay(1);
-                    Debug.WriteLineIf(i==99, $"Error reading parameter {p.Key} ({AC2P.BbParameterNames[p.Key]})");
+                    Debug.WriteLineIf(i == 99, $"Error reading parameter {p.Key} ({AC2P.BbParameterNames[p.Key]})");
                 }
                 if (CancellationRequested)
                 {
@@ -1907,7 +1901,7 @@ namespace AdversCan
                 currentDevice.flagGetParamDone = false;
                 SendMessage(msg);
 
-                
+
                 for (int j = 0; j < 100; j++)
                 {
                     if (currentDevice.flagGetParamDone)
@@ -2122,106 +2116,106 @@ namespace AdversCan
             #endregion
 
             #region Commands init
-            commands.Add(0, new() { Id=0, Name = "Кто здесь?" });
+            commands.Add(0, new() { Id = 0, Name = "Кто здесь?" });
             commands.Add(1, new AC2PCommand() { Id = 1, Name = "пуск устройства" });
             commands.Add(3, new AC2PCommand() { Id = 3, Name = "остановка устройства" });
-            commands.Add(4, new AC2PCommand() {  Id = 4, Name = "пуск только помпы" });
-            commands.Add(5, new AC2PCommand() {  Id = 5, Name = "сброс неисправностей" });
-            commands.Add(6, new AC2PCommand() {  Id = 6, Name = "задать параметры работы жидкостного подогревателя" });
-            commands.Add(7, new AC2PCommand() {  Id = 7, Name = "запрос температурных переходов по режимам жидкостного подогревателя" });
-            commands.Add(8, new AC2PCommand() {  Id = 8, Name = "задать состояние клапанов устройства ”Блок управления клапанами”" });
-            commands.Add(9, new AC2PCommand() {  Id = 9, Name = "задать параметры работы воздушного отопителя" });
-            commands.Add(10, new AC2PCommand() {  Id = 10, Name = "запуск в режиме вентиляции (для воздушных отопителей)" });
-            commands.Add(20, new AC2PCommand() {  Id = 20, Name = "калибровка термопар" });
-            commands.Add(21, new AC2PCommand() {  Id = 21, Name = "задать параметры частоты ШИМ нагнетателя воздуха" });
-            commands.Add(22, new AC2PCommand() {  Id = 22, Name = "Reset CPU" });
-            commands.Add(45, new AC2PCommand() {  Id = 45, Name = "биты реакции на неисправности" });
-            commands.Add(65, new AC2PCommand() {  Id = 65, Name = "установить значение температуры" });
-            commands.Add(66, new AC2PCommand() {  Id = 66, Name = "сброс неисправностей" });
-            commands.Add(67, new AC2PCommand() {  Id = 67, Name = "вход/выход в стадию M (ручное управление) или T (тестирование блока управления)" });
-            commands.Add(68, new AC2PCommand() {  Id = 68, Name = "задание параметров устройств в стадии M (ручное управление)" });
-            commands.Add(69, new AC2PCommand() {  Id = 69, Name = "управление устройствами" });
-            commands.Add(70, new AC2PCommand() {  Id = 69, Name = "Включение/Выключение устройств" });
+            commands.Add(4, new AC2PCommand() { Id = 4, Name = "пуск только помпы" });
+            commands.Add(5, new AC2PCommand() { Id = 5, Name = "сброс неисправностей" });
+            commands.Add(6, new AC2PCommand() { Id = 6, Name = "задать параметры работы жидкостного подогревателя" });
+            commands.Add(7, new AC2PCommand() { Id = 7, Name = "запрос температурных переходов по режимам жидкостного подогревателя" });
+            commands.Add(8, new AC2PCommand() { Id = 8, Name = "задать состояние клапанов устройства ”Блок управления клапанами”" });
+            commands.Add(9, new AC2PCommand() { Id = 9, Name = "задать параметры работы воздушного отопителя" });
+            commands.Add(10, new AC2PCommand() { Id = 10, Name = "запуск в режиме вентиляции (для воздушных отопителей)" });
+            commands.Add(20, new AC2PCommand() { Id = 20, Name = "калибровка термопар" });
+            commands.Add(21, new AC2PCommand() { Id = 21, Name = "задать параметры частоты ШИМ нагнетателя воздуха" });
+            commands.Add(22, new AC2PCommand() { Id = 22, Name = "Reset CPU" });
+            commands.Add(45, new AC2PCommand() { Id = 45, Name = "биты реакции на неисправности" });
+            commands.Add(65, new AC2PCommand() { Id = 65, Name = "установить значение температуры" });
+            commands.Add(66, new AC2PCommand() { Id = 66, Name = "сброс неисправностей" });
+            commands.Add(67, new AC2PCommand() { Id = 67, Name = "вход/выход в стадию M (ручное управление) или T (тестирование блока управления)" });
+            commands.Add(68, new AC2PCommand() { Id = 68, Name = "задание параметров устройств в стадии M (ручное управление)" });
+            commands.Add(69, new AC2PCommand() { Id = 69, Name = "управление устройствами" });
+            commands.Add(70, new AC2PCommand() { Id = 69, Name = "Включение/Выключение устройств" });
             #endregion
 
             #region Command parameters init
-            commands[0].Parameters.Add(new () { StartByte = 2, BitLength = 8, GetMeaning = i => ("Устройство: " + Devices[i].Name + ";"), AnswerOnly = true }); ;
-            commands[0].Parameters.Add(new () { StartByte = 3, BitLength = 8, Meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } }, AnswerOnly = true });
-            commands[0].Parameters.Add(new () { StartByte = 4, BitLength = 8, Name = "Верия ПО", AnswerOnly = true });
-            commands[0].Parameters.Add(new () { StartByte = 5, BitLength = 8, Name = "Модификация ПО", AnswerOnly = true });
+            commands[0].Parameters.Add(new() { StartByte = 2, BitLength = 8, GetMeaning = i => ("Устройство: " + Devices[i].Name + ";"), AnswerOnly = true }); ;
+            commands[0].Parameters.Add(new() { StartByte = 3, BitLength = 8, Meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } }, AnswerOnly = true });
+            commands[0].Parameters.Add(new() { StartByte = 4, BitLength = 8, Name = "Верия ПО", AnswerOnly = true });
+            commands[0].Parameters.Add(new() { StartByte = 5, BitLength = 8, Name = "Модификация ПО", AnswerOnly = true });
 
-            commands[0].Parameters.Add(new () { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
+            commands[0].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
 
-            commands[0].Parameters.Add(new () { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
+            commands[0].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
 
-            commands[6].Parameters.Add(new () { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
-            commands[6].Parameters.Add(new () { StartByte = 4, BitLength = 4, Name = "Режим работы", Meanings = { { 0, "обычный" }, { 1, "экономичный" }, { 2, "догреватель" }, { 3, "отопление" }, { 4, "отопительные системы" } } });
-            commands[6].Parameters.Add(new () { StartByte = 4, StartBit = 4, BitLength = 4, Name = "Режим догрева", Meanings = { { 0, "отключен" }, { 1, "автоматический" }, { 2, "ручной" } } });
-            commands[6].Parameters.Add(new () { StartByte = 5, BitLength = 16, Name = "Уставка температуры", Unit = "°С" });
-            commands[6].Parameters.Add(new () { StartByte = 7, BitLength = 2, Name = "Работа помпы в ждущем режиме", Meanings = defMeaningsOnOff });
-            commands[6].Parameters.Add(new () { StartByte = 7, BitLength = 2, StartBit = 2, Name = "Работа помпы при заведённом двигателе", Meanings = defMeaningsOnOff });
+            commands[6].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
+            commands[6].Parameters.Add(new() { StartByte = 4, BitLength = 4, Name = "Режим работы", Meanings = { { 0, "обычный" }, { 1, "экономичный" }, { 2, "догреватель" }, { 3, "отопление" }, { 4, "отопительные системы" } } });
+            commands[6].Parameters.Add(new() { StartByte = 4, StartBit = 4, BitLength = 4, Name = "Режим догрева", Meanings = { { 0, "отключен" }, { 1, "автоматический" }, { 2, "ручной" } } });
+            commands[6].Parameters.Add(new() { StartByte = 5, BitLength = 16, Name = "Уставка температуры", Unit = "°С" });
+            commands[6].Parameters.Add(new() { StartByte = 7, BitLength = 2, Name = "Работа помпы в ждущем режиме", Meanings = defMeaningsOnOff });
+            commands[6].Parameters.Add(new() { StartByte = 7, BitLength = 2, StartBit = 2, Name = "Работа помпы при заведённом двигателе", Meanings = defMeaningsOnOff });
 
-            commands[7].Parameters.Add(new () { StartByte = 2, BitLength = 8, Name = "Номер мощности" });
+            commands[7].Parameters.Add(new() { StartByte = 2, BitLength = 8, Name = "Номер мощности" });
 
-            commands[7].Parameters.Add(new () { StartByte = 3, BitLength = 16, Name = "Температура перехода на большую мощность", AnswerOnly = true });
-            commands[7].Parameters.Add(new () { StartByte = 4, BitLength = 16, Name = "Температура перехода на меньшую мощность", AnswerOnly = true });
+            commands[7].Parameters.Add(new() { StartByte = 3, BitLength = 16, Name = "Температура перехода на большую мощность", AnswerOnly = true });
+            commands[7].Parameters.Add(new() { StartByte = 4, BitLength = 16, Name = "Температура перехода на меньшую мощность", AnswerOnly = true });
 
-            commands[8].Parameters.Add(new () { StartByte = 2, BitLength = 2, StartBit = 0, Name = "Состояние клапана 1", Meanings = defMeaningsOnOff });
-            commands[8].Parameters.Add(new () { StartByte = 2, BitLength = 2, StartBit = 2, Name = "Состояние клапана 2", Meanings = defMeaningsOnOff });
-            commands[8].Parameters.Add(new () { StartByte = 2, BitLength = 2, StartBit = 4, Name = "Состояние клапана 3", Meanings = defMeaningsOnOff });
-            commands[8].Parameters.Add(new () { StartByte = 2, BitLength = 2, StartBit = 6, Name = "Состояние клапана 4", Meanings = defMeaningsOnOff });
-            commands[8].Parameters.Add(new () { StartByte = 3, BitLength = 2, StartBit = 0, Name = "Состояние клапана 5", Meanings = defMeaningsOnOff });
-            commands[8].Parameters.Add(new () { StartByte = 3, BitLength = 2, StartBit = 2, Name = "Состояние клапана 6", Meanings = defMeaningsOnOff });
-            commands[8].Parameters.Add(new () { StartByte = 3, BitLength = 2, StartBit = 4, Name = "Состояние клапана 7", Meanings = defMeaningsOnOff });
-            commands[8].Parameters.Add(new () { StartByte = 3, BitLength = 2, StartBit = 6, Name = "Состояние клапана 8", Meanings = defMeaningsOnOff });
-            commands[8].Parameters.Add(new () { StartByte = 4, BitLength = 1, StartBit = 0, Meanings = { { 0, "Сбросить неисправности" } } });
+            commands[8].Parameters.Add(new() { StartByte = 2, BitLength = 2, StartBit = 0, Name = "Состояние клапана 1", Meanings = defMeaningsOnOff });
+            commands[8].Parameters.Add(new() { StartByte = 2, BitLength = 2, StartBit = 2, Name = "Состояние клапана 2", Meanings = defMeaningsOnOff });
+            commands[8].Parameters.Add(new() { StartByte = 2, BitLength = 2, StartBit = 4, Name = "Состояние клапана 3", Meanings = defMeaningsOnOff });
+            commands[8].Parameters.Add(new() { StartByte = 2, BitLength = 2, StartBit = 6, Name = "Состояние клапана 4", Meanings = defMeaningsOnOff });
+            commands[8].Parameters.Add(new() { StartByte = 3, BitLength = 2, StartBit = 0, Name = "Состояние клапана 5", Meanings = defMeaningsOnOff });
+            commands[8].Parameters.Add(new() { StartByte = 3, BitLength = 2, StartBit = 2, Name = "Состояние клапана 6", Meanings = defMeaningsOnOff });
+            commands[8].Parameters.Add(new() { StartByte = 3, BitLength = 2, StartBit = 4, Name = "Состояние клапана 7", Meanings = defMeaningsOnOff });
+            commands[8].Parameters.Add(new() { StartByte = 3, BitLength = 2, StartBit = 6, Name = "Состояние клапана 8", Meanings = defMeaningsOnOff });
+            commands[8].Parameters.Add(new() { StartByte = 4, BitLength = 1, StartBit = 0, Meanings = { { 0, "Сбросить неисправности" } } });
 
-            commands[9].Parameters.Add(new () { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
-            commands[9].Parameters.Add(new () { StartByte = 4, BitLength = 4, Name = "Режим работы", Meanings = { { 0, "не используется" }, { 1, "работа по температуре платы" }, { 2, "работа по температуре пульта" }, { 3, "работа по температуре выносного датчика" }, { 4, "работа по мощности" } } });
-            commands[9].Parameters.Add(new () { StartByte = 4, StartBit = 4, BitLength = 2, Name = "Разрешение/запрещение ждущего режима (при работе по датчику температуры)", Meanings = defMeaningsAllow });
-            commands[9].Parameters.Add(new () { StartByte = 4, StartBit = 6, BitLength = 2, Name = "Разрешение вращения нагнетателя воздуха на ждущем режиме", Meanings = defMeaningsAllow });
-            commands[9].Parameters.Add(new () { StartByte = 5, BitLength = 16, Name = "Уставка температуры помещения", Unit = "°С" });
-            commands[9].Parameters.Add(new () { StartByte = 7, BitLength = 4, Name = "Заданное значение мощности" });
+            commands[9].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
+            commands[9].Parameters.Add(new() { StartByte = 4, BitLength = 4, Name = "Режим работы", Meanings = { { 0, "не используется" }, { 1, "работа по температуре платы" }, { 2, "работа по температуре пульта" }, { 3, "работа по температуре выносного датчика" }, { 4, "работа по мощности" } } });
+            commands[9].Parameters.Add(new() { StartByte = 4, StartBit = 4, BitLength = 2, Name = "Разрешение/запрещение ждущего режима (при работе по датчику температуры)", Meanings = defMeaningsAllow });
+            commands[9].Parameters.Add(new() { StartByte = 4, StartBit = 6, BitLength = 2, Name = "Разрешение вращения нагнетателя воздуха на ждущем режиме", Meanings = defMeaningsAllow });
+            commands[9].Parameters.Add(new() { StartByte = 5, BitLength = 16, Name = "Уставка температуры помещения", Unit = "°С" });
+            commands[9].Parameters.Add(new() { StartByte = 7, BitLength = 4, Name = "Заданное значение мощности" });
 
-            commands[10].Parameters.Add(new () { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
+            commands[10].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "Время работы", Unit = "мин" });
 
-            commands[20].Parameters.Add(new () { StartByte = 2, BitLength = 16, Name = "Калибровочное значение термопары 1", AnswerOnly = true });
-            commands[20].Parameters.Add(new () { StartByte = 4, BitLength = 16, Name = "Калибровочное значение термопары 2", AnswerOnly = true });
+            commands[20].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "Калибровочное значение термопары 1", AnswerOnly = true });
+            commands[20].Parameters.Add(new() { StartByte = 4, BitLength = 16, Name = "Калибровочное значение термопары 2", AnswerOnly = true });
 
-            commands[21].Parameters.Add(new () { StartByte = 2, BitLength = 8, Name = "Предделитель" });
-            commands[21].Parameters.Add(new () { StartByte = 3, BitLength = 8, Name = "Период ШИМ" });
-            commands[21].Parameters.Add(new () { StartByte = 5, BitLength = 8, Name = "Требуемая частота", Unit = "Гц" });
+            commands[21].Parameters.Add(new() { StartByte = 2, BitLength = 8, Name = "Предделитель" });
+            commands[21].Parameters.Add(new() { StartByte = 3, BitLength = 8, Name = "Период ШИМ" });
+            commands[21].Parameters.Add(new() { StartByte = 5, BitLength = 8, Name = "Требуемая частота", Unit = "Гц" });
 
-            commands[22].Parameters.Add(new () { StartByte = 2, StartBit = 0, BitLength = 8, Name = "Действие после перезагрузки", Meanings = { { 0, "Остаться в загрузчике" }, { 1, "Переход в основную программу без зедержки" }, { 2, "5 секунд в загрузчике" } } });
+            commands[22].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "Действие после перезагрузки", Meanings = { { 0, "Остаться в загрузчике" }, { 1, "Переход в основную программу без зедержки" }, { 2, "5 секунд в загрузчике" } } });
 
-            commands[45].Parameters.Add(new () { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Игнорирование всех неисправностей", Meanings = defMeaningsYesNo });
-            commands[45].Parameters.Add(new () { StartByte = 2, StartBit = 2, BitLength = 2, Name = "Игнорирование неисправностей ТН", Meanings = defMeaningsYesNo });
-            commands[45].Parameters.Add(new () { StartByte = 2, StartBit = 4, BitLength = 2, Name = "Игнорирование срывов пламени ", Meanings = defMeaningsYesNo });
-            commands[45].Parameters.Add(new () { StartByte = 2, StartBit = 6, BitLength = 2, Name = "Игнорирование неисправностей свечи", Meanings = defMeaningsYesNo });
-            commands[45].Parameters.Add(new () { StartByte = 3, StartBit = 0, BitLength = 2, Name = "Игнорирование неисправностей НВ", Meanings = defMeaningsYesNo });
-            commands[45].Parameters.Add(new () { StartByte = 3, StartBit = 2, BitLength = 2, Name = "Игнорирование неисправностей датчиков", Meanings = defMeaningsYesNo });
-            commands[45].Parameters.Add(new () { StartByte = 3, StartBit = 4, BitLength = 2, Name = "Игнорирование неисправностей помпы", Meanings = defMeaningsYesNo });
-            commands[45].Parameters.Add(new () { StartByte = 3, StartBit = 6, BitLength = 2, Name = "Игнорирование перегревов", Meanings = defMeaningsYesNo });
+            commands[45].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Игнорирование всех неисправностей", Meanings = defMeaningsYesNo });
+            commands[45].Parameters.Add(new() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "Игнорирование неисправностей ТН", Meanings = defMeaningsYesNo });
+            commands[45].Parameters.Add(new() { StartByte = 2, StartBit = 4, BitLength = 2, Name = "Игнорирование срывов пламени ", Meanings = defMeaningsYesNo });
+            commands[45].Parameters.Add(new() { StartByte = 2, StartBit = 6, BitLength = 2, Name = "Игнорирование неисправностей свечи", Meanings = defMeaningsYesNo });
+            commands[45].Parameters.Add(new() { StartByte = 3, StartBit = 0, BitLength = 2, Name = "Игнорирование неисправностей НВ", Meanings = defMeaningsYesNo });
+            commands[45].Parameters.Add(new() { StartByte = 3, StartBit = 2, BitLength = 2, Name = "Игнорирование неисправностей датчиков", Meanings = defMeaningsYesNo });
+            commands[45].Parameters.Add(new() { StartByte = 3, StartBit = 4, BitLength = 2, Name = "Игнорирование неисправностей помпы", Meanings = defMeaningsYesNo });
+            commands[45].Parameters.Add(new() { StartByte = 3, StartBit = 6, BitLength = 2, Name = "Игнорирование перегревов", Meanings = defMeaningsYesNo });
 
-            commands[65].Parameters.Add(new () { StartByte = 2, StartBit = 0, BitLength = 8, Name = "", Meanings = { { 7, "Температура жидкости" }, { 10, "Температура перегрева" }, { 12, "Температура пламени" }, { 13, "Температура корпуса" }, { 27, "Температура воздуха" } } });
-            commands[65].Parameters.Add(new () { StartByte = 3, BitLength = 16, Name = "Значение температуры", Unit = "°C" });
+            commands[65].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "", Meanings = { { 7, "Температура жидкости" }, { 10, "Температура перегрева" }, { 12, "Температура пламени" }, { 13, "Температура корпуса" }, { 27, "Температура воздуха" } } });
+            commands[65].Parameters.Add(new() { StartByte = 3, BitLength = 16, Name = "Значение температуры", Unit = "°C" });
 
-            commands[67].Parameters.Add(new () { StartByte = 2, StartBit = 0, BitLength = 2, Name = "", Meanings = { { 0, "Выход из режима М" }, { 1, "Вход в режим М" } } });
-            commands[67].Parameters.Add(new () { StartByte = 2, StartBit = 2, BitLength = 2, Name = "", Meanings = { { 0, "Выход из режима Т" }, { 1, "Вход в режим Т" } } });
+            commands[67].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "", Meanings = { { 0, "Выход из режима М" }, { 1, "Вход в режим М" } } });
+            commands[67].Parameters.Add(new() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "", Meanings = { { 0, "Выход из режима Т" }, { 1, "Вход в режим Т" } } });
 
-            commands[68].Parameters.Add(new () { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Состояние помпы", Meanings = defMeaningsOnOff });
-            commands[68].Parameters.Add(new () { StartByte = 3, StartBit = 0, BitLength = 8, Name = "Обороты нагнетателя", Unit = "об/с" });
-            commands[68].Parameters.Add(new () { StartByte = 4, StartBit = 0, BitLength = 8, Name = "Мощность свечи", Unit = "%" });
-            commands[68].Parameters.Add(new () { StartByte = 5, StartBit = 0, BitLength = 16, Name = "Частота ТН", a = 0.01, Unit = "Гц" });
+            commands[68].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Состояние помпы", Meanings = defMeaningsOnOff });
+            commands[68].Parameters.Add(new() { StartByte = 3, StartBit = 0, BitLength = 8, Name = "Обороты нагнетателя", Unit = "об/с" });
+            commands[68].Parameters.Add(new() { StartByte = 4, StartBit = 0, BitLength = 8, Name = "Мощность свечи", Unit = "%" });
+            commands[68].Parameters.Add(new() { StartByte = 5, StartBit = 0, BitLength = 16, Name = "Частота ТН", a = 0.01, Unit = "Гц" });
 
-            commands[69].Parameters.Add(new () { StartByte = 2, StartBit = 0, BitLength = 8, Name = "Тип устройства", Meanings = { { 0, "ТН, Гц*10" }, { 1, "Реле(0/1)" }, { 2, "Свеча, %" }, { 3, "Помпа,%" }, { 4, "Шим НВ,%" }, { 23, "Обороты НВ, об/с" } } });
-            commands[69].Parameters.Add(new () { StartByte = 3, StartBit = 0, BitLength = 16, Name = "Значение" });
+            commands[69].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "Тип устройства", Meanings = { { 0, "ТН, Гц*10" }, { 1, "Реле(0/1)" }, { 2, "Свеча, %" }, { 3, "Помпа,%" }, { 4, "Шим НВ,%" }, { 23, "Обороты НВ, об/с" } } });
+            commands[69].Parameters.Add(new() { StartByte = 3, StartBit = 0, BitLength = 16, Name = "Значение" });
 
-            commands[70].Parameters.Add(new () { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Состояние ТН", Meanings = defMeaningsOnOff });
-            commands[70].Parameters.Add(new () { StartByte = 2, StartBit = 2, BitLength = 2, Name = "Состояние реле", Meanings = defMeaningsOnOff });
-            commands[70].Parameters.Add(new () { StartByte = 2, StartBit = 4, BitLength = 2, Name = "Состояние свечи", Meanings = defMeaningsOnOff });
-            commands[70].Parameters.Add(new () { StartByte = 2, StartBit = 6, BitLength = 2, Name = "Состояние помпы", Meanings = defMeaningsOnOff });
-            commands[70].Parameters.Add(new () { StartByte = 3, StartBit = 0, BitLength = 2, Name = "Состояние НВ", Meanings = defMeaningsOnOff });
+            commands[70].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "Состояние ТН", Meanings = defMeaningsOnOff });
+            commands[70].Parameters.Add(new() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "Состояние реле", Meanings = defMeaningsOnOff });
+            commands[70].Parameters.Add(new() { StartByte = 2, StartBit = 4, BitLength = 2, Name = "Состояние свечи", Meanings = defMeaningsOnOff });
+            commands[70].Parameters.Add(new() { StartByte = 2, StartBit = 6, BitLength = 2, Name = "Состояние помпы", Meanings = defMeaningsOnOff });
+            commands[70].Parameters.Add(new() { StartByte = 3, StartBit = 0, BitLength = 2, Name = "Состояние НВ", Meanings = defMeaningsOnOff });
             #endregion
 
             #region PGN parameters initialise

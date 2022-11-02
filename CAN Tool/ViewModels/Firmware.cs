@@ -1,17 +1,15 @@
 ﻿using AdversCan;
+using CAN_Tool.Infrastructure.Commands;
 using CAN_Tool.ViewModels.Base;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using System.Windows;
-using CAN_Tool.Infrastructure.Commands;
-using System.Diagnostics;
+using System.Windows.Input;
 
 namespace CAN_Tool.ViewModels
 {

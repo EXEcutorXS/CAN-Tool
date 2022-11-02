@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CAN_Tool.ViewModels.Base;
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO.Ports;
 using System.Threading;
-using System.ComponentModel;
-using System.Windows.Threading;
-using CAN_Tool.ViewModels.Base;
-using System.Diagnostics;
-using System.Windows.Interop;
-using AdversCan;
 
 namespace Can_Adapter
 {
@@ -220,7 +215,7 @@ namespace Can_Adapter
                     {
                         if (item.CompareTo(Items[i]) <= 0)
                         {
-                            Insert(i,item);
+                            Insert(i, item);
                             return true;
                         }
                     }
@@ -268,11 +263,6 @@ namespace Can_Adapter
         private readonly SerialPort serialPort;
 
         private readonly UpdatableList<CanMessage> _messages = new();
-
-        private List<CanMessage> messagesToSend = new();
-
-        private int maxQueue = 0;
-        public int MaxQueue => maxQueue;
 
         public UpdatableList<CanMessage> Messages { get => _messages; }
 
@@ -327,7 +317,7 @@ namespace Can_Adapter
             lastMessageString = str.ToString();
 
             serialPort.Write(str.ToString());
-            
+
             for (int i = 0; i < 100; i++)
             {
                 Thread.Sleep(1);

@@ -1,31 +1,18 @@
-﻿using System;
+﻿using AdversCan;
+using Can_Adapter;
+using CAN_Tool.ViewModels;
+using ScottPlot.Renderable;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.ComponentModel;
-using System.IO.Ports;
-using Can_Adapter;
-using AdversCan;
-using CAN_Tool.ViewModels;
-using System.Globalization;
-using ScottPlot;
-using ScottPlot.Renderable;
-using System.Threading;
-using System.Windows.Data;
-using CAN_Tool.ViewModels.Converters;
-using System.Windows.Media.Animation;
-using System.Text.RegularExpressions;
-using System.Text.Json;
-using System.IO;
 
 
 namespace CAN_Tool
@@ -137,7 +124,7 @@ namespace CAN_Tool
                 i.IsSelected = i.Tag is CultureInfo ci && ci.Equals(currLang);
             }
 
-            
+
         }
 
         private void ChangeLanguageClick(Object sender, EventArgs e)
@@ -183,7 +170,7 @@ namespace CAN_Tool
             vm.CommandParametersArray[Convert.ToInt32((sender as Control).Name.Substring(6))] = value;
             AC2PCommand cmd = ((KeyValuePair<int, AC2PCommand>)CommandSelector.SelectedItem).Value;
             ulong id = (ulong)cmd.Id;
-            ulong res =  id << 48;
+            ulong res = id << 48;
             AC2PParameter[] pars = cmd.Parameters.Where(p => p.AnswerOnly == false).ToArray();
             for (int i = 0; i < pars.Length; i++)
             {
@@ -399,7 +386,7 @@ namespace CAN_Tool
             {
                 vm?.CanAdapter.SetBitrate(CanBitrateField.SelectedIndex);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 vm.Error = ex.Message;
             }
