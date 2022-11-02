@@ -45,8 +45,6 @@ namespace CAN_Tool
 
     public partial class MainWindow : Window
     {
-        private Settings settings = new();
-
         MainWindowViewModel vm;
 
         SynchronizationContext UIcontext = SynchronizationContext.Current;
@@ -54,7 +52,7 @@ namespace CAN_Tool
         public List<Brush> Brushes;
         private void SaveSettings()
         {
-            string serialized = JsonSerializer.Serialize(settings);
+            string serialized = JsonSerializer.Serialize(App.Settings);
             StreamWriter sw = new("settings.json", false);
             sw.Write(serialized);
             sw.Flush();
@@ -68,7 +66,7 @@ namespace CAN_Tool
             {
                 using (FileStream fs = new FileStream("settings.json", FileMode.OpenOrCreate))
                 {
-                    settings = JsonSerializer.Deserialize<Settings>(fs);
+                    App.Settings = JsonSerializer.Deserialize<Settings>(fs);
                 }
             }
             catch
@@ -104,15 +102,16 @@ namespace CAN_Tool
 
             Chart.Plot.AddAxis(Edge.Right, 2, color: System.Drawing.Color.LightGreen);
 
+
             vm.CanAdapter.GotNewMessage += MessageHandler;
 
             vm.RefreshPortListCommand.Execute(null);
 
             TryToLoadSettings();
 
-            menuLanguage.SelectedIndex = settings.langaugeNumber;
-            menuColor.SelectedIndex = settings.themeNumber;
-            DarkModeCheckBox.IsChecked = settings.isDark;
+            menuLanguage.SelectedIndex = App.Settings.langaugeNumber;
+            menuColor.SelectedIndex = App.Settings.themeNumber;
+            DarkModeCheckBox.IsChecked = App.Settings.isDark;
         }
 
 
@@ -326,7 +325,7 @@ namespace CAN_Tool
 
         private void DarkMode_Checked(object sender, RoutedEventArgs e)
         {
-            settings.isDark = (bool)(sender as CheckBox).IsChecked;
+            App.Settings.isDark = (bool)(sender as CheckBox).IsChecked;
             var resources = Application.Current.Resources.MergedDictionaries;
 
             var existingResourceDictionary = Application.Current.Resources.MergedDictionaries
@@ -334,7 +333,7 @@ namespace CAN_Tool
                                             rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml");
 
 
-            var source = settings.isDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
+            var source = App.Settings.isDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
             var newResourceDictionary = new ResourceDictionary() { Source = new Uri(source) };
 
             Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
@@ -380,7 +379,7 @@ namespace CAN_Tool
 
             Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
             Application.Current.Resources.MergedDictionaries.Add(newResourceDictionary);
-            settings.themeNumber = menuColor.SelectedIndex;
+            App.Settings.themeNumber = menuColor.SelectedIndex;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -391,7 +390,7 @@ namespace CAN_Tool
 
         private void menuLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            settings.langaugeNumber = menuLanguage.SelectedIndex;
+            App.Settings.langaugeNumber = menuLanguage.SelectedIndex;
         }
 
         private void CanBitrateField_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -52,17 +52,17 @@
             <StackPanel>
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="5">
-                <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
 
-                <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton" Margin="10" Content="{DynamicResource b_open}" Command="{Binding OpenPortCommand}" />
-                <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton_Copy" Margin="10" Content="{DynamicResource b_close}" Command="{Binding ClosePortCommand}" />
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton" Margin="10" Content="{DynamicResource b_open}" Command="{Binding OpenPortCommand}" />
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton_Copy" Margin="10" Content="{DynamicResource b_close}" Command="{Binding ClosePortCommand}" />
 
-                <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
- 
-                </StackPanel>
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
 
-            </StackPanel>
+                        </StackPanel>
+
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
                         <CheckBox x:Name="ExpertMode" Margin="10" Style="{StaticResource MaterialDesignOutlinedDarkButton}" Content="{DynamicResource b_expert}" FontSize="20" Cursor="Hand"></CheckBox>
                         <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignOutlinedDarkButton}" Content="Dark" FontSize="20" Cursor="Hand" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
@@ -85,7 +85,7 @@
                     <Button Content="{DynamicResource b_self_reception}" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                     <Button Content="{DynamicResource b_stop}" Margin="10" Command="{Binding StopCanAdapterCommand}" />
                 </StackPanel>
-                
+
             </StackPanel>
         </Grid>
 
@@ -100,7 +100,7 @@
             </ListBox>
             <TabControl Style="{DynamicResource MaterialDesignFilledTabControl}">
                 <TabItem>
-                    <TabItem.Header >
+                    <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_IdCardAlt" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_common}"></TextBlock>
@@ -143,13 +143,13 @@
                                     <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Left" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
                                         <Button Margin="8" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
                                             <Button.Content>
-                                                <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
+                                                <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                                             </Button.Content>
                                         </Button>
 
                                         <Button Margin="8" ToolTip="Stop Device" Command="{Binding StopHeaterCommand}">
                                             <Button.Content>
-                                                <fa:ImageAwesome Icon="Solid_Stop" Margin="2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
+                                                <fa:ImageAwesome Icon="Solid_Stop" Margin="2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                                             </Button.Content>
                                         </Button>
                                         <Button Margin="8" ToolTip="Run just water pump" Command="{Binding StartPumpCommand}" Content="{DynamicResource b_water_pump}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"></Button>
@@ -239,16 +239,57 @@
                         </StackPanel>
                         <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.Log}" AutoGenerateColumns="False" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Path = Mode}" Header="{DynamicResource b_list_mode}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = Stage}" Header="{DynamicResource b_list_stage}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = StageTime}" Header="{DynamicResource b_list_stagetime}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = WorkTime}" Header="{DynamicResource b_list_worktime}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = Voltage,StringFormat={}{0:F1}}" Header="{DynamicResource b_list_voltage}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = RevSet}" Header="{DynamicResource b_list_rev_set}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = RevMeasured}" Header="{DynamicResource b_list_rev_meas}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = FuelPumpMeasured,StringFormat={}{0:F2}}" Header="{DynamicResource b_list_fuel}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = GlowPlug}" Header="{DynamicResource b_list_glowplug}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = FlameSensor}" Header="{DynamicResource b_list_flamesensor}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = Mode}" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_mode}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Binding="{Binding Path = Stage}" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_stage}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = StageTime}" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_stagetime}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = WorkTime}" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_worktime}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = Voltage,StringFormat={}{0:F1}}" IsReadOnly="True" >
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_voltage}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = RevSet}" IsReadOnly="True" >
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_rev_set}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = RevMeasured}" IsReadOnly="True" >
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_rev_meas}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = FuelPumpMeasured,StringFormat={}{0:F2}}" IsReadOnly="True" >
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_fuel}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = GlowPlug}" IsReadOnly="True" >
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_glowplug}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = FlameSensor}" IsReadOnly="True" >
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_flamesensor}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path = LiquidTemp}" Header="{DynamicResource b_list_liqtemp}" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path = OverheatTemp}" Header="{DynamicResource b_list_overheattemp}" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path = Error}" Header="{DynamicResource b_list_error}" IsReadOnly="True" />
@@ -279,7 +320,7 @@
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_MailBulk" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
+                            <fa:ImageAwesome Icon="Solid_MailBulk" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_messages}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
@@ -298,7 +339,7 @@
                                     <TextBox ToolTip="Data Preview " MaxHeight="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsText,Mode=OneWay}" IsReadOnly="True" />
                                     <Button Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}">
                                         <Button.Content>
-                                            <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
+                                            <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                                         </Button.Content>
                                     </Button>
                                 </StackPanel>
@@ -350,8 +391,8 @@
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Regular_Keyboard" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_commands}" ></TextBlock>
+                            <fa:ImageAwesome Icon="Regular_Keyboard" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
+                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_commands}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
@@ -365,7 +406,7 @@
                                     <TextBlock x:Name="CommandPrevirew" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="10" Text="{Binding CustomMessage.DataAsText,Mode=OneWay}"></TextBlock>
                                     <Button Margin="10" Command="{Binding Path=SendCustomMessageCommand}">
                                         <Button.Content>
-                                            <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
+                                            <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                                         </Button.Content>
                                     </Button>
                                 </StackPanel>
@@ -379,7 +420,7 @@
                 <TabItem>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_Wrench" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
+                            <fa:ImageAwesome Icon="Solid_Wrench" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_config}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
@@ -407,7 +448,7 @@
                 <TabItem x:Name="GraphTab">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_ChartLine" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
+                            <fa:ImageAwesome Icon="Solid_ChartLine" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_log_chart}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
@@ -439,7 +480,6 @@
                             </DataGrid>
                         </Expander>
                         <Grid>
-                            <materialDesign:ColorPicker x:Name="ColorPicker"></materialDesign:ColorPicker>
                             <WpfPlot Name="Chart"></WpfPlot>
                         </Grid>
                     </DockPanel>
@@ -447,7 +487,7 @@
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_InfoCircle" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
+                            <fa:ImageAwesome Icon="Solid_InfoCircle" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_status}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
@@ -462,7 +502,7 @@
                 <TabItem>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_BoxOpen" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"  />
+                            <fa:ImageAwesome Icon="Solid_BoxOpen" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_black_box}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>

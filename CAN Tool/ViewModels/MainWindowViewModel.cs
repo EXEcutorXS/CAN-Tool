@@ -302,15 +302,21 @@ namespace CAN_Tool.ViewModels
                         sig.YAxisIndex = 2;
                     plt.Grid(color: System.Drawing.Color.FromArgb(50, 200, 200, 200));
                     plt.Grid(lineStyle: LineStyle.Dot);
-                    plt.Style(dataBackground: System.Drawing.Color.FromArgb(255, 40, 40, 40), figureBackground: System.Drawing.Color.DimGray);
+                    if (App.Settings.isDark)
+                        plt.Style(dataBackground: System.Drawing.Color.FromArgb(255, 40, 40, 40), figureBackground: System.Drawing.Color.DimGray);
+                    else
+                        plt.Style(dataBackground: System.Drawing.Color.WhiteSmoke, figureBackground: System.Drawing.Color.White);
                     plt.Legend();
 
                 }
-
-            plt.Palette = Palette.OneHalfDark;
-
+            /*
+            if (App.Settings.isDark)
+                plt.Palette = Palette.OneHalfDark;
+            else
+                plt.Palette = Palette.Aurora;
+            */
             myChart.Refresh();
-
+            
         }
         private bool CanChartDrawCommandExecute(object parameter) => (SelectedConnectedDevice != null && SelectedConnectedDevice.LogCurrentPos > 0);
         #endregion

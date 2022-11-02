@@ -486,8 +486,7 @@ namespace AdversCan
         public StatusVariable(int var) : base()
         {
             Id = var;
-            if (var == 5 ||
-                var == 6 ||
+            if (var == 6 ||
                 var == 7 ||
                 var == 8 ||
                 var == 9 ||

@@ -33,7 +33,8 @@ namespace CAN_Tool
 	{
 		private static List<CultureInfo> m_Languages = new List<CultureInfo>();
 
-		public static List<CultureInfo> Languages
+		public static Settings Settings { set; get; } = new();
+        public static List<CultureInfo> Languages
 		{
 			get
 			{
