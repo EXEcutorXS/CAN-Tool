@@ -496,16 +496,6 @@ namespace AdversCan
                 Display = true;
 
             Id = var;
-            if (var == 1 ||
-                var == 2 ||
-                var == 7 ||
-                var == 15 ||
-                var == 16 ||
-                var == 17 ||
-                var == 18 ||
-                var == 21
-                )
-                commonView = false; ;
 
             switch (var)
             {
@@ -550,10 +540,6 @@ namespace AdversCan
         private bool display = false;
 
         public bool Display { get { return display; } set { Set(ref display, value); } }
-
-        private bool commonView = true;
-
-        public bool CommonView { get { return commonView; } set { Set(ref commonView, value); } }
 
         public double Value
         {
@@ -1164,9 +1150,6 @@ namespace AdversCan
         UpdatableList<StatusVariable> status = new();
         public UpdatableList<StatusVariable> Status => status;
 
-        UpdatableList<StatusVariable> commonView = new();
-        public UpdatableList<StatusVariable> CommonView => commonView;
-
         private readonly UpdatableList<ReadedParameter> _readedParameters = new();
         public UpdatableList<ReadedParameter> readedParameters => _readedParameters;
 
@@ -1515,8 +1498,6 @@ namespace AdversCan
                     sv.RawValue = rawValue;
                     currentDevice.SupportedVariables[sv.Id] = true;
                     currentDevice.Status.TryToAdd(sv);
-                    if (sv.CommonView)
-                        currentDevice.CommonView.TryToAdd(sv);
 
                     if (sv.Id == 1)
                         currentDevice.Parameters.Stage = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
