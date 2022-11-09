@@ -37,7 +37,6 @@ namespace CAN_Tool
 
         SynchronizationContext UIcontext = SynchronizationContext.Current;
 
-        public List<Brush> Brushes;
         private void SaveSettings()
         {
             string serialized = JsonSerializer.Serialize(App.Settings);
@@ -102,7 +101,6 @@ namespace CAN_Tool
             DarkModeCheckBox.IsChecked = App.Settings.isDark;
             ExpertMode.IsChecked = App.Settings.ExpertModeOn;
         }
-
 
         private void MessageHandler(object sender, EventArgs args)
         {

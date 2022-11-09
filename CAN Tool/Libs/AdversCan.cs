@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 
 namespace AdversCan
@@ -676,12 +677,17 @@ namespace AdversCan
         {
             get
             {
-                ReadedVariable error = Variables.FirstOrDefault(v => v.Id == 24);
+
+                ReadedVariable error = Variables.FirstOrDefault(v => v.Id == 24); //24 - paramsname.h error code
 
                 if (error == null)
-                    return "Нет кода ошибки";
+                    return (string)Application.Current.FindResource("t_no_error_code");
                 else
-                    return $"Код {AC2P.ErrorNames[(int)error.Value]}";
+                {
+                    string fromRes = (string)Application.Current.TryFindResource("e_" + error.Value);
+                    if (fromRes != null) return fromRes;
+                    return $"{AC2P.ErrorNames.GetValueOrDefault(error.Value, (string)Application.Current.FindResource("t_error") + error.Value.ToString())}";
+                }
             }
         }
 

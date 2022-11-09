@@ -65,5 +65,67 @@
     <v:String x:Key="b_list_paneltemp">Pan.Temp</v:String>
     <v:String x:Key="b_list_inlettemp">In.Temp</v:String>
     <v:String x:Key="b_list_error">Err.code</v:String>
+
+    <v:String x:Key="e_1">overheat</v:String>
+    <v:String x:Key="e_2">overheat</v:String>
+    <v:String x:Key="e_3">error of the overheat temp. sensor</v:String>
+    <v:String x:Key="e_4">error of the liquid temp. sensor</v:String>
+    <v:String x:Key="e_5">open circuit of the flame temp. sensor</v:String>
+    <v:String x:Key="e_9">glow plug error</v:String>
+    <v:String x:Key="e_10">fan speed does not correspond to the defined</v:String>
+    <v:String x:Key="e_12">high supply voltage</v:String>
+    <v:String x:Key="e_13">no ignition</v:String>
+    <v:String x:Key="e_14">water pump error</v:String>
+    <v:String x:Key="e_15">low supply voltage</v:String>
+    <v:String x:Key="e_16">body temp.sensor does not cool down</v:String>
+    <v:String x:Key="e_17">short circuit of the fuel pump</v:String>
+    <v:String x:Key="e_22">open circuit of the fuel pump</v:String>
+    <v:String x:Key="e_27">fan does not rotate</v:String>
+    <v:String x:Key="e_28">fan self-rotation</v:String>
+    <v:String x:Key="e_29">exceeding the limit of flame blowout</v:String>
+    <v:String x:Key="e_36">overheating of the flame indicator</v:String>
+    <v:String x:Key="e_40">no connection with the heater</v:String>
+    <v:String x:Key="e_45">open circuit of the tank temp. sensor</v:String>
+    <v:String x:Key="e_46">short circuit of the tank temp. sensor</v:String>
+    <v:String x:Key="e_53">open circuit of the flow sensor</v:String>
+    <v:String x:Key="e_54">short circuit of the flow sensor</v:String>
+    <v:String x:Key="e_55">open circuit of the air temp. sensor</v:String>
+    <v:String x:Key="e_56">short circuit of the air temp. sensor</v:String>
+    <v:String x:Key="e_57">short circuit of the zone 1 temp. sensor</v:String>
+    <v:String x:Key="e_58">open circuit of the zone 1 temp. sensor</v:String>
+    <v:String x:Key="e_59">short circuit of the zone 2 temp. sensor</v:String>
+    <v:String x:Key="e_60">open circuit of the zone 2 temp. sensor</v:String>
+    <v:String x:Key="e_61">short circuit of the zone 3 temp. sensor</v:String>
+    <v:String x:Key="e_62">open circuit of the zone 3 temp. sensor</v:String>
+    <v:String x:Key="e_63">short circuit of the zone 4 temp. sensor</v:String>
+    <v:String x:Key="e_64">open circuit of the zone 4 temp. sensor</v:String>
+    <v:String x:Key="e_65">short circuit of the zone 5 temp. sensor</v:String>
+    <v:String x:Key="e_66">open circuit of the zone 5 temp. sensor</v:String>
+    <v:String x:Key="e_69">short circuit of the pump 1</v:String>
+    <v:String x:Key="e_70">open circuit of the pump 1</v:String>
+    <v:String x:Key="e_71">short circuit of the pump 2</v:String>
+    <v:String x:Key="e_72">open circuit of the pump 2</v:String>
+    <v:String x:Key="e_73">short circuit of the pump 3</v:String>
+    <v:String x:Key="e_74">open circuit of the pump 3</v:String>
+    <v:String x:Key="e_75">short circuit of the pump 4</v:String>
+    <v:String x:Key="e_76">open circuit of the pump 4</v:String>
+    <v:String x:Key="e_77">short circuit of the pump 5</v:String>
+    <v:String x:Key="e_78">open circuit of the pump 5</v:String>
+    <v:String x:Key="e_79">short circuit of the fan 1</v:String>
+    <v:String x:Key="e_80">open circuit of the fan 1</v:String>
+    <v:String x:Key="e_81">short circuit of the fan 2</v:String>
+    <v:String x:Key="e_82">open circuit of the fan 2</v:String>
+    <v:String x:Key="e_83">short circuit of the fan 3</v:String>
+    <v:String x:Key="e_84">open circuit of the fan 3</v:String>
+    <v:String x:Key="e_85">short circuit of the fan 4</v:String>
+    <v:String x:Key="e_86">open circuit of the fan 4</v:String>
+    <v:String x:Key="e_87">short circuit of the fan 5</v:String>
+    <v:String x:Key="e_88">open circuit of the fan 5</v:String>
+    <v:String x:Key="e_91">liquid level too low</v:String>
+    <v:String x:Key="e_93">level sensor short circuit</v:String>
+
+    <v:String x:Key="t_no_error_code">No error code</v:String>
+    <v:String x:Key="t_error">Error</v:String>
+
 </ResourceDictionary>
     
