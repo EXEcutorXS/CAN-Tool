@@ -13,6 +13,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
+using Xceed.Words.NET;
+using Xceed.Document.NET;
+using Alignment = Xceed.Document.NET.Alignment;
 
 namespace CAN_Tool.ViewModels
 {
@@ -295,7 +298,9 @@ namespace CAN_Tool.ViewModels
                 if (v.Display)
                 {
                     double[] arrayToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos).ToArray();
-                    var sig = plt.AddSignal(arrayToDisplay, color: v.Color, label: v.Name);
+                    var sig = plt.AddSignal(SelectedConnectedDevice.LogData[v.Id]);
+                        //AddSignal(arrayToDisplay, color: v.Color, label: v.Name);
+                    
                     if (arrayToDisplay.Max() < 5)
                         sig.YAxisIndex = 2;
                     plt.Grid(color: System.Drawing.Color.FromArgb(50, 200, 200, 200));
@@ -409,10 +414,53 @@ namespace CAN_Tool.ViewModels
         public ICommand SaveReportCommand { get; }
         private void OnSaveReportCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.EraseCommonBlackBox(selectedConnectedDevice.ID));
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + selectedConnectedDevice.Name + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
+            DocX doc = DocX.Create(path);
+            Paragraph headParagraph = doc.InsertParagraph();
+            headParagraph.AppendLine("Отчёт по устройству ").Append(selectedConnectedDevice.Name).Bold();
+            headParagraph.AppendLine("Серийный номер: ").Append(selectedConnectedDevice.SerialAsString).Bold();
+            headParagraph.AppendLine("Дата производства: ").Append(selectedConnectedDevice.ProductionDate.ToString()).Bold();
+            headParagraph.AppendLine("Сформирован: ").Append(DateTime.Now.ToLocalTime().ToString()).Bold();
+            headParagraph.AppendLine();
+            headParagraph.AppendLine("Данные чёрного ящика:").FontSize(18);
+            headParagraph.Alignment = Alignment.center;
+            Paragraph dataParagraph = doc.InsertParagraph();
+            foreach (var p in selectedConnectedDevice.BBValues)
+            {
+                dataParagraph.Append(AC2P.BbParameterNames.GetValueOrDefault(p.Id, $"PID_{p.Id}") + ": ");
+                dataParagraph.Append(p.Value.ToString()).Bold();
+                dataParagraph.AppendLine();
+            }
+            dataParagraph.AppendLine();
+
+            
+            if (selectedConnectedDevice.BBErrors.Count > 0)
+            {
+                var errorHeader = doc.InsertParagraph();
+                errorHeader.AppendLine($"В черном ящике найдено ошибок: {selectedConnectedDevice.BBErrors.Count} ").FontSize(17);
+                errorHeader.AppendLine();
+                errorHeader.Alignment = Alignment.center;
+                var errorParagraph = doc.InsertParagraph();
+
+                foreach (var e in selectedConnectedDevice.BBErrors)
+                {
+
+                    errorParagraph.AppendLine(e.Name).Bold();
+                    errorParagraph.AppendLine();
+                    foreach (var v in e.Variables)
+                    {
+                        if (v.Id != 65535)
+                            errorParagraph.AppendLine('\t' + v.Name + ": ").Append(v.Value.ToString()).Bold();
+                    }
+                    errorParagraph.AppendLine();
+                }
+            }
+
+            doc.Save();
+
         }
         private bool CanSaveReportCommandExecute(object parameter) =>
-            (SelectedConnectedDevice.BBErrors.Count > 0 || SelectedConnectedDevice.BBValues.Count > 0);
+        (selectedConnectedDevice != null && (SelectedConnectedDevice.BBErrors.Count > 0 || SelectedConnectedDevice.BBValues.Count > 0));
         #endregion
 
         #region SendCustomMessageCommand
@@ -600,13 +648,13 @@ namespace CAN_Tool.ViewModels
             CanAdapter.Transmit(msg);
         }
 
-        private async void requestSerial()
+        private async void requestSerial(ConnectedDevice d)
         {
             await Task.Delay(200);
             AC2PMessage m = new();
             m.TransmitterType = 126;
             m.TransmitterAddress = 6;
-            m.ReceiverId = SelectedConnectedDevice.ID;
+            m.ReceiverId = d.ID;
             m.PGN = 7;
             m.Data = new byte[8];
             m.Data[0] = 3;
@@ -657,7 +705,7 @@ namespace CAN_Tool.ViewModels
         {
             SelectedConnectedDevice = AC2PInstance.ConnectedDevices[^1];
             firmwarePage.GetVersionCommand.Execute(null);
-            Task.Run(() => requestSerial());
+            Task.Run(() => requestSerial(AC2PInstance.ConnectedDevices[^1]));
         }
 
 
@@ -729,6 +777,7 @@ namespace CAN_Tool.ViewModels
             TurnOnWaterPumpCommand = new LambdaCommand(OnTurnOnWaterPumpCommandExecuted, deviceInManualMode);
             TurnOffWaterPumpCommand = new LambdaCommand(OnTurnOffWaterPumpCommandExecuted, deviceInManualMode);
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
+            SaveReportCommand = new LambdaCommand(OnSaveReportCommandExecuted, CanSaveReportCommandExecute);
 
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;

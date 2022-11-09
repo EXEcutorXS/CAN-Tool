@@ -25,6 +25,7 @@ namespace CAN_Tool
     public class Settings
     {
         public bool isDark { get; set; }
+        public bool ExpertModeOn { set; get; }
         public int themeNumber { get; set; }
         public int langaugeNumber { get; set; }
     }
@@ -99,6 +100,7 @@ namespace CAN_Tool
             menuLanguage.SelectedIndex = App.Settings.langaugeNumber;
             menuColor.SelectedIndex = App.Settings.themeNumber;
             DarkModeCheckBox.IsChecked = App.Settings.isDark;
+            ExpertMode.IsChecked = App.Settings.ExpertModeOn;
         }
 
 
@@ -390,6 +392,11 @@ namespace CAN_Tool
             {
                 vm.Error = ex.Message;
             }
+        }
+
+        private void ExpertMode_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            App.Settings.ExpertModeOn = (bool)ExpertMode.IsChecked;
         }
     }
 

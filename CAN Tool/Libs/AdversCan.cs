@@ -1256,7 +1256,7 @@ namespace AdversCan
             }
         }
 
-        public void LogInit(int length = 86400)
+        public void LogInit(int length = 600)
         {
             LogCurrentPos = 0;
             LogData = new List<double[]>();
@@ -1447,7 +1447,7 @@ namespace AdversCan
             AC2PMessage m = new AC2PMessage(msg);
             DeviceId id = m.TransmitterId;
 
-            Debug.WriteLine("<-" + m.ToString());
+            //Debug.WriteLine("<-" + m.ToString());
             if (ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id)) == null)
             {
 
@@ -1551,6 +1551,7 @@ namespace AdversCan
                         Debug.WriteLine($"{AC2P.ParamtersNames[parameterId]}={parameterValue}");
                     }
                     else
+                        if (AC2P.ParamtersNames.ContainsKey(parameterId))
                         Debug.WriteLine($"Parameter \"{AC2P.ParamtersNames[parameterId]}\" not supported");
                     //Серийник в отдельной переменной
                     if (parameterId == 12)
@@ -1960,7 +1961,7 @@ namespace AdversCan
 
         public void SendMessage(AC2PMessage m)
         {
-            Debug.WriteLine("-> " + (new AC2PMessage(m)).ToString());
+            //Debug.WriteLine("-> " + (new AC2PMessage(m)).ToString());
             canAdapter.Transmit(m);
         }
         public void SendMessage(DeviceId from, DeviceId to, int pgn, byte[] data)

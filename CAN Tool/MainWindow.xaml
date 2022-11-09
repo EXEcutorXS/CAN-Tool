@@ -1,4 +1,4 @@
-﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:acan="clr-namespace:AdversCan" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" Title="Adver CAN-Tool" Height="820" Width="1470" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:acan="clr-namespace:AdversCan" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" Title="Adver CAN-Tool" Height="820" Width="1500" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
@@ -64,7 +64,7 @@
 
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
-                        <CheckBox x:Name="ExpertMode" Margin="10" Style="{StaticResource MaterialDesignOutlinedDarkButton}" Content="{DynamicResource b_expert}" FontSize="20" Cursor="Hand"></CheckBox>
+                        <CheckBox x:Name="ExpertMode" Margin="10" Style="{StaticResource MaterialDesignOutlinedDarkButton}" Content="{DynamicResource b_expert}" FontSize="20" Cursor="Hand" IsChecked="True" Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
                         <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignOutlinedDarkButton}" Content="Dark" FontSize="20" Cursor="Hand" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
                         <ComboBox Style="{DynamicResource MaterialDesignComboBox}" x:Name="menuColor" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuColor_SelectionChanged" ItemsSource="{Binding Brushes}">
                             <ComboBox.ItemTemplate>
@@ -260,39 +260,51 @@
                                         <TextBlock Text="{DynamicResource b_list_worktime}"></TextBlock>
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = Voltage,StringFormat={}{0:F1}}" IsReadOnly="True" >
+                                <DataGridTextColumn Binding="{Binding Path = Voltage,StringFormat={}{0:F1}}" IsReadOnly="True">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="{DynamicResource b_list_voltage}"></TextBlock>
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = RevSet}" IsReadOnly="True" >
+                                <DataGridTextColumn Binding="{Binding Path = RevSet}" IsReadOnly="True">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="{DynamicResource b_list_rev_set}"></TextBlock>
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = RevMeasured}" IsReadOnly="True" >
+                                <DataGridTextColumn Binding="{Binding Path = RevMeasured}" IsReadOnly="True">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="{DynamicResource b_list_rev_meas}"></TextBlock>
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = FuelPumpMeasured,StringFormat={}{0:F2}}" IsReadOnly="True" >
+                                <DataGridTextColumn Binding="{Binding Path = FuelPumpMeasured,StringFormat={}{0:F2}}" IsReadOnly="True">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="{DynamicResource b_list_fuel}"></TextBlock>
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = GlowPlug}" IsReadOnly="True" >
+                                <DataGridTextColumn Binding="{Binding Path = GlowPlug}" IsReadOnly="True">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="{DynamicResource b_list_glowplug}"></TextBlock>
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = FlameSensor}" IsReadOnly="True" >
+                                <DataGridTextColumn Binding="{Binding Path = FlameSensor}" IsReadOnly="True">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="{DynamicResource b_list_flamesensor}"></TextBlock>
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = LiquidTemp}" Header="{DynamicResource b_list_liqtemp}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = OverheatTemp}" Header="{DynamicResource b_list_overheattemp}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = Error}" Header="{DynamicResource b_list_error}" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path = LiquidTemp}" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_liqtemp}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = OverheatTemp}" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_overheattemp}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path = Error}" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="{DynamicResource b_list_error}"></TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
 
                             </DataGrid.Columns>
                         </DataGrid>
@@ -517,7 +529,7 @@
                                 <Button Content="{DynamicResource b_read_bb_errors}" Margin="10" Command="{Binding ReadBlackBoxErrorsCommand}"></Button>
                                 <Button Content="{DynamicResource b_clear_bb_data}" Margin="10" Command="{Binding EraseBlackBoxDataCommand}"></Button>
                                 <Button Content="{DynamicResource b_clear_bb_errors}" Margin="10" Command="{Binding EraseBlackBoxErrorsCommand}"></Button>
-                                <Button Content="PDF" Margin="10" Command="{Binding SaveReportCommand}"></Button>
+                                <Button Content="{DynamicResource b_save_report}" Margin="10" Command="{Binding SaveReportCommand}"></Button>
                             </StackPanel>
                             <DataGrid ItemsSource="{Binding SelectedConnectedDevice.BBValues,Mode=OneWay}" AutoGenerateColumns="False" Margin="10" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
                                 <DataGrid.Columns>
