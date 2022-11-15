@@ -116,7 +116,7 @@
                                             <Button x:Name="ErrorButton" Style="{StaticResource MaterialDesignFloatingActionButton}" Background="Red" Command="{Binding ClearErrorsCommand}" ToolTip="Press to clean error code" Visibility="{Binding SelectedConnectedDevice.Parameters.Error, Converter={StaticResource IntToVisibileConverter}}">
                                                 <StackPanel Orientation="Horizontal">
                                                     <fa:FontAwesome Icon="Solid_ExclamationTriangle" FontSize="25" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"></fa:FontAwesome>
-                                                    <TextBlock FontSize="20" VerticalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.Error}" />
+                                                    <TextBlock FontSize="20" VerticalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.Error}"  />
                                                 </StackPanel>
                                             </Button>
                                             <Border.Background>
@@ -133,7 +133,7 @@
                                             <TextBlock Grid.Row="0" Text="{Binding SelectedConnectedDevice.FirmwareAsText}" VerticalAlignment="Center" FontSize="25" />
                                             <TextBlock Grid.Row="1" Text="{Binding SelectedConnectedDevice.ProductionDate}" VerticalAlignment="Center" FontSize="25" />
                                             <TextBlock Grid.Row="2" Text="{Binding SelectedConnectedDevice.SerialAsString}" VerticalAlignment="Center" FontSize="25" />
-                                            <TextBlock Grid.Row="3" Text="{Binding Path=SelectedConnectedDevice.Parameters.ErrorString}" FontSize="25" VerticalAlignment="Center" Visibility="{Binding SelectedConnectedDevice.Parameters.Error, Converter={StaticResource IntToVisibileConverter}}" />
+                                            <TextBlock Grid.Row="3" Text="{Binding Path=SelectedConnectedDevice.Parameters.ErrorString}" Foreground="Red" FontSize="25" VerticalAlignment="Center" Visibility="{Binding SelectedConnectedDevice.Parameters.Error, Converter={StaticResource IntToVisibileConverter}}" />
 
                                         </Grid>
                                     </StackPanel >
@@ -585,6 +585,7 @@
 
                             <CheckBox Margin="5" Style="{StaticResource MaterialDesignSwitchDarkToggleButton }" IsChecked="{Binding ManualWaterPump}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" IsEnabled="{Binding SelectedConnectedDevice.ManualMode,Mode=OneWay,TargetNullValue=false}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" />
                             <TextBlock Margin="5" FontSize="25" VerticalAlignment="Center" Text="{DynamicResource b_water_pump}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"></TextBlock>
+                            <Button Margin="10" Content="{DynamicResource b_1000_ticks}" Command="{Binding PumpCheckCommand}" />
 
                         </StackPanel>
                         <Grid>

@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using CAN_Tool.Libs;
 
 namespace AdversCan
 {
@@ -673,20 +674,20 @@ namespace AdversCan
             return retString.ToString();
         }
 
+
         public string Name
         {
             get
             {
-
                 ReadedVariable error = Variables.FirstOrDefault(v => v.Id == 24); //24 - paramsname.h error code
 
                 if (error == null)
-                    return (string)Application.Current.FindResource("t_no_error_code");
+                    return Helper.GetString("t_no_error_code");
                 else
                 {
-                    string fromRes = (string)Application.Current.TryFindResource("e_" + error.Value);
+                    string fromRes = Helper.GetString("e_" + error.Value);
                     if (fromRes != null) return fromRes;
-                    return $"{AC2P.ErrorNames.GetValueOrDefault(error.Value, (string)Application.Current.FindResource("t_error") + error.Value.ToString())}";
+                    return $"{AC2P.ErrorNames.GetValueOrDefault(error.Value, Helper.GetString("t_error") + error.Value.ToString())}";
                 }
             }
         }
@@ -1262,7 +1263,7 @@ namespace AdversCan
             }
         }
 
-        public void LogInit(int length = 600)
+        public void LogInit(int length = 3600)
         {
             LogCurrentPos = 0;
             LogData = new List<double[]>();
@@ -1775,6 +1776,42 @@ namespace AdversCan
                 UpdatePercent(100 * counter++ / BbParameters.Count);
             }
             Done();
+        }
+
+        public async void CheckPump(ConnectedDevice cd)
+        {
+            if (!Capture(Helper.GetString("b_1000_ticks"))) return;
+            if (cd == null) return;
+
+            AC2PMessage msg = new();
+            msg.TransmitterType = 126;
+            msg.TransmitterAddress = 6;
+            msg.ReceiverId = cd.ID;
+            msg.PGN = 1;
+            msg.Data = new byte[8];
+            msg.Data[0] = 0;
+            msg.Data[1] = 68;
+            msg.Data[2] = 0;
+            msg.Data[3] = 0;
+            msg.Data[4] = 0;
+            msg.Data[5] = 400 / 256;
+            msg.Data[6] = 400 % 256;
+            var startTime = DateTime.Now;
+            SendMessage(msg);
+            while (true)
+            {
+                UpdatePercent((int)((DateTime.Now - startTime).TotalSeconds / 2.5));
+                await Task.Delay(100);
+                if (CancellationRequested || (DateTime.Now - startTime).TotalSeconds > 250)
+                    break;
+            }
+            msg.Data[5] = 0;
+            msg.Data[6] = 0;
+            SendMessage(msg);
+            if (CancellationRequested)
+                Cancel();
+            else
+                Done();
         }
 
         public async void ReadErrorsBlackBox(DeviceId id)

@@ -16,6 +16,7 @@ using System.Windows.Media;
 using Xceed.Words.NET;
 using Xceed.Document.NET;
 using Alignment = Xceed.Document.NET.Alignment;
+using CAN_Tool.Libs;
 
 namespace CAN_Tool.ViewModels
 {
@@ -298,10 +299,11 @@ namespace CAN_Tool.ViewModels
                 if (v.Display)
                 {
                     double[] arrayToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos).ToArray();
-                    var sig = plt.AddSignal(SelectedConnectedDevice.LogData[v.Id]);
-                        //AddSignal(arrayToDisplay, color: v.Color, label: v.Name);
-                    
-                    if (arrayToDisplay.Max() < 5)
+                    //var sig = plt.AddSignal(SelectedConnectedDevice.LogData[v.Id], color: v.Color, label: v.Name);
+                    var sig = plt.AddSignal(arrayToDisplay, color: v.Color, label: v.Name);
+
+                    //if (arrayToDisplay.Max() < 5)
+                    if (v.Id == 17 || v.Id == 18)
                         sig.YAxisIndex = 2;
                     plt.Grid(color: System.Drawing.Color.FromArgb(50, 200, 200, 200));
                     plt.Grid(lineStyle: LineStyle.Dot);
@@ -433,7 +435,7 @@ namespace CAN_Tool.ViewModels
             }
             dataParagraph.AppendLine();
 
-            
+
             if (selectedConnectedDevice.BBErrors.Count > 0)
             {
                 var errorHeader = doc.InsertParagraph();
@@ -496,6 +498,19 @@ namespace CAN_Tool.ViewModels
             ManualFuelPump = 0;
             ManualGlowPlug = 0;
             executeCommand(67, new byte[] { 0, 0, 0, 0, 0, 0 });
+        }
+        #endregion
+
+        #region PumpCheckCommand
+        public ICommand PumpCheckCommand { get; }
+        private void OnPumpCheckCommandExecuted(object parameter)
+        {
+            Task.Run(() => AC2PInstance.CheckPump(selectedConnectedDevice));
+        }
+
+        private bool CanPumpCheckCommandExecute(object parameter)
+        {
+            return (deviceSelected(null) && selectedConnectedDevice.ManualMode && !AC2PInstance.CurrentTask.Occupied);
         }
         #endregion
 
@@ -705,7 +720,7 @@ namespace CAN_Tool.ViewModels
         {
             SelectedConnectedDevice = AC2PInstance.ConnectedDevices[^1];
             firmwarePage.GetVersionCommand.Execute(null);
-            Task.Run(() => requestSerial(AC2PInstance.ConnectedDevices[^1]));
+            Task.Run(() => requestSerial(SelectedConnectedDevice));
         }
 
 
@@ -778,6 +793,7 @@ namespace CAN_Tool.ViewModels
             TurnOffWaterPumpCommand = new LambdaCommand(OnTurnOffWaterPumpCommandExecuted, deviceInManualMode);
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
             SaveReportCommand = new LambdaCommand(OnSaveReportCommandExecuted, CanSaveReportCommandExecute);
+            PumpCheckCommand = new LambdaCommand(OnPumpCheckCommandExecuted, CanPumpCheckCommandExecute);
 
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;

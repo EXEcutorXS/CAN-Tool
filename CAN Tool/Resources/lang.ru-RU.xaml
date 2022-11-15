@@ -35,6 +35,7 @@
     <v:String x:Key="b_clear_bb_errors">Стереть ошибки</v:String>
     <v:String x:Key="b_enter_manual">Вкл</v:String>
     <v:String x:Key="b_leave_manual">Выкл</v:String>
+    <v:String x:Key="b_1000_ticks">1000 качков</v:String>
     <v:String x:Key="b_air_set">НВ уст.</v:String>
     <v:String x:Key="b_air_measured">НВ изм.</v:String>
     <v:String x:Key="b_fuel_pump_set">ТН</v:String>
