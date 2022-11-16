@@ -298,11 +298,10 @@ namespace CAN_Tool.ViewModels
             foreach (var v in SelectedConnectedDevice.Status)
                 if (v.Display)
                 {
-                    double[] arrayToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos).ToArray();
+                    //double[] arrayToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos).ToArray();
                     //var sig = plt.AddSignal(SelectedConnectedDevice.LogData[v.Id], color: v.Color, label: v.Name);
-                    var sig = plt.AddSignal(arrayToDisplay, color: v.Color, label: v.Name);
+                    var sig = plt.AddSignal(SelectedConnectedDevice.LogData[v.Id].Take(SelectedConnectedDevice.LogCurrentPos).ToArray(), color: v.Color, label: v.Name);
 
-                    //if (arrayToDisplay.Max() < 5)
                     if (v.Id == 17 || v.Id == 18)
                         sig.YAxisIndex = 2;
                     plt.Grid(color: System.Drawing.Color.FromArgb(50, 200, 200, 200));

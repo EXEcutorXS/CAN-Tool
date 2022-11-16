@@ -1,6 +1,7 @@
 ﻿using AdversCan;
 using Can_Adapter;
 using CAN_Tool.ViewModels;
+using MaterialDesignThemes.Wpf;
 using ScottPlot.Renderable;
 using System;
 using System.Collections.Generic;
@@ -24,11 +25,20 @@ namespace CAN_Tool
 
     public class Settings
     {
+        public Settings()
+        {
+            Random random = new Random((int)DateTime.Now.Ticks);
+            Colors = new Color[100];
+            for (int i = 0; i < 100; i++)
+                Colors[i] = Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255));
+        }
         public bool isDark { get; set; }
         public bool ExpertModeOn { set; get; }
         public int themeNumber { get; set; }
         public int langaugeNumber { get; set; }
-    }
+
+        public Color[] Colors  { get; set; }
+}
 
 
     public partial class MainWindow : Window
@@ -39,6 +49,10 @@ namespace CAN_Tool
 
         private void SaveSettings()
         {
+            foreach (var b in vm.SelectedConnectedDevice.Status)
+            {
+                App.Settings.Colors[b.Id] = (b.ChartBrush as SolidColorBrush).Color;
+            }
             string serialized = JsonSerializer.Serialize(App.Settings);
             StreamWriter sw = new("settings.json", false);
             sw.Write(serialized);
@@ -395,6 +409,24 @@ namespace CAN_Tool
         private void ExpertMode_CheckedChanged(object sender, RoutedEventArgs e)
         {
             App.Settings.ExpertModeOn = (bool)ExpertMode.IsChecked;
+        }
+
+        private void ColorPicker_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
+                (DataSet.SelectedItem as StatusVariable).ChartBrush = new SolidColorBrush((sender as ColorPicker).Color);
+        }
+
+        private void ColorPicker_StylusUp(object sender, StylusEventArgs e)
+        {
+            if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
+                (DataSet.SelectedItem as StatusVariable).ChartBrush = new SolidColorBrush((sender as ColorPicker).Color);
+        }
+
+        private void DataSet_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DataSet.SelectedItem != null)
+                ColorPicker.Color = ((DataSet.SelectedItem as StatusVariable).ChartBrush as SolidColorBrush).Color;
         }
     }
 

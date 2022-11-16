@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using CAN_Tool.Libs;
+using CAN_Tool;
 
 namespace AdversCan
 {
@@ -499,19 +500,8 @@ namespace AdversCan
 
             Id = var;
 
-            switch (var)
-            {
-                case 5: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 0)); break;
-                case 15: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 255)); break;
-                case 16: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 255)); break;
-                case 18: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0)); break;
-                case 21: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 255)); break;
-                case 40: ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 100, 100)); break;
-                default:
-                    Random random = new Random((int)DateTime.Now.Ticks);
-                    ChartBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255)));
-                    break;
-            }
+            chartBrush = new SolidColorBrush(App.Settings.Colors[Id]);
+
         }
         public StatusVariable()
         {
@@ -564,10 +554,9 @@ namespace AdversCan
             }
         }
 
-        private System.Windows.Media.Brush chartBrush;
+        public System.Drawing.Color Color => System.Drawing.Color.FromArgb(255, (ChartBrush as SolidColorBrush).Color.R, (ChartBrush as SolidColorBrush).Color.G, (ChartBrush as SolidColorBrush).Color.B);
 
-        public System.Drawing.Color Color => System.Drawing.Color.FromArgb(255, (chartBrush as SolidColorBrush).Color.R, (chartBrush as SolidColorBrush).Color.G, (chartBrush as SolidColorBrush).Color.B);
-
+        private Brush chartBrush;
 
         [AffectsTo(nameof(Color))]
         public System.Windows.Media.Brush ChartBrush
