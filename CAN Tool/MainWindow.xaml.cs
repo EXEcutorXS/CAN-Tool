@@ -29,6 +29,7 @@ namespace CAN_Tool
         {
             Random random = new Random((int)DateTime.Now.Ticks);
             Colors = new Color[100];
+            ShowFlag = new bool[100];
             for (int i = 0; i < 100; i++)
                 Colors[i] = Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255));
         }
@@ -38,6 +39,8 @@ namespace CAN_Tool
         public int langaugeNumber { get; set; }
 
         public Color[] Colors  { get; set; }
+
+        public bool[] ShowFlag { set; get; }
 }
 
 
@@ -52,6 +55,7 @@ namespace CAN_Tool
             foreach (var b in vm.SelectedConnectedDevice.Status)
             {
                 App.Settings.Colors[b.Id] = (b.ChartBrush as SolidColorBrush).Color;
+                App.Settings.ShowFlag[b.Id] = (b.Display);
             }
             string serialized = JsonSerializer.Serialize(App.Settings);
             StreamWriter sw = new("settings.json", false);
@@ -118,6 +122,7 @@ namespace CAN_Tool
 
         private void MessageHandler(object sender, EventArgs args)
         {
+            
             UIcontext.Send(x =>
             {
                 if (LogExpander.IsExpanded)

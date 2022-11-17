@@ -476,7 +476,7 @@
                         </StackPanel>
                         <Expander DockPanel.Dock="Top" Header="{DynamicResource b_dataset}">
                             <DockPanel>
-                                <DataGrid x:Name="DataSet" Margin="10"  DockPanel.Dock="Left" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" SelectionChanged="DataSet_SelectionChanged">
+                                <DataGrid x:Name="DataSet" Margin="20"  DockPanel.Dock="Left" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" SelectionChanged="DataSet_SelectionChanged">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Variable" Binding="{Binding Path=Name}" IsReadOnly="True"></DataGridTextColumn>
                                     <DataGridCheckBoxColumn Header="Show" Binding="{Binding Path=Display}"></DataGridCheckBoxColumn>
@@ -492,7 +492,7 @@
                                     <DataGridTextColumn Header="Value" Binding="{Binding Path=FormattedValue}" IsReadOnly="True"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
-                                <materialDesign:ColorPicker Margin="10" x:Name="ColorPicker" DockPanel.Dock="Right"  MouseLeftButtonUp="ColorPicker_MouseLeftButtonUp" StylusUp="ColorPicker_StylusUp">
+                                <materialDesign:ColorPicker Margin="20" x:Name="ColorPicker" DockPanel.Dock="Right"  MouseLeftButtonUp="ColorPicker_MouseLeftButtonUp" StylusUp="ColorPicker_StylusUp">
                                     
                                 </materialDesign:ColorPicker>
                             </DockPanel>

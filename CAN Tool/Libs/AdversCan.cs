@@ -483,23 +483,7 @@ namespace AdversCan
         public StatusVariable(int var) : base()
         {
             Id = var;
-            if (var == 6 ||
-                var == 7 ||
-                var == 8 ||
-                var == 9 ||
-                var == 12 ||
-                var == 13 ||
-                var == 15 ||
-                var == 16 ||
-                var == 18 ||
-                var == 21 ||
-                var == 40 ||
-                var == 41
-                )
-                Display = true;
-
-            Id = var;
-
+            Display = App.Settings.ShowFlag[Id];
             chartBrush = new SolidColorBrush(App.Settings.Colors[Id]);
 
         }
@@ -559,7 +543,7 @@ namespace AdversCan
         private Brush chartBrush;
 
         [AffectsTo(nameof(Color))]
-        public System.Windows.Media.Brush ChartBrush
+        public Brush ChartBrush
         {
             get => chartBrush;
             set => Set(ref chartBrush, value);
@@ -1440,6 +1424,7 @@ namespace AdversCan
 
         private void ProcessCanMessage(CanMessage msg)
         {
+            
             AC2PMessage m = new AC2PMessage(msg);
             DeviceId id = m.TransmitterId;
 

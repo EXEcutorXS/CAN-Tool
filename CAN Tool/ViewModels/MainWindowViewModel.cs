@@ -695,7 +695,12 @@ namespace CAN_Tool.ViewModels
 
             if (AutoRedraw)                                 //Перерисовк графиков
                 if (CanChartDrawCommandExecute(null))
-                    OnChartDrawCommandExecuted(null);
+                {
+                    if (SelectedConnectedDevice.LogCurrentPos < 600)
+                        OnChartDrawCommandExecuted(null);
+                    else if (DateTime.Now.Second % 10 == 0)
+                        OnChartDrawCommandExecuted(null);
+                }
 
             foreach (ConnectedDevice d in AC2PInstance.ConnectedDevices) //Поддержание связи
             {
