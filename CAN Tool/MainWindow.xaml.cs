@@ -2,6 +2,7 @@
 using Can_Adapter;
 using CAN_Tool.ViewModels;
 using MaterialDesignThemes.Wpf;
+using ScottPlot.MarkerShapes;
 using ScottPlot.Renderable;
 using System;
 using System.Collections.Generic;
@@ -28,10 +29,18 @@ namespace CAN_Tool
         public Settings()
         {
             Random random = new Random((int)DateTime.Now.Ticks);
-            Colors = new Color[100];
-            ShowFlag = new bool[100];
-            for (int i = 0; i < 100; i++)
+            Colors = new Color[70];
+            ShowFlag = new bool[70];
+            LineWidthes = new int[70];
+            LineStyles = new ScottPlot.LineStyle[70];
+            MarkShapes = new ScottPlot.MarkerShape[70];
+            for (int i = 0; i < 70; i++)
+            {
                 Colors[i] = Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255));
+                LineWidthes[i] = 1;
+                MarkShapes[i] = ScottPlot.MarkerShape.none;
+                LineStyles[i] = ScottPlot.LineStyle.Solid;
+            }
         }
         public bool isDark { get; set; }
         public bool ExpertModeOn { set; get; }
@@ -41,7 +50,11 @@ namespace CAN_Tool
         public Color[] Colors  { get; set; }
 
         public bool[] ShowFlag { set; get; }
-}
+        public int[] LineWidthes { set; get; }
+        public ScottPlot.LineStyle[] LineStyles { set; get; }
+        public ScottPlot.MarkerShape[] MarkShapes { set; get; }
+
+    }
 
 
     public partial class MainWindow : Window
@@ -56,6 +69,9 @@ namespace CAN_Tool
             {
                 App.Settings.Colors[b.Id] = (b.ChartBrush as SolidColorBrush).Color;
                 App.Settings.ShowFlag[b.Id] = (b.Display);
+                App.Settings.LineStyles[b.Id] = (b.LineStyle);
+                App.Settings.LineWidthes[b.Id] = (b.LineWidth);
+                App.Settings.MarkShapes[b.Id] = (b.MarkShape);
             }
             string serialized = JsonSerializer.Serialize(App.Settings);
             StreamWriter sw = new("settings.json", false);

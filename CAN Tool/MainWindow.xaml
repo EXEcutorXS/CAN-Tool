@@ -1,4 +1,4 @@
-﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:acan="clr-namespace:AdversCan" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" Title="Adver CAN-Tool" Height="820" Width="1500" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:acan="clr-namespace:AdversCan" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" xmlns:col="clr-namespace:System.Collections;assembly=mscorlib" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:sctplt="clr-namespace:ScottPlot;assembly=ScottPlot" Title="Adver CAN-Tool" Height="820" Width="1500" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
@@ -116,7 +116,7 @@
                                             <Button x:Name="ErrorButton" Style="{StaticResource MaterialDesignFloatingActionButton}" Background="Red" Command="{Binding ClearErrorsCommand}" ToolTip="Press to clean error code" Visibility="{Binding SelectedConnectedDevice.Parameters.Error, Converter={StaticResource IntToVisibileConverter}}">
                                                 <StackPanel Orientation="Horizontal">
                                                     <fa:FontAwesome Icon="Solid_ExclamationTriangle" FontSize="25" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"></fa:FontAwesome>
-                                                    <TextBlock FontSize="20" VerticalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.Error}"  />
+                                                    <TextBlock FontSize="20" VerticalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.Error}" />
                                                 </StackPanel>
                                             </Button>
                                             <Border.Background>
@@ -476,24 +476,65 @@
                         </StackPanel>
                         <Expander DockPanel.Dock="Top" Header="{DynamicResource b_dataset}">
                             <DockPanel>
-                                <DataGrid x:Name="DataSet" Margin="20"  DockPanel.Dock="Left" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" SelectionChanged="DataSet_SelectionChanged">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Variable" Binding="{Binding Path=Name}" IsReadOnly="True"></DataGridTextColumn>
-                                    <DataGridCheckBoxColumn Header="Show" Binding="{Binding Path=Display}"></DataGridCheckBoxColumn>
-                                    <DataGridTemplateColumn Header="Color">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Rectangle Width="30" Height="10" Fill="{Binding Path=ChartBrush}" MouseLeftButtonDown="ColorPick" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="Value" Binding="{Binding Path=FormattedValue}" IsReadOnly="True"></DataGridTextColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                                <materialDesign:ColorPicker Margin="20" x:Name="ColorPicker" DockPanel.Dock="Right"  MouseLeftButtonUp="ColorPicker_MouseLeftButtonUp" StylusUp="ColorPicker_StylusUp">
-                                    
+                                <DataGrid x:Name="DataSet" Margin="20" DockPanel.Dock="Left" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" SelectionChanged="DataSet_SelectionChanged">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Variable" Binding="{Binding Path=Name}" IsReadOnly="True"></DataGridTextColumn>
+                                        <DataGridCheckBoxColumn Header="Show" Binding="{Binding Path=Display}"></DataGridCheckBoxColumn>
+                                        <DataGridTemplateColumn Header="Color">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Rectangle Width="30" Height="10" Fill="{Binding Path=ChartBrush}" MouseLeftButtonDown="ColorPick" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="Value" Binding="{Binding Path=FormattedValue}" IsReadOnly="True"></DataGridTextColumn>
+                                        <DataGridComboBoxColumn Header="Width" SelectedItemBinding="{Binding Path=LineWidth}">
+                                            <DataGridComboBoxColumn.ItemsSource>
+                                                <col:ArrayList>
+                                                    <sys:Int32>1</sys:Int32>
+                                                    <sys:Int32>2</sys:Int32>
+                                                    <sys:Int32>3</sys:Int32>
+                                                    <sys:Int32>4</sys:Int32>
+                                                    <sys:Int32>5</sys:Int32>
+                                                </col:ArrayList>
+                                            </DataGridComboBoxColumn.ItemsSource>
+                                        </DataGridComboBoxColumn>
+                                        <DataGridComboBoxColumn Header="Style" SelectedItemBinding="{Binding Path=LineStyle}">
+                                            <DataGridComboBoxColumn.ItemsSource>
+                                                <col:ArrayList>
+                                                    <sctplt:LineStyle>0</sctplt:LineStyle>
+                                                    <sctplt:LineStyle>1</sctplt:LineStyle>
+                                                    <sctplt:LineStyle>2</sctplt:LineStyle>
+                                                    <sctplt:LineStyle>3</sctplt:LineStyle>
+                                                    <sctplt:LineStyle>4</sctplt:LineStyle>
+                                                    <sctplt:LineStyle>5</sctplt:LineStyle>
+                                                </col:ArrayList>
+                                            </DataGridComboBoxColumn.ItemsSource>
+                                        </DataGridComboBoxColumn>
+                                        <DataGridComboBoxColumn Header="Mark" SelectedItemBinding="{Binding Path=MarkShape}">
+                                            <DataGridComboBoxColumn.ItemsSource>
+                                                <col:ArrayList>
+                                                    <sctplt:MarkerShape>0</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>1</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>2</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>3</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>4</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>5</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>6</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>7</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>8</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>9</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>10</sctplt:MarkerShape>
+                                                    <sctplt:MarkerShape>11</sctplt:MarkerShape>
+                                                </col:ArrayList>
+                                            </DataGridComboBoxColumn.ItemsSource>
+                                        </DataGridComboBoxColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <materialDesign:ColorPicker Margin="20" x:Name="ColorPicker" DockPanel.Dock="Right" MouseLeftButtonUp="ColorPicker_MouseLeftButtonUp" StylusUp="ColorPicker_StylusUp">
+
                                 </materialDesign:ColorPicker>
                             </DockPanel>
                         </Expander>

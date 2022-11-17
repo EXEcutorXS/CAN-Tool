@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Media;
 using CAN_Tool.Libs;
 using CAN_Tool;
+using ScottPlot;
 
 namespace AdversCan
 {
@@ -485,6 +486,9 @@ namespace AdversCan
             Id = var;
             Display = App.Settings.ShowFlag[Id];
             chartBrush = new SolidColorBrush(App.Settings.Colors[Id]);
+            lineWidth = App.Settings.LineWidthes[Id];
+            LineStyle = App.Settings.LineStyles[Id];
+            markShape = App.Settings.MarkShapes[Id];
 
         }
         public StatusVariable()
@@ -548,6 +552,33 @@ namespace AdversCan
             get => chartBrush;
             set => Set(ref chartBrush, value);
         }
+
+        private int lineWidth;
+
+        public int LineWidth
+        {
+            get => lineWidth;
+            set => Set(ref lineWidth, value);
+        }
+
+        public int[] LineWidthes => new int[] { 1,2,3,4,5 };
+
+        private LineStyle lineStyle;
+
+        public LineStyle LineStyle
+        {
+            get => lineStyle;
+            set => Set(ref lineStyle, value);
+        }
+
+        private MarkerShape markShape;
+
+        public MarkerShape MarkShape
+        {
+            get => markShape;
+            set => Set(ref markShape, value);
+        }
+
 
         public bool IsSimmiliarTo(StatusVariable item)
         {
@@ -1371,6 +1402,8 @@ namespace AdversCan
 
         private SynchronizationContext UIContext;
 
+        public ScottPlot.WpfPlot plot;
+
         static readonly Dictionary<int, string> defMeaningsYesNo = new() { { 0, "Нет" }, { 1, "Да" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
         static readonly Dictionary<int, string> defMeaningsOnOff = new() { { 0, "Выкл" }, { 1, "Вкл" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
         static readonly Dictionary<int, string> defMeaningsAllow = new() { { 0, "Разрешено" }, { 1, "Запрещёно" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
@@ -1429,10 +1462,6 @@ namespace AdversCan
             DeviceId id = m.TransmitterId;
 
             //Debug.WriteLine("<-" + m.ToString());
-            if (ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id)) == null)
-            {
-
-            }
 
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(m.TransmitterId));
 
@@ -1648,7 +1677,6 @@ namespace AdversCan
             }
 
             Messages.TryToAdd(m);
-
         }
         public static void ParseParamsname(string filePath = "paramsname.h")
         {
@@ -2026,6 +2054,7 @@ namespace AdversCan
 
         private void Adapter_GotNewMessage(object sender, EventArgs e)
         {
+            
             UIContext.Send(x => ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null);
         }
 

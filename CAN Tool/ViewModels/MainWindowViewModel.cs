@@ -35,6 +35,12 @@ namespace CAN_Tool.ViewModels
         }
 
         public int[] Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
+        
+        public int[] LineWidthes => new int[] { 1, 2, 3, 4, 5};
+
+        public LineStyle[] LineStyles => new LineStyle[] {LineStyle.None,LineStyle.Solid,LineStyle.Dash,LineStyle.DashDot,LineStyle.DashDotDot,LineStyle.Dot};
+
+        public MarkerShape[] MarkerShapes => new MarkerShape[] { MarkerShape.none, MarkerShape.filledCircle, (MarkerShape)2, (MarkerShape)3, (MarkerShape)4, (MarkerShape)5 };
 
         private int manualAirBlower;
         public int ManualAirBlower { set => Set(ref manualAirBlower, value); get => manualAirBlower; }
@@ -300,7 +306,11 @@ namespace CAN_Tool.ViewModels
                 {
                     //double[] arrayToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos).ToArray();
                     //var sig = plt.AddSignal(SelectedConnectedDevice.LogData[v.Id], color: v.Color, label: v.Name);
-                    var sig = plt.AddSignal(SelectedConnectedDevice.LogData[v.Id].Take(SelectedConnectedDevice.LogCurrentPos).ToArray(), color: v.Color, label: v.Name);
+                    var sig = plt.AddSignalConst(SelectedConnectedDevice.LogData[v.Id].Take(SelectedConnectedDevice.LogCurrentPos).ToArray(), color: v.Color, label: v.Name);
+                    sig.UseParallel = false;
+                    sig.LineWidth = v.LineWidth;
+                    sig.LineStyle = v.LineStyle;
+                    sig.MarkerShape = v.MarkShape;
 
                     if (v.Id == 17 || v.Id == 18)
                         sig.YAxisIndex = 2;
@@ -311,6 +321,7 @@ namespace CAN_Tool.ViewModels
                     else
                         plt.Style(dataBackground: System.Drawing.Color.WhiteSmoke, figureBackground: System.Drawing.Color.White);
                     plt.Legend();
+                    
 
                 }
             /*
@@ -748,6 +759,7 @@ namespace CAN_Tool.ViewModels
 
             _canAdapter = new CanAdapter();
             _AC2PInstance = new AC2P(CanAdapter);
+            AC2PInstance.plot = myChart;
             FirmwarePage = new(this);
 
             System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
