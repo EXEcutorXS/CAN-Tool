@@ -23,9 +23,9 @@ namespace CAN_Tool.ViewModels
     internal class MainWindowViewModel : ViewModel
     {
 
-        private readonly List<System.Windows.Media.SolidColorBrush> brushes = new();
+        private readonly List<SolidColorBrush> brushes = new();
 
-        public List<System.Windows.Media.SolidColorBrush> Brushes => brushes;
+        public List<SolidColorBrush> Brushes => brushes;
         private FirmwarePage firmwarePage;
 
         public FirmwarePage FirmwarePage
@@ -33,15 +33,7 @@ namespace CAN_Tool.ViewModels
             get { return firmwarePage; }
             set { Set(ref firmwarePage, value); }
         }
-
-        public int[] Bitrates => new int[] { 20, 50, 125, 250, 500, 800, 1000 };
-        
-        public int[] LineWidthes => new int[] { 1, 2, 3, 4, 5};
-
-        public LineStyle[] LineStyles => new LineStyle[] {LineStyle.None,LineStyle.Solid,LineStyle.Dash,LineStyle.DashDot,LineStyle.DashDotDot,LineStyle.Dot};
-
-        public MarkerShape[] MarkerShapes => new MarkerShape[] { MarkerShape.none, MarkerShape.filledCircle, (MarkerShape)2, (MarkerShape)3, (MarkerShape)4, (MarkerShape)5 };
-
+       
         private int manualAirBlower;
         public int ManualAirBlower { set => Set(ref manualAirBlower, value); get => manualAirBlower; }
 
@@ -304,15 +296,13 @@ namespace CAN_Tool.ViewModels
             foreach (var v in SelectedConnectedDevice.Status)
                 if (v.Display)
                 {
-                    //double[] arrayToDisplay = new ArraySegment<Double>(SelectedConnectedDevice.LogData[v.Id], 0, SelectedConnectedDevice.LogCurrentPos).ToArray();
-                    //var sig = plt.AddSignal(SelectedConnectedDevice.LogData[v.Id], color: v.Color, label: v.Name);
                     var sig = plt.AddSignalConst(SelectedConnectedDevice.LogData[v.Id].Take(SelectedConnectedDevice.LogCurrentPos).ToArray(), color: v.Color, label: v.Name);
                     sig.UseParallel = false;
                     sig.LineWidth = v.LineWidth;
                     sig.LineStyle = v.LineStyle;
                     sig.MarkerShape = v.MarkShape;
 
-                    if (v.Id == 17 || v.Id == 18)
+                    if (v.Id == 17 || v.Id == 18) //ТН проецируется на правую ось
                         sig.YAxisIndex = 2;
                     plt.Grid(color: System.Drawing.Color.FromArgb(50, 200, 200, 200));
                     plt.Grid(lineStyle: LineStyle.Dot);
@@ -324,12 +314,6 @@ namespace CAN_Tool.ViewModels
                     
 
                 }
-            /*
-            if (App.Settings.isDark)
-                plt.Palette = Palette.OneHalfDark;
-            else
-                plt.Palette = Palette.Aurora;
-            */
             myChart.Refresh();
 
         }

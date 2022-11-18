@@ -11,6 +11,7 @@ using System.Windows;
 //TODO: Оформить ручник посолидней
 //TODO: Вынести Can Adapter в отдельныю dll
 //TODO: Загрузка лога
+//TODO: Больше локализации
 
 
 

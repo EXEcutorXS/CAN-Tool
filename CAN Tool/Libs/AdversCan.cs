@@ -15,6 +15,7 @@ using System.Windows.Media;
 using CAN_Tool.Libs;
 using CAN_Tool;
 using ScottPlot;
+using static CAN_Tool.Libs.Helper;
 
 namespace AdversCan
 {
@@ -686,12 +687,12 @@ namespace AdversCan
                 ReadedVariable error = Variables.FirstOrDefault(v => v.Id == 24); //24 - paramsname.h error code
 
                 if (error == null)
-                    return Helper.GetString("t_no_error_code");
+                    return GetString("t_no_error_code");
                 else
                 {
-                    string fromRes = Helper.GetString("e_" + error.Value);
+                    string fromRes = GetString("e_" + error.Value);
                     if (fromRes != null) return fromRes;
-                    return $"{AC2P.ErrorNames.GetValueOrDefault(error.Value, Helper.GetString("t_error") + error.Value.ToString())}";
+                    return $"{AC2P.ErrorNames.GetValueOrDefault(error.Value, GetString("t_error") + error.Value.ToString())}";
                 }
             }
         }
@@ -1782,7 +1783,7 @@ namespace AdversCan
 
         public async void CheckPump(ConnectedDevice cd)
         {
-            if (!Capture(Helper.GetString("b_1000_ticks"))) return;
+            if (!Capture(GetString("b_1000_ticks"))) return;
             if (cd == null) return;
 
             AC2PMessage msg = new();

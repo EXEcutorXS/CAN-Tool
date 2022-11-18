@@ -79,7 +79,19 @@
                     </StackPanel>
                 </DockPanel>
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" ItemsSource="{Binding Path=Bitrates}" SelectedIndex="3" SelectionChanged="CanBitrateField_SelectionChanged" />
+                    <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" SelectedIndex="3" SelectionChanged="CanBitrateField_SelectionChanged">
+                        <ComboBox.ItemsSource>
+                            <col:ArrayList>
+                                <sys:Int32>20</sys:Int32>
+                                <sys:Int32>50</sys:Int32>
+                                <sys:Int32>125</sys:Int32>
+                                <sys:Int32>250</sys:Int32>
+                                <sys:Int32>500</sys:Int32>
+                                <sys:Int32>800</sys:Int32>
+                                <sys:Int32>1000</sys:Int32>
+                            </col:ArrayList>
+                        </ComboBox.ItemsSource>
+                    </ComboBox>
                     <Button Content="{DynamicResource b_normal}" Margin="10" Command="{Binding SetAdapterNormalModeCommand}" />
                     <Button Content="{DynamicResource b_listen}" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                     <Button Content="{DynamicResource b_self_reception}" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
