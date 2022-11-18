@@ -1263,11 +1263,11 @@ namespace AdversCan
             else
             {
                 LogStop();
-                LogDataOverrun.Invoke(this, null);
+                LogDataOverrun?.Invoke(this, null);
             }
         }
 
-        public void LogInit(int length = 3600)
+        public void LogInit(int length = 86400)
         {
             LogCurrentPos = 0;
             LogData = new List<double[]>();
