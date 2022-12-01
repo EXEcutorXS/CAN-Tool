@@ -320,6 +320,11 @@ namespace Can_Adapter
             lastMessage = msg;
 
             serialPort.Write(str.ToString());
+            for (int i = 0; i < 1000; i++)
+            {
+                Thread.Sleep(1);
+                if (txDone || TxFail) return ;
+            }
         }
 
         public bool TransmitWithCheck(CanMessage msg)

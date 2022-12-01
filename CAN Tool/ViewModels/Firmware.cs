@@ -181,6 +181,18 @@ namespace CAN_Tool.ViewModels
                 if (WaitForFlag(ref VM.SelectedConnectedDevice.flagProgramDone, 20)) break;
             }
         }
+
+        private void flashFragmentOld(CodeFragment f)
+        {
+            writeFragmentToRamOld(f);
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't flash memory"); return; }
+                startFlashing();
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagProgramDone, 20)) break;
+            }
+        }
+
         private void bootloaderSetAdrLen(uint adress, int len)
         {
             Debug.WriteLine($"Setting adress to 0X{adress:X}");
@@ -282,6 +294,42 @@ namespace CAN_Tool.ViewModels
                 if (checkTransmittedData(len, crc)) break;
             }
         }
+
+        private void writeFragmentToRamOld(CodeFragment f)
+        {
+            int len = 0;
+            AC2PMessage msg = new()
+            {
+                PGN = 101,
+                TransmitterAddress = 6,
+                TransmitterType = 126,
+                ReceiverAddress = 0,
+                ReceiverType = 123
+            };
+
+            Debug.WriteLine($"Starting {f.StartAdress:X} fragment transmission");
+            for (int i = 0; i < (f.Length + 7) / 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    msg.Data[j] = f.Data[i * 8 + j];
+                    len++;
+                }
+                msg.Data[0] = f.Data[i * 8];
+                msg.Data[1] = f.Data[i * 8 + 1];
+                msg.Data[2] = f.Data[i * 8 + 2];
+                msg.Data[3] = f.Data[i * 8 + 3];
+                msg.Data[4] = f.Data[i * 8 + 4];
+                msg.Data[5] = f.Data[i * 8 + 5];
+                msg.Data[6] = f.Data[i * 8 + 6];
+                msg.Data[7] = f.Data[i * 8 + 7];
+                VM.CanAdapter.TransmitForSure(msg, 10);
+
+            }
+
+        }
+
+
         private void updateFirmware(List<CodeFragment> fragments)
         {
             Debug.WriteLine("Starting Firmware updating procedure");
@@ -309,6 +357,52 @@ namespace CAN_Tool.ViewModels
             VM.AC2PInstance.CurrentTask.onDone();
 
         }
+
+        private void initAnddressOld()
+        {
+            AC2PMessage msg = new()
+            {
+                PGN = 100,
+                TransmitterAddress = 6,
+                TransmitterType = 126,
+                ReceiverAddress = 0,
+                ReceiverType = 123
+            };
+            msg.Data[0] = 1;
+
+            VM.CanAdapter.TransmitForSure(msg, 100);
+        }
+        private void updateFirmwareOld(List<CodeFragment> fragments)
+        {
+            Debug.WriteLine("Starting Firmware updating procedure");
+            VM.AC2PInstance.CurrentTask.Capture("Memory Erasing");
+            Debug.WriteLine("Starting flash erasing");
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't erase memory"); return; }
+                eraseFlash();
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagEraseDone, 5000)) break;
+            }
+
+            VM.AC2PInstance.CurrentTask.onDone();
+
+            VM.AC2PInstance.CurrentTask.Capture("Programming...");
+
+            int cnt = 0;
+
+            initAnddressOld();
+
+            foreach (var f in fragments)
+            {
+                flashFragmentOld(f);
+                VM.AC2PInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
+                if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested) return;
+            }
+            Debug.WriteLine("Firmware updating success");
+            VM.AC2PInstance.CurrentTask.onDone();
+
+        }
+
         public ICommand UpdateFirmwareCommand { get; }
 
 
@@ -366,7 +460,7 @@ namespace CAN_Tool.ViewModels
 
         private void OnUpdateFirmwareCommandExecuted(object parameter)
         {
-            Task.Run(() => updateFirmware(fragments));
+            Task.Run(() => updateFirmwareOld(fragments));
         }
 
         private bool CanUpdateFirmwareCommandExecute(object parameter)
