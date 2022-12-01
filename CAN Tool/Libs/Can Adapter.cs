@@ -241,14 +241,14 @@ namespace Can_Adapter
 
         private int ptr = 0;
 
-        private string lastMessageString = "";
-
         public UInt32 Version = 0;
 
         public int Bitrate = 250;
         public bool PortOpened => serialPort.IsOpen;
 
         private bool txDone = true;
+
+        private bool TxFail = true;
         public bool TxDone { private set => Set(ref txDone, value); get => txDone; }
 
         private int errorCounter = 0;
@@ -256,6 +256,8 @@ namespace Can_Adapter
 
         private int failedMessagesCounter = 0;
         public int FailedMessagesCounter { private set => Set(ref failedMessagesCounter, value); get => failedMessagesCounter; }
+
+        private CanMessage lastMessage;
 
 
         private readonly SynchronizationContext UIContext;
@@ -298,6 +300,7 @@ namespace Can_Adapter
         {
 
             TxDone = false;
+            TxFail = false;
 
             if (serialPort.IsOpen == false)
                 return;
@@ -314,15 +317,52 @@ namespace Can_Adapter
             str.Append(msg.DLC);
             str.Append(msg.GetDataInTextFormat());
             str.Append('\r');
-            lastMessageString = str.ToString();
+            lastMessage = msg;
+
+            serialPort.Write(str.ToString());
+        }
+
+        public bool TransmitWithCheck(CanMessage msg)
+        {
+
+            TxDone = false;
+            TxFail = false;
+
+            if (serialPort.IsOpen == false)
+                return false;
+            StringBuilder str = new("");
+            if (msg.IDE && msg.RTR)
+                str.Append('R');
+            if (!msg.IDE && msg.RTR)
+                str.Append('r');
+            if (msg.IDE && !msg.RTR)
+                str.Append('T');
+            if (!msg.IDE && !msg.RTR)
+                str.Append('t');
+            str.Append(msg.IdAsText);
+            str.Append(msg.DLC);
+            str.Append(msg.GetDataInTextFormat());
+            str.Append('\r');
+            lastMessage = msg;
 
             serialPort.Write(str.ToString());
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 Thread.Sleep(1);
-                if (txDone) break;
+                if (txDone) return true;
+                if (TxFail) return false;
             }
+            return false;
+        }
+
+        public bool TransmitForSure(CanMessage msg, int tries)
+        {
+            while (TransmitWithCheck(msg) == false && tries-- > 0) ;
+            if (tries == 0) return false;
+            else
+                return true;
+
         }
 
         private void UartMessageProcess()
@@ -343,9 +383,9 @@ namespace Can_Adapter
                     TransmissionSuccess?.Invoke(this, new());
                     break;
                 case '\a':
+                    TxFail = true;
                     ErrorCounter++;
-                    Debug.WriteLine("<<ERROR,RESEND>>", "CAN");
-                    serialPort.WriteLine(lastMessageString);
+                    Debug.WriteLine("<<ERROR>>", "CAN");
                     ErrorReported?.Invoke(this, new());
                     break;
                 default:

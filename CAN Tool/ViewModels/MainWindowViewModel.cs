@@ -33,7 +33,7 @@ namespace CAN_Tool.ViewModels
             get { return firmwarePage; }
             set { Set(ref firmwarePage, value); }
         }
-       
+
         private int manualAirBlower;
         public int ManualAirBlower { set => Set(ref manualAirBlower, value); get => manualAirBlower; }
 
@@ -311,7 +311,7 @@ namespace CAN_Tool.ViewModels
                     else
                         plt.Style(dataBackground: System.Drawing.Color.WhiteSmoke, figureBackground: System.Drawing.Color.White);
                     plt.Legend();
-                    
+
 
                 }
             myChart.Refresh();
@@ -512,8 +512,17 @@ namespace CAN_Tool.ViewModels
         public ICommand IncreaceManualAirBlowerCommand { get; }
         private void OnIncreaceManualAirBlowerCommandExecuted(object parameter)
         {
-            if (ManualAirBlower < 100)
-                ManualAirBlower++;
+            int delta;
+
+            if (parameter == null)
+                delta = 1;
+            else
+                delta = (int)parameter;
+
+            ManualAirBlower += delta;
+            if (ManualAirBlower >= 140)
+                manualAirBlower = 140;
+
             updateManualMode();
         }
         #endregion
@@ -522,8 +531,17 @@ namespace CAN_Tool.ViewModels
         public ICommand DecreaseManualAirBlowerCommand { get; }
         private void OnDecreaseManualAirBlowerCommandExecuted(object parameter)
         {
-            if (ManualAirBlower > 0)
-                ManualAirBlower--;
+            int delta;
+
+            if (parameter == null)
+                delta = -1;
+            else
+                delta = (int)parameter;
+
+            ManualAirBlower += delta;
+            if (ManualAirBlower <= 0)
+                ManualAirBlower = 0;
+
             updateManualMode();
         }
         #endregion
@@ -654,7 +672,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[4] = (byte)ManualGlowPlug;
             msg.Data[5] = (byte)(ManualFuelPump / 256);
             msg.Data[6] = (byte)ManualFuelPump;
-            CanAdapter.Transmit(msg);
+            Task.Run(() => CanAdapter.Transmit(msg));
         }
 
         private async void requestSerial(ConnectedDevice d)

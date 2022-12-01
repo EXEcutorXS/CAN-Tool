@@ -65,6 +65,7 @@ namespace CAN_Tool
 
         private void SaveSettings()
         {
+            if (vm.SelectedConnectedDevice == null) return;
             foreach (var b in vm.SelectedConnectedDevice.Status)
             {
                 App.Settings.Colors[b.Id] = (b.ChartBrush as SolidColorBrush).Color;
@@ -308,14 +309,17 @@ namespace CAN_Tool
                 vm.TurnOffWaterPumpCommand.Execute(null);
         }
 
-        private void ProgressBar_MouseWheel(object sender, MouseWheelEventArgs e)
+        private void ManualAirMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
         {
+            int delta=1;
+            if (Keyboard.GetKeyStates(Key.LeftShift)==KeyStates.Down)
+                delta = 5;
             if (e.Delta > 0)
                 if (vm.IncreaceManualAirBlowerCommand.CanExecute(null))
-                    vm.IncreaceManualAirBlowerCommand.Execute(null);
+                    vm.IncreaceManualAirBlowerCommand.Execute(delta);
             if (e.Delta < 0)
                 if (vm.DecreaseManualAirBlowerCommand.CanExecute(null))
-                    vm.DecreaseManualAirBlowerCommand.Execute(null);
+                    vm.DecreaseManualAirBlowerCommand.Execute(delta*-1);
         }
 
         private void ProgressBar_MouseWheel_1(object sender, MouseWheelEventArgs e)

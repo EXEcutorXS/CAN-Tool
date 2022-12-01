@@ -2146,25 +2146,25 @@ namespace AdversCan
 
             #region Commands init
             commands.Add(0, new() { Id = 0, Name = "Кто здесь?" });
-            commands.Add(1, new AC2PCommand() { Id = 1, Name = "пуск устройства" });
-            commands.Add(3, new AC2PCommand() { Id = 3, Name = "остановка устройства" });
-            commands.Add(4, new AC2PCommand() { Id = 4, Name = "пуск только помпы" });
-            commands.Add(5, new AC2PCommand() { Id = 5, Name = "сброс неисправностей" });
-            commands.Add(6, new AC2PCommand() { Id = 6, Name = "задать параметры работы жидкостного подогревателя" });
-            commands.Add(7, new AC2PCommand() { Id = 7, Name = "запрос температурных переходов по режимам жидкостного подогревателя" });
-            commands.Add(8, new AC2PCommand() { Id = 8, Name = "задать состояние клапанов устройства ”Блок управления клапанами”" });
-            commands.Add(9, new AC2PCommand() { Id = 9, Name = "задать параметры работы воздушного отопителя" });
-            commands.Add(10, new AC2PCommand() { Id = 10, Name = "запуск в режиме вентиляции (для воздушных отопителей)" });
-            commands.Add(20, new AC2PCommand() { Id = 20, Name = "калибровка термопар" });
-            commands.Add(21, new AC2PCommand() { Id = 21, Name = "задать параметры частоты ШИМ нагнетателя воздуха" });
-            commands.Add(22, new AC2PCommand() { Id = 22, Name = "Reset CPU" });
-            commands.Add(45, new AC2PCommand() { Id = 45, Name = "биты реакции на неисправности" });
-            commands.Add(65, new AC2PCommand() { Id = 65, Name = "установить значение температуры" });
-            commands.Add(66, new AC2PCommand() { Id = 66, Name = "сброс неисправностей" });
-            commands.Add(67, new AC2PCommand() { Id = 67, Name = "вход/выход в стадию M (ручное управление) или T (тестирование блока управления)" });
-            commands.Add(68, new AC2PCommand() { Id = 68, Name = "задание параметров устройств в стадии M (ручное управление)" });
-            commands.Add(69, new AC2PCommand() { Id = 69, Name = "управление устройствами" });
-            commands.Add(70, new AC2PCommand() { Id = 69, Name = "Включение/Выключение устройств" });
+            commands.Add(1, new () { Id = 1, Name = "пуск устройства" });
+            commands.Add(3, new () { Id = 3, Name = "остановка устройства" });
+            commands.Add(4, new () { Id = 4, Name = "пуск только помпы" });
+            commands.Add(5, new () { Id = 5, Name = "сброс неисправностей" });
+            commands.Add(6, new () { Id = 6, Name = "задать параметры работы жидкостного подогревателя" });
+            commands.Add(7, new () { Id = 7, Name = "запрос температурных переходов по режимам жидкостного подогревателя" });
+            commands.Add(8, new () { Id = 8, Name = "задать состояние клапанов устройства ”Блок управления клапанами”" });
+            commands.Add(9, new () { Id = 9, Name = "задать параметры работы воздушного отопителя" });
+            commands.Add(10, new () { Id = 10, Name = "запуск в режиме вентиляции (для воздушных отопителей)" });
+            commands.Add(20, new () { Id = 20, Name = "калибровка термопар" });
+            commands.Add(21, new () { Id = 21, Name = "задать параметры частоты ШИМ нагнетателя воздуха" });
+            commands.Add(22, new () { Id = 22, Name = "Reset CPU" });
+            commands.Add(45, new () { Id = 45, Name = "биты реакции на неисправности" });
+            commands.Add(65, new () { Id = 65, Name = "установить значение температуры" });
+            commands.Add(66, new () { Id = 66, Name = "сброс неисправностей" });
+            commands.Add(67, new () { Id = 67, Name = "вход/выход в стадию M (ручное управление) или T (тестирование блока управления)" });
+            commands.Add(68, new () { Id = 68, Name = "задание параметров устройств в стадии M (ручное управление)" });
+            commands.Add(69, new () { Id = 69, Name = "управление устройствами" });
+            commands.Add(70, new () { Id = 69, Name = "Включение/Выключение устройств" });
             #endregion
 
             #region Command parameters init
