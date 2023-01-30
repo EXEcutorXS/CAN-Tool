@@ -130,12 +130,12 @@ namespace CAN_Tool.ViewModels
         private void eraseFlash()
         {
             AC2PMessage msg = new();
-            msg.PGN = 100;
+            msg.PGN = 105;
             msg.TransmitterAddress = 6;
             msg.TransmitterType = 126;
             msg.ReceiverAddress = 0;
             msg.ReceiverType = 123;
-            msg.Data[0] = 1;
+            msg.Data[0] = 6;
             VM.CanAdapter.Transmit(msg);
             VM.SelectedConnectedDevice.flagEraseDone = false;
         }
@@ -143,12 +143,12 @@ namespace CAN_Tool.ViewModels
         private void startFlashing()
         {
             AC2PMessage msg = new();
-            msg.PGN = 100;
+            msg.PGN = 105;
             msg.TransmitterAddress = 6;
             msg.TransmitterType = 126;
             msg.ReceiverAddress = 0;
             msg.ReceiverType = 123;
-            msg.Data[0] = 3;
+            msg.Data[0] = 4;
             VM.CanAdapter.Transmit(msg);
         }
 
@@ -222,11 +222,11 @@ namespace CAN_Tool.ViewModels
         private bool checkTransmittedData(int len, int crc)
         {
             AC2PMessage msg = new();
-            msg.PGN = 100;
+            msg.PGN = 105;
             msg.TransmitterAddress = 6;
             msg.TransmitterType = 126;
             msg.ReceiverId = VM.SelectedConnectedDevice.ID;
-            msg.Data[0] = 4;
+            msg.Data[0] = 2;
             Debug.WriteLine("Waiting for check info");
             for (int i = 0; i < 6; i++)
             {
@@ -236,7 +236,7 @@ namespace CAN_Tool.ViewModels
                     return false;
                 }
                 VM.CanAdapter.Transmit(msg);
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagCheckDone, 100)) break;
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagTransmissionCheck, 100)) break;
             }
             Debug.WriteLine($"Len:{VM.SelectedConnectedDevice.dataLength}/{len},CRC:0x{VM.SelectedConnectedDevice.crc:X}/0X{crc:X}");
             if (crc == VM.SelectedConnectedDevice.crc && len == VM.SelectedConnectedDevice.dataLength)
@@ -253,7 +253,7 @@ namespace CAN_Tool.ViewModels
             int len;
             AC2PMessage msg = new()
             {
-                PGN = 101,
+                PGN = 106,
                 TransmitterAddress = 6,
                 TransmitterType = 126,
                 ReceiverAddress = 0,
@@ -277,7 +277,7 @@ namespace CAN_Tool.ViewModels
                     {
                         msg.Data[j] = f.Data[i * 8 + j];
                         crc += f.Data[i * 8 + j] * 170771;
-                        crc = crc ^ (crc >> 16);
+                        crc = crc ^ ((crc >> 16)&0xFFFF);
                         len++;
                     }
                     msg.Data[0] = f.Data[i * 8];
@@ -293,6 +293,52 @@ namespace CAN_Tool.ViewModels
                 }
                 if (checkTransmittedData(len, crc)) break;
             }
+        }
+
+
+
+
+        private void updateFirmware(List<CodeFragment> fragments)
+        {
+            Debug.WriteLine("Starting Firmware updating procedure");
+            VM.AC2PInstance.CurrentTask.Capture("Memory Erasing");
+            Debug.WriteLine("Starting flash erasing");
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't erase memory"); return; }
+                eraseFlash();
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagEraseDone, 5000)) break;
+            }
+
+            VM.AC2PInstance.CurrentTask.onDone();
+
+            VM.AC2PInstance.CurrentTask.Capture("Programming...");
+
+            int cnt = 0;
+            foreach (var f in fragments)
+            {
+                flashFragment(f);
+                VM.AC2PInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
+                if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested) return;
+            }
+            Debug.WriteLine("Firmware updating success");
+            VM.AC2PInstance.CurrentTask.onDone();
+
+        }
+        #region oldVersionBootloader
+        private void initAnddressOld()
+        {
+            AC2PMessage msg = new()
+            {
+                PGN = 100,
+                TransmitterAddress = 6,
+                TransmitterType = 126,
+                ReceiverAddress = 0,
+                ReceiverType = 123
+            };
+            msg.Data[0] = 1;
+
+            VM.CanAdapter.TransmitForSure(msg, 100);
         }
 
         private void writeFragmentToRamOld(CodeFragment f)
@@ -328,50 +374,6 @@ namespace CAN_Tool.ViewModels
             }
 
         }
-
-
-        private void updateFirmware(List<CodeFragment> fragments)
-        {
-            Debug.WriteLine("Starting Firmware updating procedure");
-            VM.AC2PInstance.CurrentTask.Capture("Memory Erasing");
-            Debug.WriteLine("Starting flash erasing");
-            for (int i = 0; i < 4; i++)
-            {
-                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't erase memory"); return; }
-                eraseFlash();
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagEraseDone, 5000)) break;
-            }
-
-            VM.AC2PInstance.CurrentTask.onDone();
-
-            VM.AC2PInstance.CurrentTask.Capture("Programming...");
-
-            int cnt = 0;
-            foreach (var f in fragments)
-            {
-                flashFragment(f);
-                VM.AC2PInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
-                if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested) return;
-            }
-            Debug.WriteLine("Firmware updating success");
-            VM.AC2PInstance.CurrentTask.onDone();
-
-        }
-
-        private void initAnddressOld()
-        {
-            AC2PMessage msg = new()
-            {
-                PGN = 100,
-                TransmitterAddress = 6,
-                TransmitterType = 126,
-                ReceiverAddress = 0,
-                ReceiverType = 123
-            };
-            msg.Data[0] = 1;
-
-            VM.CanAdapter.TransmitForSure(msg, 100);
-        }
         private void updateFirmwareOld(List<CodeFragment> fragments)
         {
             Debug.WriteLine("Starting Firmware updating procedure");
@@ -402,7 +404,7 @@ namespace CAN_Tool.ViewModels
             VM.AC2PInstance.CurrentTask.onDone();
 
         }
-
+        #endregion
         public ICommand UpdateFirmwareCommand { get; }
 
 
@@ -460,7 +462,7 @@ namespace CAN_Tool.ViewModels
 
         private void OnUpdateFirmwareCommandExecuted(object parameter)
         {
-            Task.Run(() => updateFirmwareOld(fragments));
+            Task.Run(() => updateFirmware(fragments));
         }
 
         private bool CanUpdateFirmwareCommandExecute(object parameter)

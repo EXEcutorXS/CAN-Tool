@@ -1190,7 +1190,15 @@ namespace AdversCan
 
         public bool flagProgramDone = false;
 
-        public bool flagCheckDone = false;
+        public bool flagTransmissionCheck = false;
+
+        public bool flagCrcGetDone = false;
+
+        public bool flagDataGetDone = false;
+
+        public int receivedDataLength = 0;
+
+        public uint receiverDataCrc = 0;
 
         public bool flagGetParamDone = false;
 
@@ -1645,15 +1653,16 @@ namespace AdversCan
 
             }
 
-            if (m.PGN == 100)
+            if (m.PGN == 105)
             {
-                if (m.Data[0] == 1 && m.Data[1] == 1)
+                if (m.Data[0] == 7 && m.Data[1] == 0)
                 {
                     Debug.WriteLine("Memory erase confirmed");
                     currentDevice.flagEraseDone = true;
                 }
-                if (m.Data[0] == 2 && m.Data[1] == 1)
+                if (m.Data[3] == 2)
                 {
+                    currentDevice.receivedDataLength = m.Data[1] * 65536 + m.Data[2] *256 | m.Data[3];
                     Debug.WriteLine("Adress set confirmed");
                     currentDevice.flagSetAdrDone = true;
                 }
@@ -1667,7 +1676,7 @@ namespace AdversCan
                 {
                     currentDevice.crc = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
                     currentDevice.dataLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
-                    currentDevice.flagCheckDone = true;
+                    currentDevice.flagTransmissionCheck = true;
                 }
                 if (m.Data[0] == 5)
                 {
