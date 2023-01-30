@@ -33,7 +33,10 @@
                 <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Left">
-                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.LastOperationDuration,StringFormat=Done in {0},TargetNullValue=_ }" Margin="10 0 10 0"></TextBlock>
+                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.LastOperationDuration,StringFormat=Done in {0} }" Margin="10 0 10 0"></TextBlock>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Left">
+                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.FailReason}" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
             <ProgressBar Width="300" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></ProgressBar>
             <StatusBarItem HorizontalAlignment="Left">

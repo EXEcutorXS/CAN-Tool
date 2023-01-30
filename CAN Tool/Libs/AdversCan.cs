@@ -778,6 +778,7 @@ namespace AdversCan
 
         public void onFail(string reason = "")
         {
+            FailReason = reason;
             CTS.Cancel();
             Occupied = false;
             Failed = true;
@@ -817,6 +818,7 @@ namespace AdversCan
             if (occupied) return false;
             Occupied = true;
             Name = TaskName;
+            FailReason = "";
             PercentComplete = 0;
             Done = false;
             Cancelled = false;
@@ -1212,9 +1214,9 @@ namespace AdversCan
 
         public uint fragmentAdress = 0;
 
-        public int dataLength = 0;
+        public int receivedFragmentLength = 0;
 
-        public int crc = 0;
+        public uint receivedFragmentCrc = 0;
 
         public string Name => ToString();
 
@@ -1670,34 +1672,36 @@ namespace AdversCan
 
                 if (m.Data[0] == 3)
                 {
-                    currentDevice.receivedDataLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
-                    currentDevice.receiverDataCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
-                    Debug.WriteLine("Data fragment transmitted");
-                    currentDevice.flagSetAdrDone = true;
+                    currentDevice.receivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
+                    currentDevice.receivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
+                    Debug.WriteLine($"Data fragment len:{currentDevice.receivedFragmentLength},CRC:{currentDevice.receivedFragmentCrc:X}");
+                    currentDevice.flagDataGetDone = true;
                 }
 
-                if (m.Data[0] == 5 && m.Data[1] == 0)
+                if (m.Data[0] == 5 )
                 {
-                    Debug.WriteLine("Flash program confirmed");
-                    currentDevice.flagProgramDone = true;
+                    if (m.Data[1] == 0)
+                    {
+                        Debug.WriteLine("Flash fragment successed");
+                        currentDevice.flagProgramDone = true;
+                    }
+                    else
+                        Debug.WriteLine("Flash fragment failed");
                 }
 
-                if (m.Data[0] == 7 && m.Data[1] == 0)
+                if (m.Data[0] == 7 )
                 {
-                    Debug.WriteLine("Memory erase confirmed");
-                    currentDevice.flagEraseDone = true;
+                    if (m.Data[1] == 0)
+                    {
+                        Debug.WriteLine("Memory erase confirmed");
+                        currentDevice.flagEraseDone = true;
+                    }
+                    else
+                        Debug.WriteLine("Memory erase fail");
                 }
-
-                if (m.Data[0] == 4)
-                {
-                    currentDevice.crc = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
-                    currentDevice.dataLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
-                    currentDevice.flagTransmissionCheck = true;
-                }
-
             }
 
-            Messages.TryToAdd(m);
+                Messages.TryToAdd(m);
         }
         public static void ParseParamsname(string filePath = "paramsname.h")
         {
@@ -2162,6 +2166,8 @@ namespace AdversCan
             PGNs.Add(39, new() { id = 39, name = "Статусы драйверов ТН, свечи, помпа, реле" });
             PGNs.Add(100, new() { id = 100, name = "Управления памятью (Мультипакет)", multipack = true });
             PGNs.Add(101, new() { id = 101, name = "Заполнение буферного массива для последующей записи во флэш" });
+            PGNs.Add(105, new() { id = 105, name = "Управление памятью из бутлодера" });
+            PGNs.Add(106, new() { id = 106, name = "Заполнение буферного массива для последующей записи во флэш" });
             #endregion
 
             #region Commands init

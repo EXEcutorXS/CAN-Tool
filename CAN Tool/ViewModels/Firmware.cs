@@ -123,6 +123,7 @@ namespace CAN_Tool.ViewModels
             msg.PGN = 105;
             msg.ReceiverType = 123;
             msg.Data[0] = 6;
+            msg.Data[1] = 255;  //Стереть всю память
             VM.CanAdapter.Transmit(msg);
             VM.SelectedConnectedDevice.flagEraseDone = false;
         }
@@ -160,57 +161,52 @@ namespace CAN_Tool.ViewModels
             writeFragmentToRam(f);
             for (int i = 0; i < 4; i++)
             {
-                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't flash memory"); return; }
+                VM.SelectedConnectedDevice.flagProgramDone = false;
+                if (i == 3)
+                {
+                    VM.AC2PInstance.CurrentTask.onFail("Can't flash memory");
+                    return;
+                }
                 startFlashing();
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagProgramDone, 20)) break;
-            }
-        }
-
-        private void flashFragmentOld(CodeFragment f)
-        {
-            writeFragmentToRamOld(f);
-            for (int i = 0; i < 4; i++)
-            {
-                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't flash memory"); return; }
-                startFlashing();
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagProgramDone, 20)) break;
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagProgramDone, 100))
+                    break;
             }
         }
 
 
-
-        private bool checkTransmittedData(int len, int crc)
+        private bool checkTransmittedData(int len, uint crc)
         {
             AC2PMessage msg = new();
             msg.PGN = 105;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
-            msg.ReceiverId = VM.SelectedConnectedDevice.ID;
+            msg.ReceiverType = 123;
             msg.Data[0] = 2;
             Debug.WriteLine("Waiting for check info");
             for (int i = 0; i < 6; i++)
             {
+                VM.SelectedConnectedDevice.flagTransmissionCheck = false;
                 if (i == 5)
                 {
                     VM.AC2PInstance.CurrentTask.onFail("Can't check transmission result");
                     return false;
                 }
                 VM.CanAdapter.Transmit(msg);
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagTransmissionCheck, 100)) break;
+                WaitForFlag(ref VM.SelectedConnectedDevice.flagTransmissionCheck, 100);
+
+                Debug.WriteLine($"Len:{VM.SelectedConnectedDevice.receivedFragmentLength}/{len},CRC:0x{VM.SelectedConnectedDevice.receivedFragmentCrc:X}/0X{crc:X}");
+                if (crc == VM.SelectedConnectedDevice.receivedFragmentCrc && len == VM.SelectedConnectedDevice.receivedFragmentLength)
+                    return true;
+                else
+                {
+                    Debug.WriteLine("###Transmission failed!");
+                    return false;
+                }
             }
-            Debug.WriteLine($"Len:{VM.SelectedConnectedDevice.dataLength}/{len},CRC:0x{VM.SelectedConnectedDevice.crc:X}/0X{crc:X}");
-            if (crc == VM.SelectedConnectedDevice.crc && len == VM.SelectedConnectedDevice.dataLength)
-                return true;
-            else
-            {
-                Debug.WriteLine("###Transmission fail!");
-                return false;
-            }
+            return false;
         }
 
         private void setFragmentAdr(CodeFragment f)
         {
-            
+
             AC2PMessage msg = new()
             {
                 PGN = 105,
@@ -218,31 +214,34 @@ namespace CAN_Tool.ViewModels
             };
             msg.Data[0] = 0;
             msg.Data[1] = (byte)(f.StartAdress >> 24);
-            msg.Data[1] = (byte)(f.StartAdress >> 16);
-            msg.Data[1] = (byte)(f.StartAdress >> 8);
-            msg.Data[1] = (byte)(f.StartAdress >> 0);
+            msg.Data[2] = (byte)(f.StartAdress >> 16);
+            msg.Data[3] = (byte)(f.StartAdress >> 8);
+            msg.Data[4] = (byte)(f.StartAdress >> 0);
             for (int i = 0; i < 4; i++)
             {
+                VM.SelectedConnectedDevice.flagSetAdrDone = false;
                 if (i == 3)
                 {
-                    VM.AC2PInstance.CurrentTask.onFail("Can't set adress");
+                    VM.AC2PInstance.CurrentTask.onFail("Can't set address");
                     return;
                 }
                 VM.CanAdapter.Transmit(msg);
-                WaitForFlag(ref VM.SelectedConnectedDevice.flagSetAdrDone, 100);
-                if (VM.SelectedConnectedDevice.fragmentAdress == f.StartAdress)
-                    return;
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagSetAdrDone, 300))
+                {
+                    if (VM.SelectedConnectedDevice.fragmentAdress == f.StartAdress)
+                        break;
+                    else
+                        continue;
+                }
+
             }
         }
         private void writeFragmentToRam(CodeFragment f)
         {
-            int crc;
+            uint crc;
             int len;
 
-            setFragmentAdr(f);
 
-            if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested)
-                return;
             AC2PMessage msg = new()
             {
                 PGN = 106,
@@ -252,21 +251,25 @@ namespace CAN_Tool.ViewModels
             Debug.WriteLine($"Starting {f.StartAdress:X} fragment transmission");
             for (int k = 0; k < 16; k++)
             {
+                setFragmentAdr(f);
+
+                if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested)
+                    return;
+
                 if (k == 15) { VM.AC2PInstance.CurrentTask.onFail("Can't transmit data pack"); return; }
                 Debug.WriteLine($"Try: {k}");
-                bootloaderSetAdrLen(f.StartAdress, f.Length);
                 crc = 0;
                 len = 0;
-                VM.SelectedConnectedDevice.crc = 0;
-                VM.SelectedConnectedDevice.dataLength = 0;
+                VM.SelectedConnectedDevice.receivedFragmentCrc = 0;
+                VM.SelectedConnectedDevice.receivedFragmentLength = 0;
 
                 for (int i = 0; i < (f.Length + 7) / 8; i++)
                 {
                     for (int j = 0; j < 8; j++)
                     {
                         msg.Data[j] = f.Data[i * 8 + j];
-                        crc += f.Data[i * 8 + j] * 170771;
-                        crc = crc ^ ((crc >> 16)&0xFFFF);
+                        crc += f.Data[i * 8 + j] * 170771U;
+                        crc = crc ^ ((crc >> 16) & 0xFFFFU);
                         len++;
                     }
                     msg.Data[0] = f.Data[i * 8];
@@ -278,14 +281,11 @@ namespace CAN_Tool.ViewModels
                     msg.Data[6] = f.Data[i * 8 + 6];
                     msg.Data[7] = f.Data[i * 8 + 7];
                     VM.CanAdapter.Transmit(msg);
-
+                    Thread.Sleep(10);
                 }
                 if (checkTransmittedData(len, crc)) break;
             }
         }
-
-
-
 
         private void updateFirmware(List<CodeFragment> fragments)
         {
@@ -315,6 +315,17 @@ namespace CAN_Tool.ViewModels
 
         }
         #region oldVersionBootloader
+        /*
+        private void flashFragmentOld(CodeFragment f)
+        {
+            writeFragmentToRamOld(f);
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't flash memory"); return; }
+                startFlashing();
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagProgramDone, 20)) break;
+            }
+        }
 
         private void bootloaderSetAdrLen(uint adress, int len)
         {
@@ -416,9 +427,9 @@ namespace CAN_Tool.ViewModels
             VM.AC2PInstance.CurrentTask.onDone();
 
         }
+        */
         #endregion
         public ICommand UpdateFirmwareCommand { get; }
-
 
         private List<CodeFragment> parseHexFile(string path, int maxFragment)
         {
@@ -426,7 +437,7 @@ namespace CAN_Tool.ViewModels
             uint pageAdress = 0;
             uint localAdress = 0;
 
-            if (path != null)
+            if (path != null && path.Length > 0)
                 using (StreamReader sr = new StreamReader(path))
                 {
                     while (!sr.EndOfStream)

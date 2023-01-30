@@ -320,11 +320,14 @@ namespace Can_Adapter
             lastMessage = msg;
 
             serialPort.Write(str.ToString());
-            for (int i = 0; i < 1000; i++)
+            /*
+            for (int i = 0; i < 30; i++)
             {
                 Thread.Sleep(1);
-                if (txDone || TxFail) return ;
+                if (txDone || TxFail)
+                    return;
             }
+            */
         }
 
         public bool TransmitWithCheck(CanMessage msg)
@@ -422,7 +425,7 @@ namespace Can_Adapter
         public CanAdapter()
         {
             serialPort = new SerialPort();
-            serialPort.BaudRate = 1000000;
+            serialPort.BaudRate = 256000;
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             UIContext = SynchronizationContext.Current;
         }
