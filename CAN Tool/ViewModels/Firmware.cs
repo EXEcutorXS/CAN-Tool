@@ -45,8 +45,6 @@ namespace CAN_Tool.ViewModels
 
             AC2PMessage msg = new();
             msg.PGN = 1;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
             msg.ReceiverId = VM.SelectedConnectedDevice.ID;
             msg.Data[0] = 0;
             msg.Data[1] = 22;
@@ -64,9 +62,6 @@ namespace CAN_Tool.ViewModels
 
             AC2PMessage msg = new();
             msg.PGN = 6;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
-            msg.ReceiverAddress = 0;
             msg.ReceiverType = 123;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
@@ -83,10 +78,7 @@ namespace CAN_Tool.ViewModels
 
             AC2PMessage msg = new();
             msg.PGN = 1;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
             msg.ReceiverType = 123;
-            msg.ReceiverAddress = 0;
             msg.Data[0] = 0;
             msg.Data[1] = 22;
             msg.Data[2] = 1;
@@ -117,8 +109,6 @@ namespace CAN_Tool.ViewModels
         {
             AC2PMessage msg = new();
             msg.PGN = 6;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
             msg.ReceiverId = VM.SelectedConnectedDevice.ID;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
@@ -131,9 +121,6 @@ namespace CAN_Tool.ViewModels
         {
             AC2PMessage msg = new();
             msg.PGN = 105;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
-            msg.ReceiverAddress = 0;
             msg.ReceiverType = 123;
             msg.Data[0] = 6;
             VM.CanAdapter.Transmit(msg);
@@ -144,9 +131,6 @@ namespace CAN_Tool.ViewModels
         {
             AC2PMessage msg = new();
             msg.PGN = 105;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
-            msg.ReceiverAddress = 0;
             msg.ReceiverType = 123;
             msg.Data[0] = 4;
             VM.CanAdapter.Transmit(msg);
@@ -193,31 +177,7 @@ namespace CAN_Tool.ViewModels
             }
         }
 
-        private void bootloaderSetAdrLen(uint adress, int len)
-        {
-            Debug.WriteLine($"Setting adress to 0X{adress:X}");
-            AC2PMessage msg = new();
-            msg.PGN = 100;
-            msg.TransmitterAddress = 6;
-            msg.TransmitterType = 126;
-            msg.ReceiverAddress = 0;
-            msg.ReceiverType = 123;
-            msg.Data[0] = 5;
-            msg.Data[1] = 0xFF;
-            msg.Data[2] = (byte)((adress >> 24) & 0xFF);
-            msg.Data[3] = (byte)((adress >> 16) & 0xFF);
-            msg.Data[4] = (byte)((adress >> 8) & 0xFF);
-            msg.Data[5] = (byte)((adress >> 0) & 0xFF);
-            msg.Data[6] = 0xff;
-            msg.Data[7] = 0xff;
 
-            for (int i = 0; i < 6; i++)
-            {
-                if (i == 5) { VM.AC2PInstance.CurrentTask.onFail("Can't set start adress"); return; }
-                VM.CanAdapter.Transmit(msg);
-                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagSetAdrDone, 100)) break;
-            }
-        }
 
         private bool checkTransmittedData(int len, int crc)
         {
@@ -247,16 +207,45 @@ namespace CAN_Tool.ViewModels
                 return false;
             }
         }
+
+        private void setFragmentAdr(CodeFragment f)
+        {
+            
+            AC2PMessage msg = new()
+            {
+                PGN = 105,
+                ReceiverType = 123
+            };
+            msg.Data[0] = 0;
+            msg.Data[1] = (byte)(f.StartAdress >> 24);
+            msg.Data[1] = (byte)(f.StartAdress >> 16);
+            msg.Data[1] = (byte)(f.StartAdress >> 8);
+            msg.Data[1] = (byte)(f.StartAdress >> 0);
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 3)
+                {
+                    VM.AC2PInstance.CurrentTask.onFail("Can't set adress");
+                    return;
+                }
+                VM.CanAdapter.Transmit(msg);
+                WaitForFlag(ref VM.SelectedConnectedDevice.flagSetAdrDone, 100);
+                if (VM.SelectedConnectedDevice.fragmentAdress == f.StartAdress)
+                    return;
+            }
+        }
         private void writeFragmentToRam(CodeFragment f)
         {
             int crc;
             int len;
+
+            setFragmentAdr(f);
+
+            if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested)
+                return;
             AC2PMessage msg = new()
             {
                 PGN = 106,
-                TransmitterAddress = 6,
-                TransmitterType = 126,
-                ReceiverAddress = 0,
                 ReceiverType = 123
             };
 
@@ -326,6 +315,29 @@ namespace CAN_Tool.ViewModels
 
         }
         #region oldVersionBootloader
+
+        private void bootloaderSetAdrLen(uint adress, int len)
+        {
+            Debug.WriteLine($"Setting adress to 0X{adress:X}");
+            AC2PMessage msg = new();
+            msg.PGN = 100;
+            msg.ReceiverType = 123;
+            msg.Data[0] = 5;
+            msg.Data[1] = 0xFF;
+            msg.Data[2] = (byte)((adress >> 24) & 0xFF);
+            msg.Data[3] = (byte)((adress >> 16) & 0xFF);
+            msg.Data[4] = (byte)((adress >> 8) & 0xFF);
+            msg.Data[5] = (byte)((adress >> 0) & 0xFF);
+            msg.Data[6] = 0xff;
+            msg.Data[7] = 0xff;
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (i == 5) { VM.AC2PInstance.CurrentTask.onFail("Can't set start adress"); return; }
+                VM.CanAdapter.Transmit(msg);
+                if (WaitForFlag(ref VM.SelectedConnectedDevice.flagSetAdrDone, 100)) break;
+            }
+        }
         private void initAnddressOld()
         {
             AC2PMessage msg = new()

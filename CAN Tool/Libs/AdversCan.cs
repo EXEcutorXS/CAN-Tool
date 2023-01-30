@@ -126,6 +126,10 @@ namespace AdversCan
             DLC = 8;
             RTR = false;
             IDE = true;
+            TransmitterType = 126;
+            TransmitterAddress = 6;
+            ReceiverAddress = 0;
+
         }
         public AC2PMessage(CanMessage m) : this()
         {
@@ -562,7 +566,7 @@ namespace AdversCan
             set => Set(ref lineWidth, value);
         }
 
-        public int[] LineWidthes => new int[] { 1,2,3,4,5 };
+        public int[] LineWidthes => new int[] { 1, 2, 3, 4, 5 };
 
         private LineStyle lineStyle;
 
@@ -1206,6 +1210,8 @@ namespace AdversCan
 
         public bool waitForBB = false;
 
+        public uint fragmentAdress = 0;
+
         public int dataLength = 0;
 
         public int crc = 0;
@@ -1466,7 +1472,7 @@ namespace AdversCan
 
         private void ProcessCanMessage(CanMessage msg)
         {
-            
+
             AC2PMessage m = new AC2PMessage(msg);
             DeviceId id = m.TransmitterId;
 
@@ -1655,35 +1661,40 @@ namespace AdversCan
 
             if (m.PGN == 105)
             {
+                if (m.Data[0] == 1)
+                {
+                    currentDevice.fragmentAdress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                    Debug.WriteLine($"Adress set to 0X{currentDevice.fragmentAdress:X}");
+                    currentDevice.flagSetAdrDone = true;
+                }
+
+                if (m.Data[0] == 3)
+                {
+                    currentDevice.receivedDataLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
+                    currentDevice.receiverDataCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
+                    Debug.WriteLine("Data fragment transmitted");
+                    currentDevice.flagSetAdrDone = true;
+                }
+
+                if (m.Data[0] == 5 && m.Data[1] == 0)
+                {
+                    Debug.WriteLine("Flash program confirmed");
+                    currentDevice.flagProgramDone = true;
+                }
+
                 if (m.Data[0] == 7 && m.Data[1] == 0)
                 {
                     Debug.WriteLine("Memory erase confirmed");
                     currentDevice.flagEraseDone = true;
                 }
-                if (m.Data[3] == 2)
-                {
-                    currentDevice.receivedDataLength = m.Data[1] * 65536 + m.Data[2] *256 | m.Data[3];
-                    Debug.WriteLine("Adress set confirmed");
-                    currentDevice.flagSetAdrDone = true;
-                }
 
-                if (m.Data[0] == 3 && m.Data[1] == 1)
-                {
-                    Debug.WriteLine("Flash program confirmed");
-                    currentDevice.flagProgramDone = true;
-                }
                 if (m.Data[0] == 4)
                 {
                     currentDevice.crc = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
                     currentDevice.dataLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
                     currentDevice.flagTransmissionCheck = true;
                 }
-                if (m.Data[0] == 5)
-                {
-                    int adr = m.Data[2] * 0x1000000 + m.Data[3] * 0x10000 + m.Data[4] * 0x100 + m.Data[5];
-                    Debug.WriteLine($"Adress set to 0X{adr:X}");
-                    currentDevice.flagSetAdrDone = true;
-                }
+
             }
 
             Messages.TryToAdd(m);
@@ -2064,7 +2075,7 @@ namespace AdversCan
 
         private void Adapter_GotNewMessage(object sender, EventArgs e)
         {
-            
+
             UIContext.Send(x => ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null);
         }
 
@@ -2155,25 +2166,25 @@ namespace AdversCan
 
             #region Commands init
             commands.Add(0, new() { Id = 0, Name = "Кто здесь?" });
-            commands.Add(1, new () { Id = 1, Name = "пуск устройства" });
-            commands.Add(3, new () { Id = 3, Name = "остановка устройства" });
-            commands.Add(4, new () { Id = 4, Name = "пуск только помпы" });
-            commands.Add(5, new () { Id = 5, Name = "сброс неисправностей" });
-            commands.Add(6, new () { Id = 6, Name = "задать параметры работы жидкостного подогревателя" });
-            commands.Add(7, new () { Id = 7, Name = "запрос температурных переходов по режимам жидкостного подогревателя" });
-            commands.Add(8, new () { Id = 8, Name = "задать состояние клапанов устройства ”Блок управления клапанами”" });
-            commands.Add(9, new () { Id = 9, Name = "задать параметры работы воздушного отопителя" });
-            commands.Add(10, new () { Id = 10, Name = "запуск в режиме вентиляции (для воздушных отопителей)" });
-            commands.Add(20, new () { Id = 20, Name = "калибровка термопар" });
-            commands.Add(21, new () { Id = 21, Name = "задать параметры частоты ШИМ нагнетателя воздуха" });
-            commands.Add(22, new () { Id = 22, Name = "Reset CPU" });
-            commands.Add(45, new () { Id = 45, Name = "биты реакции на неисправности" });
-            commands.Add(65, new () { Id = 65, Name = "установить значение температуры" });
-            commands.Add(66, new () { Id = 66, Name = "сброс неисправностей" });
-            commands.Add(67, new () { Id = 67, Name = "вход/выход в стадию M (ручное управление) или T (тестирование блока управления)" });
-            commands.Add(68, new () { Id = 68, Name = "задание параметров устройств в стадии M (ручное управление)" });
-            commands.Add(69, new () { Id = 69, Name = "управление устройствами" });
-            commands.Add(70, new () { Id = 69, Name = "Включение/Выключение устройств" });
+            commands.Add(1, new() { Id = 1, Name = "пуск устройства" });
+            commands.Add(3, new() { Id = 3, Name = "остановка устройства" });
+            commands.Add(4, new() { Id = 4, Name = "пуск только помпы" });
+            commands.Add(5, new() { Id = 5, Name = "сброс неисправностей" });
+            commands.Add(6, new() { Id = 6, Name = "задать параметры работы жидкостного подогревателя" });
+            commands.Add(7, new() { Id = 7, Name = "запрос температурных переходов по режимам жидкостного подогревателя" });
+            commands.Add(8, new() { Id = 8, Name = "задать состояние клапанов устройства ”Блок управления клапанами”" });
+            commands.Add(9, new() { Id = 9, Name = "задать параметры работы воздушного отопителя" });
+            commands.Add(10, new() { Id = 10, Name = "запуск в режиме вентиляции (для воздушных отопителей)" });
+            commands.Add(20, new() { Id = 20, Name = "калибровка термопар" });
+            commands.Add(21, new() { Id = 21, Name = "задать параметры частоты ШИМ нагнетателя воздуха" });
+            commands.Add(22, new() { Id = 22, Name = "Reset CPU" });
+            commands.Add(45, new() { Id = 45, Name = "биты реакции на неисправности" });
+            commands.Add(65, new() { Id = 65, Name = "установить значение температуры" });
+            commands.Add(66, new() { Id = 66, Name = "сброс неисправностей" });
+            commands.Add(67, new() { Id = 67, Name = "вход/выход в стадию M (ручное управление) или T (тестирование блока управления)" });
+            commands.Add(68, new() { Id = 68, Name = "задание параметров устройств в стадии M (ручное управление)" });
+            commands.Add(69, new() { Id = 69, Name = "управление устройствами" });
+            commands.Add(70, new() { Id = 69, Name = "Включение/Выключение устройств" });
             #endregion
 
             #region Command parameters init
