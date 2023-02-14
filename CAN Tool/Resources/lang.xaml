@@ -92,6 +92,7 @@
     <v:String x:Key="e_54">short circuit of the flow sensor</v:String>
     <v:String x:Key="e_55">open circuit of the air temp. sensor</v:String>
     <v:String x:Key="e_56">short circuit of the air temp. sensor</v:String>
+    
     <v:String x:Key="e_57">short circuit of the zone 1 temp. sensor</v:String>
     <v:String x:Key="e_58">open circuit of the zone 1 temp. sensor</v:String>
     <v:String x:Key="e_59">short circuit of the zone 2 temp. sensor</v:String>
@@ -102,6 +103,7 @@
     <v:String x:Key="e_64">open circuit of the zone 4 temp. sensor</v:String>
     <v:String x:Key="e_65">short circuit of the zone 5 temp. sensor</v:String>
     <v:String x:Key="e_66">open circuit of the zone 5 temp. sensor</v:String>
+    
     <v:String x:Key="e_69">short circuit of the pump 1</v:String>
     <v:String x:Key="e_70">open circuit of the pump 1</v:String>
     <v:String x:Key="e_71">short circuit of the pump 2</v:String>

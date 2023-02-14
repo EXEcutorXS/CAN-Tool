@@ -986,7 +986,7 @@ namespace AdversCan
 
                 if (Stage == 2)
                 {
-                    if (Mode == 0) return "Разогрев свечи ";
+                    if (Mode == 0) return "Разогрев свечи";
                     if (Mode == 1) return "Первая попытка розжига";
                     if (Mode == 2) return "Продувка между розжигами ";
                     if (Mode == 3) return "Вторая попытка розжига ";
