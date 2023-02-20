@@ -1,4 +1,4 @@
-﻿using AdversCan;
+﻿using OmniProtocol;
 using Can_Adapter;
 using CAN_Tool.ViewModels;
 using MaterialDesignThemes.Wpf;
@@ -145,7 +145,7 @@ namespace CAN_Tool
                 if (LogExpander.IsExpanded)
                 {
                     CanMessage msg = (args as GotMessageEventArgs).receivedMessage;
-                    AC2PMessage m = new AC2PMessage(msg);
+                    OmniMessage m = new OmniMessage(msg);
                     LogField.AppendText(m.ToString());
                 }
             }, null);
@@ -204,13 +204,13 @@ namespace CAN_Tool
                 }
 
             vm.CommandParametersArray[Convert.ToInt32((sender as Control).Name.Substring(6))] = value;
-            AC2PCommand cmd = ((KeyValuePair<int, AC2PCommand>)CommandSelector.SelectedItem).Value;
+            OmniCommand cmd = ((KeyValuePair<int, OmniCommand>)CommandSelector.SelectedItem).Value;
             ulong id = (ulong)cmd.Id;
             ulong res = id << 48;
-            AC2PParameter[] pars = cmd.Parameters.Where(p => p.AnswerOnly == false).ToArray();
+            OmniPgnParameter[] pars = cmd.Parameters.Where(p => p.AnswerOnly == false).ToArray();
             for (int i = 0; i < pars.Length; i++)
             {
-                AC2PParameter p = pars[i];
+                OmniPgnParameter p = pars[i];
                 ulong rawValue;
                 rawValue = (ulong)((vm.CommandParametersArray[i] - p.b) / p.a);
                 int shift = 0;
@@ -233,7 +233,7 @@ namespace CAN_Tool
         {
             MainWindowViewModel mainWindowViewModel = (MainWindowViewModel)DataContext;
             ComboBox comboBox = sender as ComboBox;
-            AC2PCommand cmd = ((KeyValuePair<int, AC2PCommand>)comboBox.SelectedItem).Value;
+            OmniCommand cmd = ((KeyValuePair<int, OmniCommand>)comboBox.SelectedItem).Value;
             CommandParameterPanel.Children.Clear();
             mainWindowViewModel.CommandParametersArray = new double[cmd.Parameters.Count];
             vm.CustomMessage.PGN = 1;
@@ -242,7 +242,7 @@ namespace CAN_Tool
                 vm.CustomMessage.ReceiverId = vm.SelectedConnectedDevice.ID;
 
             int counter = 0;
-            foreach (AC2PParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))
+            foreach (OmniPgnParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))
             {
                 StackPanel panel = new();
                 panel.Orientation = System.Windows.Controls.Orientation.Horizontal;
@@ -286,7 +286,7 @@ namespace CAN_Tool
             MainWindowViewModel vm = (MainWindowViewModel)DataContext;
             try
             {
-                vm.SelectedMessage = (AC2PMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
+                vm.SelectedMessage = (OmniMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
             }
             catch { }
         }

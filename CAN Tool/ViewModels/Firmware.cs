@@ -1,4 +1,4 @@
-﻿using AdversCan;
+﻿using OmniProtocol;
 using CAN_Tool.Infrastructure.Commands;
 using CAN_Tool.ViewModels.Base;
 using Microsoft.Win32;
@@ -43,7 +43,7 @@ namespace CAN_Tool.ViewModels
         private void OnSwitchToBootloaderCommandExecuted(Object parameter)
         {
 
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.PGN = 1;
             msg.ReceiverId = VM.SelectedConnectedDevice.ID;
             msg.Data[0] = 0;
@@ -60,7 +60,7 @@ namespace CAN_Tool.ViewModels
         private void OnRequestBootloaderVersioExecuted(Object parameter)
         {
 
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.PGN = 6;
             msg.ReceiverType = 123;
             msg.Data[0] = 0;
@@ -76,7 +76,7 @@ namespace CAN_Tool.ViewModels
         private void OnSwitchToMainProgramCommandExecuted(Object parameter)
         {
 
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.PGN = 1;
             msg.ReceiverType = 123;
             msg.Data[0] = 0;
@@ -107,7 +107,7 @@ namespace CAN_Tool.ViewModels
 
         private void OnGetVersionCommandExecuted(object parameter)
         {
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.PGN = 6;
             msg.ReceiverId = VM.SelectedConnectedDevice.ID;
             msg.Data[0] = 0;
@@ -119,7 +119,7 @@ namespace CAN_Tool.ViewModels
 
         private void eraseFlash()
         {
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.PGN = 105;
             msg.ReceiverType = 123;
             msg.Data[0] = 6;
@@ -130,14 +130,14 @@ namespace CAN_Tool.ViewModels
 
         private void startFlashing()
         {
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.PGN = 105;
             msg.ReceiverType = 123;
             msg.Data[0] = 4;
             VM.CanAdapter.Transmit(msg);
         }
 
-        private bool WaitForFlag(ref bool flag, int delay)
+        public bool WaitForFlag(ref bool flag, int delay)
         {
             int wd = 0;
             while (!flag && wd < delay)
@@ -176,7 +176,7 @@ namespace CAN_Tool.ViewModels
 
         private bool checkTransmittedData(int len, uint crc)
         {
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.PGN = 105;
             msg.ReceiverType = 123;
             msg.Data[0] = 2;
@@ -207,7 +207,7 @@ namespace CAN_Tool.ViewModels
         private void setFragmentAdr(CodeFragment f)
         {
 
-            AC2PMessage msg = new()
+            OmniMessage msg = new()
             {
                 PGN = 105,
                 ReceiverType = 123
@@ -242,7 +242,7 @@ namespace CAN_Tool.ViewModels
             int len;
 
 
-            AC2PMessage msg = new()
+            OmniMessage msg = new()
             {
                 PGN = 106,
                 ReceiverType = 123
@@ -442,7 +442,7 @@ namespace CAN_Tool.ViewModels
                 {
                     while (!sr.EndOfStream)
                     {
-                        AC2PMessage msg = new();
+                        OmniMessage msg = new();
                         string line = sr.ReadLine().Substring(1);
                         byte[] bytes = new byte[25];
                         for (int i = 0; i < line.Length / 2; i++)

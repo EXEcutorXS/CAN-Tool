@@ -1,4 +1,4 @@
-﻿using AdversCan;
+﻿using OmniProtocol;
 using Can_Adapter;
 using CAN_Tool.Infrastructure.Commands;
 using CAN_Tool.ViewModels.Base;
@@ -52,8 +52,8 @@ namespace CAN_Tool.ViewModels
         CanAdapter _canAdapter;
         public CanAdapter CanAdapter { get => _canAdapter; }
 
-        AC2P _AC2PInstance;
-        public AC2P AC2PInstance => _AC2PInstance;
+        Omni _AC2PInstance;
+        public Omni AC2PInstance => _AC2PInstance;
 
         ConnectedDevice selectedConnectedDevice;
         public ConnectedDevice SelectedConnectedDevice
@@ -62,15 +62,15 @@ namespace CAN_Tool.ViewModels
             get => selectedConnectedDevice;
         }
 
-        public Dictionary<int, AC2PCommand> Commands => AC2P.commands;
+        public Dictionary<int, OmniCommand> Commands => Omni.commands;
 
         public WpfPlot myChart;
 
         #region SelectedMessage
 
-        private AC2PMessage selectedMessage;
+        private OmniMessage selectedMessage;
 
-        public AC2PMessage SelectedMessage
+        public OmniMessage SelectedMessage
         {
             get => selectedMessage;
             set => Set(ref selectedMessage, value);
@@ -79,11 +79,11 @@ namespace CAN_Tool.ViewModels
 
         #region  CustomMessage
 
-        AC2PMessage customMessage = new AC2PMessage();
+        OmniMessage customMessage = new OmniMessage();
 
-        public Dictionary<int, AC2PCommand> CommandList { get; } = AC2P.commands;
+        public Dictionary<int, OmniCommand> CommandList { get; } = Omni.commands;
 
-        public AC2PMessage CustomMessage { get => customMessage; set => customMessage.Update(value); }
+        public OmniMessage CustomMessage { get => customMessage; set => customMessage.Update(value); }
 
         public double[] CommandParametersArray;
 
@@ -177,7 +177,7 @@ namespace CAN_Tool.ViewModels
             Thread.Sleep(20);
             CanAdapter.StartNormal();
             Thread.Sleep(20);
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.TransmitterType = 126;
             msg.TransmitterAddress = 6;
             msg.ReceiverAddress = 7;
@@ -423,7 +423,7 @@ namespace CAN_Tool.ViewModels
             Paragraph dataParagraph = doc.InsertParagraph();
             foreach (var p in selectedConnectedDevice.BBValues)
             {
-                dataParagraph.Append(AC2P.BbParameterNames.GetValueOrDefault(p.Id, $"PID_{p.Id}") + ": ");
+                dataParagraph.Append(Omni.BbParameterNames.GetValueOrDefault(p.Id, $"PID_{p.Id}") + ": ");
                 dataParagraph.Append(p.Value.ToString()).Bold();
                 dataParagraph.AppendLine();
             }
@@ -617,7 +617,7 @@ namespace CAN_Tool.ViewModels
             using (StreamWriter sw = new StreamWriter(path))
             {
                 foreach (var v in SelectedConnectedDevice.Status)
-                    sw.Write(AC2P.Variables[v.Id].ShortName + ";");
+                    sw.Write(Omni.Variables[v.Id].ShortName + ";");
                 sw.WriteLine();
                 for (int i = 0; i < SelectedConnectedDevice.LogCurrentPos; i++)
                 {
@@ -639,7 +639,7 @@ namespace CAN_Tool.ViewModels
 
         private void executeCommand(int cmdNum, params byte[] data)
         {
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.TransmitterType = 126;
             msg.TransmitterAddress = 6;
             msg.ReceiverId = SelectedConnectedDevice.ID;
@@ -655,7 +655,7 @@ namespace CAN_Tool.ViewModels
 
         private void updateManualMode()
         {
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.TransmitterType = 126;
             msg.TransmitterAddress = 6;
             msg.ReceiverId = SelectedConnectedDevice.ID;
@@ -678,7 +678,7 @@ namespace CAN_Tool.ViewModels
         private async void requestSerial(ConnectedDevice d)
         {
             await Task.Delay(200);
-            AC2PMessage m = new();
+            OmniMessage m = new();
             m.TransmitterType = 126;
             m.TransmitterAddress = 6;
             m.ReceiverId = d.ID;
@@ -719,7 +719,7 @@ namespace CAN_Tool.ViewModels
             {
                 if (d.ID.Type == 34)
                 {
-                    AC2PMessage msg = new();
+                    OmniMessage msg = new();
                     msg.TransmitterAddress = 6;
                     msg.TransmitterType = 126;
                     msg.PGN = 0;
@@ -760,7 +760,7 @@ namespace CAN_Tool.ViewModels
         {
 
             _canAdapter = new CanAdapter();
-            _AC2PInstance = new AC2P(CanAdapter);
+            _AC2PInstance = new Omni(CanAdapter);
             AC2PInstance.plot = myChart;
             FirmwarePage = new(this);
 
