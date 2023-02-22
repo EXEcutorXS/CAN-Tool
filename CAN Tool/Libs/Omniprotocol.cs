@@ -70,7 +70,7 @@ namespace OmniProtocol
             set => Set(ref format, value);
         }
 
-        
+
         public string Decode(long rawValue)
         {
             StringBuilder retString = new();
@@ -119,6 +119,100 @@ namespace OmniProtocol
         public List<OmniPgnParameter> Parameters => _Parameters;
         public override string ToString() => Name;
 
+    }
+
+    public class ZoneHandler : ViewModel
+    {
+        private int tempSetpointDay = 22;
+        public int TempSetpointDay { set => Set(ref tempSetpointDay, value); get => tempSetpointDay; }
+
+        private int tempSetpointNight = 20;
+        public int TempSetpointNight { set => Set(ref tempSetpointNight, value); get => tempSetpointNight; }
+
+        private int currentTemperature = 19;
+        public int CurrentTemperature { set => Set(ref currentTemperature, value); get => currentTemperature; }
+
+        private bool connected = false;
+        public bool Connected { set => Set(ref connected, value); get => connected; }
+
+        private bool state = false;
+        public bool State { set => Set(ref state, value); get => state; }
+
+        private bool selected = false;
+        public bool Selected { set => Set(ref selected, value); get => selected; }
+
+        private bool manualMode = false;
+        public bool ManualMode { set => Set(ref manualMode, value); get => manualMode; }
+
+        private int manualPercent = 40;
+        public int ManualPercent { set => Set(ref manualPercent, value); get => manualPercent; }
+
+        private int settedPwmPercent = 50;
+        public int SettedPwmPercent { set => Set(ref settedPwmPercent, value); get => settedPwmPercent; }
+
+        private int fanStage = 2;
+        public int FanStage { set => Set(ref fanStage, value); get => fanStage; }
+
+        private int currentPwm = 50;
+        public int CurrentPwm { set => Set(ref currentPwm, value); get => currentPwm; }
+
+    }
+    public class TimberlineHandler : ViewModel
+    {
+
+        public TimberlineHandler()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Zones.AddNew();
+            }
+
+            SelectedZone = zones[0];
+
+        }
+
+        private int tankTemperature;
+        public int TankTempereature { set => Set(ref tankTemperature, value); get => tankTemperature; }
+
+        private int outsideTemperature;
+        public int OutsideTemperature { set => Set(ref outsideTemperature, value); get => outsideTemperature; }
+
+        private int liquidLevel;
+        public int LiquidLevel { set => Set(ref liquidLevel, value); get => liquidLevel; }
+
+        private bool heaterEnabled;
+        public bool HeaterEnabled { set => Set(ref heaterEnabled, value); get => heaterEnabled; }
+
+        private bool elementEbabled;
+        public bool ElementEbabled { set => Set(ref elementEbabled, value); get => elementEbabled; }
+
+        private bool domesticWaterFlow;
+        public bool DomesticWaterFlow { set => Set(ref domesticWaterFlow, value); get => domesticWaterFlow; }
+
+        public DateTime time;
+
+        public DateTime Time { set => Set(ref time, value); get => time; }
+
+        public BindingList<ZoneHandler> Zones => zones;
+
+        private BindingList<ZoneHandler> zones = new();
+
+        private ZoneHandler selectedZone;
+        public ZoneHandler SelectedZone
+        {
+            set
+            {
+                foreach (var z in zones)
+                {
+                    if (z == value) z.Selected = true;
+                    else
+                        z.Selected = false;
+                }
+                selectedZone = value;
+            }
+            get => selectedZone;
+
+        }
     }
     public class OmniMessage : CanMessage, IUpdatable<OmniMessage>
     {
@@ -1201,6 +1295,8 @@ namespace OmniProtocol
         private readonly BindingList<MainParameters> log = new();
         public BindingList<MainParameters> Log => log;
 
+        public TimberlineHandler Timber { set; get; } = new();
+
         private bool manualMode;
 
         public bool ManualMode
@@ -1659,6 +1755,112 @@ namespace OmniProtocol
                     }
                     catch { }
             }
+            if (m.PGN == 21)
+            {
+                if (m.Data[2] != 255) currentDevice.Timber.TankTempereature = m.Data[2] - 75;
+                if (m.Data[4] != 255) currentDevice.Timber.OutsideTemperature = m.Data[4] - 75;
+                if (m.Data[6] != 255) currentDevice.Timber.LiquidLevel = m.Data[6];
+                if ((m.Data[7] & 3) != 3) currentDevice.Timber.DomesticWaterFlow = (m.Data[7] & 3) != 0;
+            }
+            if (m.PGN == 22)
+            {
+                if ((m.Data[0] & 3) != 3)
+                {
+                    currentDevice.Timber.Zones[0].State = (m.Data[0] & 3) != 0;
+                    currentDevice.Timber.Zones[0].Connected = true;
+                }
+                else
+                    currentDevice.Timber.Zones[0].Connected = false;
+                if (((m.Data[0] >> 2) & 3) != 3)
+                {
+                    currentDevice.Timber.Zones[1].State = ((m.Data[0] >> 2) & 3) != 0;
+                    currentDevice.Timber.Zones[1].Connected = true;
+                }
+                else
+                    currentDevice.Timber.Zones[1].Connected = false;
+                if (((m.Data[0] >> 4) & 3) != 3)
+                {
+                    currentDevice.Timber.Zones[2].State = ((m.Data[0] >> 4) & 3) != 0;
+                    currentDevice.Timber.Zones[2].Connected = true;
+                }
+                else
+                    currentDevice.Timber.Zones[2].Connected = false;
+                if (((m.Data[0] >> 6) & 3) != 3)
+                {
+                    currentDevice.Timber.Zones[3].State = ((m.Data[0] >> 6) & 3) != 0;
+                    currentDevice.Timber.Zones[3].Connected = true;
+                }
+                else
+                    currentDevice.Timber.Zones[3].Connected = false;
+                if ((m.Data[1] & 3) != 3)
+                {
+                    currentDevice.Timber.Zones[4].State = (m.Data[1] & 3) != 0;
+                    currentDevice.Timber.Zones[4].Connected = true;
+                }
+                else
+                    currentDevice.Timber.Zones[4].Connected = false;
+
+                if (m.Data[2] != 255) currentDevice.Timber.Zones[0].CurrentTemperature = m.Data[2] - 75;
+                if (m.Data[3] != 255) currentDevice.Timber.Zones[1].CurrentTemperature = m.Data[3] - 75;
+                if (m.Data[4] != 255) currentDevice.Timber.Zones[2].CurrentTemperature = m.Data[4] - 75;
+                if (m.Data[5] != 255) currentDevice.Timber.Zones[3].CurrentTemperature = m.Data[5] - 75;
+                if (m.Data[6] != 255) currentDevice.Timber.Zones[4].CurrentTemperature = m.Data[6] - 75;
+            }
+
+            if (m.PGN == 23)
+            {
+                if (m.Data[0] != 255) currentDevice.Timber.Zones[0].SettedPwmPercent = m.Data[0];
+                if (m.Data[1] != 255) currentDevice.Timber.Zones[1].SettedPwmPercent = m.Data[1];
+                if (m.Data[2] != 255) currentDevice.Timber.Zones[2].SettedPwmPercent = m.Data[2];
+                if (m.Data[3] != 255) currentDevice.Timber.Zones[3].SettedPwmPercent = m.Data[3];
+                if (m.Data[4] != 255) currentDevice.Timber.Zones[4].SettedPwmPercent = m.Data[4];
+            }
+
+            if (m.PGN == 24)
+            {
+                if ((m.Data[0] & 15) != 15) currentDevice.Timber.Zones[0].FanStage = m.Data[0] & 15;
+                if (((m.Data[0] >> 4) & 15) != 15) currentDevice.Timber.Zones[1].FanStage = (m.Data[0] >> 4) & 15;
+                if ((m.Data[1] & 15) != 15) currentDevice.Timber.Zones[2].FanStage = m.Data[1] & 15;
+                if (((m.Data[1] >> 4) & 15) != 15) currentDevice.Timber.Zones[3].FanStage = (m.Data[0] >> 4) & 15;
+                if ((m.Data[2] & 15) != 15) currentDevice.Timber.Zones[4].FanStage = m.Data[2] & 15;
+                if (m.Data[3] != 255) currentDevice.Timber.Zones[0].CurrentPwm = m.Data[3];
+                if (m.Data[4] != 255) currentDevice.Timber.Zones[1].CurrentPwm = m.Data[4];
+                if (m.Data[5] != 255) currentDevice.Timber.Zones[2].CurrentPwm = m.Data[5];
+                if (m.Data[6] != 255) currentDevice.Timber.Zones[3].CurrentPwm = m.Data[6];
+                if (m.Data[7] != 255) currentDevice.Timber.Zones[4].CurrentPwm = m.Data[7];
+            }
+
+            if (m.PGN == 25)
+            {
+                if (m.Data[0] != 255) currentDevice.Timber.Zones[0].TempSetpointDay = m.Data[0] - 75;
+                if (m.Data[1] != 255) currentDevice.Timber.Zones[1].TempSetpointDay = m.Data[1] - 75;
+                if (m.Data[2] != 255) currentDevice.Timber.Zones[2].TempSetpointDay = m.Data[2] - 75;
+                if (m.Data[3] != 255) currentDevice.Timber.Zones[3].TempSetpointDay = m.Data[3] - 75;
+                if (m.Data[4] != 255) currentDevice.Timber.Zones[4].TempSetpointDay = m.Data[4] - 75;
+            }
+
+            if (m.PGN == 26)
+            {
+                if (m.Data[0] != 255) currentDevice.Timber.Zones[0].TempSetpointNight = m.Data[0] - 75;
+                if (m.Data[1] != 255) currentDevice.Timber.Zones[1].TempSetpointNight = m.Data[1] - 75;
+                if (m.Data[2] != 255) currentDevice.Timber.Zones[2].TempSetpointNight = m.Data[2] - 75;
+                if (m.Data[3] != 255) currentDevice.Timber.Zones[3].TempSetpointNight = m.Data[3] - 75;
+                if (m.Data[4] != 255) currentDevice.Timber.Zones[4].TempSetpointNight = m.Data[4] - 75;
+            }
+
+            if (m.PGN == 27)
+            {
+                if (m.Data[0] != 255) currentDevice.Timber.Zones[0].ManualPercent = m.Data[0];
+                if (m.Data[1] != 255) currentDevice.Timber.Zones[1].ManualPercent = m.Data[1];
+                if (m.Data[2] != 255) currentDevice.Timber.Zones[2].ManualPercent = m.Data[2];
+                if (m.Data[3] != 255) currentDevice.Timber.Zones[3].ManualPercent = m.Data[3];
+                if (m.Data[4] != 255) currentDevice.Timber.Zones[4].ManualPercent = m.Data[4];
+                if ((m.Data[5] & 3) != 3) currentDevice.Timber.Zones[0].ManualMode = (m.Data[5] & 3) != 0;
+                if (((m.Data[5] >> 2) & 3) != 3) currentDevice.Timber.Zones[1].ManualMode = ((m.Data[5] >> 2) & 3) != 0;
+                if (((m.Data[5] >> 4) & 3) != 3) currentDevice.Timber.Zones[2].ManualMode = ((m.Data[5] >> 4) & 3) != 0;
+                if (((m.Data[5] >> 6) & 3) != 3) currentDevice.Timber.Zones[3].ManualMode = ((m.Data[5] >> 6) & 3) != 0;
+                if ((m.Data[6] & 3) != 3) currentDevice.Timber.Zones[4].ManualMode = (m.Data[6] & 3) != 0;
+            }
 
             if (m.PGN == 33)
             {
@@ -1696,7 +1898,7 @@ namespace OmniProtocol
                     currentDevice.flagDataGetDone = true;
                 }
 
-                if (m.Data[0] == 5 )
+                if (m.Data[0] == 5)
                 {
                     if (m.Data[1] == 0)
                     {
@@ -1707,7 +1909,7 @@ namespace OmniProtocol
                         Debug.WriteLine("Flash fragment failed");
                 }
 
-                if (m.Data[0] == 7 )
+                if (m.Data[0] == 7)
                 {
                     if (m.Data[1] == 0)
                     {
@@ -1719,7 +1921,7 @@ namespace OmniProtocol
                 }
             }
 
-                Messages.TryToAdd(m);
+            Messages.TryToAdd(m);
         }
         public static void ParseParamsname(string filePath = "paramsname.h")
         {
@@ -1890,7 +2092,7 @@ namespace OmniProtocol
 
                 currentDevice.flagGetBBDone = false;
                 SendMessage(msg);
-                    
+
                 for (int j = 0; j < 100; j++)
                 {
                     if (currentDevice.flagGetBBDone) break;

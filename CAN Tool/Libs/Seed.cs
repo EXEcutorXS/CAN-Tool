@@ -322,6 +322,8 @@ namespace OmniProtocol
             PGNs[22].parameters.Add(new() { Name = "Температура зоны 3", BitLength = 8, StartByte = 4, Unit = "°C", b = -75 });
             PGNs[22].parameters.Add(new() { Name = "Температура зоны 4", BitLength = 8, StartByte = 5, Unit = "°C", b = -75 });
             PGNs[22].parameters.Add(new() { Name = "Температура зоны 5", BitLength = 8, StartByte = 6, Unit = "°C", b = -75 });
+            PGNs[22].parameters.Add(new() { Name = "Подогреватель", BitLength = 2, StartByte = 7, StartBit = 0, Meanings = defMeaningsOnOff });
+            PGNs[22].parameters.Add(new() { Name = "ТЭН", BitLength = 2, StartByte = 7, StartBit = 2, Meanings = defMeaningsOnOff });
 
             PGNs[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 1", BitLength = 8, StartByte = 0, Unit = "%" });
             PGNs[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 2", BitLength = 8, StartByte = 1, Unit = "%" });
@@ -351,12 +353,18 @@ namespace OmniProtocol
             PGNs[26].parameters.Add(new() { Name = "Ночная уставка зоны 3", BitLength = 8, StartByte = 2, Unit = "°C", b = -75 });
             PGNs[26].parameters.Add(new() { Name = "Ночная уставка зоны 4", BitLength = 8, StartByte = 3, Unit = "°C", b = -75 });
             PGNs[26].parameters.Add(new() { Name = "Ночная уставка зоны 5", BitLength = 8, StartByte = 4, Unit = "°C", b = -75 });
+            
 
             PGNs[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 1", BitLength = 8, StartByte = 0, Unit = "%" });
             PGNs[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 2", BitLength = 8, StartByte = 1, Unit = "%" });
             PGNs[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 3", BitLength = 8, StartByte = 2, Unit = "%" });
             PGNs[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 4", BitLength = 8, StartByte = 3, Unit = "%" });
             PGNs[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 5", BitLength = 8, StartByte = 4, Unit = "%" });
+            PGNs[27].parameters.Add(new() { Name = "Зона 1 Ручной режим", BitLength = 2, StartByte = 5, StartBit = 0, Meanings = defMeaningsOnOff });
+            PGNs[27].parameters.Add(new() { Name = "Зона 1 Ручной режим", BitLength = 2, StartByte = 5, StartBit = 2, Meanings = defMeaningsOnOff });
+            PGNs[27].parameters.Add(new() { Name = "Зона 1 Ручной режим", BitLength = 2, StartByte = 5, StartBit = 4, Meanings = defMeaningsOnOff });
+            PGNs[27].parameters.Add(new() { Name = "Зона 1 Ручной режим", BitLength = 2, StartByte = 5, StartBit = 6, Meanings = defMeaningsOnOff });
+            PGNs[27].parameters.Add(new() { Name = "Зона 1 Ручной режим", BitLength = 2, StartByte = 6, StartBit = 0, Meanings = defMeaningsOnOff });
 
             PGNs[28].parameters.Add(new() { Name = "Общее время на всех режимах", BitLength = 32, StartByte = 0, Unit = "с" });
             PGNs[28].parameters.Add(new() { Name = "Общее время работы (кроме ожидания команды)", BitLength = 32, StartByte = 4, Unit = "%" });

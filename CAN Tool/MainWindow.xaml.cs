@@ -47,12 +47,15 @@ namespace CAN_Tool
         public int themeNumber { get; set; }
         public int langaugeNumber { get; set; }
 
-        public Color[] Colors  { get; set; }
+        public Color[] Colors { get; set; }
 
         public bool[] ShowFlag { set; get; }
         public int[] LineWidthes { set; get; }
         public ScottPlot.LineStyle[] LineStyles { set; get; }
         public ScottPlot.MarkerShape[] MarkShapes { set; get; }
+
+        public bool UseFarenheit { set; get; }
+        public bool UsePsi { set; get; }
 
     }
 
@@ -139,7 +142,7 @@ namespace CAN_Tool
 
         private void MessageHandler(object sender, EventArgs args)
         {
-            
+
             UIcontext.Send(x =>
             {
                 if (LogExpander.IsExpanded)
@@ -311,15 +314,15 @@ namespace CAN_Tool
 
         private void ManualAirMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
         {
-            int delta=1;
-            if (Keyboard.GetKeyStates(Key.LeftShift)==KeyStates.Down)
+            int delta = 1;
+            if (Keyboard.GetKeyStates(Key.LeftShift) == KeyStates.Down)
                 delta = 5;
             if (e.Delta > 0)
                 if (vm.IncreaceManualAirBlowerCommand.CanExecute(null))
                     vm.IncreaceManualAirBlowerCommand.Execute(delta);
             if (e.Delta < 0)
                 if (vm.DecreaseManualAirBlowerCommand.CanExecute(null))
-                    vm.DecreaseManualAirBlowerCommand.Execute(delta*-1);
+                    vm.DecreaseManualAirBlowerCommand.Execute(delta * -1);
         }
 
         private void ProgressBar_MouseWheel_1(object sender, MouseWheelEventArgs e)
@@ -452,6 +455,43 @@ namespace CAN_Tool
         {
             if (DataSet.SelectedItem != null)
                 ColorPicker.Color = ((DataSet.SelectedItem as StatusVariable).ChartBrush as SolidColorBrush).Color;
+        }
+
+        private void ScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+            //vm.CanAdapter.Transmit()
+        }
+
+        private void Zone1Field_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ZoneControlArea.DataContext = vm.SelectedConnectedDevice.Timber.Zones[0];
+            vm.SelectedConnectedDevice.Timber.SelectedZone = vm.SelectedConnectedDevice.Timber.Zones[0];
+
+        }
+
+        private void Zone2Field_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ZoneControlArea.DataContext = vm.SelectedConnectedDevice.Timber.Zones[1];
+            vm.SelectedConnectedDevice.Timber.SelectedZone = vm.SelectedConnectedDevice.Timber.Zones[1];
+        }
+
+        private void Zone3Field_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ZoneControlArea.DataContext = vm.SelectedConnectedDevice.Timber.Zones[2];
+            vm.SelectedConnectedDevice.Timber.SelectedZone = vm.SelectedConnectedDevice.Timber.Zones[2];
+        }
+
+        private void Zone4Field_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ZoneControlArea.DataContext = vm.SelectedConnectedDevice.Timber.Zones[3];
+            vm.SelectedConnectedDevice.Timber.SelectedZone = vm.SelectedConnectedDevice.Timber.Zones[3];
+        }
+
+        private void Zone5Field_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ZoneControlArea.DataContext = vm.SelectedConnectedDevice.Timber.Zones[4];
+            vm.SelectedConnectedDevice.Timber.SelectedZone = vm.SelectedConnectedDevice.Timber.Zones[4];
         }
     }
 

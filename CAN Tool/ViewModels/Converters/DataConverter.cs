@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace CAN_Tool.ViewModels.Converters
 {
@@ -152,6 +153,22 @@ namespace CAN_Tool.ViewModels.Converters
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class StateToBorderBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && (bool)value == true)
+                return Brushes.DarkGray;
+            else
+                return Brushes.Transparent;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
