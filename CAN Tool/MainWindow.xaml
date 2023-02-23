@@ -8,7 +8,8 @@
         <c:BinarToVisibleConverter x:Key="OnlyForBinars" />
         <c:PlanarToVisibleConverter x:Key="OnlyForPlanars" />
         <c:HcuToVisibleConverter x:Key="OnlyForHcu" />
-        <c:StateToBorderBrushConverter x:Key="BoolToBrush" />
+        <c:StateToBorderBrushConverter x:Key="BoolToBrush" /> 
+        <c:BoolToOpacity x:Key="BoolToOpacity" />
     </Window.Resources>
     <Window.DataContext>
         <vm:MainWindowViewModel />
@@ -369,8 +370,8 @@
                                         </StackPanel>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <Border BorderThickness="3" CornerRadius="5" DataContext="{Binding SelectedConnectedDevice.Timber.Zones[0]}" BorderBrush="{Binding Selected,Converter={StaticResource BoolToBrush}}" Margin="5" Padding="5">
-                                        <StackPanel x:Name="Zone1Field" Margin ="5" Orientation="Horizontal"  MouseLeftButtonDown="Zone1Field_MouseLeftButtonDown" Visibility="{Binding Connected,Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Border BorderThickness="3" CornerRadius="5" DataContext="{Binding SelectedConnectedDevice.Timber.Zones[1]}" BorderBrush="{Binding Selected,Converter={StaticResource BoolToBrush}}" Opacity="{Binding State,Converter={StaticResource BoolToOpacity}}" Margin="5" Padding="5">
+                                        <StackPanel x:Name="Zone1Field" Margin ="5" Orientation="Horizontal"  MouseLeftButtonDown="Zone1Field_MouseLeftButtonDown" >
                                                 <CheckBox  IsChecked="{Binding State,Mode=OneWay}" Height="50" FontSize="30" Margin="5" Content="Zone 1" IsEnabled="{Binding Connected}" />
                                             <fa:ImageAwesome x:Name = "Fan1Icon" Icon="Solid_Fan" Height="30" Foreground="{DynamicResource MaterialDesignBody}" />
                                             <TextBlock VerticalAlignment="Center" Margin="5" Style="{StaticResource MaterialDesignHeadline4TextBlock}" Text="{Binding CurrentTemperature,StringFormat={}{0}°}"></TextBlock>
