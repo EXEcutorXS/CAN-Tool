@@ -717,15 +717,12 @@ namespace CAN_Tool.ViewModels
 
             foreach (ConnectedDevice d in AC2PInstance.ConnectedDevices) //Поддержание связи
             {
-                if (d.ID.Type == 34)
-                {
                     OmniMessage msg = new();
                     msg.TransmitterAddress = 6;
                     msg.TransmitterType = 126;
                     msg.PGN = 0;
                     msg.ReceiverId = d.ID;
                     CanAdapter.Transmit(msg);
-                }
             }
         }
 
