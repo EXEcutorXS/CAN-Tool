@@ -123,13 +123,19 @@ namespace OmniProtocol
 
     public class ZoneHandler : ViewModel
     {
+        public ZoneHandler(Action<ZoneHandler> NotifierAction)
+        {
+            selectedZoneChanged = NotifierAction;
+        }
+        private Action<ZoneHandler> selectedZoneChanged;
+
         private int tempSetpointDay = 22;
         public int TempSetpointDay { set => Set(ref tempSetpointDay, value); get => tempSetpointDay; }
 
         private int tempSetpointNight = 20;
         public int TempSetpointNight { set => Set(ref tempSetpointNight, value); get => tempSetpointNight; }
 
-        private int currentTemperature = 19;
+        private int currentTemperature = 0;
         public int CurrentTemperature { set => Set(ref currentTemperature, value); get => currentTemperature; }
 
         private bool connected = false;
@@ -139,7 +145,7 @@ namespace OmniProtocol
         public bool State { set => Set(ref state, value); get => state; }
 
         private bool selected = false;
-        public bool Selected { set => Set(ref selected, value); get => selected; }
+        public bool Selected { set  { Set(ref selected, value); if (value) selectedZoneChanged(this); } get => selected; }
 
         private bool manualMode = false;
         public bool ManualMode { set => Set(ref manualMode, value); get => manualMode; }
@@ -156,19 +162,26 @@ namespace OmniProtocol
         private int currentPwm = 50;
         public int CurrentPwm { set => Set(ref currentPwm, value); get => currentPwm; }
 
+        public Task ManualPercentChangeTask;
+
+        public bool GotChange = false;
+
     }
     public class TimberlineHandler : ViewModel
     {
-
+        private void ZoneChanged(ZoneHandler newSelectedZone)
+        {
+            SelectedZone = newSelectedZone;
+        }
         public TimberlineHandler()
         {
             for (int i = 0; i < 5; i++)
             {
-                Zones.AddNew();
+                Zones.Add(new ZoneHandler(ZoneChanged));
             }
 
             SelectedZone = zones[0];
-
+            zones[0].Selected = true;
         }
 
         private int tankTemperature;
@@ -198,21 +211,9 @@ namespace OmniProtocol
         private BindingList<ZoneHandler> zones = new();
 
         private ZoneHandler selectedZone;
-        public ZoneHandler SelectedZone
-        {
-            set
-            {
-                foreach (var z in zones)
-                {
-                    if (z == value) z.Selected = true;
-                    else
-                        z.Selected = false;
-                }
-                selectedZone = value;
-            }
-            get => selectedZone;
+        public ZoneHandler SelectedZone { set=>Set(ref selectedZone,value); get=>selectedZone; }
 
-        }
+
     }
     public class OmniMessage : CanMessage, IUpdatable<OmniMessage>
     {
@@ -1805,6 +1806,10 @@ namespace OmniProtocol
                 if (m.Data[4] != 255) currentDevice.Timber.Zones[2].CurrentTemperature = m.Data[4] - 75;
                 if (m.Data[5] != 255) currentDevice.Timber.Zones[3].CurrentTemperature = m.Data[5] - 75;
                 if (m.Data[6] != 255) currentDevice.Timber.Zones[4].CurrentTemperature = m.Data[6] - 75;
+
+                if ((m.Data[7] & 3) != 3) currentDevice.Timber.HeaterEnabled = (m.Data[7] & 3) != 0;
+                if (((m.Data[7]>>2) & 3) != 3) currentDevice.Timber.ElementEbabled = ((m.Data[7]>>2) & 3) != 0;
+
             }
 
             if (m.PGN == 23)

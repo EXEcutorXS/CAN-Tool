@@ -8,7 +8,7 @@
         <c:BinarToVisibleConverter x:Key="OnlyForBinars" />
         <c:PlanarToVisibleConverter x:Key="OnlyForPlanars" />
         <c:HcuToVisibleConverter x:Key="OnlyForHcu" />
-        <c:StateToBorderBrushConverter x:Key="BoolToBrush" /> 
+        <c:StateToBorderBrushConverter x:Key="BoolToBrush" />
         <c:BoolToOpacity x:Key="BoolToOpacity" />
     </Window.Resources>
     <Window.DataContext>
@@ -70,8 +70,8 @@
 
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
-                        <CheckBox x:Name="ExpertMode" Margin="10" Style="{StaticResource MaterialDesignOutlinedDarkButton}" Content="{DynamicResource b_expert}" FontSize="20" Cursor="Hand" IsChecked="True" Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
-                        <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignOutlinedDarkButton}" Content="Dark" FontSize="20" Cursor="Hand" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
+                        <CheckBox x:Name="ExpertMode" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Width="100" Content="{DynamicResource b_expert}" FontSize="20"  Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
+                        <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Width="100" Content="Dark" FontSize="20" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
                         <ComboBox Style="{DynamicResource MaterialDesignComboBox}" x:Name="menuColor" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuColor_SelectionChanged" ItemsSource="{Binding Brushes}">
                             <ComboBox.ItemTemplate>
                                 <ItemContainerTemplate>
@@ -347,66 +347,62 @@
                         </DataGrid>
                         <StackPanel DockPanel.Dock="Top" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}" Orientation="Vertical">
                             <StackPanel Orientation="Horizontal">
-                                <Button Width="100" Margin="10">Heater</Button>
-                                <Button Width="100" Margin="10">Element</Button>
+                                <CheckBox Margin="10" Style="{StaticResource MaterialDesignActionDarkCheckBox}" IsChecked="{Binding SelectedConnectedDevice.Timber.HeaterEnabled,Mode=OneWay}" IsEnabled="False"></CheckBox>
+                                <Button x:Name="HeaterButton" Style="{StaticResource MaterialDesignFlatButton}" FontSize="30" Height="50" Margin="10" Click="HeaterButton_Click">Heater</Button>
+                                <CheckBox Margin="10" Style="{StaticResource MaterialDesignActionDarkCheckBox}" IsChecked="{Binding SelectedConnectedDevice.Timber.ElementEbabled,Mode=OneWay}" IsEnabled="False"></CheckBox>
+                                <Button x:Name="ElementButton" Style="{StaticResource MaterialDesignFlatButton}" FontSize="30"  Height="50" Margin="10" Click="ElementButton_Click">Element</Button>
+                                <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Liquid level: {0},Path=SelectedConnectedDevice.Timber.LiquidLevel}"/>
+                                <ProgressBar Margin="15" Orientation="Vertical" Maximum="7" Value="{Binding SelectedConnectedDevice.Timber.LiquidLevel}" Height="20" />
+                                <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Outside: {0}°,Path=SelectedConnectedDevice.Timber.OutsideTemperature}" />
+                                
                             </StackPanel>
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Orientation="Vertical">
-                                    <StackPanel x:Name="ZoneControlArea" Orientation="Vertical" DataContext="{Binding SelectedConnectedDevice.Timber.Zones[0]}">
+                                    <StackPanel x:Name="ZoneControlArea" Orientation="Vertical" DataContext="{Binding SelectedConnectedDevice.Timber.SelectedZone}">
                                         <StackPanel Orientation="Horizontal">
                                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Sun" Foreground="{DynamicResource MaterialDesignBody}" />
-                                            <ScrollBar Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointDay,Mode=OneWay}" />
+                                            <ScrollBar Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointDay,Mode=OneWay}" ValueChanged="DayTimeChanged"/>
                                             <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointDay,StringFormat={}{0}°}"></TextBlock>
-                                            <ProgressBar Value="{Binding CurrentPwm}" Maximum="100" Width="300" Height="40" Margin="10"></ProgressBar>
-                                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding CurrentPwm,StringFormat={}{0}%}"></TextBlock>
+                                            
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Moon" Foreground="{DynamicResource MaterialDesignBody}" />
-                                            <ScrollBar Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointNight,Mode=OneWay}"></ScrollBar>
+                                            <ScrollBar Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointNight,Mode=OneWay}" ValueChanged="NightTimeChanged"></ScrollBar>
                                             <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointNight,StringFormat={}{0}°}"></TextBlock>
-                                            <CheckBox Style="{StaticResource MaterialDesignFilterChipCheckBox}" Height="50" FontSize="30" Margin="10" IsChecked="{Binding ManualMode,Mode=OneWay}">Manual</CheckBox>
-                                            <ScrollBar Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="100" Value="{Binding ManualPercent,Mode=OneWay}"></ScrollBar>
-                                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding ManualPercent,StringFormat={}{0}%}"></TextBlock>
+                                            
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Style="{StaticResource MaterialDesignActionDarkCheckBox}" Margin="10" IsChecked="{Binding State,Mode=OneWay}"></CheckBox>
+                                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" FontSize="30" Margin="10" Click="EnabledButtonClick">Enabled</Button>
+                                            <CheckBox Style="{StaticResource MaterialDesignActionDarkCheckBox}"  Margin="10" IsChecked="{Binding ManualMode,Mode=OneWay}"></CheckBox>
+                                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" FontSize="30" Margin="10" Click="ManualButtonClick">Fan Manual</Button>
+                                            <ScrollBar Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="100" Value="{Binding ManualPercent,Mode=OneWay}" Visibility="{Binding ManualMode,Converter={StaticResource BoolToVisibileConverter}}" ValueChanged="ManualPercentChanged"></ScrollBar>
+                                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding ManualPercent,StringFormat={}{0}%}" Visibility="{Binding ManualMode,Converter={StaticResource BoolToVisibileConverter}}" />
                                         </StackPanel>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Border BorderThickness="3" CornerRadius="5" DataContext="{Binding SelectedConnectedDevice.Timber.Zones[1]}" BorderBrush="{Binding Selected,Converter={StaticResource BoolToBrush}}" Opacity="{Binding State,Converter={StaticResource BoolToOpacity}}" Margin="5" Padding="5">
-                                        <StackPanel x:Name="Zone1Field" Margin ="5" Orientation="Horizontal"  MouseLeftButtonDown="Zone1Field_MouseLeftButtonDown" >
-                                                <CheckBox  IsChecked="{Binding State,Mode=OneWay}" Height="50" FontSize="30" Margin="5" Content="Zone 1" IsEnabled="{Binding Connected}" />
-                                            <fa:ImageAwesome x:Name = "Fan1Icon" Icon="Solid_Fan" Height="30" Foreground="{DynamicResource MaterialDesignBody}" />
-                                            <TextBlock VerticalAlignment="Center" Margin="5" Style="{StaticResource MaterialDesignHeadline4TextBlock}" Text="{Binding CurrentTemperature,StringFormat={}{0}°}"></TextBlock>
-                                        </StackPanel>
-                                        </Border>
-                                        <Border BorderThickness="3" CornerRadius="5" DataContext="{Binding SelectedConnectedDevice.Timber.Zones[1]}" BorderBrush="{Binding Selected,Converter={StaticResource BoolToBrush}}" Margin="5" Padding="5">
-                                            <StackPanel x:Name="Zone2Field" Orientation="Horizontal" MouseLeftButtonDown="Zone2Field_MouseLeftButtonDown" Visibility="{Binding Connected,Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                <CheckBox  IsChecked="{Binding State,Mode=OneWay}" Height="50" FontSize="30" Margin="5" Content="Zone 2" IsEnabled="{Binding Connected}" />
-                                                <fa:ImageAwesome x:Name="Fan2Icon" Icon="Solid_Fan" Height="30" Foreground="{DynamicResource MaterialDesignBody}" />
-                                                <TextBlock VerticalAlignment="Center" Margin="5" Style="{StaticResource MaterialDesignHeadline4TextBlock}" Text="{Binding CurrentTemperature,StringFormat={}{0}°}"></TextBlock>
-                                            </StackPanel>
-                                        </Border>
-                                        <Border BorderThickness="3" CornerRadius="5" DataContext="{Binding SelectedConnectedDevice.Timber.Zones[2]}" BorderBrush="{Binding Selected,Converter={StaticResource BoolToBrush}}" Margin="5" Padding="5">
-                                            <StackPanel x:Name="Zone3Field" Orientation="Horizontal" MouseLeftButtonDown="Zone3Field_MouseLeftButtonDown" Visibility="{Binding Connected,Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                <CheckBox IsChecked="{Binding State,Mode=OneWay}" Height="50" FontSize="30" Margin="5" Content="Zone 3" IsEnabled="{Binding Connected}" />
-                                                <fa:ImageAwesome x:Name="Fan3Icon" Icon="Solid_Fan" Height="30" Foreground="{DynamicResource MaterialDesignBody}" />
-                                                <TextBlock VerticalAlignment="Center" Margin="5" Style="{StaticResource MaterialDesignHeadline4TextBlock}" Text="{Binding CurrentTemperature,StringFormat={}{0}°}"></TextBlock>
-                                            </StackPanel>
-                                        </Border>
-                                        <Border BorderThickness="3" CornerRadius="5" DataContext="{Binding SelectedConnectedDevice.Timber.Zones[3]}" BorderBrush="{Binding Selected,Converter={StaticResource BoolToBrush}}" Margin="5" Padding="5">
-                                            <StackPanel x:Name="Zone4Field" Orientation="Horizontal" MouseLeftButtonDown="Zone4Field_MouseLeftButtonDown" Visibility="{Binding Connected,Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                <CheckBox IsChecked="{Binding State,Mode=OneWay}" Height="50" FontSize="30" Margin="5" Content="Zone 4" IsEnabled="{Binding Connected}" />
-                                                <fa:ImageAwesome x:Name="Fan4Icon" Icon="Solid_Fan" Height="30" Foreground="{DynamicResource MaterialDesignBody}" />
-                                                <TextBlock VerticalAlignment="Center" Margin="5" Style="{StaticResource MaterialDesignHeadline4TextBlock}" Text="{Binding CurrentTemperature,StringFormat={}{0}°}"></TextBlock>
-                                            </StackPanel>
-                                        </Border>
-                                        <Border BorderThickness="3" CornerRadius="5" DataContext="{Binding SelectedConnectedDevice.Timber.Zones[4]}" BorderBrush="{Binding Selected,Converter={StaticResource BoolToBrush}}" Margin="5" Padding="5">
-                                            <StackPanel x:Name="Zone5Field" Orientation="Horizontal" MouseLeftButtonDown="Zone5Field_MouseLeftButtonDown" Visibility="{Binding Connected,Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                <CheckBox  IsChecked="{Binding State,Mode=OneWay}" Height="50" FontSize="30" Margin="5" Content="Zone 5" IsEnabled="{Binding Connected}" />
-                                                <fa:ImageAwesome x:Name="Fan5Icon" Icon="Solid_Fan" Height="30" Foreground="{DynamicResource MaterialDesignBody}" />
-                                                <TextBlock VerticalAlignment="Center" Margin="5" Style="{StaticResource MaterialDesignHeadline4TextBlock}" Text="{Binding CurrentTemperature,StringFormat={}{0}°}"></TextBlock>
-                                            </StackPanel>
-                                        </Border>
-                                    </StackPanel>
-                                        
+                                    <ListBox ItemsSource="{Binding SelectedConnectedDevice.Timber.Zones}">
+                                        <ListBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ListBox.ItemsPanel>
+                                        <ListBox.ItemTemplate>
+
+                                            <DataTemplate>
+                                                <RadioButton Style="{StaticResource MaterialDesignChoiceChipAccentRadioButton}" GroupName="Zones" Height="50" FontSize="30" IsChecked="{Binding Selected}" IsEnabled="{Binding Connected,Mode=OneWay}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <CheckBox Margin="5" Style="{StaticResource MaterialDesignActionDarkCheckBox}" IsChecked="{Binding State,Mode=OneWay}" IsEnabled="False"></CheckBox>
+                                                        <TextBlock VerticalAlignment="Center" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0}°}" />
+                                                        <fa:ImageAwesome Height="30" Icon="Solid_Fan" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" >
+                                                        </fa:ImageAwesome>
+                                                        <ProgressBar Margin="5" Height="10" Orientation="Vertical" Maximum="100" Value="{Binding CurrentPwm}" />
+                                                        <TextBlock VerticalAlignment="Center" Text="{Binding CurrentPwm,Mode=OneWay,StringFormat={}{0:d2}%}" />
+                                                    </StackPanel>
+                                                </RadioButton>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+
                                 </StackPanel>
 
                             </StackPanel>
