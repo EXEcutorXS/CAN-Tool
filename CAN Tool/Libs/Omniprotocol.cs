@@ -576,9 +576,7 @@ namespace OmniProtocol
         }
 
         public string idString => Omni.configParameters[Id]?.StringId;
-        public string rusName => Omni.configParameters[Id]?.NameRu;
-        public string enName => Omni.configParameters[Id]?.NameEn;
-
+        public string Name => GetString($"par_{id}"); //Omni.configParameters[Id]?.NameRu;
     }
     public class StatusVariable : ViewModel, IUpdatable<StatusVariable>, IComparable
     {
@@ -637,10 +635,7 @@ namespace OmniProtocol
         {
             get
             {
-                if (Omni.Variables.ContainsKey(Id))
-                    return Omni.Variables[Id].ShortName;
-                else
-                    return $"Unknown parameter {Id}";
+                return GetString($"var_{Id}");
             }
         }
 

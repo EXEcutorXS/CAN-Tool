@@ -588,7 +588,14 @@ namespace CAN_Tool
                 vm.CanAdapter.Transmit(m);
             }
         }
+        private void RadioChecked(object sender, RoutedEventArgs e)
+        {
+            DaytimeScroll.Value = vm.SelectedConnectedDevice.Timber.SelectedZone.TempSetpointDay;
+            NightTimeScroll.Value = vm.SelectedConnectedDevice.Timber.SelectedZone.TempSetpointNight;
+            ManualScroll.Value = vm.SelectedConnectedDevice.Timber.SelectedZone.ManualPercent;
 
+        }
+        
         private void ManualPercentChanged(object sender, RoutedEventArgs e)
         {
             

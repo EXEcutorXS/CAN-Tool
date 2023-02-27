@@ -361,13 +361,13 @@
                                     <StackPanel x:Name="ZoneControlArea" Orientation="Vertical" DataContext="{Binding SelectedConnectedDevice.Timber.SelectedZone}">
                                         <StackPanel Orientation="Horizontal">
                                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Sun" Foreground="{DynamicResource MaterialDesignBody}" />
-                                            <ScrollBar Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointDay,Mode=OneWay}" ValueChanged="DayTimeChanged"/>
+                                            <ScrollBar x:Name="DaytimeScroll" Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointDay,Mode=OneWay}" ValueChanged="DayTimeChanged"/>
                                             <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointDay,StringFormat={}{0}°}"></TextBlock>
                                             
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Moon" Foreground="{DynamicResource MaterialDesignBody}" />
-                                            <ScrollBar Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointNight,Mode=OneWay}" ValueChanged="NightTimeChanged"></ScrollBar>
+                                            <ScrollBar x:Name="NightTimeScroll" Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointNight,Mode=OneWay}" ValueChanged="NightTimeChanged"></ScrollBar>
                                             <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointNight,StringFormat={}{0}°}"></TextBlock>
                                             
                                         </StackPanel>
@@ -376,7 +376,7 @@
                                             <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" FontSize="30" Margin="10" Click="EnabledButtonClick">Enabled</Button>
                                             <CheckBox Style="{StaticResource MaterialDesignActionDarkCheckBox}"  Margin="10" IsChecked="{Binding ManualMode,Mode=OneWay}"></CheckBox>
                                             <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" FontSize="30" Margin="10" Click="ManualButtonClick">Fan Manual</Button>
-                                            <ScrollBar Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="100" Value="{Binding ManualPercent,Mode=OneWay}" Visibility="{Binding ManualMode,Converter={StaticResource BoolToVisibileConverter}}" ValueChanged="ManualPercentChanged"></ScrollBar>
+                                            <ScrollBar x:Name="ManualScroll" Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="100" Value="{Binding ManualPercent,Mode=OneWay}" Visibility="{Binding ManualMode,Converter={StaticResource BoolToVisibileConverter}}" ValueChanged="ManualPercentChanged"></ScrollBar>
                                             <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding ManualPercent,StringFormat={}{0}%}" Visibility="{Binding ManualMode,Converter={StaticResource BoolToVisibileConverter}}" />
                                         </StackPanel>
                                     </StackPanel>
@@ -389,7 +389,7 @@
                                         <ListBox.ItemTemplate>
 
                                             <DataTemplate>
-                                                <RadioButton Style="{StaticResource MaterialDesignChoiceChipAccentRadioButton}" GroupName="Zones" Height="50" FontSize="30" IsChecked="{Binding Selected}" IsEnabled="{Binding Connected,Mode=OneWay}">
+                                                <RadioButton Style="{StaticResource MaterialDesignChoiceChipAccentRadioButton}" GroupName="Zones" Height="50" FontSize="30" IsChecked="{Binding Selected}" IsEnabled="{Binding Connected,Mode=OneWay}" Checked="RadioChecked">
                                                     <StackPanel Orientation="Horizontal">
                                                         <CheckBox Margin="5" Style="{StaticResource MaterialDesignActionDarkCheckBox}" IsChecked="{Binding State,Mode=OneWay}" IsEnabled="False"></CheckBox>
                                                         <TextBlock VerticalAlignment="Center" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0}°}" />
@@ -529,9 +529,9 @@
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path = idString}" Header="CODENAME" IsReadOnly="True">
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = Value}" Header="VAVUE">
+                                <DataGridTextColumn Binding="{Binding Path = Value}" Header="{DynamicResource t_value}">
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = rusName}" Header="DESCRIPTION" IsReadOnly="True">
+                                <DataGridTextColumn Binding="{Binding Path = Name}" Header="{DynamicResource t_description}" IsReadOnly="True">
                                 </DataGridTextColumn>
                             </DataGrid.Columns>
                         </DataGrid>
@@ -661,8 +661,8 @@
                             <DataGrid ItemsSource="{Binding SelectedConnectedDevice.BBValues,Mode=OneWay}" AutoGenerateColumns="False" Margin="10" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="ID" Binding="{Binding Path=Id,Mode=OneWay}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="VALUE" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="DESCRIPTION" Binding="{Binding Path=Description,Mode=OneWay}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="{DynamicResource t_value}" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="{DynamicResource t_description}" Binding="{Binding Path=Description,Mode=OneWay}"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
@@ -769,8 +769,8 @@
 
                             <DataGrid Grid.Column="3" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Value" Binding="{Binding Path=FormattedValue,Mode=OneWay}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="{DynamicResource t_name}" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="{DynamicResource t_value}" Binding="{Binding Path=FormattedValue,Mode=OneWay}"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>

@@ -67,6 +67,9 @@
     <v:String x:Key="b_list_inlettemp">In.Temp</v:String>
     <v:String x:Key="b_list_error">Err.code</v:String>
 
+    <v:String x:Key="t_value">Value</v:String>
+    <v:String x:Key="t_description">Description</v:String>
+
     <v:String x:Key="e_1">overheat</v:String>
     <v:String x:Key="e_2">overheat</v:String>
     <v:String x:Key="e_3">error of the overheat temp. sensor</v:String>
@@ -92,7 +95,7 @@
     <v:String x:Key="e_54">short circuit of the flow sensor</v:String>
     <v:String x:Key="e_55">open circuit of the air temp. sensor</v:String>
     <v:String x:Key="e_56">short circuit of the air temp. sensor</v:String>
-    
+
     <v:String x:Key="e_57">short circuit of the zone 1 temp. sensor</v:String>
     <v:String x:Key="e_58">open circuit of the zone 1 temp. sensor</v:String>
     <v:String x:Key="e_59">short circuit of the zone 2 temp. sensor</v:String>
@@ -103,7 +106,7 @@
     <v:String x:Key="e_64">open circuit of the zone 4 temp. sensor</v:String>
     <v:String x:Key="e_65">short circuit of the zone 5 temp. sensor</v:String>
     <v:String x:Key="e_66">open circuit of the zone 5 temp. sensor</v:String>
-    
+
     <v:String x:Key="e_69">short circuit of the pump 1</v:String>
     <v:String x:Key="e_70">open circuit of the pump 1</v:String>
     <v:String x:Key="e_71">short circuit of the pump 2</v:String>
@@ -125,10 +128,360 @@
     <v:String x:Key="e_87">short circuit of the fan 5</v:String>
     <v:String x:Key="e_88">open circuit of the fan 5</v:String>
     <v:String x:Key="e_91">liquid level too low</v:String>
-    <v:String x:Key="e_93">level sensor short circuit</v:String>
+    <v:String x:Key="e_92">level sensor short circuit</v:String>
+    <v:String x:Key="e_93">level sensor open circuit</v:String>
 
     <v:String x:Key="t_no_error_code">No error code</v:String>
     <v:String x:Key="t_error">Error</v:String>
 
+    <v:String x:Key="par_0">FAN_PWM, Hz</v:String>
+    <v:String x:Key="par_1">Pulse width, ms</v:String>
+    <v:String x:Key="par_2">Glow plug rated voltage, V</v:String>
+    <v:String x:Key="par_3">FLAME_APPEARANCE_DELTA</v:String>
+    <v:String x:Key="par_4">FLAME_APPEARANCE_TIMEOUT</v:String>
+    <v:String x:Key="par_5">FLAME SENSOR CALIBRATION Value</v:String>
+    <v:String x:Key="par_6">FRAME SENSOR CALIBRATION Value</v:String>
+    <v:String x:Key="par_7">Rated supply voltage (12/24 V)</v:String>
+    <v:String x:Key="par_8">Minimum supply voltage, V*100</v:String>
+    <v:String x:Key="par_9">Maximum supply voltage, V*100</v:String>
+    <v:String x:Key="par_10">DELTA_T_STOP</v:String>
+    <v:String x:Key="par_11">DELTA_T_RUN</v:String>
+    <v:String x:Key="par_12">Device ID1</v:String>
+    <v:String x:Key="par_13">Device ID2</v:String>
+    <v:String x:Key="par_14">Device ID3</v:String>
+    <v:String x:Key="par_15">T_SETPOINT ORIGINAL Mode</v:String>
+    <v:String x:Key="par_16">T_SETPOINT WARMUP Mode</v:String>
+    <v:String x:Key="par_17">T_SETPOINT ECONOMY Mode</v:String>
+    <v:String x:Key="par_18">Device's CAN address</v:String>
+    <v:String x:Key="par_19">Brushless motor's calibration value</v:String>
+    <v:String x:Key="par_20">Signaling_mode [0, 1, 2, 3]</v:String>
+    <v:String x:Key="par_21">Zone1 enable</v:String>
+    <v:String x:Key="par_22">Zone2 enable</v:String>
+    <v:String x:Key="par_23">Zone3 enable</v:String>
+    <v:String x:Key="par_24">Zone4 enable</v:String>
+    <v:String x:Key="par_25">Zone5 enable</v:String>
+    <v:String x:Key="par_26">Maximum flame temperature</v:String>
+    <v:String x:Key="par_27">Fuel pump performance</v:String>
+
+    <v:String x:Key="par_28">HCU_ELEMENT_SETPOINT</v:String>
+    <v:String x:Key="par_29">HCU_ELEMENT_ON</v:String>
+    <v:String x:Key="par_30">HCU_ELEMENT_ON_DW</v:String>
+
+    <v:String x:Key="par_31">HEATER_LIQUID_SETPOINT</v:String>
+    <v:String x:Key="par_32">HEATER_LIQUID_IGNITION</v:String>
+    <v:String x:Key="par_33">HEATER_LIQUID_IGNITION_DW</v:String>
+
+    <v:String x:Key="par_34">HCU_TANK_SETPOINT</v:String>
+    <v:String x:Key="par_35">HCU_TANK_IGNITION</v:String>
+    <v:String x:Key="par_36">HCU_TANK_IGNITION_DW</v:String>
+
+    <v:String x:Key="par_37">Domestic water priority</v:String>
+    <v:String x:Key="par_38">Domestic water pause</v:String>
+
+    <v:String x:Key="par_39">TU0</v:String>
+    <v:String x:Key="par_40">TU1</v:String>
+    <v:String x:Key="par_41">TU2</v:String>
+    <v:String x:Key="par_42">TU3</v:String>
+    <v:String x:Key="par_43">TU4</v:String>
+    <v:String x:Key="par_44">TU5</v:String>
+    <v:String x:Key="par_45">TU6</v:String>
+    <v:String x:Key="par_46">TU7</v:String>
+    <v:String x:Key="par_47">TU8</v:String>
+    <v:String x:Key="par_48">TU9</v:String>
+
+    <v:String x:Key="par_49">TD0</v:String>
+    <v:String x:Key="par_50">TD1</v:String>
+    <v:String x:Key="par_51">TD2</v:String>
+    <v:String x:Key="par_52">TD3</v:String>
+    <v:String x:Key="par_53">TD4</v:String>
+    <v:String x:Key="par_54">TD5</v:String>
+    <v:String x:Key="par_55">TD6</v:String>
+    <v:String x:Key="par_56">TD7</v:String>
+    <v:String x:Key="par_57">TD8</v:String>
+    <v:String x:Key="par_58">TD9</v:String>
+
+    <v:String x:Key="par_59">Zone1 water pump number</v:String>
+    <v:String x:Key="par_60">Zone2 water pump number</v:String>
+    <v:String x:Key="par_61">Zone3 water pump number</v:String>
+    <v:String x:Key="par_62">Zone4 water pump number</v:String>
+    <v:String x:Key="par_63">Zone5 water pump number</v:String>
+
+    <v:String x:Key="par_64">Fan1_PWM_limitation, %</v:String>
+    <v:String x:Key="par_65">Fan2_PWM_limitation, %</v:String>
+    <v:String x:Key="par_66">Fan3_PWM_limitation, %</v:String>
+    <v:String x:Key="par_67">Fan4_PWM_limitation, %</v:String>
+    <v:String x:Key="par_68">Fan5_PWM_limitation, %</v:String>
+
+    <v:String x:Key="par_69">Fans PWM correction time, ms</v:String>
+    <v:String x:Key="par_70">Time format (12/24 or AM/PM)</v:String>
+    <v:String x:Key="par_71">Temperature units (C/F)</v:String>
+    <v:String x:Key="par_72">DAYTIME_FROM</v:String>
+    <v:String x:Key="par_73">DAYTIME_TO</v:String>
+    <v:String x:Key="par_74">BRIGHTNESS_DAY</v:String>
+    <v:String x:Key="par_75">BRIGHTNESS_NIGHT</v:String>
+
+    <v:String x:Key="par_76">T_RELAY_SETPOINT</v:String>
+    <v:String x:Key="par_77">WAIT_MODE_PUMP</v:String>
+    <v:String x:Key="par_78">ENGINE_PUMP</v:String>
+    <v:String x:Key="par_79">WARMUP_MODE</v:String>
+    <v:String x:Key="par_80">RUN_ON_LATCHED</v:String>
+
+    <v:String x:Key="par_81">DT_IGNITION_ORIGIN</v:String>
+    <v:String x:Key="par_82">DT_IGNITION_ECONOMY</v:String>
+    <v:String x:Key="par_83">DT_IGNITION_WARMUP</v:String>
+
+    <v:String x:Key="par_84">POWER_LEVEL_MIN</v:String>
+    <v:String x:Key="par_85">POWER_LEVEL_MAX</v:String>
+    <v:String x:Key="par_86">PERCENT_ENGINE</v:String>
+
+    <v:String x:Key="par_87">T_SETPOINT_HEATING</v:String>
+    <v:String x:Key="par_88">DT_IGNITION_HEATING</v:String>
+    <v:String x:Key="par_89">Language</v:String>
+    <v:String x:Key="par_90">Send SMS on call</v:String>
+    <v:String x:Key="par_91">Internet settings</v:String>
+    <v:String x:Key="par_92">ON_SIGNALING_OPERATE</v:String>
+    <v:String x:Key="par_93">SAVED_RUNNING_TIME</v:String>
+    <v:String x:Key="par_94">SAVED_MODE</v:String>
+    <v:String x:Key="par_95">FAN_MANUAL_MODE</v:String>
+
+    <v:String x:Key="par_96">Time of occurrence of a fault at high voltage, *200ms</v:String>
+    <v:String x:Key="par_97">Time of occurrence of a fault at low voltage, *200ms</v:String>
+
+    <v:String x:Key="par_98">PCB_TEMP_OR_ENGINE</v:String>
+
+    <v:String x:Key="par_99">Delta T when zone's fans start (for heating systems)</v:String>
+    <v:String x:Key="par_100">Water pump of the heater: 1 - ON, 0 - OFF</v:String>
+
+    <v:String x:Key="par_101">BOILER_TEMP</v:String>
+    <v:String x:Key="par_102">BOILER_TIME_KEEPWARM</v:String>
+    <v:String x:Key="par_103">BOILER_HYST_TEMP</v:String>
+    <v:String x:Key="par_104">BOILER_HOTMODE</v:String>
+    <v:String x:Key="par_105">System type: 1 - accumulative, 0 - running</v:String>
+    <v:String x:Key="par_106">AirHeaterType: 1 - convectors, 0 - fans</v:String>
+    <v:String x:Key="par_107">Boiler temp update time 10-120 sec</v:String>
+    <v:String x:Key="par_110">TIMER1_TIME</v:String>
+    <v:String x:Key="par_111">TIMER1_WEEK</v:String>
+    <v:String x:Key="par_112">TIMER1_STATE</v:String>
+    <v:String x:Key="par_113">TIMER2_TIME</v:String>
+    <v:String x:Key="par_114">TIMER2_WEEK</v:String>
+    <v:String x:Key="par_115">TIMER2_STATE</v:String>
+    <v:String x:Key="par_116">TIMER3_TIME</v:String>
+    <v:String x:Key="par_117">TIMER3_WEEK</v:String>
+    <v:String x:Key="par_118">TIMER3_STATE</v:String>
+    <v:String x:Key="par_120">FAN1_MANUAL</v:String>
+    <v:String x:Key="par_121">FAN2_MANUAL</v:String>
+    <v:String x:Key="par_122">FAN3_MANUAL</v:String>
+    <v:String x:Key="par_123">FAN4_MANUAL</v:String>
+    <v:String x:Key="par_124">FAN5_MANUAL</v:String>
+
+    <v:String x:Key="par_130">Checking zone fans for faults</v:String>
+    <v:String x:Key="par_131">Use pressure measurement for the fuel pump correction</v:String>
+    <v:String x:Key="par_132">Set delay time to determine overvoltage error</v:String>
+    <v:String x:Key="par_133">Set delay time to determine undervoltage error</v:String>
+
+    <v:String x:Key="par_501">DISPLAY_ZONE1_DAY_T</v:String>
+    <v:String x:Key="par_502">DISPLAY_ZONE2_DAY_T</v:String>
+    <v:String x:Key="par_503">DISPLAY_ZONE3_DAY_T</v:String>
+    <v:String x:Key="par_504">DISPLAY_ZONE4_DAY_T</v:String>
+    <v:String x:Key="par_505">DISPLAY_ZONE5_DAY_T</v:String>
+
+    <v:String x:Key="par_506">DISPLAY_ZONE1_NIGHT_T</v:String>
+    <v:String x:Key="par_507">DISPLAY_ZONE2_NIGHT_T</v:String>
+    <v:String x:Key="par_508">DISPLAY_ZONE3_NIGHT_T</v:String>
+    <v:String x:Key="par_509">DISPLAY_ZONE4_NIGHT_T</v:String>
+    <v:String x:Key="par_510">DISPLAY_ZONE5_NIGHT_T</v:String>
+
+    <v:String x:Key="par_520">DISPLAY_ZONE1_FAN_MANUAL_VALUE</v:String>
+    <v:String x:Key="par_521">DISPLAY_ZONE2_FAN_MANUAL_VALUE</v:String>
+    <v:String x:Key="par_522">DISPLAY_ZONE3_FAN_MANUAL_VALUE</v:String>
+    <v:String x:Key="par_523">DISPLAY_ZONE4_FAN_MANUAL_VALUE</v:String>
+    <v:String x:Key="par_524">DISPLAY_ZONE5_FAN_MANUAL_VALUE</v:String>
+
+    <v:String x:Key="par_525">DISPLAY_ZONE1_FAN_AUTO</v:String>
+    <v:String x:Key="par_526">DISPLAY_ZONE2_FAN_AUTO</v:String>
+    <v:String x:Key="par_527">DISPLAY_ZONE3_FAN_AUTO</v:String>
+    <v:String x:Key="par_528">DISPLAY_ZONE4_FAN_AUTO</v:String>
+    <v:String x:Key="par_529">DISPLAY_ZONE5_FAN_AUTO</v:String>
+
+    <v:String x:Key="par_530">DISPLAY_SYSTEM_LIMIT_WORKTIME</v:String>
+    <v:String x:Key="par_531">DISPLAY_TIMEOUT</v:String>
+    <v:String x:Key="par_532">DISPLAY_SYSTEM_STORAGE_MODE</v:String>
+
+    <v:String x:Key="par_540">HCU_ELEMENT_SETPOINT</v:String>
+    <v:String x:Key="par_541">HCU_ELEMENT_IGNITION</v:String>
+    <v:String x:Key="par_542">HEATER_LIQUID_SETPOINT</v:String>
+    <v:String x:Key="par_543">HEATER_LIQUID_IGNITION</v:String>
+
+    <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
+
+    <v:String x:Key="bb_1">Start counter</v:String>
+    <v:String x:Key="bb_2">Vent counter</v:String>
+    <v:String x:Key="bb_3">Successful start counter</v:String>
+    <v:String x:Key="bb_4">Failed start counter</v:String>
+    <v:String x:Key="bb_5">Heater running flag</v:String>
+    <v:String x:Key="bb_6">Power loss counter</v:String>
+    <v:String x:Key="bb_7">Total work time</v:String>
+    <v:String x:Key="bb_8">Total work time on power 0</v:String>
+    <v:String x:Key="bb_9">Total work time on power 1</v:String>
+    <v:String x:Key="bb_10">Total work time on power 2</v:String>
+    <v:String x:Key="bb_11">Total work time on power 3</v:String>
+    <v:String x:Key="bb_12">Total work time on power 4</v:String>
+    <v:String x:Key="bb_13">Total work time on power 5</v:String>
+    <v:String x:Key="bb_14">Total work time on power 6</v:String>
+    <v:String x:Key="bb_15">Total work time on power 7</v:String>
+    <v:String x:Key="bb_16">Total work time on power 8</v:String>
+    <v:String x:Key="bb_17">Total work time on power 9</v:String>
+    <v:String x:Key="bb_18">Total vent time</v:String>
+    <v:String x:Key="bb_19">Total idle time</v:String>
+    <v:String x:Key="bb_20">First attempt start counter</v:String>
+    <v:String x:Key="bb_21">Second attempt start counter</v:String>
+    <v:String x:Key="bb_22">Failed start counter</v:String>
+
+    <v:String x:Key="bb_23">Total low power time</v:String>
+    <v:String x:Key="bb_24">Total middle power time</v:String>
+    <v:String x:Key="bb_25">Total high power time</v:String>
+
+    <v:String x:Key="bb_26">Total element working time</v:String>
+    <v:String x:Key="bb_27">Total work time on power 10</v:String>
+    <v:String x:Key="bb_28">Pump start counter</v:String>
+    <v:String x:Key="bb_29">Only pump total work time</v:String>
+
+    <v:String x:Key="var_1">Stage</v:String>
+    <v:String x:Key="var_2">Mode</v:String>
+    <v:String x:Key="var_3">Total work time</v:String>
+    <v:String x:Key="var_4">Mode work time</v:String>
+
+    <v:String x:Key="var_5">Supply voltage, V*100</v:String>
+    <v:String x:Key="var_6">Flame sensor temp</v:String>
+    <v:String x:Key="var_7">Body temp</v:String>
+    <v:String x:Key="var_8">Remote control temp</v:String>
+    <v:String x:Key="var_9">Cabin temp</v:String>
+    <v:String x:Key="var_10">Intake temp</v:String>
+    <v:String x:Key="var_11">Temp setpoint</v:String>
+    <v:String x:Key="var_12">Power level setpoint</v:String>
+    <v:String x:Key="var_13">Current power level</v:String>
+    <v:String x:Key="var_14">Chosen sensor</v:String>
+    <v:String x:Key="var_15">Blower rev setpoint</v:String>
+    <v:String x:Key="var_16">Blower rev measured</v:String>
+    <v:String x:Key="var_17">Fuel pump setpoint, Hz*100</v:String>
+    <v:String x:Key="var_18">Fuel pump measured, Hz*100</v:String>
+    <v:String x:Key="var_19">Glow plug period</v:String>
+    <v:String x:Key="var_20">Glow plug pulse</v:String>
+    <v:String x:Key="var_21">Glow plug power %</v:String>
+    <v:String x:Key="var_22">Flame sensor cal value</v:String>
+    <v:String x:Key="var_23">Body sensor cal value</v:String>
+
+    <v:String x:Key="var_24">Error code</v:String>
+    <v:String x:Key="var_25">Error code. Blink count</v:String>
+    <v:String x:Key="var_26">Fault byte 1</v:String>
+    <v:String x:Key="var_27">Fault byte 2</v:String>
+    <v:String x:Key="var_28">Fault byte 3</v:String>
+    <v:String x:Key="var_29">Fault byte 4</v:String>
+    <v:String x:Key="var_30">Fault byte 5</v:String>
+    <v:String x:Key="var_31">Fault byte 6</v:String>
+    <v:String x:Key="var_32">Fault byte 7</v:String>
+    <v:String x:Key="var_33">Fault byte 8</v:String>
+
+    <v:String x:Key="var_34">Ignition attempt</v:String>
+    <v:String x:Key="var_35">Idle allowed</v:String>
+    <v:String x:Key="var_36">Lowest flame sensor value</v:String>
+    <v:String x:Key="var_37">Flame break border</v:String>
+    <v:String x:Key="var_38">Flame break counter</v:String>
+    <v:String x:Key="var_39">Overheating border</v:String>
+    <v:String x:Key="var_40">Liquid temp</v:String>
+    <v:String x:Key="var_41">Overheating temp</v:String>
+    <v:String x:Key="var_42">Flame sensor delta</v:String>
+    <v:String x:Key="var_43">Liquid temp delta</v:String>
+    <v:String x:Key="var_44">Overheating temp delta</v:String>
+    <v:String x:Key="var_45">Relay state (ON/OFF)</v:String>
+    <v:String x:Key="var_46">Pump state (On/OFF)</v:String>
+    <v:String x:Key="var_47">External wire state (YES/NO)</v:String>
+    <v:String x:Key="var_48">Engine state (ON/OFF)</v:String>
+
+    <v:String x:Key="var_49">ADC Channel 0</v:String>
+    <v:String x:Key="var_50">ADC Channel 1</v:String>
+    <v:String x:Key="var_51">ADC Channel 2</v:String>
+    <v:String x:Key="var_52">ADC Channel 3</v:String>
+    <v:String x:Key="var_53">ADC Channel 4</v:String>
+    <v:String x:Key="var_54">ADC Channel 5</v:String>
+    <v:String x:Key="var_55">ADC Channel 6</v:String>
+    <v:String x:Key="var_56">ADC Channel 7</v:String>
+    <v:String x:Key="var_57">ADC Channel 8</v:String>
+    <v:String x:Key="var_58">ADC Channel 9</v:String>
+
+    <v:String x:Key="var_59">MCU temperature</v:String>
+    <v:String x:Key="var_60">Ambient pressure</v:String>
+    <v:String x:Key="var_61">Tank temperature</v:String>
+
+    <v:String x:Key="var_62">Glow plug state (ON/OFF)</v:String>
+
+    <v:String x:Key="vars_1">Stage</v:String>
+    <v:String x:Key="vars_2">Mode</v:String>
+    <v:String x:Key="vars_3">Tot.tim</v:String>
+    <v:String x:Key="vars_4">WorkTim</v:String>
+
+    <v:String x:Key="vars_5">U, V</v:String>
+    <v:String x:Key="vars_6">Tflam</v:String>
+    <v:String x:Key="vars_7">Tbody</v:String>
+    <v:String x:Key="vars_8">Trem</v:String>
+    <v:String x:Key="vars_9">Tcab</v:String>
+    <v:String x:Key="vars_10">Tinlet</v:String>
+    <v:String x:Key="vars_11">Tsetp</v:String>
+    <v:String x:Key="vars_12">Pset</v:String>
+    <v:String x:Key="vars_13">Pcurr</v:String>
+    <v:String x:Key="vars_14">ChosSens</v:String>
+    <v:String x:Key="vars_15">REVset</v:String>
+    <v:String x:Key="vars_16">REVmeas</v:String>
+    <v:String x:Key="vars_17">Fpset</v:String>
+    <v:String x:Key="vars_18">Fpmeas</v:String>
+    <v:String x:Key="vars_19">GlowPlPer</v:String>
+    <v:String x:Key="vars_20">GlowPlImp</v:String>
+    <v:String x:Key="vars_21">Glow%</v:String>
+    <v:String x:Key="vars_22">Flame calib.</v:String>
+    <v:String x:Key="vars_23">Body calib.</v:String>
+
+    <v:String x:Key="vars_24">Error</v:String>
+    <v:String x:Key="vars_25">Blink</v:String>
+    <v:String x:Key="vars_26">Err.b0</v:String>
+    <v:String x:Key="vars_27">Err.b1</v:String>
+    <v:String x:Key="vars_28">Err.b2</v:String>
+    <v:String x:Key="vars_29">Err.b3</v:String>
+    <v:String x:Key="vars_30">Err.b4</v:String>
+    <v:String x:Key="vars_31">Err.b5</v:String>
+    <v:String x:Key="vars_32">Err.b6</v:String>
+    <v:String x:Key="vars_33">Err.b7</v:String>
+
+    <v:String x:Key="vars_34">Ign Try#</v:String>
+    <v:String x:Key="vars_35">Idle</v:String>
+    <v:String x:Key="vars_36">FS min</v:String>
+    <v:String x:Key="vars_37">FS lim</v:String>
+    <v:String x:Key="vars_38">FlBrCnt</v:String>
+    <v:String x:Key="vars_39">OvrhtBrdr</v:String>
+    <v:String x:Key="vars_40">Tliq</v:String>
+    <v:String x:Key="vars_41">Tover</v:String>
+    <v:String x:Key="vars_42">Dtflam</v:String>
+    <v:String x:Key="vars_43">Dtliq</v:String>
+    <v:String x:Key="vars_44">Dtoverh</v:String>
+    <v:String x:Key="vars_45">Relay</v:String>
+    <v:String x:Key="vars_46">Pump</v:String>
+    <v:String x:Key="vars_47">ExtW</v:String>
+    <v:String x:Key="vars_48">Engine</v:String>
+
+    <v:String x:Key="vars_49">ADC0</v:String>
+    <v:String x:Key="vars_50">ADC1</v:String>
+    <v:String x:Key="vars_51">ADC2</v:String>
+    <v:String x:Key="vars_52">ADC3</v:String>
+    <v:String x:Key="vars_53">ADC4</v:String>
+    <v:String x:Key="vars_54">ADC5</v:String>
+    <v:String x:Key="vars_55">ADC6</v:String>
+    <v:String x:Key="vars_56">ADC7</v:String>
+    <v:String x:Key="vars_57">ADC8</v:String>
+    <v:String x:Key="vars_58">ADC9</v:String>
+
+    <v:String x:Key="vars_59">Tcpu</v:String>
+    <v:String x:Key="vars_60">Press</v:String>
+    <v:String x:Key="vars_61">Ttank</v:String>
+
+    <v:String x:Key="vars_62">Relay</v:String>
 </ResourceDictionary>
     
