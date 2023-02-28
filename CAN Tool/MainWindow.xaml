@@ -531,8 +531,6 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path = Id}" Header="ID" IsReadOnly="True">
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Binding="{Binding Path = idString}" Header="CODENAME" IsReadOnly="True">
-                                </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path = Value}" Header="{DynamicResource t_value}">
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path = Name}" Header="{DynamicResource t_description}" IsReadOnly="True">

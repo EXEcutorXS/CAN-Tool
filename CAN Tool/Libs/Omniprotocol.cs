@@ -232,7 +232,7 @@ namespace OmniProtocol
         public OmniMessage(CanMessage m) : this()
         {
             if (m.DLC != 8 || m.RTR || !m.IDE)
-                throw new ArgumentException("CAN message is not compliant with AC2P");
+                throw new ArgumentException("CAN message is not compliant with OmniProtocol");
             Data = m.Data;
             Id = m.Id;
             return;
@@ -384,7 +384,7 @@ namespace OmniProtocol
             if (p.GetMeaning != null)
                 return p.GetMeaning((int)rawValue);
             if (p.Meanings != null && p.Meanings.ContainsKey((int)rawValue))
-                retString.Append(rawValue.ToString() + " - " + p.Meanings[(int)rawValue]);
+                retString.Append(rawValue.ToString() + " - " + GetString(p.Meanings[(int)rawValue]));
             else
             {
                 if (rawValue == Math.Pow(2, p.BitLength) - 1)
@@ -530,13 +530,8 @@ namespace OmniProtocol
 
         public string Description
         {
-            get
-            {
-                if (Omni.BbParameterNames.ContainsKey(id))
-                    return Omni.BbParameterNames[id];
-                else
-                    return "No data";
-            }
+            get => GetString($"bb_{Id}");
+            
         }
 
     }
@@ -575,7 +570,6 @@ namespace OmniProtocol
             return id - (obj as ReadedParameter).id;
         }
 
-        public string idString => Omni.configParameters[Id]?.StringId;
         public string Name => GetString($"par_{id}"); //Omni.configParameters[Id]?.NameRu;
     }
     public class StatusVariable : ViewModel, IUpdatable<StatusVariable>, IComparable
@@ -636,6 +630,14 @@ namespace OmniProtocol
             get
             {
                 return GetString($"var_{Id}");
+            }
+        }
+
+        public string ShortName
+        {
+            get
+            {
+                return GetString($"vars_{Id}");
             }
         }
 
@@ -715,23 +717,12 @@ namespace OmniProtocol
             return id == item.id;
         }
 
-        public string Name
-        {
-            get
-            {
-                if (Omni.VariablesNames.ContainsKey(id))
-                    return $"{Omni.VariablesNames[id]}";
-                else
-                    return "Неизв.переменная # " + id.ToString();
-            }
-        }
+        public string Name => GetString($"var_{Id}");
+        
         public string Description => ToString();
         public override string ToString()
         {
-            if (Omni.VariablesNames.ContainsKey(id))
-                return $"{Omni.VariablesNames[id]}: {_value}";
-            else
-                return "";
+                return $"{Name}: {_value}";
         }
 
         public int CompareTo(object obj)
@@ -785,11 +776,7 @@ namespace OmniProtocol
                 if (error == null)
                     return GetString("t_no_error_code");
                 else
-                {
-                    string fromRes = GetString("e_" + error.Value);
-                    if (fromRes != null) return fromRes;
-                    return $"{Omni.ErrorNames.GetValueOrDefault(error.Value, GetString("t_error") + error.Value.ToString())}";
-                }
+                    return GetString($"e_{error.Value}");
             }
         }
 
@@ -1056,7 +1043,7 @@ namespace OmniProtocol
 
         public string StageString => GetString($"m_{Stage}-{Mode}");
         
-        public string ErrorString => GetString($"e_{error}");
+        public string ErrorString => error.ToString() + " - " + GetString($"e_{error}");
 
         public object Clone()
         {
@@ -1376,11 +1363,10 @@ namespace OmniProtocol
     {
         public int Id;
         public string StringId;
-        public string NameRu;
-        public string NameEn;
+        public string Name;
         public override string ToString()
         {
-            return $"{Id} - {StringId}: {NameRu}";
+            return $"{Id} - {StringId}: {Name}";
         }
     }
     public class Variable
@@ -1429,23 +1415,18 @@ namespace OmniProtocol
 
         public static Dictionary<int, OmniCommand> commands = new();
 
-        public static Dictionary<int, ConfigParameter> configParameters = new();
         public static Dictionary<int, Variable> Variables = new();
         public static Dictionary<int, BbParameter> BbParameters = new();
 
-        public static Dictionary<int, string> ParamtersNames = new();
-        public static Dictionary<int, string> VariablesNames = new();
         public static Dictionary<int, string> BbParameterNames = new();
 
 
 
-        private readonly BindingList<ConnectedDevice> _connectedDevices = new();
-        public BindingList<ConnectedDevice> ConnectedDevices => _connectedDevices;
+        private readonly BindingList<ConnectedDevice> connectedDevices = new();
+        public BindingList<ConnectedDevice> ConnectedDevices => connectedDevices;
 
-        private readonly UpdatableList<OmniMessage> _messages = new();
-        public UpdatableList<OmniMessage> Messages => _messages;
-
-        public static Dictionary<int, string> ErrorNames = new();
+        private readonly UpdatableList<OmniMessage> messages = new();
+        public UpdatableList<OmniMessage> Messages => messages;
 
         private readonly CanAdapter canAdapter;
 
@@ -1572,11 +1553,11 @@ namespace OmniProtocol
                     if (parameterValue != 0xFFFFFFFF)
                     {
                         currentDevice.readedParameters.TryToAdd(new() { Id = parameterId, Value = parameterValue });
-                        Debug.WriteLine($"{Omni.ParamtersNames[parameterId]}={parameterValue}");
+                        Debug.WriteLine($"{GetString($"par_{parameterId}")}={parameterValue}");
                     }
                     else
-                        if (Omni.ParamtersNames.ContainsKey(parameterId))
-                        Debug.WriteLine($"Parameter \"{Omni.ParamtersNames[parameterId]}\" not supported");
+                        if (GotString($"par_{parameterId}"))
+                        Debug.WriteLine($"{GetString($"par_{parameterId}")} not supported");
                     //Серийник в отдельной переменной
                     if (parameterId == 12)
                         currentDevice.Serial1 = parameterValue;
@@ -1819,20 +1800,6 @@ namespace OmniProtocol
                 string tempString = sr.ReadLine();
                 List<string> tempList = new List<string>();
 
-                if (tempString.StartsWith("#define PAR"))
-                {
-                    var p = new ConfigParameter();
-                    tempString = tempString.Remove(0, 8);
-                    p.NameEn = tempString.Substring(tempString.LastIndexOf('@') + 1);
-                    p.NameRu = tempString.Substring(tempString.LastIndexOf("//") + 2, tempString.LastIndexOf('@') - tempString.LastIndexOf("//") - 2);
-                    tempString = tempString.Remove(tempString.IndexOf('/'));
-                    tempList = tempString.Split(' ').ToList();
-                    p.StringId = tempList[0];
-                    p.Id = int.Parse(tempList.Last());
-                    configParameters.Add(p.Id, p);
-                    ParamtersNames.Add(p.Id, p.StringId);
-                }
-
                 if (tempString.StartsWith("#define VAR"))
                 {
 
@@ -1852,7 +1819,6 @@ namespace OmniProtocol
                     if (parts.Length > 3) v.Format = parts[3]?.Trim();
                     if (parts.Length > 4) v.ShortName = parts[4]?.Trim();
                     Variables.Add(v.Id, v);
-                    VariablesNames.Add(v.Id, v.ShortName);
                 }
 
                 if (tempString.StartsWith("#define BB"))
@@ -1873,7 +1839,7 @@ namespace OmniProtocol
         public async void ReadBlackBoxData(DeviceId id)
         {
             if (!Capture("Чтение параметров чёрного ящика")) return;
-            ConnectedDevice currentDevice = _connectedDevices.FirstOrDefault(d => d.ID == id);
+            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(d => d.ID == id);
             if (currentDevice == null) return;
             WaitingForBBErrors = false;
             OmniMessage msg = new()
@@ -2044,8 +2010,10 @@ namespace OmniProtocol
 
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
-            foreach (var p in configParameters)
+            for (int parId = 0; parId < 601; parId++) //Currently we have 600 parameters
             {
+                if (!GotString($"par_{parId}")) // Если нет параметра в ресурсах - не запрашиваем ???
+                    continue;
                 OmniMessage msg = new();
                 msg.PGN = 7;
                 msg.TransmitterAddress = 6;
@@ -2054,8 +2022,8 @@ namespace OmniProtocol
                 msg.ReceiverType = id.Type;
                 msg.Data[0] = 3; //Read Param
                 msg.Data[1] = 0xFF; //Read Param
-                msg.Data[2] = (byte)(p.Key / 256);
-                msg.Data[3] = (byte)(p.Key % 256);
+                msg.Data[2] = (byte)(parId / 256);
+                msg.Data[3] = (byte)(parId % 256);
 
                 currentDevice.flagGetParamDone = false;
                 SendMessage(msg);
@@ -2066,9 +2034,9 @@ namespace OmniProtocol
                     if (currentDevice.flagGetParamDone)
                         break;
                     await Task.Delay(1);
-                    Debug.WriteLineIf(j == 99, $"Error reading parameter {p.Key} ({Omni.ParamtersNames[p.Key]})");
+                    Debug.WriteLineIf(j == 99, $"Error reading parameter {parId} ({GetString($"par_{parId}")}");
                 }
-                UpdatePercent(cnt++ * 100 / configParameters.Count);
+                UpdatePercent(cnt++ * 100 / 601);
                 if (CancellationRequested)
                 {
                     Cancel();
