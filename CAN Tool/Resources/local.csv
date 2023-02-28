@@ -1,0 +1,487 @@
+Key	en-En	ru-Ru
+b_refreshPorts	Refresh ports	Обновить порты
+b_open	Open	Открыть
+b_close	Close	Закрыть
+b_normal	Normal	Нормальный
+b_listen	Listen	Прослушивание
+b_self_reception	Self reception	Самоприём
+b_stop	Stop	Остановить
+b_exit	Exit	Выход
+b_common	Common	Общие данные
+b_water_pump	Water pump	Помпа
+b_vent	Ventilation	Вентиляция
+b_calibrate	Calibrate termocouples	Калибровка термопар
+b_clear_errors	Clear errors	Стереть ошибки
+b_save_report	Report	Отчёт
+b_read	Read	Считать
+b_save	Save	Сохранить
+b_reset	Reset	Сбросить
+b_start_log	Start	Начать
+b_stop_log	Stop	Остановить
+b_redraw	Redraw	Отрисовать
+b_save_log	Save log	Сохранить лог
+b_autoredraw	Autoredraw	Автоотрисовка
+b_log_length	Log length:	Длина лога:
+b_dataset	Dataset:	Набор данных
+b_messages	Messages	Сообщения
+b_commands	Commands	Комманды
+b_config	Config	Настройки
+b_log_chart	Log &amp; Chart	График
+b_status	Status	Статус
+b_black_box	Black Box	ЧЯ
+b_read_bb_data	Read Data	Считать данные
+b_read_bb_errors	Read Errors	Считать ошибки
+b_clear_bb_data	Clear Data	Стереть данные
+b_clear_bb_errors	Clear Errors	Стереть ошибки
+b_enter_manual	Enter Manual	Вкл
+b_leave_manual	Leave Manual	Выкл
+b_1000_ticks	1000 ticks	1000 качков
+b_air_set	Blower set	НВ уст.
+b_air_measured	Blower real	НВ изм.
+b_fuel_pump_set	Fuel Pump	ТН
+b_glow_plug_set	Glow Plug	Свеча
+b_manual	Manual	Ручник
+b_firmware	Firmware	Прошивка
+b_load_hex	Load HEX	Загрузить HEX
+b_burn	Write to Flash	Прошить
+b_find_boot	Ping Bootloader	Найти загрузчик
+b_switch_to_boot	to Bootloader	войти в Bootloader
+b_switch_to_main_program	to Main Program	Запустить программу
+b_get_version	Get Version	Запросить версию
+b_cancel	Cancel	Отмена
+b_expert	Expert	Эксперт
+b_list_mode	Mode	Реж
+b_list_stage	Stage	Уч
+b_list_rev_set	Rev.Set	Об.Зад
+b_list_rev_meas	Rev.Meas	Об.Изм
+b_list_fuel	F Pump Meas	ТН изм
+b_list_glowplug	Glow Plug	Свеча
+b_list_flamesensor	Flame Sens	Инд.плам
+b_list_stagetime	Stage time	Вр.на реж
+b_list_worktime	Work time	Время раб
+b_list_voltage	Voltage	Напр.
+b_list_liqtemp	Liq.Temp	Т жид.
+b_list_bodytemp	Body Temp	Т корп
+b_list_overheattemp	Ov.Temp	Т перег.
+b_list_paneltemp	Pan.Temp	Т пульта
+b_list_inlettemp	In.Temp	Т вход
+b_list_error	Err.code	Код.ош.
+
+t_value	Value	Значение
+t_description	Description	Описание
+
+
+e_1	overheat	Перегрев
+e_2	overheat	Перегрев
+e_3	error of the overheat temp. sensor	Ошибка датчика перегрева
+e_4	error of the liquid temp. sensor	Ошибка датчика температуры хладагента
+e_5	open circuit of the flame temp. sensor	Разрыв цепи датчика пламени
+e_9	glow plug error	Ошибка свечи
+e_10	fan speed does not correspond to the defined	Реальная скорость нагнетателя воздуха не соответствует заданной
+e_12	high supply voltage	Повышенное напряжение питания
+e_13	no ignition	Нет горения
+e_14	water pump error	Ошибка помпы
+e_15	low supply voltage	Пониженное напряжение питания
+e_16	body temp.sensor does not cool down	Датчик температуры корпуса не остывает
+e_17	short circuit of the fuel pump	КЗ в цепи топливного насоса
+e_22	open circuit of the fuel pump	Обрыв в цепи топливного насоса
+e_27	fan does not rotate	Нет вращения вентилятора
+e_28	fan self-rotation	Самопроизвольное вращение вентилятора
+e_29	exceeding the limit of flame blowout	Превышено максимальное число срывов пламени
+e_36	overheating of the flame indicator	Перегрев по индикатору пламени
+e_40	no connection with the heater	Нет связи с подогревателем
+e_45	open circuit of the tank temp. sensor	Обрыв в цепи датчика температуры бака
+e_46	short circuit of the tank temp. sensor	КЗ в цепи датчика температуры бака
+e_53	open circuit of the flow sensor	Обрыв в цепи датчика потока
+e_54	short circuit of the flow sensor	КЗ в цепи датчика потока
+e_55	open circuit of the air temp. sensor	Обрыв в цепи датчика температуры воздуха
+e_56	short circuit of the air temp. sensor	КЗ в цепи датчика температуры воздуха
+
+e_57	short circuit of the zone 1 temp. sensor	КЗ в цепи датчика температуры 1 зоны
+e_58	open circuit of the zone 1 temp. sensor	Обрыв цепи датчика темп. 1 зоны
+e_59	short circuit of the zone 2 temp. sensor	КЗ цепи датчика температуры 2 зоны
+e_60	open circuit of the zone 2 temp. sensor	Обрывцепи датчика темп. 2 зоны
+e_61	short circuit of the zone 3 temp. sensor	КЗ цепи датчика температуры 3 зоны
+e_62	open circuit of the zone 3 temp. sensor	Обрывцепи датчика темп. 3 зоны
+e_63	short circuit of the zone 4 temp. sensor	КЗ цепи датчика температуры 4 зоны
+e_64	open circuit of the zone 4 temp. sensor	Обрывцепи датчика темп. 5 зоны
+e_65	short circuit of the zone 5 temp. sensor	КЗ цепи датчика температуры 5 зоны
+e_66	open circuit of the zone 5 temp. sensor	Обрывцепи датчика темп. 5 зоны
+
+e_69	short circuit of the pump 1	КЗ в цепи помпы 1
+e_70	open circuit of the pump 1	Обрыв цепи помпы 1
+e_71	short circuit of the pump 2	КЗ в цепи помпы 2
+e_72	open circuit of the pump 2	Обрыв цепи помпы 2
+e_73	short circuit of the pump 3	КЗ в цепи помпы 3
+e_74	open circuit of the pump 3	Обрыв цепи помпы 3
+e_75	short circuit of the pump 4	КЗ в цепи помпы 4
+e_76	open circuit of the pump 4	Обрыв цепи помпы 4
+e_77	short circuit of the pump 5	КЗ в цепи помпы 5
+e_78	open circuit of the pump 5	Обрыв цепи помпы 5
+e_79	short circuit of the fan 1	КЗ в цепи вентилятора 1
+e_80	open circuit of the fan 1	Обрыв в цепи вентилятора 1
+e_81	short circuit of the fan 2	КЗ в цепи вентилятора 2
+e_82	open circuit of the fan 2	Обрыв в цепи вентилятора 2
+e_83	short circuit of the fan 3	КЗ в цепи вентилятора 3
+e_84	open circuit of the fan 3	Обрыв в цепи вентилятора 3
+e_85	short circuit of the fan 4	КЗ в цепи вентилятора 4
+e_86	open circuit of the fan 4	Обрыв в цепи вентилятора 4
+e_87	short circuit of the fan 5	КЗ в цепи вентилятора 5
+e_88	open circuit of the fan 5	Обрыв в цепи вентилятора 5
+e_91	liquid level too low	Низкий уровень жидкости
+e_92	level sensor short circuit	КЗ цепи датчика уровня
+e_93	level sensor open circuit	Обрыв цепи датчика уровня
+
+t_no_error_code	No error code	Нет кода ошибки
+t_error	Error	Ошибка
+
+par_0	FAN_PWM, Hz	ШИМ нагнетателя воздуха, Гц                                                                               
+par_1	Pulse width, ms	Длительность импульса ТН, мс                                                                              
+par_2	Glow plug rated voltage, V	Номинальное напряжение свечи, В                                                                           
+par_3	FLAME_APPEARANCE_DELTA	прирост температуры пламени для определения его появления (стадия P)                                      
+par_4	FLAME_APPEARANCE_TIMEOUT	максимальное время ожидания появления пламени при розжиге (стадия P), c                                   
+par_5	FLAME SENSOR CALIBRATION Value	Калибровочное значение ИП, значения АЦП                                                                   
+par_6	FRAME SENSOR CALIBRATION Value	Калибровочное значение датчика корпуса, значения АЦП                                                      
+par_7	Rated supply voltage (12/24 V)	номинальное напряжение питания изделия (12/24В)                                                           
+par_8	Minimum supply voltage, V*100	минимальное значение напряжения питания, В*100                                                            
+par_9	Maximum supply voltage, V*100	максимальное значение напряжения питания, В*100                                                           
+par_10	DELTA_T_STOP	температура уставки &lt;= температуры по датчику на X градусов (3)                                           
+par_11	DELTA_T_RUN	температура уставки &gt;= температуры по датчику на Y градусов (3)                                           
+par_12	Device ID1	серийный номер. первые 4 байта                                                                            
+par_13	Device ID2	серийный номер. вторые 4 байта                                                                            
+par_14	Device ID3	серийный номер. третьи 4 байта                                                                            
+par_15	T_SETPOINT ORIGINAL Mode	уставка температуры жидкостного подогревателя (обычный режим работы)                                      
+par_16	T_SETPOINT WARMUP Mode	уставка температуры жидкостного подогревателя (режим работы догреватель)                                  
+par_17	T_SETPOINT ECONOMY Mode	уставка температуры жидкостного подогревателя (экономичный режим работы)                                  
+par_18	Device's CAN address	Адрес устройства в сети CAN                                                                               
+par_19	Brushless motor's calibration value	Калибровочное значение безколлекторного двигателя                                                         
+par_20	Signaling_mode [0, 1, 2, 3]	Режим запуска по каналу сигнализации: 0-откл., 1-имп., 2-защелка, 3-имп. и защелка                        
+par_21	Zone1 enable	Зона1 подключена (для систем отопления)                                                                   
+par_22	Zone2 enable	Зона2 подключена (для систем отопления)                                                                   
+par_23	Zone3 enable	Зона3 подключена (для систем отопления)                                                                   
+par_24	Zone4 enable	Зона4 подключена (для систем отопления)                                                                   
+par_25	Zone5 enable	Зона5 подключена (для систем отопления)                                                                   
+par_26	Maximum flame temperature	максимальная темепература выхлопных газов                                                                 
+par_27	Fuel pump performance	производительность топливного насоса, мл/100 качков                                                       
+
+par_28	HCU_ELEMENT_SETPOINT	уставка температуры ТЭНа для перехода в ждущий                                                            
+par_29	HCU_ELEMENT_ON	уставка температуры ТЭНа для выхода из ждущего                                                            
+par_30	HCU_ELEMENT_ON_DW	уставка температуры ТЭНа для выхода из ждущего при разборе воды                                           
+
+par_31	HEATER_LIQUID_SETPOINT	уставка температуры жидкости подогревателя для перехода в ждущий                                          
+par_32	HEATER_LIQUID_IGNITION	уставка температуры жидкости подогревателя для выхода из ждущего                                          
+par_33	HEATER_LIQUID_IGNITION_DW	уставка температуры жидкости подогревателя для выхода из ждущего при разборе воды при разборе воды        
+
+par_34	HCU_TANK_SETPOINT	уставка температуры бака для перехода в ждущий                                                            
+par_35	HCU_TANK_IGNITION	уставка температуры бака для выхода из ждущего                                                            
+par_36	HCU_TANK_IGNITION_DW	уставка температуры бака для выхода из ждущего при разборе воды при разборе воды                          
+
+par_37	Domestic water priority	приоритет бытовой воды в системе отопления                                                                
+par_38	Domestic water pause	Пауза для начала разбора воды                                                                             
+
+
+par_39	TU0	Дельта перехода вверх 0                                                                                   
+par_40	TU1	Дельта перехода вверх 1                                                                                   
+par_41	TU2	Дельта перехода вверх 2                                                                                   
+par_42	TU3	Дельта перехода вверх 3                                                                                   
+par_43	TU4	Дельта перехода вверх 4                                                                                   
+par_44	TU5	Дельта перехода вверх 5                                                                                   
+par_45	TU6	Дельта перехода вверх 6                                                                                   
+par_46	TU7	Дельта перехода вверх 7                                                                                   
+par_47	TU8	Дельта перехода вверх 8                                                                                   
+par_48	TU9	Дельта перехода вверх 9                                                                                   
+
+par_49	TD0	Дельта перехода вниз 0                                                                                    
+par_50	TD1	Дельта перехода вниз 1                                                                                    
+par_51	TD2	Дельта перехода вниз 2                                                                                    
+par_52	TD3	Дельта перехода вниз 3                                                                                    
+par_53	TD4	Дельта перехода вниз 4                                                                                    
+par_54	TD5	Дельта перехода вниз 5                                                                                    
+par_55	TD6	Дельта перехода вниз 6                                                                                    
+par_56	TD7	Дельта перехода вниз 7                                                                                    
+par_57	TD8	Дельта перехода вниз 8                                                                                    
+par_58	TD9	Дельта перехода вниз 9                                                                                    
+
+par_59	Zone1 water pump number	Номер помпы для зоны 1                                                                                    
+par_60	Zone2 water pump number	Номер помпы для зоны 2                                                                                    
+par_61	Zone3 water pump number	Номер помпы для зоны 3                                                                                    
+par_62	Zone4 water pump number	Номер помпы для зоны 4                                                                                    
+par_63	Zone5 water pump number	Номер помпы для зоны 5                                                                                    
+
+par_64	Fan1_PWM_limitation, %	Ограничение ШИМ вентилятора зоны 1, %                                                                     
+par_65	Fan2_PWM_limitation, %	Ограничение ШИМ вентилятора зоны 2, %                                                                     
+par_66	Fan3_PWM_limitation, %	Ограничение ШИМ вентилятора зоны 3, %                                                                     
+par_67	Fan4_PWM_limitation, %	Ограничение ШИМ вентилятора зоны 4, %                                                                     
+par_68	Fan5_PWM_limitation, %	Ограничение ШИМ вентилятора зоны 5, %                                                                     
+
+par_69	Fans PWM correction time, ms	Периодичность корректировки ШИМ вентиляторов, мс                                                          
+par_70	Time format (12/24 or AM/PM)	Формат времени (12/24 или AM/PM)                                                                          
+par_71	Temperature units (C/F)	Единицы измерения температуры (C/F)                                                                       
+par_72	DAYTIME_FROM	Начало дневного времени суток, мин                                                                        
+par_73	DAYTIME_TO	Окончание дневного времени суток, мин                                                                     
+par_74	BRIGHTNESS_DAY	Яркость дисплея днем, %                                                                                   
+par_75	BRIGHTNESS_NIGHT	Яркость дисплея ночью, %                                                                                  
+
+par_76	T_RELAY_SETPOINT	Температура включения печки салона автомобиля                                                             
+par_77	WAIT_MODE_PUMP	Работа помпы в ждущем режиме: 0 - не работает, иначе - работает                                           
+par_78	ENGINE_PUMP	Работа помпы при заведенном двигателе: 1 - работает, иначе - не работает                                  
+par_79	WARMUP_MODE	Режим догревателя: 0 - отключен, 1 - автоматический, 2 - ручной                                           
+par_80	RUN_ON_LATCHED	запускаться или нет, если сигналка в сработанном состоянии после остановки                                
+
+par_81	DT_IGNITION_ORIGIN	обычный режим: разница температур между уставкой и началом розжига                                        
+par_82	DT_IGNITION_ECONOMY	экономичный режим: разница температур между уставкой и началом розжига                                    
+par_83	DT_IGNITION_WARMUP	догреватель: разница температур между уставкой и началом розжига                                          
+
+par_84	POWER_LEVEL_MIN	минимальная ступень мощности                                                                              
+par_85	POWER_LEVEL_MAX	максимальная ступень мощности                                                                             
+par_86	PERCENT_ENGINE	проценты от напряжения питания для определения заведенного двигателя                                      
+
+par_87	T_SETPOINT_HEATING	уставка температуры жидкостного подогревателя (отопление)                                                 
+par_88	DT_IGNITION_HEATING	режим отопления: разница температур между уставкой и началом розжига                                      
+par_89	Language	Язык: 0 - английский, 1 - русский                                                                         
+par_90	Send SMS on call	Отправлять смс при звонке: 0 - не отправлять, 1 - отправлять                                              
+par_91	Internet settings	настройки интернета                                                                                       
+par_92	ON_SIGNALING_OPERATE	параметры работы при срабатывании сигнализации: 0 - по умолчанию, 1 - по сохраненным, 2 - по последним    
+par_93	SAVED_RUNNING_TIME	сохраненное значение времени работы при срабатывании сигнализации, минуты                                 
+par_94	SAVED_MODE	сохраненное значение режима работы при срабатывании сигнализации: 0 - обычный, 1 - экономичный, 3 - отопление, 4 - отопительные системы 
+par_95	FAN_MANUAL_MODE	настройка ручного режима вентиляции: 0 - выключение вентиляторов при достижении заданной температуры, 1 - вентилятор не останавливается 
+
+par_96	Time of occurrence of a fault at high voltage, *200ms	Время возникновения неисправности при повышенном напряжении, *200мс                                       
+par_97	Time of occurrence of a fault at low voltage, *200ms	Время возникновения неисправности при пониженном напряжении, *200мс                                       
+
+par_98	PCB_TEMP_OR_ENGINE	Плата с подключением датчика темп. или сигнала завед. двигателя: 0-двигатель, 1-датчик температуры   
+
+par_99	Delta T when zone's fans start (for heating systems)	падение температуры от уставки при котором вентиляторы зон начинают работать                              
+par_100	Water pump of the heater: 1 - ON, 0 - OFF	включать помпу изделия при работе ТЭНа: 1 - включать, 0 - выключать                                       
+
+par_101	BOILER_TEMP	температура бойлера                           
+par_102	BOILER_TIME_KEEPWARM	время поддержания температуры в бойлере       
+par_103	BOILER_HYST_TEMP	бойлер. гистерезис температуры                
+par_104	BOILER_HOTMODE	бойлер HOTMODE                                
+par_105	System type: 1 - accumulative, 0 - running	вид системы: 1 - накопительная, 0 - проточная 
+par_106	AirHeaterType: 1 - convectors, 0 - fans	вид отопления: 1-конвекторы, 0-воздушники     
+par_107	Boiler temp update time 10-120 sec	время работы помпы бойлера для нагрева датчика температуры в режиме Keep warm, 10-120 секунд.  
+par_110	TIMER1_TIME	TIMER1_TIME                                   
+par_111	TIMER1_WEEK	TIMER1_WEEK                                   
+par_112	TIMER1_STATE	TIMER1_STATE                                  
+par_113	TIMER2_TIME	TIMER2_TIME                                   
+par_114	TIMER2_WEEK	TIMER2_WEEK                                   
+par_115	TIMER2_STATE	TIMER2_STATE                                  
+par_116	TIMER3_TIME	TIMER3_TIME                                   
+par_117	TIMER3_WEEK	TIMER3_WEEK                                   
+par_118	TIMER3_STATE	TIMER3_STATE                                  
+par_120	FAN1_MANUAL	FAN1_MANUAL                                   
+par_121	FAN2_MANUAL	FAN2_MANUAL                                   
+par_122	FAN3_MANUAL	FAN3_MANUAL                                   
+par_123	FAN4_MANUAL	FAN4_MANUAL                                   
+par_124	FAN5_MANUAL	FAN5_MANUAL                                   
+
+par_130	Checking zone fans for faults	Проверка неисправностей вентиляторов зон: 0 - не проверять, 1 - проверять        
+par_131	Use pressure measurement for the fuel pump correction	Использовать измеренное давление для корректировки ТН: 0 - не использовать, 1 - использовать 
+par_132	Set delay time to determine overvoltage error	Установить значение реакции на пониженное напряжение 
+par_133	Set delay time to determine undervoltage error	Установить значение реакции на повышенное напряжение 
+
+par_501	DISPLAY_ZONE1_DAY_T	Уставка дневной температуры зоны 1, С         
+par_502	DISPLAY_ZONE2_DAY_T	Уставка дневной температуры зоны 2, С         
+par_503	DISPLAY_ZONE3_DAY_T	Уставка дневной температуры зоны 3, С         
+par_504	DISPLAY_ZONE4_DAY_T	Уставка дневной температуры зоны 4, С         
+par_505	DISPLAY_ZONE5_DAY_T	Уставка дневной температуры зоны 5, С         
+
+par_506	DISPLAY_ZONE1_NIGHT_T	Уставка ночной температуры зоны 1, С          
+par_507	DISPLAY_ZONE2_NIGHT_T	Уставка ночной температуры зоны 2, С          
+par_508	DISPLAY_ZONE3_NIGHT_T	Уставка ночной температуры зоны 3, С          
+par_509	DISPLAY_ZONE4_NIGHT_T	Уставка ночной температуры зоны 4, С          
+par_510	DISPLAY_ZONE5_NIGHT_T	Уставка ночной температуры зоны 5, С          
+
+par_520	DISPLAY_ZONE1_FAN_MANUAL_VALUE	Мощность воздушника в ручном режиме зоны 1, %          
+par_521	DISPLAY_ZONE2_FAN_MANUAL_VALUE	Мощность воздушника в ручном режиме зоны 2, %          
+par_522	DISPLAY_ZONE3_FAN_MANUAL_VALUE	Мощность воздушника в ручном режиме зоны 3, %          
+par_523	DISPLAY_ZONE4_FAN_MANUAL_VALUE	Мощность воздушника в ручном режиме зоны 4, %          
+par_524	DISPLAY_ZONE5_FAN_MANUAL_VALUE	Мощность воздушника в ручном режиме зоны 5, %          
+
+par_525	DISPLAY_ZONE1_FAN_AUTO	Режим работы воздушника: 1-ручной, 0-авто
+par_526	DISPLAY_ZONE2_FAN_AUTO	Режим работы воздушника: 1-ручной, 0-авто
+par_527	DISPLAY_ZONE3_FAN_AUTO	Режим работы воздушника: 1-ручной, 0-авто
+par_528	DISPLAY_ZONE4_FAN_AUTO	Режим работы воздушника: 1-ручной, 0-авто
+par_529	DISPLAY_ZONE5_FAN_AUTO	Режим работы воздушника: 1-ручной, 0-авто
+
+par_530	DISPLAY_SYSTEM_LIMIT_WORKTIME	Максимальное время работы системы, часов               
+par_531	DISPLAY_TIMEOUT	Таймаут подсветки дисплея, секунд                      
+par_532	DISPLAY_SYSTEM_STORAGE_MODE	Режим хранения системы от промерзания, вкл/выкл        
+
+par_540	HCU_ELEMENT_SETPOINT	уставка температуры бака для перехода ТЭНа в ждущий в режиме StorageMode  
+par_541	HCU_ELEMENT_IGNITION	уставка температуры бака для выхода ТЭНа из ждущего в режиме StorageMode  
+par_542	HEATER_LIQUID_SETPOINT	уставка температуры жидкости бака для перехода котла в ждущий в режиме StorageMode    
+par_543	HEATER_LIQUID_IGNITION	уставка температуры жидкости бака для выхода котла из ждущего в режиме StorageMode    
+
+par_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C                     
+
+bb_1	Start counter	счетчик запусков
+bb_2	Vent counter	счетчик запусков на вентиляции
+bb_3	Successful start counter	счетчик запусков завершенных без неисправностей
+bb_4	Failed start counter	счетчик запусков завершенных с неисправностями
+bb_5	Heater running flag	флаг работы подогревателя для фиксации сброса питания
+bb_6	Power loss counter	счетчик сбросов питания во время работы
+bb_7	Total work time	общее время работы
+bb_8	Total work time on power 0	время работы на 0 мощности
+bb_9	Total work time on power 1	время работы на 1 мощности
+bb_10	Total work time on power 2	время работы на 2 мощности
+bb_11	Total work time on power 3	время работы на 3 мощности
+bb_12	Total work time on power 4	время работы на 4 мощности
+bb_13	Total work time on power 5	время работы на 5 мощности
+bb_14	Total work time on power 6	время работы на 6 мощности
+bb_15	Total work time on power 7	время работы на 7 мощности
+bb_16	Total work time on power 8	время работы на 8 мощности
+bb_17	Total work time on power 9	время работы на 9 мощности
+bb_18	Total vent time	время работы на вентиляции
+bb_19	Total idle time	время работы на ждущем режиме
+bb_20	First attempt start counter	количество запусков с первой попытки
+bb_21	Second attempt start counter	количество запусков со второй попытки
+bb_22	Failed start counter	количество незапусков (попытки розжига исчерпаны)
+
+bb_23	Total low power time	время работы на малой мощности
+bb_24	Total middle power time	время работы на средней мощности
+bb_25	Total high power time	время работы на максимальной мощности
+
+bb_26	Total element working time	время работы ТЭНа, с
+bb_27	Total work time on power 10	время работы на 10 мощности
+bb_28	Pump start counter	счетчик запусков помпы
+bb_29	Only pump total work time	время работы только помпы
+
+var_1	Stage	Стадия                                        
+var_2	Mode	Режим работы                                  
+var_3	Total work time	Общее время работы, c                         
+var_4	Mode work time	Время работы на режиме, c                     
+
+var_5	Supply voltage, V*100	Напряжение питания, В*100                     
+var_6	Flame sensor temp	Температура ИП                                
+var_7	Body temp	Температура корп                              
+var_8	Remote control temp	Температура датчика в ПУ                      
+var_9	Cabin temp	Температура кабинного датчика                 
+var_10	Intake temp	Температура на входе                          
+var_11	Temp setpoint	Температура уставки                           
+var_12	Power level setpoint	Заданная мощность                             
+var_13	Current power level	Текущая мощность                              
+var_14	Chosen sensor	По какому датчику работал                     
+var_15	Blower rev setpoint	Заданные обороты НВ                           
+var_16	Blower rev measured	Измеренные обороты НВ                         
+var_17	Fuel pump setpoint, Hz*100	Заданная частота ТН, Гц*100                   
+var_18	Fuel pump measured, Hz*100	Реализованная частота ТН, Гц*100              
+var_19	Glow plug period	Период свечи                                  
+var_20	Glow plug pulse	Импульс свечи                                 
+var_21	Glow plug power %	Заданные проценты мощности свечи              
+var_22	Flame sensor cal value	Калибровочное значение термопары ИП           
+var_23	Body sensor cal value	Калибровочное значение термопары корпуса      
+
+var_24	Error code	Код неисправности                             
+var_25	Error code. Blink count	Код неисправности. Количество морганий (миганий)
+var_26	Fault byte 1	Байт неисправностей1                          
+var_27	Fault byte 2	Байт неисправностей2                          
+var_28	Fault byte 3	Байт неисправностей3                          
+var_29	Fault byte 4	Байт неисправностей4                          
+var_30	Fault byte 5	Байт неисправностей5                          
+var_31	Fault byte 6	Байт неисправностей6                          
+var_32	Fault byte 7	Байт неисправностей7                          
+var_33	Fault byte 8	Байт неисправностей8                          
+
+var_34	Ignition attempt	Попытка розжига                               
+var_35	Idle allowed	Разрешен ждущий режим                         
+var_36	Lowest flame sensor value	Минимальное значение ИП                       
+var_37	Flame break border	Граница срыва пламени                         
+var_38	Flame break counter	Количество срывов пламени во время работы     
+var_39	Overheating border	Граница перегрева                             
+var_40	Liquid temp	Температура жидкости                          
+var_41	Overheating temp	Температура перегрева                         
+var_42	Flame sensor delta	Изменение температуры пламени                 
+var_43	Liquid temp delta	Изменение температуры жидкости                
+var_44	Overheating temp delta	Изменение температуры перегрева               
+var_45	Relay state (ON/OFF)	Состояние реле (ВКЛ/ВЫКЛ)                     
+var_46	Pump state (On/OFF)	Состояние помпы (ВКЛ/ВЫКЛ)                    
+var_47	External wire state (YES/NO)	Состояние сигнализации (сигнал есть/нет)      
+var_48	Engine state (ON/OFF)	Состояние двигателя (заведен/остановлен)      
+
+var_49	ADC Channel 0	АЦП канал 0                                   
+var_50	ADC Channel 1	АЦП канал 1                                   
+var_51	ADC Channel 2	АЦП канал 2                                   
+var_52	ADC Channel 3	АЦП канал 3                                   
+var_53	ADC Channel 4	АЦП канал 4                                   
+var_54	ADC Channel 5	АЦП канал 5                                   
+var_55	ADC Channel 6	АЦП канал 6                                   
+var_56	ADC Channel 7	АЦП канал 7                                   
+var_57	ADC Channel 8	АЦП канал 8                                   
+var_58	ADC Channel 9	АЦП канал 9                                   
+
+var_59	MCU temperature	Температура процессора                        
+var_60	Ambient pressure	Атмосферное давление, кПа                     
+var_61	Tank temperature	Температура бака в системах отопления         
+
+var_62	Glow plug state (ON/OFF)	Состояние свечи (ВКЛ/ВЫКЛ)                     
+
+vars_1	Stage	Стадия       
+vars_2	Mode	Режим        
+vars_3	Tot.tim	Вр.Работы    
+vars_4	WorkTim	Вр.Реж.      
+
+vars_5	U, V	U, В         
+vars_6	Tflam	Тплам        
+vars_7	Tbody	Ткорп        
+vars_8	Trem	Тпульта      
+vars_9	Tcab	Твнешн       
+vars_10	Tinlet	Твхода       
+vars_11	Tsetp	Туставки     
+vars_12	Pset	Р зад        
+vars_13	Pcurr	Р тек        
+vars_14	ChosSens	Работа по    
+vars_15	REVset	Об.зад       
+vars_16	REVmeas	Об. изм      
+vars_17	Fpset	ТН зад       
+vars_18	Fpmeas	ТН тек       
+vars_19	GlowPlPer	Св. пер      
+vars_20	GlowPlImp	Св. имп      
+vars_21	Glow%	Св. %        
+vars_22	Flame calib.	К.З. ИП      
+vars_23	Body calib.	К.З. Корп    
+
+vars_24	Error	Неиспр       
+vars_25	Blink	Неиспр.Миг   
+vars_26	Err.b0	Б.неиспр0    
+vars_27	Err.b1	Б.неиспр1    
+vars_28	Err.b2	Б.неиспр2    
+vars_29	Err.b3	Б.неиспр3    
+vars_30	Err.b4	Б.неиспр4    
+vars_31	Err.b5	Б.неиспр5    
+vars_32	Err.b6	Б.неиспр6    
+vars_33	Err.b7	Б.неиспр7    
+
+vars_34	Ign Try#	ПопыткаРозж  
+vars_35Ждущ.Реж     
+vars_36	FS min	ИП min       
+vars_37	FS lim	ИП lim       
+vars_38	FlBrCnt	Кол.Ср.Пл    
+vars_39	OvrhtBrdr	Гр.Перегр    
+vars_40	Tliq	Тж           
+vars_41	Tover	Тпер         
+vars_42	Dtflam	DT ИП        
+vars_43	Dtliq	DT Тж        
+vars_44	Dtoverh	DT Тпер      
+vars_45	Relay	Реле         
+vars_46	Pump	Помпа        
+vars_47	ExtW	Сигнализация 
+vars_48	Engine	Двигатель    
+
+vars_49	ADC0	АЦП 0        
+vars_50	ADC1	АЦП 1        
+vars_51	ADC2	АЦП 2        
+vars_52	ADC3	АЦП 3        
+vars_53	ADC4	АЦП 4        
+vars_54	ADC5	АЦП 5        
+vars_55	ADC6	АЦП 6        
+vars_56	ADC7	АЦП 7        
+vars_57	ADC8	АЦП 8        
+vars_58	ADC9	АЦП 9        
+
+vars_59	Tcpu	Тcpu         
+vars_60	Press	Давл.,кПа    
+vars_61	Ttank	Тбака        
+
+vars_62	Relay	Реле         
