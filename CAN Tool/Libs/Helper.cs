@@ -1,8 +1,6 @@
-﻿using System.Windows;
-
-namespace CAN_Tool.Libs
+﻿namespace CAN_Tool.Libs
 {
-    internal static class Helper
+    public static class Helper
     {
         public static string GetString(string key)
         {

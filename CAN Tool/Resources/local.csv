@@ -36,7 +36,7 @@ b_clear_bb_errors	Clear Errors	Стереть ошибки
 b_enter_manual	Enter Manual	Вкл
 b_leave_manual	Leave Manual	Выкл
 b_1000_ticks	1000 ticks	1000 качков
-b_air_set	Blower set	НВ уст.
+b_air_set	Blower	НВ
 b_air_measured	Blower real	НВ изм.
 b_fuel_pump_set	Fuel Pump	ТН
 b_glow_plug_set	Glow Plug	Свеча
@@ -485,3 +485,94 @@ vars_60	Press	Давл.,кПа
 vars_61	Ttank	Тбака        
 
 vars_62	Relay	Реле         
+
+m_0-1	Waiting for the command	Ожидание команды
+m_0-2	Blowing on power on	Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)
+m_0-3	Saving data	Сохранение данных о пуске после завершения работы
+
+m_1-0	Initial diagnostics	Стартовая диагностика
+m_1-1	Fan starting	Страгивание нагнетателя воздуха
+m_1-2	Waiting for the temperature decrease	Ожидание снижения температуры (жидкости у жидкостных или воздуха у воздушных
+m_1-3	Blowing on start	Проверка датчика корпуса на неостылость при пуске
+m_1-4	Waiting	Ждущий
+
+m_2-0	Glow plug heating	Разогрев свечи
+m_2-1	Ignition 1 (main cyclogram)	Первая попытка розжига (основная циклограмма)
+m_2-2	Blowing	Продувка между розжигами
+m_2-3	Ignition 2 (main cyclogram)	Вторая попытка розжига (основная циклограмма)
+m_2-4	Heating	Прогрев камеры сгорания
+m_2-5	Blowing on flame break	Продувка после срыва пламени на прогреве
+m_2-6	Blowing before waiting	Продувка перед ждущим
+m_2-7	Preparing for ignition	Подготовка к розжигу
+m_2-8	Ignition 1 (alternative cyclogram)	Первая попытка розжига (альтернативная циклограмма)
+m_2-9	Ignition 2 (alternative cyclogram)	Вторая попытка розжига (альтернативная циклограмма)
+
+m_3-0	Power level 0	Работа на 0 ступени мощности, движемся сверху
+m_3-1	Power level 1	Работа на 1 ступени мощности, движемся сверху
+m_3-2	Power level 2	Работа на 2 ступени мощности, движемся сверху
+m_3-3	Power level 3	Работа на 3 ступени мощности, движемся сверху
+m_3-4	Power level 4	Работа на 4 ступени мощности, движемся сверху
+m_3-5	Power level 5	Работа на 5 ступени мощности, движемся сверху
+m_3-6	Power level 6	Работа на 6 ступени мощности, движемся сверху
+m_3-7	Power level 7	Работа на 7 ступени мощности, движемся сверху
+m_3-8	Power level 8	Работа на 8 ступени мощности, движемся сверху
+m_3-9	Power level 9	Работа на 9 ступени мощности, движемся сверху
+m_3-10	Power level 10	Работа на 10 ступени мощности, движемся сверху
+m_3-11	Power level 1	Работа на 1 ступени мощности, движемся снизу
+m_3-12	Power level 2	Работа на 2 ступени мощности, движемся снизу
+m_3-13	Power level 3	Работа на 3 ступени мощности, движемся снизу
+m_3-14	Power level 4	Работа на 4 ступени мощности, движемся снизу
+m_3-15	Power level 5	Работа на 5 ступени мощности, движемся снизу
+m_3-16	Power level 6	Работа на 6 ступени мощности, движемся снизу
+m_3-17	Power level 7	Работа на 7 ступени мощности, движемся снизу
+m_3-18	Power level 8	Работа на 8 ступени мощности, движемся снизу
+m_3-19	Power level 9	Работа на 9 ступени мощности, движемся снизу
+m_3-20	Power level 10	Работа на 10 ступени мощности, движемся снизу
+m_3-21	Blowing	Продувка перед вентиляцией
+m_3-22	Blowing on flaeme break	Продувка при срыве пламени
+m_3-23	Blowing on overheat	Продувка и вентиляция при перегреве
+m_3-24	Water pump only	Только помпа
+m_3-25	Low power	Малый
+m_3-26	Middle power	Средний
+m_3-27	High power	Сильный
+m_3-28	Blowing before waiting	Продувка перед ждущим
+m_3-29	Waiting	Ждущий
+m_3-30	Water pump only	Только помпа
+m_3-31	Boost mode	Ускоренный нагрев
+m_3-32	Ignition by pressure after flame break	Розжиг по датчику давления после срыва пламени во время работы
+m_3-34	Calibration	Автокаллибровка перед вентиляцией
+m_3-35	Ventilation	Вентиляция
+
+m_3-40	Ventilation level 0	Вентиляция на 0 мощности
+m_3-41	Ventilation level 1	Вентиляция на 1 мощности
+m_3-42	Ventilation level 2	Вентиляция на 2 мощности
+m_3-43	Ventilation level 3	Вентиляция на 3 мощности
+m_3-44	Ventilation level 4	Вентиляция на 4 мощности
+m_3-45	Ventilation level 5	Вентиляция на 5 мощности
+m_3-46	Ventilation level 6	Вентиляция на 6 мощности
+m_3-47	Ventilation level 7	Вентиляция на 7 мощности
+m_3-48	Ventilation level 8	Вентиляция на 8 мощности
+m_3-49	Ventilation level 9	Вентиляция на 9 мощности
+
+m_3-50	Power level 0	Режим работы на 0 ступени мощности
+m_3-51	Power level 1	Режим работы на 1 ступени мощности
+m_3-52	Power level 2	Режим работы на 2 ступени мощности
+m_3-53	Power level 3	Режим работы на 3 ступени мощности
+m_3-54	Power level 4	Режим работы на 4 ступени мощности
+m_3-55	Power level 5	Режим работы на 5 ступени мощности
+m_3-56	Power level 6	Режим работы на 6 ступени мощности
+m_3-57	Power level 7	Режим работы на 7 ступени мощности
+m_3-58	Power level 8	Режим работы на 8 ступени мощности
+m_3-59	Power level 9	Режим работы на 9 ступени мощности
+
+m_4-0	Shutting down	Нормальное завершения работы
+m_4-1	Shutting down	Продувка при перегреве
+m_4-2	Shutting down	Продувка при обрыве датчиков ИП или корпуса
+m_4-3	Shutting down	Продувка при неисправностях помпы, ТН, НВ или превышении количества срывов пламени
+m_4-4	Shutting down	Завершение работы без ТН
+m_4-5	Shutting down	Завершение работы без свечи и ТН
+
+m_5-0	PCB testing	Проверка платы
+m_5-1	Motor calibration	Калибровка коллекторного НВ
+
+m_6-0	Manual mode	Ручной режим работы. Параметры работы задаются по последовательному каналу

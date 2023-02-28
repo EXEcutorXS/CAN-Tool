@@ -70,8 +70,8 @@
 
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
-                        <CheckBox x:Name="ExpertMode" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Width="100" Content="{DynamicResource b_expert}" FontSize="20"  Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
-                        <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Width="100" Content="Dark" FontSize="20" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
+                        <CheckBox x:Name="ExpertMode" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="{DynamicResource b_expert}" FontSize="20"  Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
+                        <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Dark" FontSize="20" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
                         <ComboBox Style="{DynamicResource MaterialDesignComboBox}" x:Name="menuColor" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuColor_SelectionChanged" ItemsSource="{Binding Brushes}">
                             <ComboBox.ItemTemplate>
                                 <ItemContainerTemplate>
@@ -206,7 +206,11 @@
                                                         <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
                                                     </ProgressBar.LayoutTransform>
                                                 </ProgressBar>
-                                                <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.RevSet,TargetNullValue=0}" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline3TextBlock}"></TextBlock>
+                                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.RevSet,TargetNullValue=0}" Style="{DynamicResource MaterialDesignHeadline4TextBlock}"></TextBlock>
+                                                    <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}">/</TextBlock>
+                                                    <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0}" Style="{DynamicResource MaterialDesignHeadline4TextBlock}"></TextBlock>
+                                                </StackPanel>
                                             </Grid>
                                         </StackPanel>
                                     </Border>
