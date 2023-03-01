@@ -10,40 +10,40 @@ namespace OmniProtocol
         {
             #region Device names init
             Devices = new Dictionary<int, Device>() {
-            { 0, new (){ID=0,Name="Любой" } } ,
-            { 1, new (){ID=1,Name="14ТС-Мини",DevType=DeviceType.Binar } } ,
-            { 2, new (){ID=2,Name="Планар 2" ,DevType=DeviceType.Planar}} ,
-            { 3, new (){ID=3,Name="Планар 44Д",DevType=DeviceType.Planar }} ,
-            { 4, new (){ID=4,Name="30ТСД", DevType=DeviceType.Binar}} ,
-            { 5, new (){ID=5,Name="30ТСГ", DevType=DeviceType.Binar }} ,
-            { 6, new (){ID=6,Name="Binar-5S B" , DevType=DeviceType.Binar}} ,
-            { 7, new (){ID=7,Name="Планар 8Д" ,DevType=DeviceType.Planar}} ,
-            { 8, new (){ID=8,Name="OB-8" , DevType=DeviceType.Binar}} ,
-            { 9, new (){ID=9,Name="Планар 4Д",DevType=DeviceType.Planar }} ,
-            { 10, new (){ID=10,Name="Binar-5S D" , DevType=DeviceType.Binar}} ,
-            { 11, new (){ID=11,Name="Планар-9Д, ОВ-8ДК",DevType=DeviceType.Planar }} ,
-            { 12, new (){ID=12,Name="Планар-44Б",DevType=DeviceType.Planar }} ,
-            { 13, new (){ID=13,Name="Планар-4Б",DevType=DeviceType.Planar }} ,
-            { 14, new (){ID=14,Name="Плита" , DevType=DeviceType.CookingPanel}} ,
-            { 15, new (){ID=15,Name="Планар-44Г",DevType=DeviceType.Planar }} ,
-            { 16, new (){ID=16,Name="ОВ-4" , DevType=DeviceType.Binar}} ,
-            { 17, new (){ID=17,Name="14ТСД-10", DevType=DeviceType.Binar }} ,
-            { 18, new (){ID=18,Name="Планар 2Б",DevType=DeviceType.Planar }} ,
-            { 19, new (){ID=19,Name="Блок управления клапанами." , DevType=DeviceType.ValveControl}} ,
-            { 20, new (){ID=20,Name="Планар-6Д" ,DevType=DeviceType.Planar}} ,
-            { 21, new (){ID=21,Name="14ТС-10" , DevType=DeviceType.Binar}} ,
-            { 22, new (){ID=22,Name="30SP (впрысковый)" , DevType=DeviceType.Binar}} ,
-            { 23, new (){ID=23,Name="Бинар 5Б-Компакт" , DevType=DeviceType.Binar,MaxBlower=90,MaxFuelPump=4}} ,
-            { 25, new (){ID=25,Name="35SP (впрысковый)", DevType=DeviceType.Binar }} ,
-            { 27, new (){ID=27,Name="Бинар 5Д-Компакт", DevType=DeviceType.Binar, MaxBlower=90,MaxFuelPump=4}} ,
-            { 29, new (){ID=29,Name="Бинар 6Г-Компакт" , DevType=DeviceType.Binar}} ,
-            { 31, new (){ID=31,Name="14ТСГ-Мини", DevType=DeviceType.Binar }} ,
-            { 32, new (){ID=32,Name="30SPG (на базе 30SP)", DevType=DeviceType.Binar }} ,
-            { 34, new (){ID=34,Name="Binar-10Д" , DevType=DeviceType.Binar, MaxBlower=90}} ,
-            { 35, new (){ID=35,Name="Binar-10Б" , DevType=DeviceType.Binar, MaxBlower=90}} ,
-            { 123, new (){ID=123,Name="Bootloader", DevType=DeviceType.Bootloader }} ,
-            { 126, new (){ID=126,Name="Устройство управления", DevType=DeviceType.HCU }},
-            { 255, new (){ID=255,Name="Не задано" }}
+            { 0, new (){ID=0, } } ,
+            { 1, new (){ID=1,DevType=DeviceType.Binar } } ,
+            { 2, new (){ID=2,DevType=DeviceType.Planar}} ,
+            { 3, new (){ID=3,DevType=DeviceType.Planar }} ,
+            { 4, new (){ID=4, DevType=DeviceType.Binar}} ,
+            { 5, new (){ID=5, DevType=DeviceType.Binar }} ,
+            { 6, new (){ID=6, DevType=DeviceType.Binar}} ,
+            { 7, new (){ID=7,DevType=DeviceType.Planar}} ,
+            { 8, new (){ID=8, DevType=DeviceType.Binar}} ,
+            { 9, new (){ID=9,DevType=DeviceType.Planar }} ,
+            { 10, new (){ID=10, DevType=DeviceType.Binar}} ,
+            { 11, new (){ID=11,DevType=DeviceType.Planar }} ,
+            { 12, new (){ID=12,DevType=DeviceType.Planar }} ,
+            { 13, new (){ID=13, DevType=DeviceType.Planar }} ,
+            { 14, new (){ID=14, DevType=DeviceType.CookingPanel}} ,
+            { 15, new (){ID=15, DevType=DeviceType.Planar }} ,
+            { 16, new (){ID=16, DevType=DeviceType.Binar}} ,
+            { 17, new (){ID=17, DevType=DeviceType.Binar }} ,
+            { 18, new (){ID=18, DevType=DeviceType.Planar }} ,
+            { 19, new (){ID=19, DevType=DeviceType.ValveControl}} ,
+            { 20, new (){ID=20, DevType=DeviceType.Planar}} ,
+            { 21, new (){ID=21, DevType=DeviceType.Binar}} ,
+            { 22, new (){ID=22, DevType=DeviceType.Binar}} ,
+            { 23, new (){ID=23, DevType=DeviceType.Binar,MaxBlower=90,MaxFuelPump=4}} ,
+            { 25, new (){ID=25, DevType=DeviceType.Binar }} ,
+            { 27, new (){ID=27, DevType=DeviceType.Binar, MaxBlower=90,MaxFuelPump=4}} ,
+            { 29, new (){ID=29, DevType=DeviceType.Binar}} ,
+            { 31, new (){ID=31, DevType=DeviceType.Binar }} ,
+            { 32, new (){ID=32, DevType=DeviceType.Binar }} ,
+            { 34, new (){ID=34, DevType=DeviceType.Binar, MaxBlower=90}} ,
+            { 35, new (){ID=35, DevType=DeviceType.Binar, MaxBlower=90}} ,
+            { 123, new (){ID=123, DevType=DeviceType.Bootloader }} ,
+            { 126, new (){ID=126, DevType=DeviceType.HCU }},
+            { 255, new (){ID=255}}
         };
             #endregion
 
@@ -224,7 +224,7 @@ namespace OmniProtocol
 
             PGNs[10].parameters.Add(new() { Name = "Стадия", BitLength = 8, StartByte = 0, Meanings = Stages, Var = 1 });
             PGNs[10].parameters.Add(new() { Name = "Режим", BitLength = 8, StartByte = 1, Var = 2 });
-            PGNs[10].parameters.Add(new() { Name = "Код неисправности", BitLength = 8, StartByte = 2, Var = 24, GetMeaning = x => GetString($"e_{x}")});
+            PGNs[10].parameters.Add(new() { Name = "Код неисправности", BitLength = 8, StartByte = 2, Var = 24, GetMeaning = x => GetString($"e_{x}") });
             PGNs[10].parameters.Add(new() { Name = "Помпа неисправна", BitLength = 2, StartByte = 3, Meanings = defMeaningsYesNo });
             PGNs[10].parameters.Add(new() { Name = "Код предупреждения", BitLength = 8, StartByte = 4 });
             PGNs[10].parameters.Add(new() { Name = "Количество морганий", BitLength = 8, StartByte = 5, Var = 25 });
@@ -350,7 +350,7 @@ namespace OmniProtocol
             PGNs[26].parameters.Add(new() { Name = "Ночная уставка зоны 3", BitLength = 8, StartByte = 2, Unit = "°C", b = -75 });
             PGNs[26].parameters.Add(new() { Name = "Ночная уставка зоны 4", BitLength = 8, StartByte = 3, Unit = "°C", b = -75 });
             PGNs[26].parameters.Add(new() { Name = "Ночная уставка зоны 5", BitLength = 8, StartByte = 4, Unit = "°C", b = -75 });
-            
+
 
             PGNs[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 1", BitLength = 8, StartByte = 0, Unit = "%" });
             PGNs[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 2", BitLength = 8, StartByte = 1, Unit = "%" });

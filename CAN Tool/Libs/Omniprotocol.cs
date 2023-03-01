@@ -145,7 +145,7 @@ namespace OmniProtocol
         public bool State { set => Set(ref state, value); get => state; }
 
         private bool selected = false;
-        public bool Selected { set  { Set(ref selected, value); if (value) selectedZoneChanged(this); } get => selected; }
+        public bool Selected { set { Set(ref selected, value); if (value) selectedZoneChanged(this); } get => selected; }
 
         private bool manualMode = false;
         public bool ManualMode { set => Set(ref manualMode, value); get => manualMode; }
@@ -211,7 +211,7 @@ namespace OmniProtocol
         private BindingList<ZoneHandler> zones = new();
 
         private ZoneHandler selectedZone;
-        public ZoneHandler SelectedZone { set=>Set(ref selectedZone,value); get=>selectedZone; }
+        public ZoneHandler SelectedZone { set => Set(ref selectedZone, value); get => selectedZone; }
 
 
     }
@@ -483,11 +483,12 @@ namespace OmniProtocol
     public class Device
     {
         public int ID;
-        public string Name;
+        public string Name => GetString($"d_{ID}");
         public DeviceType DevType { set; get; }
 
         public int MaxBlower { get; set; } = 130;
         public double MaxFuelPump { get; set; } = 4;
+        public int BBErrorsLen { get; set; } = 512;
 
         public override string ToString()
         {
@@ -531,7 +532,7 @@ namespace OmniProtocol
         public string Description
         {
             get => GetString($"bb_{Id}");
-            
+
         }
 
     }
@@ -613,7 +614,7 @@ namespace OmniProtocol
 
         private bool display = false;
 
-        public bool Display { get { return display; } set { Set(ref display, value); } }
+        public bool Display { get => display; set => Set(ref display, value); }
 
         public double Value
         {
@@ -625,21 +626,9 @@ namespace OmniProtocol
             get => Value.ToString(assignedParameter.OutputFormat);
         }
 
-        public string Name
-        {
-            get
-            {
-                return GetString($"var_{Id}");
-            }
-        }
+        public string Name => GetString($"var_{Id}");
 
-        public string ShortName
-        {
-            get
-            {
-                return GetString($"vars_{Id}");
-            }
-        }
+        public string ShortName => GetString($"vars_{Id}");
 
         public System.Drawing.Color Color => System.Drawing.Color.FromArgb(255, (ChartBrush as SolidColorBrush).Color.R, (ChartBrush as SolidColorBrush).Color.G, (ChartBrush as SolidColorBrush).Color.B);
 
@@ -694,7 +683,7 @@ namespace OmniProtocol
             return Id - (obj as StatusVariable).Id;
         }
     }
-    public class ReadedVariable : ViewModel, IUpdatable<ReadedVariable>, IComparable
+    public class BBCommonVariable : ViewModel, IUpdatable<BBCommonVariable>, IComparable
     {
         int id;
         public int Id { get => id; set => id = value; }
@@ -707,34 +696,33 @@ namespace OmniProtocol
 
         }
 
-        public void Update(ReadedVariable item)
+        public void Update(BBCommonVariable item)
         {
             Set(ref _value, item.Value);
         }
 
-        public bool IsSimmiliarTo(ReadedVariable item)
+        public bool IsSimmiliarTo(BBCommonVariable item)
         {
             return id == item.id;
         }
 
         public string Name => GetString($"var_{Id}");
-        
+
         public string Description => ToString();
         public override string ToString()
         {
-                return $"{Name}: {_value}";
+            return $"{Name}: {Value}";
         }
 
         public int CompareTo(object obj)
         {
-            return id - (obj as ReadedVariable).id;
+            return id - (obj as BBCommonVariable).id;
         }
     }
     public class BBError : IUpdatable<BBError>, INotifyPropertyChanged, IComparable
     {
-        private readonly UpdatableList<ReadedVariable> _variables = new();
-
-        public UpdatableList<ReadedVariable> Variables { get => _variables; }
+        private readonly UpdatableList<BBCommonVariable> variables = new();
+        public UpdatableList<BBCommonVariable> Variables { get => variables; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -743,15 +731,13 @@ namespace OmniProtocol
             return false;
         }
 
-
-
         public int Id { get => 0; }
         public BBError()
         {
-            _variables.ListChanged += (s, a) => onChange("Name");
-            _variables.AddingNew += (s, a) => onChange("Name");
-            _variables.ListChanged += (s, a) => onChange("Description");
-            _variables.AddingNew += (s, a) => onChange("Description");
+            variables.ListChanged += (s, a) => onChange("Name");
+            variables.AddingNew += (s, a) => onChange("Name");
+            variables.ListChanged += (s, a) => onChange("Description");
+            variables.AddingNew += (s, a) => onChange("Description");
         }
         public void Update(BBError item)
         {
@@ -766,12 +752,11 @@ namespace OmniProtocol
             return retString.ToString();
         }
 
-
         public string Name
         {
             get
             {
-                ReadedVariable error = Variables.FirstOrDefault(v => v.Id == 24); //24 - paramsname.h error code
+                BBCommonVariable error = Variables.FirstOrDefault(v => v.Id == 24); //24 - paramsname.h error code
 
                 if (error == null)
                     return GetString("t_no_error_code");
@@ -1042,7 +1027,7 @@ namespace OmniProtocol
         }
 
         public string StageString => GetString($"m_{Stage}-{Mode}");
-        
+
         public string ErrorString => error.ToString() + " - " + GetString($"e_{error}");
 
         public object Clone()
@@ -1114,7 +1099,7 @@ namespace OmniProtocol
                 if (firmware != null)
                     return $"{firmware[0]}.{firmware[1]}.{firmware[2]}.{firmware[3]}";
                 else
-                    return "No firmware data";
+                    return GetString("t_no_formware_data");
             }
         }
 
@@ -1157,8 +1142,6 @@ namespace OmniProtocol
         private UpdatableList<ReadedBlackBoxValue> _bbValues = new();
         public UpdatableList<ReadedBlackBoxValue> BBValues => _bbValues;
 
-        public BBError currentBBError { set; get; }
-
         private UpdatableList<BBError> _BBErrors = new();
         public UpdatableList<BBError> BBErrors => _BBErrors;
 
@@ -1192,6 +1175,8 @@ namespace OmniProtocol
         public uint receiverDataCrc = 0;
 
         public bool flagGetParamDone = false;
+
+        public bool flagGetVersionDone = false;
 
         public bool flagGetBBDone = false;
 
@@ -1273,13 +1258,13 @@ namespace OmniProtocol
         {
             LogCurrentPos = 0;
             LogData = new List<double[]>();
-            foreach (var var in Omni.Variables)
+            for (int i = 0; i < 100; i++) //Переменных пока намного меньше, но поставим пока 100
             {
                 LogData.Add(new double[length]);
             }
         }
 
-        private bool[] supportedVariables = new bool[Omni.Variables.Count];
+        private bool[] supportedVariables = new bool[100];
 
         public bool[] SupportedVariables => supportedVariables;
 
@@ -1415,13 +1400,6 @@ namespace OmniProtocol
 
         public static Dictionary<int, OmniCommand> commands = new();
 
-        public static Dictionary<int, Variable> Variables = new();
-        public static Dictionary<int, BbParameter> BbParameters = new();
-
-        public static Dictionary<int, string> BbParameterNames = new();
-
-
-
         private readonly BindingList<ConnectedDevice> connectedDevices = new();
         public BindingList<ConnectedDevice> ConnectedDevices => connectedDevices;
 
@@ -1430,7 +1408,7 @@ namespace OmniProtocol
 
         private readonly CanAdapter canAdapter;
 
-        public bool WaitingForBBErrors { get; set; } = false;
+        public bool ReadingBBErrorsMode { get; set; } = false;
 
         OmniTask currentTask = new();
 
@@ -1448,6 +1426,8 @@ namespace OmniProtocol
 
         private void Cancel() => CurrentTask.onCancel();
 
+        private void Fail(string reason = "") => CurrentTask.onFail(reason);
+
         private void UpdatePercent(int p) => CurrentTask.UpdatePercent(p);
 
         private void ProcessCanMessage(CanMessage msg)
@@ -1456,39 +1436,20 @@ namespace OmniProtocol
             OmniMessage m = new OmniMessage(msg);
             DeviceId id = m.TransmitterId;
 
-            //Debug.WriteLine("<-" + m.ToString());
+            ConnectedDevice senderDevice = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(m.TransmitterId));
 
-            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(m.TransmitterId));
-
-            if (currentDevice == null)
+            if (senderDevice == null)
             {
-                currentDevice = new ConnectedDevice(id);
-                ConnectedDevices.Add(currentDevice);
+                senderDevice = new ConnectedDevice(id);
+                ConnectedDevices.Add(senderDevice);
                 NewDeviceAquired?.Invoke(this, null);
+                Task.Run(()=>RequestBasicData(id));
             }
 
 
             if (!PGNs.ContainsKey(m.PGN)) return; //Такого PGN нет в библиотеке
 
-
-            if (m.PGN == 2) //Подтверждение выполненной комманды
-            {
-
-                switch (m.Data[1])
-                {
-                    case 0:
-                        currentDevice.Firmware = new byte[] { m.Data[2], m.Data[3], m.Data[4], m.Data[5] };
-                        break;
-                    case 67:                                               //Вход в ручной режим
-                        if (m.Data[2] == 1)
-                            currentDevice.ManualMode = true;
-                        else
-                            currentDevice.ManualMode = false;
-                        break;
-                }
-
-
-            }
+            
 
             foreach (OmniPgnParameter p in PGNs[m.PGN].parameters)
             {
@@ -1501,41 +1462,41 @@ namespace OmniProtocol
                     long rawValue = OmniMessage.getRaw(m.Data, p.BitLength, p.StartBit, p.StartByte, p.Signed);
                     if (rawValue == Math.Pow(2, p.BitLength) - 1) return; //Неподдерживаемый параметр, ливаем
                     sv.RawValue = rawValue;
-                    currentDevice.SupportedVariables[sv.Id] = true;
-                    currentDevice.Status.TryToAdd(sv);
+                    senderDevice.SupportedVariables[sv.Id] = true;
+                    senderDevice.Status.TryToAdd(sv);
 
                     if (sv.Id == 1)
-                        currentDevice.Parameters.Stage = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.Stage = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 2)
-                        currentDevice.Parameters.Mode = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.Mode = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 3)
-                        currentDevice.Parameters.WorkTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.WorkTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 4)
-                        currentDevice.Parameters.StageTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.StageTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 5)
-                        currentDevice.Parameters.Voltage = rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b;
+                        senderDevice.Parameters.Voltage = rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b;
                     if (sv.Id == 6)
-                        currentDevice.Parameters.FlameSensor = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.FlameSensor = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 7)
-                        currentDevice.Parameters.BodyTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.BodyTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 8)
-                        currentDevice.Parameters.PanelTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.PanelTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 10)
-                        currentDevice.Parameters.InletTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.InletTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 15)
-                        currentDevice.Parameters.RevSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.RevSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 16)
-                        currentDevice.Parameters.RevMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.RevMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 18)
-                        currentDevice.Parameters.FuelPumpMeasured = (rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.FuelPumpMeasured = (rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 21)
-                        currentDevice.Parameters.GlowPlug = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.GlowPlug = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 24)
-                        currentDevice.Parameters.Error = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.Error = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 40)
-                        currentDevice.Parameters.LiquidTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.LiquidTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 41)
-                        currentDevice.Parameters.OverheatTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.OverheatTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
 
 
 
@@ -1543,7 +1504,25 @@ namespace OmniProtocol
 
                 }
             }
+            
+            if (m.PGN == 2) //Подтверждение выполненной комманды
+            {
 
+                switch (m.Data[1])
+                {
+                    case 0:
+                        senderDevice.Firmware = new byte[] { m.Data[2], m.Data[3], m.Data[4], m.Data[5] };
+                        break;
+                    case 67:                                               //Вход в ручной режим
+                        if (m.Data[2] == 1)
+                            senderDevice.ManualMode = true;
+                        else
+                            senderDevice.ManualMode = false;
+                        break;
+                }
+
+
+            }
             if (m.PGN == 7) //Ответ на запрос параметра
             {
                 if (m.Data[0] == 4) // Обрабатываем только упешные ответы на запросы
@@ -1552,7 +1531,7 @@ namespace OmniProtocol
                     uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
                     if (parameterValue != 0xFFFFFFFF)
                     {
-                        currentDevice.readedParameters.TryToAdd(new() { Id = parameterId, Value = parameterValue });
+                        senderDevice.readedParameters.TryToAdd(new() { Id = parameterId, Value = parameterValue });
                         Debug.WriteLine($"{GetString($"par_{parameterId}")}={parameterValue}");
                     }
                     else
@@ -1560,210 +1539,193 @@ namespace OmniProtocol
                         Debug.WriteLine($"{GetString($"par_{parameterId}")} not supported");
                     //Серийник в отдельной переменной
                     if (parameterId == 12)
-                        currentDevice.Serial1 = parameterValue;
+                        senderDevice.Serial1 = parameterValue;
                     if (parameterId == 13)
-                        currentDevice.Serial2 = parameterValue;
+                        senderDevice.Serial2 = parameterValue;
                     if (parameterId == 14)
-                        currentDevice.Serial3 = parameterValue;
+                        senderDevice.Serial3 = parameterValue;
 
-                    currentDevice.flagGetParamDone = true;
+                    senderDevice.flagGetParamDone = true;
                 }
 
             }
-
             if (m.PGN == 8) //Работа с ЧЯ
             {
                 if (m.Data[0] == 4) // Обрабатываем только упешные ответы на запросы
                 {
-                    if (!WaitingForBBErrors)
+                    if (!ReadingBBErrorsMode)
                     {
                         int parameterId = m.Data[3] + m.Data[2] * 256;
                         uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
                         if (parameterValue != 0xFFFFFFFF)
-                            currentDevice.BBValues.TryToAdd(new ReadedBlackBoxValue() { Id = parameterId, Value = parameterValue });
+                            senderDevice.BBValues.TryToAdd(new ReadedBlackBoxValue() { Id = parameterId, Value = parameterValue });
 
                     }
                     else
                     {
                         if (m.Data[2] == 0xFF && m.Data[3] == 0xFA) //Заголовок отчёта
-                        {
-                            if (currentDevice.currentBBError.Variables.Count > 0)
-                            {
-                                BBError e = new BBError();
-                                currentDevice.currentBBError = e;
-                                currentDevice.BBErrors.Add(e);
-                            }
-                        }
+                            senderDevice.BBErrors.AddNew();
                         else
                         {
-                            if (currentDevice.currentBBError == null) return;
-                            ReadedVariable v = new ReadedVariable();
+                            BBCommonVariable v = new();
                             v.Id = m.Data[2] * 256 + m.Data[3];
                             v.Value = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7];
-                            currentDevice.currentBBError.Variables.TryToAdd(v);
+                            if (v.Id != 65535)
+                                senderDevice.BBErrors.Last().Variables.TryToAdd(v);
                         }
                     }
-                    currentDevice.flagGetBBDone = true;
+                    senderDevice.flagGetBBDone = true;
                 }
             }
-
-
-            //Переменные без VAR в paramsname.h
             if (m.PGN == 18) //Версия
             {
-                currentDevice.Firmware = m.Data[0..4];
+                senderDevice.flagGetVersionDone = true;
+                senderDevice.Firmware = m.Data[0..4];
                 if (m.Data[5] != 0xff && m.Data[6] != 0xff && m.Data[7] != 0xff)
                     try
                     {
-                        currentDevice.ProductionDate = new DateOnly(m.Data[7] + 2000, m.Data[6], m.Data[5]);
+                        senderDevice.ProductionDate = new DateOnly(m.Data[7] + 2000, m.Data[6], m.Data[5]);
                     }
                     catch { }
             }
             if (m.PGN == 21)
             {
-                if (m.Data[2] != 255) currentDevice.Timber.TankTempereature = m.Data[2] - 75;
-                if (m.Data[4] != 255) currentDevice.Timber.OutsideTemperature = m.Data[4] - 75;
-                if (m.Data[6] != 255) currentDevice.Timber.LiquidLevel = m.Data[6];
-                if ((m.Data[7] & 3) != 3) currentDevice.Timber.DomesticWaterFlow = (m.Data[7] & 3) != 0;
+                if (m.Data[2] != 255) senderDevice.Timber.TankTempereature = m.Data[2] - 75;
+                if (m.Data[4] != 255) senderDevice.Timber.OutsideTemperature = m.Data[4] - 75;
+                if (m.Data[6] != 255) senderDevice.Timber.LiquidLevel = m.Data[6];
+                if ((m.Data[7] & 3) != 3) senderDevice.Timber.DomesticWaterFlow = (m.Data[7] & 3) != 0;
             }
             if (m.PGN == 22)
             {
                 if ((m.Data[0] & 3) != 3)
                 {
-                    currentDevice.Timber.Zones[0].State = (m.Data[0] & 3) != 0;
-                    currentDevice.Timber.Zones[0].Connected = true;
+                    senderDevice.Timber.Zones[0].State = (m.Data[0] & 3) != 0;
+                    senderDevice.Timber.Zones[0].Connected = true;
                 }
                 else
-                    currentDevice.Timber.Zones[0].Connected = false;
+                    senderDevice.Timber.Zones[0].Connected = false;
                 if (((m.Data[0] >> 2) & 3) != 3)
                 {
-                    currentDevice.Timber.Zones[1].State = ((m.Data[0] >> 2) & 3) != 0;
-                    currentDevice.Timber.Zones[1].Connected = true;
+                    senderDevice.Timber.Zones[1].State = ((m.Data[0] >> 2) & 3) != 0;
+                    senderDevice.Timber.Zones[1].Connected = true;
                 }
                 else
-                    currentDevice.Timber.Zones[1].Connected = false;
+                    senderDevice.Timber.Zones[1].Connected = false;
                 if (((m.Data[0] >> 4) & 3) != 3)
                 {
-                    currentDevice.Timber.Zones[2].State = ((m.Data[0] >> 4) & 3) != 0;
-                    currentDevice.Timber.Zones[2].Connected = true;
+                    senderDevice.Timber.Zones[2].State = ((m.Data[0] >> 4) & 3) != 0;
+                    senderDevice.Timber.Zones[2].Connected = true;
                 }
                 else
-                    currentDevice.Timber.Zones[2].Connected = false;
+                    senderDevice.Timber.Zones[2].Connected = false;
                 if (((m.Data[0] >> 6) & 3) != 3)
                 {
-                    currentDevice.Timber.Zones[3].State = ((m.Data[0] >> 6) & 3) != 0;
-                    currentDevice.Timber.Zones[3].Connected = true;
+                    senderDevice.Timber.Zones[3].State = ((m.Data[0] >> 6) & 3) != 0;
+                    senderDevice.Timber.Zones[3].Connected = true;
                 }
                 else
-                    currentDevice.Timber.Zones[3].Connected = false;
+                    senderDevice.Timber.Zones[3].Connected = false;
                 if ((m.Data[1] & 3) != 3)
                 {
-                    currentDevice.Timber.Zones[4].State = (m.Data[1] & 3) != 0;
-                    currentDevice.Timber.Zones[4].Connected = true;
+                    senderDevice.Timber.Zones[4].State = (m.Data[1] & 3) != 0;
+                    senderDevice.Timber.Zones[4].Connected = true;
                 }
                 else
-                    currentDevice.Timber.Zones[4].Connected = false;
+                    senderDevice.Timber.Zones[4].Connected = false;
 
-                if (m.Data[2] != 255) currentDevice.Timber.Zones[0].CurrentTemperature = m.Data[2] - 75;
-                if (m.Data[3] != 255) currentDevice.Timber.Zones[1].CurrentTemperature = m.Data[3] - 75;
-                if (m.Data[4] != 255) currentDevice.Timber.Zones[2].CurrentTemperature = m.Data[4] - 75;
-                if (m.Data[5] != 255) currentDevice.Timber.Zones[3].CurrentTemperature = m.Data[5] - 75;
-                if (m.Data[6] != 255) currentDevice.Timber.Zones[4].CurrentTemperature = m.Data[6] - 75;
+                if (m.Data[2] != 255) senderDevice.Timber.Zones[0].CurrentTemperature = m.Data[2] - 75;
+                if (m.Data[3] != 255) senderDevice.Timber.Zones[1].CurrentTemperature = m.Data[3] - 75;
+                if (m.Data[4] != 255) senderDevice.Timber.Zones[2].CurrentTemperature = m.Data[4] - 75;
+                if (m.Data[5] != 255) senderDevice.Timber.Zones[3].CurrentTemperature = m.Data[5] - 75;
+                if (m.Data[6] != 255) senderDevice.Timber.Zones[4].CurrentTemperature = m.Data[6] - 75;
 
-                if ((m.Data[7] & 3) != 3) currentDevice.Timber.HeaterEnabled = (m.Data[7] & 3) != 0;
-                if (((m.Data[7]>>2) & 3) != 3) currentDevice.Timber.ElementEbabled = ((m.Data[7]>>2) & 3) != 0;
+                if ((m.Data[7] & 3) != 3) senderDevice.Timber.HeaterEnabled = (m.Data[7] & 3) != 0;
+                if (((m.Data[7] >> 2) & 3) != 3) senderDevice.Timber.ElementEbabled = ((m.Data[7] >> 2) & 3) != 0;
 
             }
-
             if (m.PGN == 23)
             {
-                if (m.Data[0] != 255) currentDevice.Timber.Zones[0].SettedPwmPercent = m.Data[0];
-                if (m.Data[1] != 255) currentDevice.Timber.Zones[1].SettedPwmPercent = m.Data[1];
-                if (m.Data[2] != 255) currentDevice.Timber.Zones[2].SettedPwmPercent = m.Data[2];
-                if (m.Data[3] != 255) currentDevice.Timber.Zones[3].SettedPwmPercent = m.Data[3];
-                if (m.Data[4] != 255) currentDevice.Timber.Zones[4].SettedPwmPercent = m.Data[4];
+                if (m.Data[0] != 255) senderDevice.Timber.Zones[0].SettedPwmPercent = m.Data[0];
+                if (m.Data[1] != 255) senderDevice.Timber.Zones[1].SettedPwmPercent = m.Data[1];
+                if (m.Data[2] != 255) senderDevice.Timber.Zones[2].SettedPwmPercent = m.Data[2];
+                if (m.Data[3] != 255) senderDevice.Timber.Zones[3].SettedPwmPercent = m.Data[3];
+                if (m.Data[4] != 255) senderDevice.Timber.Zones[4].SettedPwmPercent = m.Data[4];
             }
-
             if (m.PGN == 24)
             {
-                if ((m.Data[0] & 15) != 15) currentDevice.Timber.Zones[0].FanStage = m.Data[0] & 15;
-                if (((m.Data[0] >> 4) & 15) != 15) currentDevice.Timber.Zones[1].FanStage = (m.Data[0] >> 4) & 15;
-                if ((m.Data[1] & 15) != 15) currentDevice.Timber.Zones[2].FanStage = m.Data[1] & 15;
-                if (((m.Data[1] >> 4) & 15) != 15) currentDevice.Timber.Zones[3].FanStage = (m.Data[0] >> 4) & 15;
-                if ((m.Data[2] & 15) != 15) currentDevice.Timber.Zones[4].FanStage = m.Data[2] & 15;
-                if (m.Data[3] != 255) currentDevice.Timber.Zones[0].CurrentPwm = m.Data[3];
-                if (m.Data[4] != 255) currentDevice.Timber.Zones[1].CurrentPwm = m.Data[4];
-                if (m.Data[5] != 255) currentDevice.Timber.Zones[2].CurrentPwm = m.Data[5];
-                if (m.Data[6] != 255) currentDevice.Timber.Zones[3].CurrentPwm = m.Data[6];
-                if (m.Data[7] != 255) currentDevice.Timber.Zones[4].CurrentPwm = m.Data[7];
+                if ((m.Data[0] & 15) != 15) senderDevice.Timber.Zones[0].FanStage = m.Data[0] & 15;
+                if (((m.Data[0] >> 4) & 15) != 15) senderDevice.Timber.Zones[1].FanStage = (m.Data[0] >> 4) & 15;
+                if ((m.Data[1] & 15) != 15) senderDevice.Timber.Zones[2].FanStage = m.Data[1] & 15;
+                if (((m.Data[1] >> 4) & 15) != 15) senderDevice.Timber.Zones[3].FanStage = (m.Data[0] >> 4) & 15;
+                if ((m.Data[2] & 15) != 15) senderDevice.Timber.Zones[4].FanStage = m.Data[2] & 15;
+                if (m.Data[3] != 255) senderDevice.Timber.Zones[0].CurrentPwm = m.Data[3];
+                if (m.Data[4] != 255) senderDevice.Timber.Zones[1].CurrentPwm = m.Data[4];
+                if (m.Data[5] != 255) senderDevice.Timber.Zones[2].CurrentPwm = m.Data[5];
+                if (m.Data[6] != 255) senderDevice.Timber.Zones[3].CurrentPwm = m.Data[6];
+                if (m.Data[7] != 255) senderDevice.Timber.Zones[4].CurrentPwm = m.Data[7];
             }
-
             if (m.PGN == 25)
             {
-                if (m.Data[0] != 255) currentDevice.Timber.Zones[0].TempSetpointDay = m.Data[0] - 75;
-                if (m.Data[1] != 255) currentDevice.Timber.Zones[1].TempSetpointDay = m.Data[1] - 75;
-                if (m.Data[2] != 255) currentDevice.Timber.Zones[2].TempSetpointDay = m.Data[2] - 75;
-                if (m.Data[3] != 255) currentDevice.Timber.Zones[3].TempSetpointDay = m.Data[3] - 75;
-                if (m.Data[4] != 255) currentDevice.Timber.Zones[4].TempSetpointDay = m.Data[4] - 75;
+                if (m.Data[0] != 255) senderDevice.Timber.Zones[0].TempSetpointDay = m.Data[0] - 75;
+                if (m.Data[1] != 255) senderDevice.Timber.Zones[1].TempSetpointDay = m.Data[1] - 75;
+                if (m.Data[2] != 255) senderDevice.Timber.Zones[2].TempSetpointDay = m.Data[2] - 75;
+                if (m.Data[3] != 255) senderDevice.Timber.Zones[3].TempSetpointDay = m.Data[3] - 75;
+                if (m.Data[4] != 255) senderDevice.Timber.Zones[4].TempSetpointDay = m.Data[4] - 75;
             }
-
             if (m.PGN == 26)
             {
-                if (m.Data[0] != 255) currentDevice.Timber.Zones[0].TempSetpointNight = m.Data[0] - 75;
-                if (m.Data[1] != 255) currentDevice.Timber.Zones[1].TempSetpointNight = m.Data[1] - 75;
-                if (m.Data[2] != 255) currentDevice.Timber.Zones[2].TempSetpointNight = m.Data[2] - 75;
-                if (m.Data[3] != 255) currentDevice.Timber.Zones[3].TempSetpointNight = m.Data[3] - 75;
-                if (m.Data[4] != 255) currentDevice.Timber.Zones[4].TempSetpointNight = m.Data[4] - 75;
+                if (m.Data[0] != 255) senderDevice.Timber.Zones[0].TempSetpointNight = m.Data[0] - 75;
+                if (m.Data[1] != 255) senderDevice.Timber.Zones[1].TempSetpointNight = m.Data[1] - 75;
+                if (m.Data[2] != 255) senderDevice.Timber.Zones[2].TempSetpointNight = m.Data[2] - 75;
+                if (m.Data[3] != 255) senderDevice.Timber.Zones[3].TempSetpointNight = m.Data[3] - 75;
+                if (m.Data[4] != 255) senderDevice.Timber.Zones[4].TempSetpointNight = m.Data[4] - 75;
             }
-
             if (m.PGN == 27)
             {
-                if (m.Data[0] != 255) currentDevice.Timber.Zones[0].ManualPercent = m.Data[0];
-                if (m.Data[1] != 255) currentDevice.Timber.Zones[1].ManualPercent = m.Data[1];
-                if (m.Data[2] != 255) currentDevice.Timber.Zones[2].ManualPercent = m.Data[2];
-                if (m.Data[3] != 255) currentDevice.Timber.Zones[3].ManualPercent = m.Data[3];
-                if (m.Data[4] != 255) currentDevice.Timber.Zones[4].ManualPercent = m.Data[4];
-                if ((m.Data[5] & 3) != 3) currentDevice.Timber.Zones[0].ManualMode = (m.Data[5] & 3) != 0;
-                if (((m.Data[5] >> 2) & 3) != 3) currentDevice.Timber.Zones[1].ManualMode = ((m.Data[5] >> 2) & 3) != 0;
-                if (((m.Data[5] >> 4) & 3) != 3) currentDevice.Timber.Zones[2].ManualMode = ((m.Data[5] >> 4) & 3) != 0;
-                if (((m.Data[5] >> 6) & 3) != 3) currentDevice.Timber.Zones[3].ManualMode = ((m.Data[5] >> 6) & 3) != 0;
-                if ((m.Data[6] & 3) != 3) currentDevice.Timber.Zones[4].ManualMode = (m.Data[6] & 3) != 0;
+                if (m.Data[0] != 255) senderDevice.Timber.Zones[0].ManualPercent = m.Data[0];
+                if (m.Data[1] != 255) senderDevice.Timber.Zones[1].ManualPercent = m.Data[1];
+                if (m.Data[2] != 255) senderDevice.Timber.Zones[2].ManualPercent = m.Data[2];
+                if (m.Data[3] != 255) senderDevice.Timber.Zones[3].ManualPercent = m.Data[3];
+                if (m.Data[4] != 255) senderDevice.Timber.Zones[4].ManualPercent = m.Data[4];
+                if ((m.Data[5] & 3) != 3) senderDevice.Timber.Zones[0].ManualMode = (m.Data[5] & 3) != 0;
+                if (((m.Data[5] >> 2) & 3) != 3) senderDevice.Timber.Zones[1].ManualMode = ((m.Data[5] >> 2) & 3) != 0;
+                if (((m.Data[5] >> 4) & 3) != 3) senderDevice.Timber.Zones[2].ManualMode = ((m.Data[5] >> 4) & 3) != 0;
+                if (((m.Data[5] >> 6) & 3) != 3) senderDevice.Timber.Zones[3].ManualMode = ((m.Data[5] >> 6) & 3) != 0;
+                if ((m.Data[6] & 3) != 3) senderDevice.Timber.Zones[4].ManualMode = (m.Data[6] & 3) != 0;
             }
-
             if (m.PGN == 33)
             {
                 switch (m.Data[0])
                 {
                     case 1:
-                        currentDevice.Serial1 = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                        senderDevice.Serial1 = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
                         break;
                     case 2:
-                        currentDevice.Serial2 = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                        senderDevice.Serial2 = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
                         break;
                     case 3:
-                        currentDevice.Serial3 = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                        senderDevice.Serial3 = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
                         break;
                     default:
                         break;
                 }
 
             }
-
             if (m.PGN == 105)
             {
                 if (m.Data[0] == 1)
                 {
-                    currentDevice.fragmentAdress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
-                    Debug.WriteLine($"Adress set to 0X{currentDevice.fragmentAdress:X}");
-                    currentDevice.flagSetAdrDone = true;
+                    senderDevice.fragmentAdress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                    Debug.WriteLine($"Adress set to 0X{senderDevice.fragmentAdress:X}");
+                    senderDevice.flagSetAdrDone = true;
                 }
 
                 if (m.Data[0] == 3)
                 {
-                    currentDevice.receivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
-                    currentDevice.receivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
-                    Debug.WriteLine($"Data fragment len:{currentDevice.receivedFragmentLength},CRC:{currentDevice.receivedFragmentCrc:X}");
-                    currentDevice.flagDataGetDone = true;
+                    senderDevice.receivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
+                    senderDevice.receivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
+                    Debug.WriteLine($"Data fragment len:{senderDevice.receivedFragmentLength},CRC:{senderDevice.receivedFragmentCrc:X}");
+                    senderDevice.flagDataGetDone = true;
                 }
 
                 if (m.Data[0] == 5)
@@ -1771,7 +1733,7 @@ namespace OmniProtocol
                     if (m.Data[1] == 0)
                     {
                         Debug.WriteLine("Flash fragment successed");
-                        currentDevice.flagProgramDone = true;
+                        senderDevice.flagProgramDone = true;
                     }
                     else
                         Debug.WriteLine("Flash fragment failed");
@@ -1782,7 +1744,7 @@ namespace OmniProtocol
                     if (m.Data[1] == 0)
                     {
                         Debug.WriteLine("Memory erase confirmed");
-                        currentDevice.flagEraseDone = true;
+                        senderDevice.flagEraseDone = true;
                     }
                     else
                         Debug.WriteLine("Memory erase fail");
@@ -1791,57 +1753,13 @@ namespace OmniProtocol
 
             Messages.TryToAdd(m);
         }
-        public static void ParseParamsname(string filePath = "paramsname.h")
-        {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            StreamReader sr = new StreamReader(filePath, Encoding.GetEncoding(1251));
-            while (!sr.EndOfStream)
-            {
-                string tempString = sr.ReadLine();
-                List<string> tempList = new List<string>();
-
-                if (tempString.StartsWith("#define VAR"))
-                {
-
-                    Variable v = new Variable();
-                    tempString = tempString.Remove(0, 8);
-
-                    if (tempString.Split("//")[0].Split(' ').Last().ToUpper().StartsWith("0X"))
-                        v.Id = Convert.ToInt32(tempString.Split("//")[0].Split(' ').Last(), 16);
-                    else
-                        v.Id = Convert.ToInt32(tempString.Split("//")[0].Split(' ').Last(), 10);
-                    v.StringId = tempString.Split("//")[0].Split(' ')[0];
-                    tempString = tempString.Split("//")[1];
-                    var parts = tempString.Split(';');
-                    v.VarType = parts[0].Trim();
-                    v.Description = parts[1]?.Trim();
-                    if (parts.Length > 2) v.Formula = parts[2]?.Trim();
-                    if (parts.Length > 3) v.Format = parts[3]?.Trim();
-                    if (parts.Length > 4) v.ShortName = parts[4]?.Trim();
-                    Variables.Add(v.Id, v);
-                }
-
-                if (tempString.StartsWith("#define BB"))
-                {
-
-                    var b = new BbParameter();
-                    tempString = tempString.Remove(0, 8);
-
-                    b.Id = Convert.ToInt32(tempString.Split("//")[0].Split(' ').Last(), 10);
-                    b.StringId = tempString.Split("//")[0].Split(' ')[0];
-                    b.Description = tempString.Split("//")[1].Trim();
-                    BbParameters.Add(b.Id, b);
-                    BbParameterNames.Add(b.Id, b.Description);
-                }
-            }
-        }
 
         public async void ReadBlackBoxData(DeviceId id)
         {
             if (!Capture("Чтение параметров чёрного ящика")) return;
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(d => d.ID == id);
             if (currentDevice == null) return;
-            WaitingForBBErrors = false;
+            ReadingBBErrorsMode = false;
             OmniMessage msg = new()
             {
                 PGN = 8,
@@ -1854,26 +1772,37 @@ namespace OmniProtocol
             msg.Data[1] = 0xFF; //Read Param
 
             int counter = 0;
-            foreach (var p in BbParameters)
+            int parameterCount = 64;
+            for (int p = 0; p < parameterCount; p++)
             {
-
-                msg.Data[4] = (byte)(p.Key / 256);
-                msg.Data[5] = (byte)(p.Key % 256);
+                msg.Data[4] = (byte)(p / 256);
+                msg.Data[5] = (byte)(p % 256);
                 currentDevice.flagGetBBDone = false;
-                SendMessage(msg);
-                Debug.WriteLine($"Requesting BB parameter {p.Key}");
-                for (int i = 0; i < 100; i++)
+                for (int t = 0; t < 7; t++)
                 {
-                    if (currentDevice.flagGetBBDone) break;
-                    await Task.Delay(1);
-                    Debug.WriteLineIf(i == 99, $"Error reading parameter {p.Key} ({Omni.BbParameterNames[p.Key]})");
+                    SendMessage(msg);
+                    bool success = false;
+                    for (int i = 0; i < 50; i++)
+                    {
+                        if (currentDevice.flagGetBBDone)
+                        {
+                            success = true;
+                            break;
+                        }
+                        await Task.Delay(1);
+                        Debug.WriteLineIf(i == 49, $"Error reading parameter {p} ({GetString($"bb_{p}")}), attempt:{t}");
+                    }
+                    if (success) break;
+                    if (t == 6)
+                        Fail("Can't read black box parameter");
                 }
+
                 if (CancellationRequested)
                 {
                     Cancel();
                     return;
                 }
-                UpdatePercent(100 * counter++ / BbParameters.Count);
+                UpdatePercent(100 * counter++ / parameterCount);
             }
             Done();
         }
@@ -1917,14 +1846,11 @@ namespace OmniProtocol
         public async void ReadErrorsBlackBox(DeviceId id)
         {
             if (!Capture("Чтение ошибок из чёрного ящика")) return;
-            WaitingForBBErrors = true;
+            ReadingBBErrorsMode = true;
 
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
             UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
-            UIContext.Send(x => currentDevice.currentBBError = new BBError(), null);
-            UIContext.Send(x => currentDevice.BBErrors.Add(currentDevice.currentBBError), null);
-
 
             OmniMessage msg = new OmniMessage
             {
@@ -1936,7 +1862,7 @@ namespace OmniProtocol
             };
             msg.Data[0] = 0x13; //Read Errors
             msg.Data[1] = 0xFF;
-            for (int i = 0; i < 512; i++)
+            for (int i = 0; i < currentDevice.DeviceReference.BBErrorsLen; i++)
             {
                 msg.Data[4] = (byte)(i / 256);  //Pair count
                 msg.Data[5] = (byte)(i % 256);  //Pair count
@@ -1944,13 +1870,24 @@ namespace OmniProtocol
                 msg.Data[7] = 0x01; //Pair count LSB
 
                 currentDevice.flagGetBBDone = false;
-                SendMessage(msg);
 
-                for (int j = 0; j < 100; j++)
+                for (int t = 0; t < 7; t++)
                 {
-                    if (currentDevice.flagGetBBDone) break;
-                    await Task.Delay(1);
-                    Debug.WriteLineIf(j == 99, $"Error reading BB adress {i}");
+                    SendMessage(msg);
+                    bool success = false;
+                    for (int j = 0; j < 50; j++)
+                    {
+                        if (currentDevice.flagGetBBDone)
+                        {
+                            success = true;
+                            break;
+                        }
+                        await Task.Delay(1);
+                        Debug.WriteLineIf(j == 49, $"Error reading BB adress {i},attempt:{t + 1}");
+                    }
+                    if (success) break;
+                    if (t == 6)
+                        Fail("Can't read black box error");
                 }
                 if (CancellationRequested)
                 {
@@ -2026,15 +1963,26 @@ namespace OmniProtocol
                 msg.Data[3] = (byte)(parId % 256);
 
                 currentDevice.flagGetParamDone = false;
-                SendMessage(msg);
+                
 
-
-                for (int j = 0; j < 100; j++)
+                for (int t = 0; t < 7; t++)
                 {
-                    if (currentDevice.flagGetParamDone)
-                        break;
-                    await Task.Delay(1);
-                    Debug.WriteLineIf(j == 99, $"Error reading parameter {parId} ({GetString($"par_{parId}")}");
+                    SendMessage(msg);
+                    bool success = false;
+
+                    for (int j = 0; j < 50; j++)
+                    {
+                        if (currentDevice.flagGetParamDone)
+                        {
+                            success = true;
+                            break;
+                        }
+                        await Task.Delay(1);
+                        Debug.WriteLineIf(j == 49, $"Error reading parameter {parId}, attempt {t + 1})");
+                    }
+                    if (success) break;
+                    if (t == 6)
+                        Fail("Can't read parameter");
                 }
                 UpdatePercent(cnt++ * 100 / 601);
                 if (CancellationRequested)
@@ -2044,6 +1992,68 @@ namespace OmniProtocol
                 }
             }
             Done();
+        }
+
+        public async void RequestBasicData(DeviceId id)
+        {
+            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
+
+            for (int parId = 12; parId < 15; parId++) //ID1 ID2 ID3
+            {
+                OmniMessage msg = new();
+                msg.PGN = 7;
+                msg.TransmitterAddress = 6;
+                msg.TransmitterType = 126;
+                msg.ReceiverAddress = id.Address;
+                msg.ReceiverType = id.Type;
+                msg.Data[0] = 3; //Read Param
+                msg.Data[1] = 0xFF; //Read Param
+                msg.Data[2] = (byte)(parId / 256);
+                msg.Data[3] = (byte)(parId % 256);
+
+                currentDevice.flagGetParamDone = false;
+
+                for (int t = 0; t < 7; t++)
+                {
+                    SendMessage(msg);
+                    bool success = false;
+
+                    for (int j = 0; j < 50; j++)
+                    {
+                        if (currentDevice.flagGetParamDone)
+                        {
+                            success = true;
+                            break;
+                        }
+                        await Task.Delay(1);
+                        Debug.WriteLineIf(j == 49, $"Error reading parameter {parId}, attempt {t + 1})");
+                    }
+                    if (success) break;
+                }
+                await Task.Delay(100);
+
+                msg.PGN = 6;
+                msg.Data[0] = 0;
+                msg.Data[1] = 18;
+                for (int t = 0; t < 7; t++)
+                {
+                    currentDevice.flagGetVersionDone = false;
+                    SendMessage(msg);
+                    bool success = false;
+
+                    for (int j = 0; j < 50; j++)
+                    {
+                        if (currentDevice.flagGetParamDone)
+                        {
+                            success = true;
+                            break;
+                        }
+                        await Task.Delay(1);
+                        Debug.WriteLineIf(j == 49, $"Error reading version for {currentDevice.ToString()}");
+                    }
+                    if (success) break;
+                }
+            }
         }
 
         public async void SaveParameters(DeviceId id)
@@ -2148,7 +2158,6 @@ namespace OmniProtocol
             canAdapter = adapter;
             adapter.GotNewMessage += Adapter_GotNewMessage;
             SeedStaticData();
-            ParseParamsname();
 
         }
 

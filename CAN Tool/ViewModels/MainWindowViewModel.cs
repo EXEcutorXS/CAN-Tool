@@ -17,6 +17,7 @@ using Xceed.Words.NET;
 using Xceed.Document.NET;
 using Alignment = Xceed.Document.NET.Alignment;
 using CAN_Tool.Libs;
+using static CAN_Tool.Libs.Helper;
 
 namespace CAN_Tool.ViewModels
 {
@@ -410,20 +411,20 @@ namespace CAN_Tool.ViewModels
         public ICommand SaveReportCommand { get; }
         private void OnSaveReportCommandExecuted(object parameter)
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + selectedConnectedDevice.Name + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + selectedConnectedDevice.Name +" "+ DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
             DocX doc = DocX.Create(path);
             Paragraph headParagraph = doc.InsertParagraph();
-            headParagraph.AppendLine("Отчёт по устройству ").Append(selectedConnectedDevice.Name).Bold();
-            headParagraph.AppendLine("Серийный номер: ").Append(selectedConnectedDevice.SerialAsString).Bold();
-            headParagraph.AppendLine("Дата производства: ").Append(selectedConnectedDevice.ProductionDate.ToString()).Bold();
-            headParagraph.AppendLine("Сформирован: ").Append(DateTime.Now.ToLocalTime().ToString()).Bold();
+            headParagraph.AppendLine(GetString("t_device_report")+ ": ").Append(selectedConnectedDevice.Name).Bold();
+            headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(selectedConnectedDevice.SerialAsString).Bold();
+            headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(selectedConnectedDevice.ProductionDate.ToString()).Bold();
+            headParagraph.AppendLine(GetString("t_formed") + ": ").Append(DateTime.Now.ToLocalTime().ToString()).Bold();
             headParagraph.AppendLine();
-            headParagraph.AppendLine("Данные чёрного ящика:").FontSize(18);
+            headParagraph.AppendLine(GetString("t_common_black_box_data") + ":").FontSize(18);
             headParagraph.Alignment = Alignment.center;
             Paragraph dataParagraph = doc.InsertParagraph();
             foreach (var p in selectedConnectedDevice.BBValues)
             {
-                dataParagraph.Append(Omni.BbParameterNames.GetValueOrDefault(p.Id, $"PID_{p.Id}") + ": ");
+                dataParagraph.Append(GetString($"bb_{p.Id}") + ": ");
                 dataParagraph.Append(p.Value.ToString()).Bold();
                 dataParagraph.AppendLine();
             }
@@ -433,7 +434,7 @@ namespace CAN_Tool.ViewModels
             if (selectedConnectedDevice.BBErrors.Count > 0)
             {
                 var errorHeader = doc.InsertParagraph();
-                errorHeader.AppendLine($"В черном ящике найдено ошибок: {selectedConnectedDevice.BBErrors.Count} ").FontSize(17);
+                errorHeader.AppendLine($"{GetString("t_errors_found")+": "} {selectedConnectedDevice.BBErrors.Count}").FontSize(17);
                 errorHeader.AppendLine();
                 errorHeader.Alignment = Alignment.center;
                 var errorParagraph = doc.InsertParagraph();
@@ -444,10 +445,7 @@ namespace CAN_Tool.ViewModels
                     errorParagraph.AppendLine(e.Name).Bold();
                     errorParagraph.AppendLine();
                     foreach (var v in e.Variables)
-                    {
-                        if (v.Id != 65535)
-                            errorParagraph.AppendLine('\t' + v.Name + ": ").Append(v.Value.ToString()).Bold();
-                    }
+                        errorParagraph.AppendLine('\t' + v.Name + ": ").Append(v.Value.ToString()).Bold();
                     errorParagraph.AppendLine();
                 }
             }
@@ -617,7 +615,7 @@ namespace CAN_Tool.ViewModels
             using (StreamWriter sw = new StreamWriter(path))
             {
                 foreach (var v in SelectedConnectedDevice.Status)
-                    sw.Write(Omni.Variables[v.Id].ShortName + ";");
+                    sw.Write(GetString($"vars_{v.Id}") + ";");
                 sw.WriteLine();
                 for (int i = 0; i < SelectedConnectedDevice.LogCurrentPos; i++)
                 {
@@ -675,33 +673,11 @@ namespace CAN_Tool.ViewModels
             Task.Run(() => CanAdapter.Transmit(msg));
         }
 
-        private async void requestSerial(ConnectedDevice d)
-        {
-            await Task.Delay(200);
-            OmniMessage m = new();
-            m.TransmitterType = 126;
-            m.TransmitterAddress = 6;
-            m.ReceiverId = d.ID;
-            m.PGN = 7;
-            m.Data = new byte[8];
-            m.Data[0] = 3;
-            m.Data[1] = 0;
-            m.Data[2] = 0;
-            m.Data[3] = 12;
-            CanAdapter.Transmit(m);
-            await Task.Delay(200);
-            m.Data[3] = 13;
-            CanAdapter.Transmit(m);
-            await Task.Delay(200);
-            m.Data[3] = 14;
-            CanAdapter.Transmit(m);
-        }
-
         #region Chart
 
         private void TimerTick(object sender, EventArgs e)
         {
-            foreach (var d in AC2PInstance.ConnectedDevices) //Источник токов для ведения лога
+            foreach (var d in AC2PInstance.ConnectedDevices) //Источник тиков для ведения лога
             {
                 d.LogTick();
             }
@@ -717,12 +693,12 @@ namespace CAN_Tool.ViewModels
 
             foreach (ConnectedDevice d in AC2PInstance.ConnectedDevices) //Поддержание связи
             {
-                    OmniMessage msg = new();
-                    msg.TransmitterAddress = 6;
-                    msg.TransmitterType = 126;
-                    msg.PGN = 0;
-                    msg.ReceiverId = d.ID;
-                    CanAdapter.Transmit(msg);
+                OmniMessage msg = new();
+                msg.TransmitterAddress = 6;
+                msg.TransmitterType = 126;
+                msg.PGN = 0;
+                msg.ReceiverId = d.ID;
+                CanAdapter.Transmit(msg);
             }
         }
 
@@ -733,8 +709,6 @@ namespace CAN_Tool.ViewModels
         public void NewDeviceHandler(object sender, EventArgs e)
         {
             SelectedConnectedDevice = AC2PInstance.ConnectedDevices[^1];
-            firmwarePage.GetVersionCommand.Execute(null);
-            Task.Run(() => requestSerial(SelectedConnectedDevice));
         }
 
 
