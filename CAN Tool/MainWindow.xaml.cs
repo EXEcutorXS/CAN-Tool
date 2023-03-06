@@ -54,8 +54,7 @@ namespace CAN_Tool
         public ScottPlot.LineStyle[] LineStyles { set; get; }
         public ScottPlot.MarkerShape[] MarkShapes { set; get; }
 
-        public bool UseFarenheit { set; get; }
-        public bool UsePsi { set; get; }
+        public bool UseImperial { set; get; }
 
     }
 
@@ -138,6 +137,7 @@ namespace CAN_Tool
             menuColor.SelectedIndex = App.Settings.themeNumber;
             DarkModeCheckBox.IsChecked = App.Settings.isDark;
             ExpertMode.IsChecked = App.Settings.ExpertModeOn;
+            ImperialUnits.IsChecked = App.Settings.UseImperial;
         }
 
         private void MessageHandler(object sender, EventArgs args)
@@ -368,6 +368,11 @@ namespace CAN_Tool
             Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
             Application.Current.Resources.MergedDictionaries.Add(newResourceDictionary);
 
+        }
+
+        private void ImperialUnits_Checked(object sender, RoutedEventArgs e)
+        {
+            App.Settings.UseImperial = (bool)ImperialUnits.IsChecked;
         }
 
 
@@ -620,6 +625,8 @@ namespace CAN_Tool
                 vm.CanAdapter.Transmit(m);
             }
         }
+
+
     }
 
 

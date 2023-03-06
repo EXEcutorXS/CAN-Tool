@@ -16,6 +16,7 @@ using CAN_Tool.Libs;
 using CAN_Tool;
 using ScottPlot;
 using static CAN_Tool.Libs.Helper;
+using System.Net.Http.Headers;
 
 namespace OmniProtocol
 {
@@ -27,6 +28,10 @@ namespace OmniProtocol
         public bool multipack;
         public List<OmniPgnParameter> parameters = new();
     }
+
+
+
+    public enum UnitT { none, temperature, voltage, current, pressure, flow, rpm, rps, percent, second, minute, hour, day, month, year, hertz }
     public class OmniPgnParameter : ViewModel
     {
         public string ParamsName = "";//from ParamsName.h
@@ -38,7 +43,9 @@ namespace OmniProtocol
         internal double a = 1;         //коэффициент приведения
         internal double b = 0;         //смещение
         //value = rawData*a+b
-        public string Unit { get; set; } = "";//Единица измерения
+        //public string Unit { get; set; } = "";//Единица измерения
+
+        public UnitT UnitT { get; set; } = UnitT.none;
 
         private string format;
 
@@ -57,10 +64,12 @@ namespace OmniProtocol
             {
                 if (format != null)
                     return format;
+                if (UnitT == UnitT.temperature && App.Settings.UseImperial)
+                    return "0.0"; // For correct farenheit display
                 else
                 {
                     if (a == 1)
-                        return "";
+                        return "0";
                     else if (a >= 0.09)
                         return "0.0";
                     else
@@ -70,6 +79,31 @@ namespace OmniProtocol
             set => Set(ref format, value);
         }
 
+        public string Unit
+        {
+            get
+            {
+                switch (UnitT)
+                {
+                    case UnitT.none: return "";
+                    case UnitT.temperature:
+                        if (App.Settings.UseImperial)
+                            return "°F";
+                        else
+                            return "°C";
+                    case UnitT.voltage: return GetString("u_voltage");
+                    case UnitT.percent: return "%";
+                    case UnitT.flow:
+                        if (App.Settings.UseImperial)
+                            return GetString("u_hal_per_minute");
+                        else
+                            return GetString("u_litre_per_minute");
+                    case UnitT.current: return GetString("u_ampere");
+                    case UnitT.rpm: return GetString("u_rpm");
+                    default: return "";
+                }
+            }
+        }
 
         public string Decode(long rawValue)
         {
@@ -81,18 +115,19 @@ namespace OmniProtocol
             if (GetMeaning != null)
                 return GetMeaning((int)rawValue);
             if (Meanings != null && Meanings.ContainsKey((int)rawValue))
-                retString.Append(rawValue.ToString() + " - " + Meanings[(int)rawValue]);
+                retString.Append(rawValue.ToString() + " - " + GetString(Meanings[(int)rawValue]));
             else
             {
                 if (rawValue == Math.Pow(2, BitLength) - 1)
-                    retString.Append($"Нет данных({rawValue})");
+                    retString.Append(GetString("t_no_data") + $" ({rawValue})");
                 else
                 {
-
                     double rawDouble = (double)rawValue;
                     if (Signed && rawValue > Math.Pow(2, BitLength - 1))
                         rawDouble *= -1;
-                    double value = rawDouble * a + b;
+                    double value = ImperialConverter(rawDouble * a + b, UnitT);
+
+
                     retString.Append(value.ToString(OutputFormat) + " " + Unit);
                 }
             }
@@ -388,11 +423,11 @@ namespace OmniProtocol
             else
             {
                 if (rawValue == Math.Pow(2, p.BitLength) - 1)
-                    retString.Append($"Нет данных({rawValue})");
+                    retString.Append($"{GetString("t_no_data")}({rawValue})");
                 else
                 {
                     double rawDouble = (double)rawValue;
-                    double value = rawDouble * p.a + p.b;
+                    double value = ImperialConverter(rawDouble * p.a + p.b, p.UnitT);
                     retString.Append(value.ToString(p.OutputFormat) + p.Unit);
                 }
             }
@@ -618,8 +653,9 @@ namespace OmniProtocol
 
         public double Value
         {
-            get => rawVal * assignedParameter.a + assignedParameter.b;
+            get => ImperialConverter(rawVal * assignedParameter.a + assignedParameter.b, assignedParameter.UnitT);
         }
+
 
         public string FormattedValue
         {
@@ -1383,6 +1419,7 @@ namespace OmniProtocol
     public partial class Omni : ViewModel
     {
 
+
         public event EventHandler NewDeviceAquired;
 
         private SynchronizationContext UIContext;
@@ -1394,7 +1431,7 @@ namespace OmniProtocol
         static readonly Dictionary<int, string> defMeaningsAllow = new() { { 0, "Разрешено" }, { 1, "Запрещёно" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
         static readonly Dictionary<int, string> Stages = new() { { 0, "STAGE_Z" }, { 1, "STAGE_P" }, { 2, "STAGE_H" }, { 3, "STAGE_W" }, { 4, "STAGE_F" }, { 5, "STAGE_T" }, { 6, "STAGE_M" } };
 
-
+        public bool UseImperial { set; get; }
 
         public static Dictionary<int, PGN> PGNs = new();
 
@@ -1430,6 +1467,7 @@ namespace OmniProtocol
 
         private void UpdatePercent(int p) => CurrentTask.UpdatePercent(p);
 
+
         private void ProcessCanMessage(CanMessage msg)
         {
 
@@ -1443,13 +1481,13 @@ namespace OmniProtocol
                 senderDevice = new ConnectedDevice(id);
                 ConnectedDevices.Add(senderDevice);
                 NewDeviceAquired?.Invoke(this, null);
-                Task.Run(()=>RequestBasicData(id));
+                Task.Run(() => RequestBasicData(id));
             }
 
 
             if (!PGNs.ContainsKey(m.PGN)) return; //Такого PGN нет в библиотеке
 
-            
+
 
             foreach (OmniPgnParameter p in PGNs[m.PGN].parameters)
             {
@@ -1476,13 +1514,13 @@ namespace OmniProtocol
                     if (sv.Id == 5)
                         senderDevice.Parameters.Voltage = rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b;
                     if (sv.Id == 6)
-                        senderDevice.Parameters.FlameSensor = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.FlameSensor = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                     if (sv.Id == 7)
-                        senderDevice.Parameters.BodyTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.BodyTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                     if (sv.Id == 8)
-                        senderDevice.Parameters.PanelTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.PanelTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                     if (sv.Id == 10)
-                        senderDevice.Parameters.InletTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.InletTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                     if (sv.Id == 15)
                         senderDevice.Parameters.RevSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 16)
@@ -1494,9 +1532,9 @@ namespace OmniProtocol
                     if (sv.Id == 24)
                         senderDevice.Parameters.Error = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                     if (sv.Id == 40)
-                        senderDevice.Parameters.LiquidTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.LiquidTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                     if (sv.Id == 41)
-                        senderDevice.Parameters.OverheatTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        senderDevice.Parameters.OverheatTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b,sv.AssignedParameter.UnitT);
 
 
 
@@ -1504,7 +1542,7 @@ namespace OmniProtocol
 
                 }
             }
-            
+
             if (m.PGN == 2) //Подтверждение выполненной комманды
             {
 
@@ -1535,7 +1573,7 @@ namespace OmniProtocol
                         Debug.WriteLine($"{GetString($"par_{parameterId}")}={parameterValue}");
                     }
                     else
-                        if (GotString($"par_{parameterId}"))
+                        if (GotResource($"par_{parameterId}"))
                         Debug.WriteLine($"{GetString($"par_{parameterId}")} not supported");
                     //Серийник в отдельной переменной
                     if (parameterId == 12)
@@ -1949,7 +1987,7 @@ namespace OmniProtocol
 
             for (int parId = 0; parId < 601; parId++) //Currently we have 600 parameters
             {
-                if (!GotString($"par_{parId}")) // Если нет параметра в ресурсах - не запрашиваем ???
+                if (!GotResource($"par_{parId}")) // Если нет параметра в ресурсах - не запрашиваем ???
                     continue;
                 OmniMessage msg = new();
                 msg.PGN = 7;
@@ -1963,7 +2001,7 @@ namespace OmniProtocol
                 msg.Data[3] = (byte)(parId % 256);
 
                 currentDevice.flagGetParamDone = false;
-                
+
 
                 for (int t = 0; t < 7; t++)
                 {
@@ -2116,7 +2154,6 @@ namespace OmniProtocol
 
         public void SendMessage(OmniMessage m)
         {
-            //Debug.WriteLine("-> " + (new AC2PMessage(m)).ToString());
             canAdapter.Transmit(m);
         }
         public void SendMessage(DeviceId from, DeviceId to, int pgn, byte[] data)

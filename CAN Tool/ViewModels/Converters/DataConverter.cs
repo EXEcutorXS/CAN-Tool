@@ -193,4 +193,30 @@ namespace CAN_Tool.ViewModels.Converters
         }
     }
 
+    public class FarenheitConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+                if (App.Settings.UseImperial)
+                    return (int)value * 1.8 + 32;
+                else
+                    return value;
+            else
+                return null;
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+                if (App.Settings.UseImperial)
+                    return ((int)value - 32) / 1.8;
+                else
+                    return value;
+            else
+                return null;
+        }
+    }
+
 }

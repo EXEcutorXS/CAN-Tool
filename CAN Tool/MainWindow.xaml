@@ -10,6 +10,8 @@
         <c:HcuToVisibleConverter x:Key="OnlyForHcu" />
         <c:StateToBorderBrushConverter x:Key="BoolToBrush" />
         <c:BoolToOpacity x:Key="BoolToOpacity" />
+        <c:FarenheitConverter x:Key="ToFarenheit" />
+        
     </Window.Resources>
     <Window.DataContext>
         <vm:MainWindowViewModel />
@@ -33,17 +35,17 @@
     <DockPanel>
         <StatusBar x:Name="MyStatusbar" DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
             <StatusBarItem HorizontalAlignment="Left">
-                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
+                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniProtocolInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Left">
-                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.LastOperationDuration,StringFormat=Done in {0} }" Margin="10 0 10 0"></TextBlock>
+                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniProtocolInstance.CurrentTask.LastOperationDuration,StringFormat=Done in {0} }" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Left">
-                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding AC2PInstance.CurrentTask.FailReason}" Margin="10 0 10 0"></TextBlock>
+                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniProtocolInstance.CurrentTask.FailReason}" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
-            <ProgressBar Width="300" Value="{Binding AC2PInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></ProgressBar>
+            <ProgressBar Width="300" Value="{Binding OmniProtocolInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0" Visibility="{Binding OmniProtocolInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></ProgressBar>
             <StatusBarItem HorizontalAlignment="Left">
-                <Button Content="{DynamicResource b_cancel}" Command="{Binding CancelOperationCommand}" Margin="5" Visibility="{Binding AC2PInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></Button>
+                <Button Content="{DynamicResource b_cancel}" Command="{Binding CancelOperationCommand}" Margin="5" Visibility="{Binding OmniProtocolInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></Button>
             </StatusBarItem>
 
             <StatusBarItem HorizontalAlignment="Right" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -72,6 +74,7 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
                         <CheckBox x:Name="ExpertMode" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="{DynamicResource b_expert}" FontSize="20"  Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
                         <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Dark" FontSize="20" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
+                        <CheckBox x:Name="ImperialUnits" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Imperial" FontSize="20" IsChecked="{Binding OmniProtocolInstance.UseImperial}" Checked="ImperialUnits_Checked" Unchecked="ImperialUnits_Checked"></CheckBox>
                         <ComboBox Style="{DynamicResource MaterialDesignComboBox}" x:Name="menuColor" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuColor_SelectionChanged" ItemsSource="{Binding Brushes}">
                             <ComboBox.ItemTemplate>
                                 <ItemContainerTemplate>
@@ -108,7 +111,7 @@
         </Grid>
 
         <DockPanel>
-            <ListBox DockPanel.Dock="Top" ItemsSource="{Binding AC2PInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}">
+            <ListBox DockPanel.Dock="Top" ItemsSource="{Binding OmniProtocolInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}">
 
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -124,7 +127,7 @@
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_common}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
-                    <DockPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullableToVisibilityConverter}}">
+                    <DockPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullableToVisibilityConverter},TargetNullValue=Visible}">
                         <TextBlock Grid.Row="4" x:Name="StageTextBlock" DockPanel.Dock="Top" HorizontalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}" FontSize="30" Margin="8" TextWrapping="WrapWithOverflow" />
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                             <StackPanel DockPanel.Dock="Top">
@@ -355,9 +358,9 @@
                                 <Button x:Name="HeaterButton" Style="{StaticResource MaterialDesignFlatButton}" FontSize="30" Height="50" Margin="10" Click="HeaterButton_Click">Heater</Button>
                                 <CheckBox Margin="10" Style="{StaticResource MaterialDesignActionDarkCheckBox}" IsChecked="{Binding SelectedConnectedDevice.Timber.ElementEbabled,Mode=OneWay}" IsEnabled="False"></CheckBox>
                                 <Button x:Name="ElementButton" Style="{StaticResource MaterialDesignFlatButton}" FontSize="30"  Height="50" Margin="10" Click="ElementButton_Click">Element</Button>
-                                <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Liquid level: {0},Path=SelectedConnectedDevice.Timber.LiquidLevel}"/>
+                                <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Liquid level: {0:d1},Path=SelectedConnectedDevice.Timber.LiquidLevel}"/>
                                 <ProgressBar Margin="15" Orientation="Vertical" Maximum="7" Value="{Binding SelectedConnectedDevice.Timber.LiquidLevel}" Height="20" />
-                                <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Outside: {0}°,Path=SelectedConnectedDevice.Timber.OutsideTemperature}" />
+                                <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Outside: {0:f1}°,Path=SelectedConnectedDevice.Timber.OutsideTemperature,Converter={StaticResource ToFarenheit}}" />
                                 
                             </StackPanel>
                             <StackPanel Orientation="Vertical">
@@ -366,13 +369,13 @@
                                         <StackPanel Orientation="Horizontal">
                                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Sun" Foreground="{DynamicResource MaterialDesignBody}" />
                                             <ScrollBar x:Name="DaytimeScroll" Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointDay,Mode=OneWay}" ValueChanged="DayTimeChanged"/>
-                                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointDay,StringFormat={}{0}°}"></TextBlock>
+                                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointDay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
                                             
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Moon" Foreground="{DynamicResource MaterialDesignBody}" />
                                             <ScrollBar x:Name="NightTimeScroll" Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointNight,Mode=OneWay}" ValueChanged="NightTimeChanged"></ScrollBar>
-                                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointNight,StringFormat={}{0}°}"></TextBlock>
+                                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointNight,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
                                             
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
@@ -396,7 +399,7 @@
                                                 <RadioButton Style="{StaticResource MaterialDesignChoiceChipAccentRadioButton}" GroupName="Zones" Height="50" FontSize="30" IsChecked="{Binding Selected}" IsEnabled="{Binding Connected,Mode=OneWay}" Checked="RadioChecked">
                                                     <StackPanel Orientation="Horizontal">
                                                         <CheckBox Margin="5" Style="{StaticResource MaterialDesignActionDarkCheckBox}" IsChecked="{Binding State,Mode=OneWay}" IsEnabled="False"></CheckBox>
-                                                        <TextBlock VerticalAlignment="Center" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0}°}" />
+                                                        <TextBlock VerticalAlignment="Center" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0}°,Converter={StaticResource ToFarenheit}}" />
                                                         <fa:ImageAwesome Height="30" Icon="Solid_Fan" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" >
                                                         </fa:ImageAwesome>
                                                         <ProgressBar Margin="5" Height="10" Orientation="Vertical" Maximum="100" Value="{Binding CurrentPwm}" />
@@ -417,7 +420,7 @@
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="Solid_MailBulk" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_messages}"></TextBlock>
+                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_messages}" />
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel>
@@ -445,7 +448,7 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding AC2PInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
+                            <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding OmniProtocolInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
                                 <DataGrid.RowStyle>
                                     <Style TargetType="DataGridRow">
                                         <Style.Triggers>

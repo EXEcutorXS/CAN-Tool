@@ -164,7 +164,7 @@ namespace CAN_Tool.ViewModels
                 VM.SelectedConnectedDevice.flagProgramDone = false;
                 if (i == 3)
                 {
-                    VM.AC2PInstance.CurrentTask.onFail("Can't flash memory");
+                    VM.OmniProtocolInstance.CurrentTask.onFail("Can't flash memory");
                     return;
                 }
                 startFlashing();
@@ -186,7 +186,7 @@ namespace CAN_Tool.ViewModels
                 VM.SelectedConnectedDevice.flagTransmissionCheck = false;
                 if (i == 5)
                 {
-                    VM.AC2PInstance.CurrentTask.onFail("Can't check transmission result");
+                    VM.OmniProtocolInstance.CurrentTask.onFail("Can't check transmission result");
                     return false;
                 }
                 VM.CanAdapter.Transmit(msg);
@@ -222,7 +222,7 @@ namespace CAN_Tool.ViewModels
                 VM.SelectedConnectedDevice.flagSetAdrDone = false;
                 if (i == 3)
                 {
-                    VM.AC2PInstance.CurrentTask.onFail("Can't set address");
+                    VM.OmniProtocolInstance.CurrentTask.onFail("Can't set address");
                     return;
                 }
                 VM.CanAdapter.Transmit(msg);
@@ -253,10 +253,10 @@ namespace CAN_Tool.ViewModels
             {
                 setFragmentAdr(f);
 
-                if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested)
+                if (VM.OmniProtocolInstance.CurrentTask.CTS.IsCancellationRequested)
                     return;
 
-                if (k == 15) { VM.AC2PInstance.CurrentTask.onFail("Can't transmit data pack"); return; }
+                if (k == 15) { VM.OmniProtocolInstance.CurrentTask.onFail("Can't transmit data pack"); return; }
                 Debug.WriteLine($"Try: {k}");
                 crc = 0;
                 len = 0;
@@ -290,28 +290,28 @@ namespace CAN_Tool.ViewModels
         private void updateFirmware(List<CodeFragment> fragments)
         {
             Debug.WriteLine("Starting Firmware updating procedure");
-            VM.AC2PInstance.CurrentTask.Capture("Memory Erasing");
+            VM.OmniProtocolInstance.CurrentTask.Capture("Memory Erasing");
             Debug.WriteLine("Starting flash erasing");
             for (int i = 0; i < 4; i++)
             {
-                if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't erase memory"); return; }
+                if (i == 3) { VM.OmniProtocolInstance.CurrentTask.onFail("Can't erase memory"); return; }
                 eraseFlash();
                 if (WaitForFlag(ref VM.SelectedConnectedDevice.flagEraseDone, 5000)) break;
             }
 
-            VM.AC2PInstance.CurrentTask.onDone();
+            VM.OmniProtocolInstance.CurrentTask.onDone();
 
-            VM.AC2PInstance.CurrentTask.Capture("Programming...");
+            VM.OmniProtocolInstance.CurrentTask.Capture("Programming...");
 
             int cnt = 0;
             foreach (var f in fragments)
             {
                 flashFragment(f);
-                VM.AC2PInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
-                if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested) return;
+                VM.OmniProtocolInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
+                if (VM.OmniProtocolInstance.CurrentTask.CTS.IsCancellationRequested) return;
             }
             Debug.WriteLine("Firmware updating success");
-            VM.AC2PInstance.CurrentTask.onDone();
+            VM.OmniProtocolInstance.CurrentTask.onDone();
 
         }
         #region oldVersionBootloader

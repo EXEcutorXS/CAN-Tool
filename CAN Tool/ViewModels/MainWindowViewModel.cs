@@ -54,7 +54,7 @@ namespace CAN_Tool.ViewModels
         public CanAdapter CanAdapter { get => _canAdapter; }
 
         Omni _AC2PInstance;
-        public Omni AC2PInstance => _AC2PInstance;
+        public Omni OmniProtocolInstance => _AC2PInstance;
 
         ConnectedDevice selectedConnectedDevice;
         public ConnectedDevice SelectedConnectedDevice
@@ -195,7 +195,7 @@ namespace CAN_Tool.ViewModels
         private void OnClosePortCommandExecuted(object parameter)
         {
             CanAdapter.PortClose();
-            AC2PInstance.ConnectedDevices.Clear();
+            OmniProtocolInstance.ConnectedDevices.Clear();
         }
         private bool CanClosePortCommandExecute(object parameter) => (CanAdapter.PortOpened);
         #endregion
@@ -327,9 +327,9 @@ namespace CAN_Tool.ViewModels
         public ICommand CancelOperationCommand { get; }
         private void OnCancelOperationCommandExecuted(object parameter)
         {
-            AC2PInstance.CurrentTask.onCancel();
+            OmniProtocolInstance.CurrentTask.onCancel();
         }
-        private bool CanCancelOperationCommandExecute(object parameter) => (AC2PInstance.CurrentTask.Occupied);
+        private bool CanCancelOperationCommandExecute(object parameter) => (OmniProtocolInstance.CurrentTask.Occupied);
         #endregion
 
         #region ConfigCommands
@@ -337,30 +337,30 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadConfigCommand { get; }
         private void OnReadConfigCommandExecuted(object parameter)
         {
-            AC2PInstance.ReadAllParameters(selectedConnectedDevice.ID);
+            OmniProtocolInstance.ReadAllParameters(selectedConnectedDevice.ID);
         }
         private bool CanReadConfigCommandExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniProtocolInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region SaveConfigCommand
         public ICommand SaveConfigCommand { get; }
         private void OnSaveConfigCommandExecuted(object parameter)
         {
-            AC2PInstance.SaveParameters(selectedConnectedDevice.ID);
+            OmniProtocolInstance.SaveParameters(selectedConnectedDevice.ID);
         }
         private bool CanSaveConfigCommandExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count > 0 && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniProtocolInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count > 0 && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region ResetConfigCommand
         public ICommand ResetConfigCommand { get; }
         private void OnResetConfigCommandExecuted(object parameter)
         {
-            AC2PInstance.ResetParameters(selectedConnectedDevice.ID);
+            OmniProtocolInstance.ResetParameters(selectedConnectedDevice.ID);
         }
         private bool CanResetConfigCommandExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniProtocolInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
         #endregion
 
@@ -370,40 +370,40 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadBlackBoxDataCommand { get; }
         private void OnReadBlackBoxDataCommandExecuted(object parameter)
         {
-            AC2PInstance.ReadBlackBoxData(selectedConnectedDevice.ID);
+            OmniProtocolInstance.ReadBlackBoxData(selectedConnectedDevice.ID);
         }
         private bool CanReadBlackBoxDataExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniProtocolInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region ReadBlackBoxErrorsCommand
         public ICommand ReadBlackBoxErrorsCommand { get; }
         private void OnReadBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.ReadErrorsBlackBox(selectedConnectedDevice.ID));
+            Task.Run(() => OmniProtocolInstance.ReadErrorsBlackBox(selectedConnectedDevice.ID));
         }
         private bool CanReadBlackBoxErrorsExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniProtocolInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region EraseBlackBoxErrorsCommand
         public ICommand EraseBlackBoxErrorsCommand { get; }
         private void OnEraseBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.EraseErrorsBlackBox(selectedConnectedDevice.ID));
+            Task.Run(() => OmniProtocolInstance.EraseErrorsBlackBox(selectedConnectedDevice.ID));
         }
         private bool CanEraseBlackBoxErrorsExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniProtocolInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
 
         #region EraseBlackBoxDataCommand
         public ICommand EraseBlackBoxDataCommand { get; }
         private void OnEraseBlackBoxDataCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.EraseCommonBlackBox(selectedConnectedDevice.ID));
+            Task.Run(() => OmniProtocolInstance.EraseCommonBlackBox(selectedConnectedDevice.ID));
         }
         private bool CanEraseBlackBoxDataExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !AC2PInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniProtocolInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
         #endregion
         #endregion
 
@@ -411,10 +411,10 @@ namespace CAN_Tool.ViewModels
         public ICommand SaveReportCommand { get; }
         private void OnSaveReportCommandExecuted(object parameter)
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + selectedConnectedDevice.Name +" "+ DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + selectedConnectedDevice.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
             DocX doc = DocX.Create(path);
             Paragraph headParagraph = doc.InsertParagraph();
-            headParagraph.AppendLine(GetString("t_device_report")+ ": ").Append(selectedConnectedDevice.Name).Bold();
+            headParagraph.AppendLine(GetString("t_device_report") + ": ").Append(selectedConnectedDevice.Name).Bold();
             headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(selectedConnectedDevice.SerialAsString).Bold();
             headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(selectedConnectedDevice.ProductionDate.ToString()).Bold();
             headParagraph.AppendLine(GetString("t_formed") + ": ").Append(DateTime.Now.ToLocalTime().ToString()).Bold();
@@ -434,7 +434,7 @@ namespace CAN_Tool.ViewModels
             if (selectedConnectedDevice.BBErrors.Count > 0)
             {
                 var errorHeader = doc.InsertParagraph();
-                errorHeader.AppendLine($"{GetString("t_errors_found")+": "} {selectedConnectedDevice.BBErrors.Count}").FontSize(17);
+                errorHeader.AppendLine($"{GetString("t_errors_found") + ": "} {selectedConnectedDevice.BBErrors.Count}").FontSize(17);
                 errorHeader.AppendLine();
                 errorHeader.Alignment = Alignment.center;
                 var errorParagraph = doc.InsertParagraph();
@@ -462,7 +462,7 @@ namespace CAN_Tool.ViewModels
         private void OnSendCustomMessageCommandExecuted(object parameter)
         {
             CustomMessage.TransmitterId = new DeviceId(126, 6);
-            AC2PInstance.SendMessage(CustomMessage);
+            OmniProtocolInstance.SendMessage(CustomMessage);
         }
         private bool CanSendCustomMessageCommandExecute(object parameter)
         {
@@ -497,12 +497,12 @@ namespace CAN_Tool.ViewModels
         public ICommand PumpCheckCommand { get; }
         private void OnPumpCheckCommandExecuted(object parameter)
         {
-            Task.Run(() => AC2PInstance.CheckPump(selectedConnectedDevice));
+            Task.Run(() => OmniProtocolInstance.CheckPump(selectedConnectedDevice));
         }
 
         private bool CanPumpCheckCommandExecute(object parameter)
         {
-            return (deviceSelected(null) && selectedConnectedDevice.ManualMode && !AC2PInstance.CurrentTask.Occupied);
+            return (deviceSelected(null) && selectedConnectedDevice.ManualMode && !OmniProtocolInstance.CurrentTask.Occupied);
         }
         #endregion
 
@@ -677,7 +677,7 @@ namespace CAN_Tool.ViewModels
 
         private void TimerTick(object sender, EventArgs e)
         {
-            foreach (var d in AC2PInstance.ConnectedDevices) //Источник тиков для ведения лога
+            foreach (var d in OmniProtocolInstance.ConnectedDevices) //Источник тиков для ведения лога
             {
                 d.LogTick();
             }
@@ -691,7 +691,7 @@ namespace CAN_Tool.ViewModels
                         OnChartDrawCommandExecuted(null);
                 }
 
-            foreach (ConnectedDevice d in AC2PInstance.ConnectedDevices) //Поддержание связи
+            foreach (ConnectedDevice d in OmniProtocolInstance.ConnectedDevices) //Поддержание связи
             {
                 OmniMessage msg = new();
                 msg.TransmitterAddress = 6;
@@ -708,7 +708,7 @@ namespace CAN_Tool.ViewModels
 
         public void NewDeviceHandler(object sender, EventArgs e)
         {
-            SelectedConnectedDevice = AC2PInstance.ConnectedDevices[^1];
+            SelectedConnectedDevice = OmniProtocolInstance.ConnectedDevices[^1];
         }
 
 
@@ -732,7 +732,7 @@ namespace CAN_Tool.ViewModels
 
             _canAdapter = new CanAdapter();
             _AC2PInstance = new Omni(CanAdapter);
-            AC2PInstance.plot = myChart;
+            OmniProtocolInstance.plot = myChart;
             FirmwarePage = new(this);
 
             System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
@@ -743,7 +743,7 @@ namespace CAN_Tool.ViewModels
 
 
 
-            AC2PInstance.NewDeviceAquired += NewDeviceHandler;
+            OmniProtocolInstance.NewDeviceAquired += NewDeviceHandler;
 
 
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
