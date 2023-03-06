@@ -564,6 +564,7 @@
                                 <DataGrid x:Name="DataSet" Margin="20" DockPanel.Dock="Left" ItemsSource="{Binding SelectedConnectedDevice.Status,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" SelectionChanged="DataSet_SelectionChanged">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Variable" Binding="{Binding Path=Name}" IsReadOnly="True"></DataGridTextColumn>
+                                        <DataGridTextColumn Header="Value" Binding="{Binding Path=FormattedValue}" IsReadOnly="True"></DataGridTextColumn>
                                         <DataGridCheckBoxColumn Header="Show" Binding="{Binding Path=Display}"></DataGridCheckBoxColumn>
                                         <DataGridTemplateColumn Header="Color">
                                             <DataGridTemplateColumn.CellTemplate>
@@ -574,7 +575,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Value" Binding="{Binding Path=FormattedValue}" IsReadOnly="True"></DataGridTextColumn>
+                                        
                                         <DataGridComboBoxColumn Header="Width" SelectedItemBinding="{Binding Path=LineWidth}">
                                             <DataGridComboBoxColumn.ItemsSource>
                                                 <col:ArrayList>

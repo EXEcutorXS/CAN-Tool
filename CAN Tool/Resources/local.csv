@@ -78,6 +78,7 @@ t_manufacturing_date	Manufacturing date	Дата производства
 t_formed	Formed	Отчёт сформирован
 t_common_black_box_data	Black box common data	Общие данные из чёрного ящика
 t_errors_found	Stored errors found	Ошибок в памяти
+t_no_data No data	Нет данных
 
 e_1	Overheat	Перегрев
 e_2	Overheat	Перегрев
@@ -619,5 +620,5 @@ d_35	Binar 10B	Бинар 10Б
 d_123	Bootloader	Программный загрузчик
 d_124	Mobile App	Мобильное приложение
 d_126	Control device	Устройство управления
-
-
+u_voltage	V	В
+u_pressure	kPa	кПа

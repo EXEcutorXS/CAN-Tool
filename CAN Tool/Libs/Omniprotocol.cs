@@ -100,6 +100,11 @@ namespace OmniProtocol
                             return GetString("u_litre_per_minute");
                     case UnitT.current: return GetString("u_ampere");
                     case UnitT.rpm: return GetString("u_rpm");
+                    case UnitT.pressure:
+                        if (App.Settings.UseImperial)
+                            return "PSI";
+                        else
+                            return GetString("u_kPa");
                     default: return "";
                 }
             }

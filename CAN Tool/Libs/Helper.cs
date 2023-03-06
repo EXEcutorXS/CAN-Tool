@@ -27,7 +27,7 @@ namespace CAN_Tool.Libs
                 switch (type)
                 {
                     case UnitT.temperature: return val * 1.8 + 32;
-                    case UnitT.pressure: return val / 14.5;
+                    case UnitT.pressure: return val * 0.14503773773;
                     case UnitT.flow: return val /= 4.5461;
                 }
             return val;
