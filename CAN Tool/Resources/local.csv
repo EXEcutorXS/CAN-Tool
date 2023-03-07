@@ -78,7 +78,7 @@ t_manufacturing_date	Manufacturing date	Дата производства
 t_formed	Formed	Отчёт сформирован
 t_common_black_box_data	Black box common data	Общие данные из чёрного ящика
 t_errors_found	Stored errors found	Ошибок в памяти
-t_no_data No data	Нет данных
+t_no_data	No data	Нет данных
 
 e_1	Overheat	Перегрев
 e_2	Overheat	Перегрев
@@ -426,6 +426,76 @@ var_61	Tank temperature	Температура бака в системах от
 
 var_62	Glow plug state (ON/OFF)	Состояние свечи (ВКЛ/ВЫКЛ)
 
+var_63	Heater button	Кнопка нагревателя
+var_64	Element button	Кнопка ТЭНа
+
+var_65	Zone 1 State	Состояние зоны 1 (ВКЛ/ВЫКЛ)
+var_66	Zone 2 State	Состояние зоны 2 (ВКЛ/ВЫКЛ)
+var_67	Zone 3 State	Состояние зоны 3 (ВКЛ/ВЫКЛ)
+var_68	Zone 4 State	Состояние зоны 4 (ВКЛ/ВЫКЛ)
+var_69	Zone 5 State	Состояние зоны 5 (ВКЛ/ВЫКЛ)
+
+var_70	Zone 1 Temp	Температура в зоне 1
+var_71	Zone 2 Temp	Температура в зоне 2
+var_72	Zone 3 Temp	Температура в зоне 3
+var_73	Zone 4 Temp	Температура в зоне 4
+var_74	Zone 5 Temp	Температура в зоне 5
+
+var_75	Zone1 Setpoint Day	Уставка день зоны 1
+var_76	Zone2 Setpoint Day	Уставка день зоны 2
+var_77	Zone3 Setpoint Day	Уставка день зоны 3
+var_78	Zone4 Setpoint Day	Уставка день зоны 4
+var_79	Zone5 Setpoint Day	Уставка день зоны 5
+
+var_80	Zone1 Setpoint Night	Уставка ночь зоны 1
+var_81	Zone2 Setpoint Night	Уставка ночь зоны 2
+var_82	Zone3 Setpoint Night	Уставка ночь зоны 3
+var_83	Zone4 Setpoint Night	Уставка ночь зоны 4
+var_84	Zone5 Setpoint Night	Уставка ночь зоны 5
+
+var_85	Zone 1 Fan Manual Mode	Ручной режим зона 1
+var_86	Zone 2 Fan Manual Mode	Ручной режим зона 2
+var_87	Zone 3 Fan Manual Mode	Ручной режим зона 3
+var_88	Zone 4 Fan Manual Mode	Ручной режим зона 4
+var_89	Zone 5 Fan Manual Mode	Ручной режим зона 5
+
+var_90	Zone 1 Fan Manual percent	Процент мощности зоны 1
+var_91	Zone 2 Fan Manual percent	Процент мощности зоны 2
+var_92	Zone 3 Fan Manual percent	Процент мощности зоны 3
+var_93	Zone 4 Fan Manual percent	Процент мощности зоны 4
+var_94	Zone 5 Fan Manual percent	Процент мощности зоны 5
+
+var_95	Zone 1 PWM current percent	Текущее значение ШИМ зоны 1
+var_96	Zone 2 PWM current percent	Текущее значение ШИМ зоны 2
+var_97	Zone 3 PWM current percent	Текущее значение ШИМ зоны 3
+var_98	Zone 4 PWM current percent	Текущее значение ШИМ зоны 4
+var_99	Zone 5 PWM current percent	Текущее значение ШИМ зоны 5
+
+var_100	Zone 1 PWM Setpoint	Заданное значение ШИМ зоны 1
+var_101	Zone 2 PWM Setpoint	Заданное значение ШИМ зоны 2
+var_102	Zone 3 PWM Setpoint	Заданное значение ШИМ зоны 3
+var_103	Zone 4 PWM Setpoint	Заданное значение ШИМ зоны 4
+var_104	Zone 5 PWM Setpoint	Заданное значение ШИМ зоны 5
+
+var_105	Liquid level	Уровень в баке
+var_106	Tank temperature	Температура в баке
+var_107	Outdoor temperature	Забортная температура
+var_108	Domestic water drain	Разбор воды
+
+var_109	Heater pump state	Помпа нагревателя
+var_110	Pump 1 state	Помпа 1
+var_111	Pump 2 state	Помпа 2
+var_112	Pump 3 state	Помпа 3
+
+var_113	Second	Секунда
+var_114	Minute	Минута
+var_115	Hour	Час
+var_116	Day	День
+var_117	Month	Месяц
+var_118	Year	Год
+
+
+
 vars_1	Stage	Стадия
 vars_2	Mode	Режим
 vars_3	Tot.tim	Вр.Работы
@@ -494,6 +564,74 @@ vars_60	Press	Давл.,кПа
 vars_61	Ttank	Тбака
 
 vars_62	Relay	Реле
+
+vars_63	Heater button	Кнопка нагревателя
+vars_64	Element button	Кнопка ТЭНа
+
+vars_65	Z1 St	З1 Вкл
+vars_66	Z2 St	З2 Вкл
+vars_67	Z3 St	З3 Вкл
+vars_68	Z4 St	З4 Вкл
+vars_69	Z5 St	З5 Вкл
+
+vars_70	Z1 T	Темп.з 1
+vars_71	Z2 T	Темп.з 2
+vars_72	Z3 T	Темп.з 3
+vars_73	Z4 T	Темп.з 4
+vars_74	Z5 T	Темп.з 5
+
+vars_75	Z1 Set.D	Уст.день з.1
+vars_76	Z2 Set.D	Уст.день з.2
+vars_77	Z3 Set.D	Уст.день з.3
+vars_78	Z4 Set.D	Уст.день з.4
+vars_79	Z5 Set.D	Уст.день з.5
+
+vars_80	Z1 Set.N	Уст.ночь з.1
+vars_81	Z2 Set.N	Уст.ночь з.2
+vars_82	Z3 Set.N	Уст.ночь з.3
+vars_83	Z4 Set.N	Уст.ночь з.4
+vars_84	Z5 Set.N	Уст.ночь з.5
+
+vars_85	Z1 Man.	Руч.з.1
+vars_86	Z2 Man.	Руч.з.2
+vars_87	Z3 Man.	Руч.з.3
+vars_88	Z4 Man.	Руч.з.4
+vars_89	Z5 Man.	Руч.з.5
+
+vars_90	Z1 Man.%	Руч.ШИМ з.1
+vars_91	Z2 Man.%	Руч.ШИМ з.2
+vars_92	Z3 Man.%	Руч.ШИМ з.3
+vars_93	Z4 Man.%	Руч.ШИМ з.4
+vars_94	Z5 Man.%	Руч.ШИМ з.5
+
+vars_95	Z1 PWM cur	Тек.ШИМ з1
+vars_96	Z2 PWM cur	Тек.ШИМ з2
+vars_97	Z3 PWM cur	Тек.ШИМ з3
+vars_98	Z4 PWM cur	Тек.ШИМ з4
+vars_99	Z5 PWM cur	Тек.ШИМ з5
+
+vars_100	Z1 PWM Set	Зад.ШИМ з.1
+vars_101	Z2 PWM Set	Зад.ШИМ з.2
+vars_102	Z3 PWM Set	Зад.ШИМ з.3
+vars_103	Z4 PWM Set	Зад.ШИМ з.4
+vars_104	Z5 PWM Set	Зад.ШИМ з.5
+
+vars_105	Liq.lvl	Ур.бак
+vars_106	Tank T	Темп.бака
+vars_107	Out T	Нар.темп.
+vars_108	Dom.wat	Раз.воды
+
+vars_109	Htr pump	Помпа нагр.
+vars_110	Pump1	Помпа 1
+vars_111	Pump2	Помпа 2
+vars_112	Pump3	Помпа 3
+
+vars_113	Second	Сек
+vars_114	Minute	Мин
+vars_115	Hour	Час
+vars_116	Day	День
+vars_117	Month	Мес
+vars_118	Year	Год
 
 m_0-1	Waiting for the command	Ожидание команды
 m_0-2	Blowing on power on	Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)

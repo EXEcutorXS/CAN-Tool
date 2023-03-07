@@ -29,12 +29,12 @@ namespace CAN_Tool
         public Settings()
         {
             Random random = new Random((int)DateTime.Now.Ticks);
-            Colors = new Color[70];
-            ShowFlag = new bool[70];
-            LineWidthes = new int[70];
-            LineStyles = new ScottPlot.LineStyle[70];
-            MarkShapes = new ScottPlot.MarkerShape[70];
-            for (int i = 0; i < 70; i++)
+            Colors = new Color[140];
+            ShowFlag = new bool[140];
+            LineWidthes = new int[140];
+            LineStyles = new ScottPlot.LineStyle[140];
+            MarkShapes = new ScottPlot.MarkerShape[140];
+            for (int i = 0; i < 140; i++)
             {
                 Colors[i] = Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255));
                 LineWidthes[i] = 1;

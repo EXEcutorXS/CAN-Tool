@@ -78,6 +78,7 @@
 <v:String x:Key="t_formed">Отчёт сформирован</v:String>
 <v:String x:Key="t_common_black_box_data">Общие данные из чёрного ящика</v:String>
 <v:String x:Key="t_errors_found">Ошибок в памяти</v:String>
+<v:String x:Key="t_no_data">Нет данных</v:String>
 
 <v:String x:Key="e_1">Перегрев</v:String>
 <v:String x:Key="e_2">Перегрев</v:String>
@@ -425,6 +426,76 @@
 
 <v:String x:Key="var_62">Состояние свечи (ВКЛ/ВЫКЛ)</v:String>
 
+<v:String x:Key="var_63">Кнопка нагревателя</v:String>
+<v:String x:Key="var_64">Кнопка ТЭНа</v:String>
+
+<v:String x:Key="var_65">Состояние зоны 1 (ВКЛ/ВЫКЛ)</v:String>
+<v:String x:Key="var_66">Состояние зоны 1 (ВКЛ/ВЫКЛ)</v:String>
+<v:String x:Key="var_67">Состояние зоны 1 (ВКЛ/ВЫКЛ)</v:String>
+<v:String x:Key="var_68">Состояние зоны 1 (ВКЛ/ВЫКЛ)</v:String>
+<v:String x:Key="var_69">Состояние зоны 1 (ВКЛ/ВЫКЛ)</v:String>
+
+<v:String x:Key="var_70">Температура в зоне 1</v:String>
+<v:String x:Key="var_71">Температура в зоне 2</v:String>
+<v:String x:Key="var_72">Температура в зоне 3</v:String>
+<v:String x:Key="var_73">Температура в зоне 4</v:String>
+<v:String x:Key="var_74">Температура в зоне 5</v:String>
+
+<v:String x:Key="var_75">Уставка день зоны 1</v:String>
+<v:String x:Key="var_76">Уставка день зоны 2</v:String>
+<v:String x:Key="var_77">Уставка день зоны 3</v:String>
+<v:String x:Key="var_78">Уставка день зоны 4</v:String>
+<v:String x:Key="var_79">Уставка день зоны 5</v:String>
+
+<v:String x:Key="var_80">Уставка ночь зоны 1</v:String>
+<v:String x:Key="var_81">Уставка ночь зоны 2</v:String>
+<v:String x:Key="var_82">Уставка ночь зоны 3</v:String>
+<v:String x:Key="var_83">Уставка ночь зоны 4</v:String>
+<v:String x:Key="var_84">Уставка ночь зоны 5</v:String>
+
+<v:String x:Key="var_85">Ручной режим зона 1</v:String>
+<v:String x:Key="var_86">Ручной режим зона 2</v:String>
+<v:String x:Key="var_87">Ручной режим зона 3</v:String>
+<v:String x:Key="var_88">Ручной режим зона 4</v:String>
+<v:String x:Key="var_89">Ручной режим зона 5</v:String>
+
+<v:String x:Key="var_90">Процент мощности зоны 1</v:String>
+<v:String x:Key="var_91">Процент мощности зоны 2</v:String>
+<v:String x:Key="var_92">Процент мощности зоны 3</v:String>
+<v:String x:Key="var_93">Процент мощности зоны 4</v:String>
+<v:String x:Key="var_94">Процент мощности зоны 5</v:String>
+
+<v:String x:Key="var_95">Текущее значение ШИМ зоны 1</v:String>
+<v:String x:Key="var_96">Текущее значение ШИМ зоны 2</v:String>
+<v:String x:Key="var_97">Текущее значение ШИМ зоны 3</v:String>
+<v:String x:Key="var_98">Текущее значение ШИМ зоны 4</v:String>
+<v:String x:Key="var_99">Текущее значение ШИМ зоны 5</v:String>
+
+<v:String x:Key="var_100">Заданное значение ШИМ зоны 1</v:String>
+<v:String x:Key="var_101">Заданное значение ШИМ зоны 2</v:String>
+<v:String x:Key="var_102">Заданное значение ШИМ зоны 3</v:String>
+<v:String x:Key="var_103">Заданное значение ШИМ зоны 4</v:String>
+<v:String x:Key="var_104">Заданное значение ШИМ зоны 5</v:String>
+
+<v:String x:Key="var_105">Уровень в баке</v:String>
+<v:String x:Key="var_106">Температура в баке</v:String>
+<v:String x:Key="var_107">Забортная температура</v:String>
+<v:String x:Key="var_108">Разбор воды</v:String>
+
+<v:String x:Key="var_109">Помпа нагревателя</v:String>
+<v:String x:Key="var_110">Помпа 1</v:String>
+<v:String x:Key="var_111">Помпа 2</v:String>
+<v:String x:Key="var_112">Помпа 3</v:String>
+
+<v:String x:Key="var_113">Секунда</v:String>
+<v:String x:Key="var_114">Минута</v:String>
+<v:String x:Key="var_115">Час</v:String>
+<v:String x:Key="var_116">День</v:String>
+<v:String x:Key="var_117">Месяц</v:String>
+<v:String x:Key="var_118">Год</v:String>
+
+
+
 <v:String x:Key="vars_1">Стадия</v:String>
 <v:String x:Key="vars_2">Режим</v:String>
 <v:String x:Key="vars_3">Вр.Работы</v:String>
@@ -493,6 +564,74 @@
 <v:String x:Key="vars_61">Тбака</v:String>
 
 <v:String x:Key="vars_62">Реле</v:String>
+
+<v:String x:Key="vars_63">Кнопка нагревателя</v:String>
+<v:String x:Key="vars_64">Кнопка ТЭНа</v:String>
+
+<v:String x:Key="vars_65">З1 Вкл</v:String>
+<v:String x:Key="vars_66">З2 Вкл</v:String>
+<v:String x:Key="vars_67">З3 Вкл</v:String>
+<v:String x:Key="vars_68">З4 Вкл</v:String>
+<v:String x:Key="vars_69">З5 Вкл</v:String>
+
+<v:String x:Key="vars_70">Темп.з 1</v:String>
+<v:String x:Key="vars_71">Темп.з 2</v:String>
+<v:String x:Key="vars_72">Темп.з 3</v:String>
+<v:String x:Key="vars_73">Темп.з 4</v:String>
+<v:String x:Key="vars_74">Темп.з 5</v:String>
+
+<v:String x:Key="vars_75">Уст.день з.1</v:String>
+<v:String x:Key="vars_76">Уст.день з.2</v:String>
+<v:String x:Key="vars_77">Уст.день з.3</v:String>
+<v:String x:Key="vars_78">Уст.день з.4</v:String>
+<v:String x:Key="vars_79">Уст.день з.5</v:String>
+
+<v:String x:Key="vars_80">Уст.ночь з.1</v:String>
+<v:String x:Key="vars_81">Уст.ночь з.2</v:String>
+<v:String x:Key="vars_82">Уст.ночь з.3</v:String>
+<v:String x:Key="vars_83">Уст.ночь з.4</v:String>
+<v:String x:Key="vars_84">Уст.ночь з.5</v:String>
+
+<v:String x:Key="vars_85">Руч.з.1</v:String>
+<v:String x:Key="vars_86">Руч.з.2</v:String>
+<v:String x:Key="vars_87">Руч.з.3</v:String>
+<v:String x:Key="vars_88">Руч.з.4</v:String>
+<v:String x:Key="vars_89">Руч.з.5</v:String>
+
+<v:String x:Key="vars_90">Руч.ШИМ з.1</v:String>
+<v:String x:Key="vars_91">Руч.ШИМ з.2</v:String>
+<v:String x:Key="vars_92">Руч.ШИМ з.3</v:String>
+<v:String x:Key="vars_93">Руч.ШИМ з.4</v:String>
+<v:String x:Key="vars_94">Руч.ШИМ з.5</v:String>
+
+<v:String x:Key="vars_95">Тек.ШИМ з1</v:String>
+<v:String x:Key="vars_96">Тек.ШИМ з2</v:String>
+<v:String x:Key="vars_97">Тек.ШИМ з3</v:String>
+<v:String x:Key="vars_98">Тек.ШИМ з4</v:String>
+<v:String x:Key="vars_99">Тек.ШИМ з5</v:String>
+
+<v:String x:Key="vars_100">Зад.ШИМ з.1</v:String>
+<v:String x:Key="vars_101">Зад.ШИМ з.2</v:String>
+<v:String x:Key="vars_102">Зад.ШИМ з.3</v:String>
+<v:String x:Key="vars_103">Зад.ШИМ з.4</v:String>
+<v:String x:Key="vars_104">Зад.ШИМ з.5</v:String>
+
+<v:String x:Key="vars_105">Ур.бак</v:String>
+<v:String x:Key="vars_106">Темп.бака</v:String>
+<v:String x:Key="vars_107">Нар.темп.</v:String>
+<v:String x:Key="vars_108">Раз.воды</v:String>
+
+<v:String x:Key="vars_109">Помпа нагр.</v:String>
+<v:String x:Key="vars_110">Помпа 1</v:String>
+<v:String x:Key="vars_111">Помпа 2</v:String>
+<v:String x:Key="vars_112">Помпа 3</v:String>
+
+<v:String x:Key="vars_113">Сек</v:String>
+<v:String x:Key="vars_114">Мин</v:String>
+<v:String x:Key="vars_115">Час</v:String>
+<v:String x:Key="vars_116">День</v:String>
+<v:String x:Key="vars_117">Мес</v:String>
+<v:String x:Key="vars_118">Год</v:String>
 
 <v:String x:Key="m_0-1">Ожидание команды</v:String>
 <v:String x:Key="m_0-2">Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)</v:String>
@@ -620,5 +759,5 @@
 <v:String x:Key="d_124">Мобильное приложение</v:String>
 <v:String x:Key="d_126">Устройство управления</v:String>
 <v:String x:Key="u_voltage">В</v:String>
-
+<v:String x:Key="u_pressure">кПа</v:String>
 </ResourceDictionary>

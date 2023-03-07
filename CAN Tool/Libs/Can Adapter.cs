@@ -1,11 +1,13 @@
 ﻿using CAN_Tool.ViewModels.Base;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Can_Adapter
 {
@@ -257,8 +259,6 @@ namespace Can_Adapter
         private int failedMessagesCounter = 0;
         public int FailedMessagesCounter { private set => Set(ref failedMessagesCounter, value); get => failedMessagesCounter; }
 
-        private CanMessage lastMessage;
-
 
         private readonly SynchronizationContext UIContext;
 
@@ -267,6 +267,8 @@ namespace Can_Adapter
         private readonly UpdatableList<CanMessage> _messages = new();
 
         public UpdatableList<CanMessage> Messages { get => _messages; }
+
+        public List<CanMessage> MessagesQueue { set; get; }
 
         public string PortName
         {
@@ -317,17 +319,16 @@ namespace Can_Adapter
             str.Append(msg.DLC);
             str.Append(msg.GetDataInTextFormat());
             str.Append('\r');
-            lastMessage = msg;
 
             serialPort.Write(str.ToString());
-            /*
+            
             for (int i = 0; i < 30; i++)
             {
-                Thread.Sleep(1);
+                Task.Delay(1);
                 if (txDone || TxFail)
                     return;
             }
-            */
+            
         }
 
         public bool TransmitWithCheck(CanMessage msg)
@@ -351,7 +352,6 @@ namespace Can_Adapter
             str.Append(msg.DLC);
             str.Append(msg.GetDataInTextFormat());
             str.Append('\r');
-            lastMessage = msg;
 
             serialPort.Write(str.ToString());
 

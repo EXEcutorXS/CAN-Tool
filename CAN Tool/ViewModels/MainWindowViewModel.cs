@@ -185,7 +185,7 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverType = 127;
             msg.PGN = 1;
             msg.Data = new byte[8];
-            CanAdapter.Transmit(msg);
+           OmniProtocolInstance.SendMessage(msg);
         }
         private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !CanAdapter.PortOpened);
         #endregion
@@ -647,8 +647,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[1] = (byte)(cmdNum & 0xFF);
             for (int i = 0; i < data.Length; i++)
                 msg.Data[i + 2] = data[i];
-
-            CanAdapter.Transmit(msg);
+            OmniProtocolInstance.SendMessage(msg);
         }
 
         private void updateManualMode()
@@ -670,7 +669,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[4] = (byte)ManualGlowPlug;
             msg.Data[5] = (byte)(ManualFuelPump / 256);
             msg.Data[6] = (byte)ManualFuelPump;
-            Task.Run(() => CanAdapter.Transmit(msg));
+            Task.Run(() => OmniProtocolInstance.SendMessage(msg));
         }
 
         #region Chart
@@ -682,7 +681,7 @@ namespace CAN_Tool.ViewModels
                 d.LogTick();
             }
 
-            if (AutoRedraw)                                 //Перерисовк графиков
+            if (AutoRedraw)                                 //Перерисовка графиков
                 if (CanChartDrawCommandExecute(null))
                 {
                     if (SelectedConnectedDevice.LogCurrentPos < 600)
@@ -698,8 +697,10 @@ namespace CAN_Tool.ViewModels
                 msg.TransmitterType = 126;
                 msg.PGN = 0;
                 msg.ReceiverId = d.ID;
-                CanAdapter.Transmit(msg);
+                OmniProtocolInstance.SendMessage(msg);
+                Task.Delay(50);
             }
+            
         }
 
         #endregion
@@ -741,10 +742,7 @@ namespace CAN_Tool.ViewModels
             timer.Interval = new TimeSpan(0, 0, 1);
             timer.Start();
 
-
-
             OmniProtocolInstance.NewDeviceAquired += NewDeviceHandler;
-
 
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
             ClosePortCommand = new LambdaCommand(OnClosePortCommandExecuted, CanClosePortCommandExecute);

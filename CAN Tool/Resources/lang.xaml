@@ -78,6 +78,7 @@
 <v:String x:Key="t_formed">Formed</v:String>
 <v:String x:Key="t_common_black_box_data">Black box common data</v:String>
 <v:String x:Key="t_errors_found">Stored errors found</v:String>
+<v:String x:Key="t_no_data">No data</v:String>
 
 <v:String x:Key="e_1">Overheat</v:String>
 <v:String x:Key="e_2">Overheat</v:String>
@@ -425,6 +426,76 @@
 
 <v:String x:Key="var_62">Glow plug state (ON/OFF)</v:String>
 
+<v:String x:Key="var_63">Heater button</v:String>
+<v:String x:Key="var_64">Element button</v:String>
+
+<v:String x:Key="var_65">Zone 1 State</v:String>
+<v:String x:Key="var_66">Zone 2 State</v:String>
+<v:String x:Key="var_67">Zone 3 State</v:String>
+<v:String x:Key="var_68">Zone 4 State</v:String>
+<v:String x:Key="var_69">Zone 5 State</v:String>
+
+<v:String x:Key="var_70">Zone 1 Temp</v:String>
+<v:String x:Key="var_71">Zone 2 Temp</v:String>
+<v:String x:Key="var_72">Zone 3 Temp</v:String>
+<v:String x:Key="var_73">Zone 4 Temp</v:String>
+<v:String x:Key="var_74">Zone 5 Temp</v:String>
+
+<v:String x:Key="var_75">Zone1 Setpoint Day</v:String>
+<v:String x:Key="var_76">Zone2 Setpoint Day</v:String>
+<v:String x:Key="var_77">Zone3 Setpoint Day</v:String>
+<v:String x:Key="var_78">Zone4 Setpoint Day</v:String>
+<v:String x:Key="var_79">Zone5 Setpoint Day</v:String>
+
+<v:String x:Key="var_80">Zone1 Setpoint Night</v:String>
+<v:String x:Key="var_81">Zone2 Setpoint Night</v:String>
+<v:String x:Key="var_82">Zone3 Setpoint Night</v:String>
+<v:String x:Key="var_83">Zone4 Setpoint Night</v:String>
+<v:String x:Key="var_84">Zone5 Setpoint Night</v:String>
+
+<v:String x:Key="var_85">Zone 1 Fan Manual Mode</v:String>
+<v:String x:Key="var_86">Zone 2 Fan Manual Mode</v:String>
+<v:String x:Key="var_87">Zone 3 Fan Manual Mode</v:String>
+<v:String x:Key="var_88">Zone 4 Fan Manual Mode</v:String>
+<v:String x:Key="var_89">Zone 5 Fan Manual Mode</v:String>
+
+<v:String x:Key="var_90">Zone 1 Fan Manual percent</v:String>
+<v:String x:Key="var_91">Zone 2 Fan Manual percent</v:String>
+<v:String x:Key="var_92">Zone 3 Fan Manual percent</v:String>
+<v:String x:Key="var_93">Zone 4 Fan Manual percent</v:String>
+<v:String x:Key="var_94">Zone 5 Fan Manual percent</v:String>
+
+<v:String x:Key="var_95">Zone 1 PWM current percent</v:String>
+<v:String x:Key="var_96">Zone 2 PWM current percent</v:String>
+<v:String x:Key="var_97">Zone 3 PWM current percent</v:String>
+<v:String x:Key="var_98">Zone 4 PWM current percent</v:String>
+<v:String x:Key="var_99">Zone 5 PWM current percent</v:String>
+
+<v:String x:Key="var_100">Zone 1 PWM Setpoint</v:String>
+<v:String x:Key="var_101">Zone 2 PWM Setpoint</v:String>
+<v:String x:Key="var_102">Zone 3 PWM Setpoint</v:String>
+<v:String x:Key="var_103">Zone 4 PWM Setpoint</v:String>
+<v:String x:Key="var_104">Zone 5 PWM Setpoint</v:String>
+
+<v:String x:Key="var_105">Liquid level</v:String>
+<v:String x:Key="var_106">Tank temperature</v:String>
+<v:String x:Key="var_107">Outdoor temperature</v:String>
+<v:String x:Key="var_108">Domestic water drain</v:String>
+
+<v:String x:Key="var_109">Heater pump state</v:String>
+<v:String x:Key="var_110">Pump 1 state</v:String>
+<v:String x:Key="var_111">Pump 2 state</v:String>
+<v:String x:Key="var_112">Pump 3 state</v:String>
+
+<v:String x:Key="var_113">Second</v:String>
+<v:String x:Key="var_114">Minute</v:String>
+<v:String x:Key="var_115">Hour</v:String>
+<v:String x:Key="var_116">Day</v:String>
+<v:String x:Key="var_117">Month</v:String>
+<v:String x:Key="var_118">Year</v:String>
+
+
+
 <v:String x:Key="vars_1">Stage</v:String>
 <v:String x:Key="vars_2">Mode</v:String>
 <v:String x:Key="vars_3">Tot.tim</v:String>
@@ -493,6 +564,74 @@
 <v:String x:Key="vars_61">Ttank</v:String>
 
 <v:String x:Key="vars_62">Relay</v:String>
+
+<v:String x:Key="vars_63">Heater button</v:String>
+<v:String x:Key="vars_64">Element button</v:String>
+
+<v:String x:Key="vars_65">Z1 St</v:String>
+<v:String x:Key="vars_66">Z2 St</v:String>
+<v:String x:Key="vars_67">Z3 St</v:String>
+<v:String x:Key="vars_68">Z4 St</v:String>
+<v:String x:Key="vars_69">Z5 St</v:String>
+
+<v:String x:Key="vars_70">Z1 T</v:String>
+<v:String x:Key="vars_71">Z2 T</v:String>
+<v:String x:Key="vars_72">Z3 T</v:String>
+<v:String x:Key="vars_73">Z4 T</v:String>
+<v:String x:Key="vars_74">Z5 T</v:String>
+
+<v:String x:Key="vars_75">Z1 Set.D</v:String>
+<v:String x:Key="vars_76">Z2 Set.D</v:String>
+<v:String x:Key="vars_77">Z3 Set.D</v:String>
+<v:String x:Key="vars_78">Z4 Set.D</v:String>
+<v:String x:Key="vars_79">Z5 Set.D</v:String>
+
+<v:String x:Key="vars_80">Z1 Set.N</v:String>
+<v:String x:Key="vars_81">Z2 Set.N</v:String>
+<v:String x:Key="vars_82">Z3 Set.N</v:String>
+<v:String x:Key="vars_83">Z4 Set.N</v:String>
+<v:String x:Key="vars_84">Z5 Set.N</v:String>
+
+<v:String x:Key="vars_85">Z1 Man.</v:String>
+<v:String x:Key="vars_86">Z2 Man.</v:String>
+<v:String x:Key="vars_87">Z3 Man.</v:String>
+<v:String x:Key="vars_88">Z4 Man.</v:String>
+<v:String x:Key="vars_89">Z5 Man.</v:String>
+
+<v:String x:Key="vars_90">Z1 Man.%</v:String>
+<v:String x:Key="vars_91">Z2 Man.%</v:String>
+<v:String x:Key="vars_92">Z3 Man.%</v:String>
+<v:String x:Key="vars_93">Z4 Man.%</v:String>
+<v:String x:Key="vars_94">Z5 Man.%</v:String>
+
+<v:String x:Key="vars_95">Z1 PWM cur</v:String>
+<v:String x:Key="vars_96">Z2 PWM cur</v:String>
+<v:String x:Key="vars_97">Z3 PWM cur</v:String>
+<v:String x:Key="vars_98">Z4 PWM cur</v:String>
+<v:String x:Key="vars_99">Z5 PWM cur</v:String>
+
+<v:String x:Key="vars_100">Z1 PWM Set</v:String>
+<v:String x:Key="vars_101">Z2 PWM Set</v:String>
+<v:String x:Key="vars_102">Z3 PWM Set</v:String>
+<v:String x:Key="vars_103">Z4 PWM Set</v:String>
+<v:String x:Key="vars_104">Z5 PWM Set</v:String>
+
+<v:String x:Key="vars_105">Liq.lvl</v:String>
+<v:String x:Key="vars_106">Tank T</v:String>
+<v:String x:Key="vars_107">Out T</v:String>
+<v:String x:Key="vars_108">Dom.wat</v:String>
+
+<v:String x:Key="vars_109">Htr pump</v:String>
+<v:String x:Key="vars_110">Pump1</v:String>
+<v:String x:Key="vars_111">Pump2</v:String>
+<v:String x:Key="vars_112">Pump3</v:String>
+
+<v:String x:Key="vars_113">Second</v:String>
+<v:String x:Key="vars_114">Minute</v:String>
+<v:String x:Key="vars_115">Hour</v:String>
+<v:String x:Key="vars_116">Day</v:String>
+<v:String x:Key="vars_117">Month</v:String>
+<v:String x:Key="vars_118">Year</v:String>
 
 <v:String x:Key="m_0-1">Waiting for the command</v:String>
 <v:String x:Key="m_0-2">Blowing on power on</v:String>
@@ -620,5 +759,5 @@
 <v:String x:Key="d_124">Mobile App</v:String>
 <v:String x:Key="d_126">Control device</v:String>
 <v:String x:Key="u_voltage">V</v:String>
-
+<v:String x:Key="u_pressure">kPa</v:String>
 </ResourceDictionary>
