@@ -16,8 +16,7 @@ using CAN_Tool.Libs;
 using CAN_Tool;
 using ScottPlot;
 using static CAN_Tool.Libs.Helper;
-using System.Net.Http.Headers;
-using System.Reflection.Metadata;
+
 
 namespace OmniProtocol
 {

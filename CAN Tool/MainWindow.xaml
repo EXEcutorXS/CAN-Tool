@@ -359,7 +359,7 @@
                                 <CheckBox Margin="10" Style="{StaticResource MaterialDesignActionDarkCheckBox}" IsChecked="{Binding SelectedConnectedDevice.Timber.ElementEbabled,Mode=OneWay}" IsEnabled="False"></CheckBox>
                                 <Button x:Name="ElementButton" Style="{StaticResource MaterialDesignFlatButton}" FontSize="30" Height="50" Margin="10" Click="ElementButton_Click">Element</Button>
                                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Liquid level: {0:d1},Path=SelectedConnectedDevice.Timber.LiquidLevel}" />
-                                <ProgressBar Margin="15" Orientation="Vertical" Maximum="7" Value="{Binding SelectedConnectedDevice.Timber.LiquidLevel}" Height="20" />
+                                <ProgressBar Margin="15" Orientation="Vertical" Maximum="7" Value="{Binding SelectedConnectedDevice.Timber.LiquidLevel}" Height="50"  />
                                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Outside: {0:f1}°,Path=SelectedConnectedDevice.Timber.OutsideTemperature,Converter={StaticResource ToFarenheit}}" />
 
                             </StackPanel>

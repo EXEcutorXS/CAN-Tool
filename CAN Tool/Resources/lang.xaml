@@ -79,6 +79,7 @@
 <v:String x:Key="t_common_black_box_data">Black box common data</v:String>
 <v:String x:Key="t_errors_found">Stored errors found</v:String>
 <v:String x:Key="t_no_data">No data</v:String>
+<v:String x:Key="t_liquid_level">Liquid level</v:String>
 
 <v:String x:Key="e_1">Overheat</v:String>
 <v:String x:Key="e_2">Overheat</v:String>

@@ -274,7 +274,7 @@ namespace CAN_Tool.ViewModels
         {
             SelectedConnectedDevice.LogStart();
         }
-        private bool CanLogStartCommandExecute(object parameter) => (SelectedConnectedDevice != null && CanAdapter.PortOpened);
+        private bool CanLogStartCommandExecute(object parameter) =>   (SelectedConnectedDevice != null && CanAdapter.PortOpened);
         #endregion
 
         #region LogStopCommand
