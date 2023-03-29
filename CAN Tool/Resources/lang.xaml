@@ -427,9 +427,6 @@
 
 <v:String x:Key="var_62">Glow plug state (ON/OFF)</v:String>
 
-<v:String x:Key="var_63">Heater button</v:String>
-<v:String x:Key="var_64">Element button</v:String>
-
 <v:String x:Key="var_65">Zone 1 State</v:String>
 <v:String x:Key="var_66">Zone 2 State</v:String>
 <v:String x:Key="var_67">Zone 3 State</v:String>
@@ -495,7 +492,8 @@
 <v:String x:Key="var_117">Month</v:String>
 <v:String x:Key="var_118">Year</v:String>
 
-
+<v:String x:Key="var_119">Heater button</v:String>
+<v:String x:Key="var_120">Element button</v:String>
 
 <v:String x:Key="vars_1">Stage</v:String>
 <v:String x:Key="vars_2">Mode</v:String>
@@ -566,8 +564,7 @@
 
 <v:String x:Key="vars_62">Relay</v:String>
 
-<v:String x:Key="vars_63">Heater button</v:String>
-<v:String x:Key="vars_64">Element button</v:String>
+
 
 <v:String x:Key="vars_65">Z1 St</v:String>
 <v:String x:Key="vars_66">Z2 St</v:String>
@@ -633,6 +630,9 @@
 <v:String x:Key="vars_116">Day</v:String>
 <v:String x:Key="vars_117">Month</v:String>
 <v:String x:Key="vars_118">Year</v:String>
+
+<v:String x:Key="vars_119">Heater button</v:String>
+<v:String x:Key="vars_120">Element button</v:String>
 
 <v:String x:Key="m_0-1">Waiting for the command</v:String>
 <v:String x:Key="m_0-2">Blowing on power on</v:String>

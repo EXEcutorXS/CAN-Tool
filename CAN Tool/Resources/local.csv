@@ -427,9 +427,6 @@ var_61	Tank temperature	Температура бака в системах от
 
 var_62	Glow plug state (ON/OFF)	Состояние свечи (ВКЛ/ВЫКЛ)
 
-var_63	Heater button	Кнопка нагревателя
-var_64	Element button	Кнопка ТЭНа
-
 var_65	Zone 1 State	Состояние зоны 1 (ВКЛ/ВЫКЛ)
 var_66	Zone 2 State	Состояние зоны 2 (ВКЛ/ВЫКЛ)
 var_67	Zone 3 State	Состояние зоны 3 (ВКЛ/ВЫКЛ)
@@ -495,7 +492,8 @@ var_116	Day	День
 var_117	Month	Месяц
 var_118	Year	Год
 
-
+var_119	Heater button	Кнопка нагревателя
+var_120	Element button	Кнопка ТЭНа
 
 vars_1	Stage	Стадия
 vars_2	Mode	Режим
@@ -566,8 +564,7 @@ vars_61	Ttank	Тбака
 
 vars_62	Relay	Реле
 
-vars_63	Heater button	Кнопка нагревателя
-vars_64	Element button	Кнопка ТЭНа
+
 
 vars_65	Z1 St	З1 Вкл
 vars_66	Z2 St	З2 Вкл
@@ -633,6 +630,9 @@ vars_115	Hour	Час
 vars_116	Day	День
 vars_117	Month	Мес
 vars_118	Year	Год
+
+vars_119	Heater button	Кнопка нагревателя
+vars_120	Element button	Кнопка ТЭНа
 
 m_0-1	Waiting for the command	Ожидание команды
 m_0-2	Blowing on power on	Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)

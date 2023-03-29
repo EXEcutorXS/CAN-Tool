@@ -427,9 +427,6 @@
 
 <v:String x:Key="var_62">Состояние свечи (ВКЛ/ВЫКЛ)</v:String>
 
-<v:String x:Key="var_63">Кнопка нагревателя</v:String>
-<v:String x:Key="var_64">Кнопка ТЭНа</v:String>
-
 <v:String x:Key="var_65">Состояние зоны 1 (ВКЛ/ВЫКЛ)</v:String>
 <v:String x:Key="var_66">Состояние зоны 2 (ВКЛ/ВЫКЛ)</v:String>
 <v:String x:Key="var_67">Состояние зоны 3 (ВКЛ/ВЫКЛ)</v:String>
@@ -495,7 +492,8 @@
 <v:String x:Key="var_117">Месяц</v:String>
 <v:String x:Key="var_118">Год</v:String>
 
-
+<v:String x:Key="var_119">Кнопка нагревателя</v:String>
+<v:String x:Key="var_120">Кнопка ТЭНа</v:String>
 
 <v:String x:Key="vars_1">Стадия</v:String>
 <v:String x:Key="vars_2">Режим</v:String>
@@ -566,8 +564,7 @@
 
 <v:String x:Key="vars_62">Реле</v:String>
 
-<v:String x:Key="vars_63">Кнопка нагревателя</v:String>
-<v:String x:Key="vars_64">Кнопка ТЭНа</v:String>
+
 
 <v:String x:Key="vars_65">З1 Вкл</v:String>
 <v:String x:Key="vars_66">З2 Вкл</v:String>
@@ -633,6 +630,9 @@
 <v:String x:Key="vars_116">День</v:String>
 <v:String x:Key="vars_117">Мес</v:String>
 <v:String x:Key="vars_118">Год</v:String>
+
+<v:String x:Key="vars_119">Кнопка нагревателя</v:String>
+<v:String x:Key="vars_120">Кнопка ТЭНа</v:String>
 
 <v:String x:Key="m_0-1">Ожидание команды</v:String>
 <v:String x:Key="m_0-2">Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)</v:String>

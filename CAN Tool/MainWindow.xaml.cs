@@ -563,11 +563,11 @@ namespace CAN_Tool
                 int zoneNumber = vm.SelectedConnectedDevice.Timber.Zones.IndexOf(vm.SelectedConnectedDevice.Timber.SelectedZone);
                 switch (zoneNumber)
                 {
-                    case 0: if (!vm.SelectedConnectedDevice.Timber.Zones[0].ManualMode) m.Data[6] = 0b11111101; else m.Data[6] = 0b11111100; break;
-                    case 1: if (!vm.SelectedConnectedDevice.Timber.Zones[1].ManualMode) m.Data[6] = 0b11110111; else m.Data[6] = 0b11110011; break;
-                    case 2: if (!vm.SelectedConnectedDevice.Timber.Zones[2].ManualMode) m.Data[6] = 0b11011111; else m.Data[6] = 0b11001111; break;
-                    case 3: if (!vm.SelectedConnectedDevice.Timber.Zones[3].ManualMode) m.Data[6] = 0b01111111; else m.Data[6] = 0b00111111; break;
-                    case 4: if (!vm.SelectedConnectedDevice.Timber.Zones[4].ManualMode) m.Data[7] = 0b11111101; else m.Data[7] = 0b11111100; break;
+                    case 0: if (!vm.SelectedConnectedDevice.Timber.Zones[0].ManualMode) m.Data[5] = 0b11111101; else m.Data[5] = 0b11111100; break;
+                    case 1: if (!vm.SelectedConnectedDevice.Timber.Zones[1].ManualMode) m.Data[5] = 0b11110111; else m.Data[5] = 0b11110011; break;
+                    case 2: if (!vm.SelectedConnectedDevice.Timber.Zones[2].ManualMode) m.Data[5] = 0b11011111; else m.Data[5] = 0b11001111; break;
+                    case 3: if (!vm.SelectedConnectedDevice.Timber.Zones[3].ManualMode) m.Data[5] = 0b01111111; else m.Data[5] = 0b00111111; break;
+                    case 4: if (!vm.SelectedConnectedDevice.Timber.Zones[4].ManualMode) m.Data[6] = 0b11111101; else m.Data[6] = 0b11111100; break;
                 }
                 vm.CanAdapter.Transmit(m);
             }
