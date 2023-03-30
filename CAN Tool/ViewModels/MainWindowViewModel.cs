@@ -18,6 +18,7 @@ using Xceed.Document.NET;
 using Alignment = Xceed.Document.NET.Alignment;
 using CAN_Tool.Libs;
 using static CAN_Tool.Libs.Helper;
+using RVC;
 
 namespace CAN_Tool.ViewModels
 {
@@ -34,6 +35,10 @@ namespace CAN_Tool.ViewModels
             get { return firmwarePage; }
             set { Set(ref firmwarePage, value); }
         }
+
+        RvcPage rvcPage;
+        public RvcPage RvcPage => rvcPage;
+        
 
         private int manualAirBlower;
         public int ManualAirBlower { set => Set(ref manualAirBlower, value); get => manualAirBlower; }
@@ -733,8 +738,10 @@ namespace CAN_Tool.ViewModels
 
             _canAdapter = new CanAdapter();
             _AC2PInstance = new Omni(CanAdapter);
+
             OmniProtocolInstance.plot = myChart;
             FirmwarePage = new(this);
+            rvcPage = new(this);
 
             System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
 

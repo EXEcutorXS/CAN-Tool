@@ -12,8 +12,9 @@ using System.Windows.Controls;
 using CAN_Tool.ViewModels.Base;
 using CAN_Tool.ViewModels;
 using System.ComponentModel;
+using OmniProtocol;
 
-namespace RVC_Project
+namespace RVC
 {
     static class RVC
     {
@@ -685,11 +686,6 @@ namespace RVC_Project
 
     }
 
-    public class RvcInstance : ViewModel
-    {
-        public BindingList<RvcMessage> MessageList { get; } = new();
-    
-    }
 
     public enum parameterSize
     {
@@ -723,9 +719,11 @@ namespace RVC_Project
         public int MaxBroadcastGap = 5000;
         public int MinBroadcastGap = 500;
         public List<Parameter> Parameters;
+        public bool HasInstance = false;
 
         public DGN(bool addInstance = false)
         {
+            HasInstance = true;
             Parameters = new List<Parameter>();
             if (addInstance) this.Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = parameterType.instance, Size = parameterSize.uint8, firstByte = 0, Id = true });
         }
@@ -901,16 +899,26 @@ namespace RVC_Project
             return retString;
         }
     }
-    public sealed class RvcMessage:ViewModel
+    public sealed class RvcMessage:ViewModel,IComparable,IUpdatable<RvcMessage>
     {
         private byte priority;
-        public byte Priority {set=>Set (ref priority) };
-        public int Dgn;
-        public byte SourceAdress;
-        public byte[] Data = new byte[8];
+
+        [AffectsTo(nameof(Verboseinfo))]
+        public byte Priority { set => Set(ref priority, value); get => priority; }
+
+        private int dgn;
+        [AffectsTo(nameof(Verboseinfo))]
+        public int Dgn { set => Set(ref dgn, value); get => dgn; }
+
+        private byte sourceAdress;
+        [AffectsTo(nameof(Verboseinfo))]
+        public byte SourceAdress { set => Set(ref sourceAdress, value); get => sourceAdress; }
+        private byte[] data = new byte[8];
+        [AffectsTo(nameof(Verboseinfo),nameof(Instance),nameof(DataAsText))]
+        public byte[] Data { set => Set(ref data, value); get => data; }
         public byte Instance => Data[0];
         
-        static bool showUnsupportedData = true;
+        public string DataAsText => $"{Data[0]:X02} {Data[1]:X02} {Data[2]:X02} {Data[3]:X02} {Data[4]:X02} {Data[5]:X02} {Data[6]:X02} {Data[7]:X02}";
 
         public IEnumerable<Parameter> Parameters => (RVC.DGNs.ContainsKey(Dgn)) ? RVC.DGNs[Dgn].Parameters : null;
         public RvcMessage(CanMessage msg)
@@ -961,6 +969,8 @@ namespace RVC_Project
 
         public string Verboseinfo => PrintParameters();
 
+        public int Id => throw new NotImplementedException();
+
         public string PrintParameters ()
         {
             if (!RVC.DGNs.ContainsKey(Dgn))
@@ -971,6 +981,31 @@ namespace RVC_Project
         public override int GetHashCode()
         {
             return GetCanMessage().GetHashCode();
+        }
+
+        public int CompareTo(object other)
+        {
+            var o = other as RvcMessage;
+            if (Dgn != o.Dgn)
+                return Dgn - o.Dgn;
+            else
+                return (Data[0] - o.Data[0]);
+        }
+
+        public void Update(RvcMessage item)
+        {
+            item.Data.CopyTo(Data,0);
+            SourceAdress = item.SourceAdress;
+            Priority = item.Priority;
+        }
+
+        public bool IsSimmiliarTo(RvcMessage item)
+        {
+            if (Dgn != item.Dgn) return false;
+            if (RVC.DGNs.ContainsKey(Dgn) && RVC.DGNs[Dgn].HasInstance)
+                return Data[0] != item.Data[0];
+            else
+                return true;
         }
     }
 }

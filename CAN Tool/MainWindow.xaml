@@ -810,6 +810,36 @@
                         <StackPanel></StackPanel>
                     </DockPanel>
                 </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Solid_Bus" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
+                            <TextBlock Margin="5 2 2 2" Text="RV-C"></TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TabControl>
+                        <TabItem Header="Control">
+
+                        </TabItem>
+                        <TabItem Header="{DynamicResource b_messages}">
+                            <DataGrid ItemsSource="{Binding RvcPage.MessageList}" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Dgn,Mode=OneWay,StringFormat=X05}" Header="DGN"></DataGridTextColumn>
+                                    <DataGridTextColumn Binding="{Binding Priority,Mode=OneWay}" Header="Priority"></DataGridTextColumn>
+                                    <DataGridTextColumn Binding="{Binding SourceAdress,Mode=OneWay}" Header="SA"></DataGridTextColumn>
+                                    <DataGridTextColumn Binding="{Binding DataAsText,Mode=OneWay}" Header="Data"></DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </TabItem>
+                        <TabItem Header="{DynamicResource b_commands}">
+
+                        </TabItem>
+                        <TabItem Header="Stress tester">
+
+                        </TabItem>
+                    </TabControl>
+
+                </TabItem>
             </TabControl>
         </DockPanel>
     </DockPanel>
