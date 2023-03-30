@@ -13,6 +13,7 @@ using CAN_Tool.ViewModels.Base;
 using CAN_Tool.ViewModels;
 using System.ComponentModel;
 using OmniProtocol;
+using CAN_Tool.Libs;
 
 namespace RVC
 {
@@ -20,7 +21,7 @@ namespace RVC
     {
         static RVC()
         {
-
+            SeedData();
         }
 
         public static void SeedData()
@@ -730,12 +731,11 @@ namespace RVC
 
         public string Decode(byte[] data)
         {
-            string ret = Name + ":{;";
+            string ret = Name + ": ;";
             foreach (Parameter p in Parameters)
             {
                 ret += p.ToString(data) + "; ";
             }
-            ret += "}";
             return ret;
         }
 
@@ -899,28 +899,33 @@ namespace RVC
             return retString;
         }
     }
-    public sealed class RvcMessage:ViewModel,IComparable,IUpdatable<RvcMessage>
+    public sealed class RvcMessage : ViewModel, IComparable, IUpdatable<RvcMessage>
     {
         private byte priority;
 
-        [AffectsTo(nameof(Verboseinfo))]
+        [AffectsTo(nameof(VerboseInfo))]
         public byte Priority { set => Set(ref priority, value); get => priority; }
 
         private int dgn;
-        [AffectsTo(nameof(Verboseinfo))]
+        [AffectsTo(nameof(VerboseInfo))]
         public int Dgn { set => Set(ref dgn, value); get => dgn; }
 
         private byte sourceAdress;
-        [AffectsTo(nameof(Verboseinfo))]
+        [AffectsTo(nameof(VerboseInfo))]
         public byte SourceAdress { set => Set(ref sourceAdress, value); get => sourceAdress; }
         private byte[] data = new byte[8];
-        [AffectsTo(nameof(Verboseinfo),nameof(Instance),nameof(DataAsText))]
+        [AffectsTo(nameof(VerboseInfo), nameof(Instance), nameof(DataAsText))]
         public byte[] Data { set => Set(ref data, value); get => data; }
         public byte Instance => Data[0];
-        
+
         public string DataAsText => $"{Data[0]:X02} {Data[1]:X02} {Data[2]:X02} {Data[3]:X02} {Data[4]:X02} {Data[5]:X02} {Data[6]:X02} {Data[7]:X02}";
 
+        private bool fresh;
+
+        public bool Fresh { get => fresh; set => Set(ref fresh, value); }
+
         public IEnumerable<Parameter> Parameters => (RVC.DGNs.ContainsKey(Dgn)) ? RVC.DGNs[Dgn].Parameters : null;
+
         public RvcMessage(CanMessage msg)
         {
             if (msg == null)
@@ -935,6 +940,9 @@ namespace RVC
             Dgn = msg.Id >> 8 & 0x1FFFF;
             SourceAdress = (byte)(msg.Id & 0xFF);
             Data = msg.Data;
+
+            Fresh = true;
+            Task.Run(() => { Task.Delay(300); Fresh = false; });
         }
 
         public CanMessage GetCanMessage()
@@ -967,14 +975,14 @@ namespace RVC
             return ret;
         }
 
-        public string Verboseinfo => PrintParameters();
+        public string VerboseInfo => PrintParameters().Replace(';', '\n');
 
         public int Id => throw new NotImplementedException();
 
-        public string PrintParameters ()
+        public string PrintParameters()
         {
             if (!RVC.DGNs.ContainsKey(Dgn))
-                return $"{Dgn:X} is not supported";
+                return $"{Dgn:X} is not supported yet";
             return RVC.DGNs[Dgn].Decode(Data);
         }
 
@@ -994,7 +1002,7 @@ namespace RVC
 
         public void Update(RvcMessage item)
         {
-            item.Data.CopyTo(Data,0);
+            item.Data.CopyTo(Data, 0);
             SourceAdress = item.SourceAdress;
             Priority = item.Priority;
         }
@@ -1002,10 +1010,12 @@ namespace RVC
         public bool IsSimmiliarTo(RvcMessage item)
         {
             if (Dgn != item.Dgn) return false;
-            if (RVC.DGNs.ContainsKey(Dgn) && RVC.DGNs[Dgn].HasInstance)
-                return Data[0] != item.Data[0];
-            else
-                return true;
+            foreach (Parameter p in item.Parameters.Where(p => p.Id == true))
+                if (p.RawData(item.Data) == p.RawData(Data)) continue;
+                else
+                    return false;
+            return true;
+
         }
     }
 }

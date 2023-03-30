@@ -35,13 +35,13 @@
     <DockPanel>
         <StatusBar x:Name="MyStatusbar" DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
             <StatusBarItem HorizontalAlignment="Left">
-                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniProtocolInstance.CurrentTask.Name}" Margin="10 0 10 0"></TextBlock>
+                <TextBlock FontSize="20" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniProtocolInstance.CurrentTask.Name}" Margin="10"></TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Left">
-                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniProtocolInstance.CurrentTask.LastOperationDuration,StringFormat=Done in {0} }" Margin="10 0 10 0"></TextBlock>
+                <TextBlock FontSize="20" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniProtocolInstance.CurrentTask.LastOperationDuration,StringFormat=Done in {0} }" Margin="10 0 10 0"></TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Left">
-                <TextBlock FontSize="15" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniProtocolInstance.CurrentTask.FailReason}" Margin="10 0 10 0"></TextBlock>
+                <TextBlock FontSize="20" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniProtocolInstance.CurrentTask.FailReason}" Margin="10"></TextBlock>
             </StatusBarItem>
             <ProgressBar Width="300" Value="{Binding OmniProtocolInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0" Visibility="{Binding OmniProtocolInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></ProgressBar>
             <StatusBarItem HorizontalAlignment="Left">
@@ -50,8 +50,7 @@
 
             <StatusBarItem HorizontalAlignment="Right" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Error, Mode=OneWay}"></TextBlock>
-                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="15" Text="{Binding CanAdapter.FailedMessagesCounter,StringFormat=Faulted messages:{0}}" Margin="10" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="20" Text="{Binding CanAdapter.Status,Mode=OneWay}" Margin="10"></TextBlock>
                 </StackPanel>
             </StatusBarItem>
 
@@ -84,7 +83,7 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <ComboBox Style="{DynamicResource MaterialDesignComboBox}" x:Name="menuLanguage" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuLanguage_SelectionChanged"></ComboBox>
-                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_exit}" Margin="10" Command="{Binding CloseApplicationCommand}" FlowDirection="RightToLeft" Click="Button_Click" />
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_exit}" Margin="10" Click="ExitButtonClick" FlowDirection="RightToLeft" />
                     </StackPanel>
                 </DockPanel>
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -822,14 +821,34 @@
 
                         </TabItem>
                         <TabItem Header="{DynamicResource b_messages}">
-                            <DataGrid ItemsSource="{Binding RvcPage.MessageList}" AutoGenerateColumns="False">
-                                <DataGrid.Columns>
+                            <DockPanel>
+                            <DataGrid x:Name="RVCMessageList" SelectedItem="{Binding RvcPage.SelectedMessage,Mode=OneWayToSource}" DockPanel.Dock="Left" Margin="10" ItemsSource="{Binding RvcPage.MessageList}" AutoGenerateColumns="False">
+                                    <DataGrid.RowStyle>
+                                        <Style TargetType="DataGridRow">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Fresh}" Value="true">
+                                                    <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}"></Setter>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Fresh}" Value="false">
+                                                    <Setter Property="Background" Value="{DynamicResource AttentionToActionBrush}"></Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGrid.RowStyle>
+                                    <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding Dgn,Mode=OneWay,StringFormat=X05}" Header="DGN"></DataGridTextColumn>
                                     <DataGridTextColumn Binding="{Binding Priority,Mode=OneWay}" Header="Priority"></DataGridTextColumn>
                                     <DataGridTextColumn Binding="{Binding SourceAdress,Mode=OneWay}" Header="SA"></DataGridTextColumn>
                                     <DataGridTextColumn Binding="{Binding DataAsText,Mode=OneWay}" Header="Data"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Background="{DynamicResource MaterialDesignCardBackground}">
+                                        <Button Margin="10" Content="{DynamicResource b_save}" Command="{Binding RvcPage.SaveRvcLogCommand}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding ElementName=RVCMessageList, Path=SelectedItem.VerboseInfo}" />
+                                </StackPanel>
+                            </DockPanel>
                         </TabItem>
                         <TabItem Header="{DynamicResource b_commands}">
 

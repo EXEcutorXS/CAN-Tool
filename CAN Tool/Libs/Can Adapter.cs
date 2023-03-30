@@ -8,19 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CAN_Tool.Libs;
 
 namespace Can_Adapter
 {
-    public interface IUpdatable<T>
-    {
-        public void Update(T item);
-
-        public bool IsSimmiliarTo(T item);
-
-        public int Id { get; }
-
-    }
-
 
     public class GotMessageEventArgs : EventArgs
     {
@@ -199,43 +190,7 @@ namespace Can_Adapter
         }
     }
 
-    public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>, IComparable
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="unit">Element to add</param>
-        /// <returns>true - element was added, false - updated</returns>
-        public bool TryToAdd(T item)
-        {
-            var found = Items.FirstOrDefault(i => i.IsSimmiliarTo(item));
-            if (found == null)
-            {
-                if (Count > 0)
-                {
-                    for (int i = 0; i < Count; i++)
-                    {
-                        if (item.CompareTo(Items[i]) <= 0)
-                        {
-                            Insert(i, item);
-                            return true;
-                        }
-                    }
-                    Add(item);
-                    return true;
-                }
-                else
-                {
-                    Add(item);
-                }
-            }
-            else
-            {
-                found.Update(item);
-            }
-            return false;
-        }
-    }
+
     public class CanAdapter : ViewModel
     {
 
@@ -258,6 +213,13 @@ namespace Can_Adapter
 
         private int failedMessagesCounter = 0;
         public int FailedMessagesCounter { private set => Set(ref failedMessagesCounter, value); get => failedMessagesCounter; }
+
+        private int lastSecondReceived;
+        private int currentSecodeReceived;
+        private System.Windows.Threading.DispatcherTimer oneSecondTimer;
+
+        //public int LastSecondReceived { get => lastSecondReceived; set => Set(ref lastSecondReceived, value); }
+
 
 
         private readonly SynchronizationContext UIContext;
@@ -322,7 +284,7 @@ namespace Can_Adapter
 
             serialPort.Write(str.ToString());
             
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 20; i++)
             {
                 Task.Delay(1);
                 if (txDone || TxFail)
@@ -384,6 +346,7 @@ namespace Can_Adapter
                     var m = new CanMessage(new string(currentBuf));
                     GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = m });
                     UIContext.Send((x) => Messages.TryToAdd(m), null);
+                    currentSecodeReceived++;
                     break;
                 case 'z':
                 case 'Z':
@@ -422,12 +385,26 @@ namespace Can_Adapter
             }
         }
 
+        public string Status => $"Bus use:{lastSecondReceived} msg/s,Faults:{failedMessagesCounter}";
+
         public CanAdapter()
         {
             serialPort = new SerialPort();
             serialPort.BaudRate = 256000;
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             UIContext = SynchronizationContext.Current;
+            oneSecondTimer = new();
+            oneSecondTimer.Tick += EverySecond;
+            oneSecondTimer.Interval = new TimeSpan(0,0,1);
+            oneSecondTimer.Start();
         }
+
+        private void EverySecond(object sender, EventArgs e)
+        {
+            lastSecondReceived = currentSecodeReceived;
+            currentSecodeReceived= 0;
+            OnPropertyChanged(nameof(Status));
+        }
+        
     }
 }

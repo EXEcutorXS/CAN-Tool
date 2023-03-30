@@ -1303,13 +1303,13 @@ namespace OmniProtocol
         {
             LogCurrentPos = 0;
             LogData = new List<double[]>();
-            for (int i = 0; i < 140; i++) //Переменных в paramsname.h пока намного меньше, но поставим пока 140
+            for (int i = 0; i < 150; i++) //Переменных в paramsname.h пока намного меньше, но поставим пока 140
             {
                 LogData.Add(new double[length]);
             }
         }
 
-        private bool[] supportedVariables = new bool[140];
+        private bool[] supportedVariables = new bool[150];
 
         public bool[] SupportedVariables => supportedVariables;
 

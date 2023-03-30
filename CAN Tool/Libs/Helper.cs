@@ -1,7 +1,59 @@
-﻿using OmniProtocol;
+﻿using MaterialDesignThemes.Wpf;
+using OmniProtocol;
+using System.ComponentModel;
+using System;
+using System.Linq;
 
 namespace CAN_Tool.Libs
 {
+    public interface IUpdatable<T>
+    {
+        public void Update(T item);
+
+        public bool IsSimmiliarTo(T item);
+
+        public int Id { get; }
+
+    }
+
+    public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>, IComparable
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="unit">Element to add</param>
+        /// <returns>true - element was added, false - updated</returns>
+        public bool TryToAdd(T item)
+        {
+            var found = Items.FirstOrDefault(i => i.IsSimmiliarTo(item));
+            if (found == null)
+            {
+                if (Count > 0)
+                {
+                    for (int i = 0; i < Count; i++)
+                    {
+                        if (item.CompareTo(Items[i]) <= 0)
+                        {
+                            Insert(i, item);
+                            return true;
+                        }
+                    }
+                    Add(item);
+                    return true;
+                }
+                else
+                {
+                    Add(item);
+                }
+            }
+            else
+            {
+                found.Update(item);
+            }
+            return false;
+        }
+    }
+
     public static class Helper
     {
         public static string GetString(string key)

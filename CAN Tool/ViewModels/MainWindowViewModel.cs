@@ -206,14 +206,6 @@ namespace CAN_Tool.ViewModels
         #endregion
         #endregion
 
-        #region CloseApplicationCommand
-        public ICommand CloseApplicationCommand { get; }
-        private void OnCloseApplicationCommandExecuted(object parameter)
-        {
-            App.Current.Shutdown();
-        }
-        private bool CanCloseApplicationCommandExecute(object parameter) => true;
-        #endregion
 
         #region HeaterCommands
 
@@ -743,7 +735,7 @@ namespace CAN_Tool.ViewModels
             FirmwarePage = new(this);
             rvcPage = new(this);
 
-            System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
+            var timer = new System.Windows.Threading.DispatcherTimer();
 
             timer.Tick += TimerTick;
             timer.Interval = new TimeSpan(0, 0, 1);
@@ -767,7 +759,6 @@ namespace CAN_Tool.ViewModels
             SetAdapterListedModeCommand = new LambdaCommand(OnSetAdapterListedModeCommandExecuted, CanSetAdapterListedModeCommandExecute);
             SetAdapterSelfReceptionModeCommand = new LambdaCommand(OnSetAdapterSelfReceptionModeCommandExecuted, CanSetAdapterSelfReceptionModeCommandExecute);
             StopCanAdapterCommand = new LambdaCommand(OnStopCanAdapterCommandExecuted, CanStopCanAdapterCommandExecute);
-            CloseApplicationCommand = new LambdaCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExecute);
             StartHeaterCommand = new LambdaCommand(OnStartHeaterCommandExecuted, DeviceConnectedAndNotInManual);
             StopHeaterCommand = new LambdaCommand(OnStopHeaterCommandExecuted, DeviceConnectedAndNotInManual);
             StartPumpCommand = new LambdaCommand(OnStartPumpCommandExecuted, DeviceConnectedAndNotInManual);

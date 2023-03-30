@@ -67,15 +67,16 @@ namespace CAN_Tool
 
         private void SaveSettings()
         {
-            if (vm.SelectedConnectedDevice == null) return;
-            foreach (var b in vm.SelectedConnectedDevice.Status)
-            {
-                App.Settings.Colors[b.Id] = (b.ChartBrush as SolidColorBrush).Color;
-                App.Settings.ShowFlag[b.Id] = (b.Display);
-                App.Settings.LineStyles[b.Id] = (b.LineStyle);
-                App.Settings.LineWidthes[b.Id] = (b.LineWidth);
-                App.Settings.MarkShapes[b.Id] = (b.MarkShape);
-            }
+            if (vm.SelectedConnectedDevice != null)
+
+                foreach (var b in vm.SelectedConnectedDevice.Status)
+                {
+                    App.Settings.Colors[b.Id] = (b.ChartBrush as SolidColorBrush).Color;
+                    App.Settings.ShowFlag[b.Id] = (b.Display);
+                    App.Settings.LineStyles[b.Id] = (b.LineStyle);
+                    App.Settings.LineWidthes[b.Id] = (b.LineWidth);
+                    App.Settings.MarkShapes[b.Id] = (b.MarkShape);
+                }
             string serialized = JsonSerializer.Serialize(App.Settings);
             StreamWriter sw = new("settings.json", false);
             sw.Write(serialized);
@@ -416,7 +417,7 @@ namespace CAN_Tool
             App.Settings.themeNumber = menuColor.SelectedIndex;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ExitButtonClick(object sender, RoutedEventArgs e)
         {
             SaveSettings();
             App.Current.Shutdown();
@@ -551,8 +552,8 @@ namespace CAN_Tool
                 vm.CanAdapter.Transmit(m);
             }
         }
-        
-            private void ManualButtonClick(object sender, RoutedEventArgs e)
+
+        private void ManualButtonClick(object sender, RoutedEventArgs e)
         {
             if (vm?.SelectedConnectedDevice != null)
             {
@@ -600,15 +601,15 @@ namespace CAN_Tool
             ManualScroll.Value = vm.SelectedConnectedDevice.Timber.SelectedZone.ManualPercent;
 
         }
-        
+
         private void ManualPercentChanged(object sender, RoutedEventArgs e)
         {
-            
+
 
             if (vm?.SelectedConnectedDevice != null && Convert.ToByte((sender as ScrollBar).Value) != vm.SelectedConnectedDevice.Timber.SelectedZone.ManualPercent)
             {
                 var scrollBar = (ScrollBar)sender;
-                var newvalue = Math.Round(scrollBar.Value , 0);
+                var newvalue = Math.Round(scrollBar.Value, 0);
                 if (newvalue > scrollBar.Maximum)
                     newvalue = scrollBar.Maximum;
 
