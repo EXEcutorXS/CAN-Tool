@@ -48,11 +48,10 @@ namespace CAN_Tool.ViewModels
             SendRvcMessageCommand = new LambdaCommand(OnSendRvcMessageCommandExecuted, x => true);
 
             SpamTimer = new();
-            SpamTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            SpamTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
             SpamTimer.Tick += SpamTimerTick;
-            
-            SpamTimer.Start();
         }
+        private int spamCounter = 0;
 
 
         private RvcMessage selectedMessage;
@@ -82,8 +81,11 @@ namespace CAN_Tool.ViewModels
 
         private void SpamTimerTick(object sender, EventArgs e)
         {
-            if (SpamState)
+            if (spamCounter > SpamInterval)
+            {
+                spamCounter = 0;
                 OnSendRvcMessageCommandExecuted(null);
+            }
         }
 
         public ICommand SendRvcMessageCommand { set; get; }

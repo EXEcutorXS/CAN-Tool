@@ -28,32 +28,17 @@ namespace CAN_Tool.ViewModels
         private readonly List<SolidColorBrush> brushes = new();
 
         public List<SolidColorBrush> Brushes => brushes;
-        private FirmwarePage firmwarePage;
 
-        public FirmwarePage FirmwarePage
-        {
-            get { return firmwarePage; }
-            set { Set(ref firmwarePage, value); }
-        }
+        public FirmwarePage FirmwarePage { set; get; }
+        public ManualPage ManualPage { set; get; }
 
         RvcPage rvcPage;
         public RvcPage RvcPage => rvcPage;
-        
 
-        private int manualAirBlower;
-        public int ManualAirBlower { set => Set(ref manualAirBlower, value); get => manualAirBlower; }
-
-        private int manualFuelPump;
-        public int ManualFuelPump { set => Set(ref manualFuelPump, value); get => manualFuelPump; }
-
-        private int manualGlowPlug;
-        public int ManualGlowPlug { set => Set(ref manualGlowPlug, value); get => manualGlowPlug; }
-
-        private bool manualWaterPump;
-        public bool ManualWaterPump { set => Set(ref manualWaterPump, value); get => manualWaterPump; }
+        public bool OmniEnabled { set; get; }
+        public bool RvcEnabled { set; get; }
 
         public bool AutoRedraw { set; get; } = true;
-
 
         CanAdapter _canAdapter;
         public CanAdapter CanAdapter { get => _canAdapter; }
@@ -213,7 +198,7 @@ namespace CAN_Tool.ViewModels
         public ICommand StartHeaterCommand { get; }
         private void OnStartHeaterCommandExecuted(object parameter)
         {
-            executeCommand(1, 0xff, 0xff);
+            ExecuteCommand(1, 0xff, 0xff);
         }
         #endregion
 
@@ -221,7 +206,7 @@ namespace CAN_Tool.ViewModels
         public ICommand StopHeaterCommand { get; }
         private void OnStopHeaterCommandExecuted(object parameter)
         {
-            executeCommand(3);
+            ExecuteCommand(3);
         }
         #endregion
 
@@ -229,7 +214,7 @@ namespace CAN_Tool.ViewModels
         public ICommand StartPumpCommand { get; }
         private void OnStartPumpCommandExecuted(object parameter)
         {
-            executeCommand(4, 0, 0);
+            ExecuteCommand(4, 0, 0);
         }
 
         #endregion
@@ -238,7 +223,7 @@ namespace CAN_Tool.ViewModels
         public ICommand ClearErrorsCommand { get; }
         private void OnClearErrorsCommandExecuted(object parameter)
         {
-            executeCommand(5);
+            ExecuteCommand(5);
         }
         #endregion
 
@@ -246,7 +231,7 @@ namespace CAN_Tool.ViewModels
         public ICommand StartVentCommand { get; }
         private void OnStartVentCommandExecuted(object parameter)
         {
-            executeCommand(10);
+            ExecuteCommand(10);
         }
         #endregion
 
@@ -255,12 +240,12 @@ namespace CAN_Tool.ViewModels
         public ICommand CalibrateTermocouplesCommand { get; }
         private void OnCalibrateTermocouplesCommandExecuted(object parameter)
         {
-            executeCommand(20);
+            ExecuteCommand(20);
         }
 
         #endregion
 
-        private bool DeviceConnectedAndNotInManual(object parameter) => CanAdapter.PortOpened && SelectedConnectedDevice != null && !SelectedConnectedDevice.ManualMode;
+        public bool DeviceConnectedAndNotInManual(object parameter) => CanAdapter.PortOpened && SelectedConnectedDevice != null && !SelectedConnectedDevice.ManualMode;
         #endregion
 
         #region LogCommands
@@ -469,137 +454,6 @@ namespace CAN_Tool.ViewModels
 
         #endregion
 
-        #region EnterManualModeCommand
-        public ICommand EnterManualModeCommand { get; }
-        private void OnEnterManualModeCommandExecuted(object parameter)
-        {
-            executeCommand(67, new byte[] { 1, 0, 0, 0, 0, 0 });
-        }
-
-        #endregion
-
-
-        #region ExitManualModeCommand
-        public ICommand ExitManualModeCommand { get; }
-        private void OnExitManualModeCommandExecuted(object parameter)
-        {
-            ManualAirBlower = 0;
-            ManualFuelPump = 0;
-            ManualGlowPlug = 0;
-            executeCommand(67, new byte[] { 0, 0, 0, 0, 0, 0 });
-        }
-        #endregion
-
-        #region PumpCheckCommand
-        public ICommand PumpCheckCommand { get; }
-        private void OnPumpCheckCommandExecuted(object parameter)
-        {
-            Task.Run(() => OmniProtocolInstance.CheckPump(selectedConnectedDevice));
-        }
-
-        private bool CanPumpCheckCommandExecute(object parameter)
-        {
-            return (deviceSelected(null) && selectedConnectedDevice.ManualMode && !OmniProtocolInstance.CurrentTask.Occupied);
-        }
-        #endregion
-
-        #region IncreaceManualAirBlower
-        public ICommand IncreaceManualAirBlowerCommand { get; }
-        private void OnIncreaceManualAirBlowerCommandExecuted(object parameter)
-        {
-            int delta;
-
-            if (parameter == null)
-                delta = 1;
-            else
-                delta = (int)parameter;
-
-            ManualAirBlower += delta;
-            if (ManualAirBlower >= 140)
-                manualAirBlower = 140;
-
-            updateManualMode();
-        }
-        #endregion
-
-        #region DecreaseManualAirBlower
-        public ICommand DecreaseManualAirBlowerCommand { get; }
-        private void OnDecreaseManualAirBlowerCommandExecuted(object parameter)
-        {
-            int delta;
-
-            if (parameter == null)
-                delta = -1;
-            else
-                delta = (int)parameter;
-
-            ManualAirBlower += delta;
-            if (ManualAirBlower <= 0)
-                ManualAirBlower = 0;
-
-            updateManualMode();
-        }
-        #endregion
-
-        #region IncreaseManualFuelPump
-        public ICommand IncreaseManualFuelPumpCommand { get; }
-        private void OnIncreaseManualFuelPumpCommandExecuted(object parameter)
-        {
-            ManualFuelPump += 5;
-            if (ManualFuelPump > 700) ManualFuelPump = 700;
-            updateManualMode();
-        }
-        #endregion
-
-
-
-        #region DecreaseManualFuelPump
-        public ICommand DecreaseFuelPumpCommand { get; }
-        private void OnDecreaseFuelPumpCommandExecuted(object parameter)
-        {
-            ManualFuelPump -= 5;
-            if (ManualFuelPump < 0) ManualFuelPump = 0;
-            updateManualMode();
-        }
-        #endregion
-
-        #region IncreaseManualGlowPlug
-        public ICommand IncreaseGlowPlugCommand { get; }
-        private void OnIncreaseGlowPlugCommandExecuted(object parameter)
-        {
-            ManualGlowPlug += 5;
-            if (ManualGlowPlug > 100) ManualGlowPlug = 100;
-            updateManualMode();
-        }
-        #endregion
-
-        #region DecreaseManualGlowPlug
-        public ICommand DecreaseGlowPlugCommand { get; }
-        private void OnDecreaseGlowPlugCommandExecuted(object parameter)
-        {
-            ManualGlowPlug -= 5;
-            if (ManualGlowPlug < 0) ManualGlowPlug = 0;
-            updateManualMode();
-        }
-        #endregion
-
-        #region TurnOnWaterPumpCommand
-        public ICommand TurnOnWaterPumpCommand { get; }
-        private void OnTurnOnWaterPumpCommandExecuted(object parameter)
-        {
-            manualWaterPump = true;
-            updateManualMode();
-        }
-        #endregion
-
-        #region TurnOffWaterPumpCommand
-        public ICommand TurnOffWaterPumpCommand { get; }
-        private void OnTurnOffWaterPumpCommandExecuted(object parameter)
-        {
-            manualWaterPump = false;
-            updateManualMode();
-        }
-        #endregion
 
         #region SaveLogCommand
 
@@ -632,7 +486,7 @@ namespace CAN_Tool.ViewModels
         #endregion
 
 
-        private void executeCommand(int cmdNum, params byte[] data)
+        public void ExecuteCommand(int cmdNum, params byte[] data)
         {
             OmniMessage msg = new();
             msg.TransmitterType = 126;
@@ -647,27 +501,6 @@ namespace CAN_Tool.ViewModels
             OmniProtocolInstance.SendMessage(msg);
         }
 
-        private void updateManualMode()
-        {
-            OmniMessage msg = new();
-            msg.TransmitterType = 126;
-            msg.TransmitterAddress = 6;
-            msg.ReceiverId = SelectedConnectedDevice.ID;
-            msg.PGN = 1;
-            msg.Data = new byte[8];
-            msg.Data[0] = 0;
-            msg.Data[1] = 68;
-
-            if (ManualWaterPump)
-                msg.Data[2] = 1;
-            else
-                msg.Data[2] = 0;
-            msg.Data[3] = (byte)ManualAirBlower;
-            msg.Data[4] = (byte)ManualGlowPlug;
-            msg.Data[5] = (byte)(ManualFuelPump / 256);
-            msg.Data[6] = (byte)ManualFuelPump;
-            Task.Run(() => OmniProtocolInstance.SendMessage(msg));
-        }
 
         #region Chart
 
@@ -768,19 +601,10 @@ namespace CAN_Tool.ViewModels
             LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
             LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
             ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);
-            EnterManualModeCommand = new LambdaCommand(OnEnterManualModeCommandExecuted, DeviceConnectedAndNotInManual);
-            ExitManualModeCommand = new LambdaCommand(OnExitManualModeCommandExecuted, deviceInManualMode);
-            IncreaceManualAirBlowerCommand = new LambdaCommand(OnIncreaceManualAirBlowerCommandExecuted, deviceInManualMode);
-            DecreaseManualAirBlowerCommand = new LambdaCommand(OnDecreaseManualAirBlowerCommandExecuted, deviceInManualMode);
-            IncreaseManualFuelPumpCommand = new LambdaCommand(OnIncreaseManualFuelPumpCommandExecuted, deviceInManualMode);
-            DecreaseFuelPumpCommand = new LambdaCommand(OnDecreaseFuelPumpCommandExecuted, deviceInManualMode);
-            IncreaseGlowPlugCommand = new LambdaCommand(OnIncreaseGlowPlugCommandExecuted, deviceInManualMode);
-            DecreaseGlowPlugCommand = new LambdaCommand(OnDecreaseGlowPlugCommandExecuted, deviceInManualMode);
-            TurnOnWaterPumpCommand = new LambdaCommand(OnTurnOnWaterPumpCommandExecuted, deviceInManualMode);
-            TurnOffWaterPumpCommand = new LambdaCommand(OnTurnOffWaterPumpCommandExecuted, deviceInManualMode);
+
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
             SaveReportCommand = new LambdaCommand(OnSaveReportCommandExecuted, CanSaveReportCommandExecute);
-            PumpCheckCommand = new LambdaCommand(OnPumpCheckCommandExecuted, CanPumpCheckCommandExecute);
+            
 
             CustomMessage.TransmitterAddress = 6;
             CustomMessage.TransmitterType = 126;

@@ -62,7 +62,7 @@ namespace CAN_Tool.Libs
             if (ret != null)
                 return ret;
             else
-                return key;
+                return key.Replace('_',' ');
         }
 
         public static bool GotResource(string key)

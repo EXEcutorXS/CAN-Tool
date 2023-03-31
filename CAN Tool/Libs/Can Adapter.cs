@@ -54,7 +54,6 @@ namespace Can_Adapter
             get => dlc;
         }
 
-
         private byte[] data = new byte[8];
 
         [AffectsTo(nameof(VerboseInfo), nameof(DataAsText))]
@@ -364,7 +363,6 @@ namespace Can_Adapter
 
             }
         }
-
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs args)
         {

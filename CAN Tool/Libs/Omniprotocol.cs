@@ -824,12 +824,7 @@ namespace OmniProtocol
 
         private DateTime capturedTime;
 
-        private TimeSpan? lastOperationDuration;
-        public TimeSpan? LastOperationDuration
-        {
-            set => Set(ref lastOperationDuration, value);
-            get => lastOperationDuration;
-        }
+
 
         public int PercentComplete
         {
@@ -864,6 +859,13 @@ namespace OmniProtocol
 
         public event EventHandler TaskDone;
         public event EventHandler TaskCancelled;
+
+        private TimeSpan? lastOperationDuration;
+        public TimeSpan? LastOperationDuration
+        {
+            set => Set(ref lastOperationDuration, value);
+            get => lastOperationDuration;
+        }
 
         public void onDone()
         {
@@ -938,6 +940,7 @@ namespace OmniProtocol
         }
 
     }
+
     public class MainParameters : ViewModel, ICloneable
     {
 
@@ -1078,6 +1081,7 @@ namespace OmniProtocol
             return MemberwiseClone();
         }
     }
+
     public class ConnectedDevice : ViewModel
     {
         public bool WaitForFlag(ref bool flag, int delay)
@@ -1424,6 +1428,23 @@ namespace OmniProtocol
         public bool ReadingBBErrorsMode { get; set; } = false;
 
         OmniTask currentTask = new();
+
+
+
+        public string TaskStatus {get
+            {
+                if (currentTask.Name == "Ready")
+                    return "";
+                if (!currentTask.Done && !currentTask.Cancelled && !currentTask.Failed)
+                    return GetString(currentTask.Name) + " " + GetString("in_progress");
+                if (currentTask.Done)
+                    return GetString(currentTask.Name) + " " + GetString("done_in") + " " + currentTask.LastOperationDuration.Value.TotalSeconds + GetString("u_s");
+                if (currentTask.Cancelled)
+                    return GetString(currentTask.Name) + " " + GetString("cancelled");
+                if (currentTask.Failed)
+                    return GetString(currentTask.Name) + " " + GetString("failed") + ", " + GetString(currentTask.FailReason);
+                return "";
+            } } 
 
         public OmniTask CurrentTask
         {
