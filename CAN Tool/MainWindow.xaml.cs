@@ -434,10 +434,7 @@ namespace CAN_Tool
             {
                 vm?.CanAdapter.SetBitrate(CanBitrateField.SelectedIndex);
             }
-            catch (Exception ex)
-            {
-                vm.Error = ex.Message;
-            }
+            catch { }
         }
 
         private void ExpertMode_CheckedChanged(object sender, RoutedEventArgs e)

@@ -1435,7 +1435,7 @@ namespace OmniProtocol
             {
                 if (currentTask.Name == "Ready")
                     return "";
-                if (!currentTask.Done && !currentTask.Cancelled && !currentTask.Failed)
+                if (!currentTask.Done && !currentTask.Cancelled && !currentTask.Failed && currentTask.Occupied)
                     return GetString(currentTask.Name) + " " + GetString("in_progress");
                 if (currentTask.Done)
                     return GetString(currentTask.Name) + " " + GetString("done_in") + " " + currentTask.LastOperationDuration.Value.TotalSeconds + GetString("u_s");

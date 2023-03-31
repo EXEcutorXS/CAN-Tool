@@ -16,7 +16,7 @@ namespace CAN_Tool.ViewModels
 
     internal class ManualPage : ViewModel
     {
-        MainWindowViewModel Vm { set; get; }
+        public MainWindowViewModel Vm { set; get; }
 
 
         private int manualAirBlower;
@@ -56,12 +56,12 @@ namespace CAN_Tool.ViewModels
         public ICommand PumpCheckCommand { get; }
         private void OnPumpCheckCommandExecuted(object parameter)
         {
-            Task.Run(() => Vm.OmniProtocolInstance.CheckPump(Vm.SelectedConnectedDevice));
+            Task.Run(() => Vm.OmniInstance.CheckPump(Vm.SelectedConnectedDevice));
         }
 
         private bool CanPumpCheckCommandExecute(object parameter)
         {
-            return (Vm.deviceSelected(null) && Vm.SelectedConnectedDevice.ManualMode && !Vm.OmniProtocolInstance.CurrentTask.Occupied);
+            return (Vm.deviceSelected(null) && Vm.SelectedConnectedDevice.ManualMode && !Vm.OmniInstance.CurrentTask.Occupied);
         }
         
         public ICommand IncreaceManualAirBlowerCommand { get; }
@@ -176,7 +176,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[4] = (byte)ManualGlowPlug;
             msg.Data[5] = (byte)(ManualFuelPump / 256);
             msg.Data[6] = (byte)ManualFuelPump;
-            Task.Run(() => Vm.OmniProtocolInstance.SendMessage(msg));
+            Task.Run(() => Vm.OmniInstance.SendMessage(msg));
         }
 
         public ManualPage(MainWindowViewModel vm)

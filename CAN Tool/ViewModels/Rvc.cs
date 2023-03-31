@@ -96,9 +96,7 @@ namespace CAN_Tool.ViewModels
             vm.CanAdapter.Transmit(msg);
         }
 
-        public RvcMessage ConstructedMessage { set; get; } = new() { Dgn = 0x1FFFF, SourceAdress = 80, Priority = 6 };
-
-        
+        public RvcMessage ConstructedMessage { set; get; } = new() { Dgn = 0x1FFFF, SourceAdress = 80, Priority = 6,Data = new byte[]{0xff, 0xff,0xff, 0xff, 0xff, 0xff, 0xff, 0xff } };
 
     }
 }
