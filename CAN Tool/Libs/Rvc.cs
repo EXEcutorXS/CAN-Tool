@@ -14,6 +14,7 @@ using CAN_Tool.ViewModels;
 using System.ComponentModel;
 using OmniProtocol;
 using CAN_Tool.Libs;
+using System.Threading;
 
 namespace RVC
 {
@@ -713,14 +714,15 @@ namespace RVC
         custom
     };
 
-    public class DGN
+    public class DGN:ViewModel
     {
-        public int Dgn;
-        public string Name;
-        public int MaxBroadcastGap = 5000;
-        public int MinBroadcastGap = 500;
-        public List<Parameter> Parameters;
-        public bool HasInstance = false;
+        public int Dgn { set; get; }
+        public string Name { set; get; }
+        public int MaxBroadcastGap { set; get; } = 5000;
+        public int MinBroadcastGap { set; get; } = 500;
+        public List<Parameter> Parameters { set; get; }
+        public bool HasInstance { set; get; } = false;
+        public string DisplayName => $"{Dgn:X05} {Name}";
 
         public DGN(bool addInstance = false)
         {
@@ -926,7 +928,17 @@ namespace RVC
 
         public IEnumerable<Parameter> Parameters => (RVC.DGNs.ContainsKey(Dgn)) ? RVC.DGNs[Dgn].Parameters : null;
 
-        public RvcMessage(CanMessage msg)
+        public RvcMessage() : base()
+        {
+            Priority = 6;
+            Dgn = 0x1FFFF;
+            SourceAdress = 100;
+
+            Fresh = true;
+            Task.Run(() => { Thread.Sleep(300); this.Fresh = false; });
+        }
+
+        public RvcMessage(CanMessage msg):base()
         {
             if (msg == null)
                 throw new ArgumentNullException("Source CAN Message can't be null");
@@ -942,7 +954,7 @@ namespace RVC
             Data = msg.Data;
 
             Fresh = true;
-            Task.Run(() => { Task.Delay(300); Fresh = false; });
+            Task.Run(() => { Thread.Sleep(300); this.Fresh = false; });
         }
 
         public CanMessage GetCanMessage()
@@ -1002,15 +1014,21 @@ namespace RVC
 
         public void Update(RvcMessage item)
         {
-            item.Data.CopyTo(Data, 0);
+            Data = item.Data;
             SourceAdress = item.SourceAdress;
             Priority = item.Priority;
+            Fresh = true;
+            Task.Run(() => { Thread.Sleep(300); Fresh = false; });
         }
 
         public bool IsSimmiliarTo(RvcMessage item)
         {
             if (Dgn != item.Dgn) return false;
-            foreach (Parameter p in item.Parameters.Where(p => p.Id == true))
+            if (item.Parameters == null) return true;
+            List<Parameter> param = new();
+            param = item.Parameters.Where(p => p.Id == true).ToList<Parameter>();
+            if (param.Count == 0) return true;
+            foreach (Parameter p in param)
                 if (p.RawData(item.Data) == p.RawData(Data)) continue;
                 else
                     return false;

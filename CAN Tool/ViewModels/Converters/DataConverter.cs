@@ -1,10 +1,12 @@
 ﻿using OmniProtocol;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using RVC;
 
 namespace CAN_Tool.ViewModels.Converters
 {
@@ -216,6 +218,35 @@ namespace CAN_Tool.ViewModels.Converters
                     return value;
             else
                 return null;
+        }
+    }
+
+    public class DgnConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return RVC.RVC.DGNs[(int)value];
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+                return ((KeyValuePair<int, DGN>)value).Key;
+            else
+                return null;
+        }
+    }
+
+    public class TimeSpanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return  new TimeSpan(0, 0, 0,  0, (int)value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((TimeSpan)value).Milliseconds;
         }
     }
 

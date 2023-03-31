@@ -262,7 +262,7 @@ namespace OmniProtocol
         public OmniMessage() : base()
         {
             Fresh = true;
-            Task.Run(() => { Task.Delay(300); Fresh = false; });
+            Task.Run(() => { Thread.Sleep(300); Fresh = false; });
             DLC = 8;
             RTR = false;
             IDE = true;
@@ -2177,7 +2177,7 @@ namespace OmniProtocol
 
         private void Adapter_GotNewMessage(object sender, EventArgs e)
         {
-            UIContext.Send(x => ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null);
+            //UIContext.Send(x => ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null);
         }
 
     }
