@@ -40,7 +40,6 @@ namespace CAN_Tool.ViewModels
         public RvcPage(MainWindowViewModel vm)
         {
             this.vm = vm;
-            vm.CanAdapter.GotNewMessage += GotNewMessage;
 
             UIContext = SynchronizationContext.Current;
 
@@ -61,9 +60,8 @@ namespace CAN_Tool.ViewModels
             set => Set(ref selectedMessage, value);
         }
 
-        public void GotNewMessage(object sender, EventArgs e)
+        public void ProcessMessage(CanMessage m)
         {
-            CanMessage m = (e as GotMessageEventArgs).receivedMessage;
             if (m.RvcCompatible)
                 UIContext.Send(x => MessageList.TryToAdd(new RvcMessage(m)), null);
         }

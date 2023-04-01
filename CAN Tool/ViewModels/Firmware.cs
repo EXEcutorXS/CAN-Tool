@@ -95,7 +95,7 @@ namespace CAN_Tool.ViewModels
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "Hex Files|*.hex";
-            dialog.ShowDialog();
+            if (!(bool)dialog.ShowDialog()) return;
             fragments = parseHexFile(dialog.FileName, fragmentSize);
             MessageBox.Show($"Hex is loaded, contains {fragments.Count} fragments.");
         }
@@ -176,9 +176,11 @@ namespace CAN_Tool.ViewModels
 
         private bool checkTransmittedData(int len, uint crc)
         {
-            OmniMessage msg = new();
-            msg.PGN = 105;
-            msg.ReceiverType = 123;
+            OmniMessage msg = new()
+            {
+                PGN = 105,
+                ReceiverType = 123
+            };
             msg.Data[0] = 2;
             Debug.WriteLine("Waiting for check info");
             for (int i = 0; i < 6; i++)

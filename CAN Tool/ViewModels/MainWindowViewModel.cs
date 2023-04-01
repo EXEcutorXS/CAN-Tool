@@ -19,6 +19,9 @@ using Alignment = Xceed.Document.NET.Alignment;
 using CAN_Tool.Libs;
 using static CAN_Tool.Libs.Helper;
 using RVC;
+using System.Windows.Markup;
+using System.Security.AccessControl;
+using System.Drawing.Text;
 
 namespace CAN_Tool.ViewModels
 {
@@ -26,6 +29,8 @@ namespace CAN_Tool.ViewModels
 
     internal class MainWindowViewModel : ViewModel
     {
+        private SynchronizationContext UIContext = SynchronizationContext.Current;
+
         public WorkMode_t[] WorkModes => new WorkMode_t[] { WorkMode_t.Omni, WorkMode_t.Rvc, WorkMode_t.RegularCan };
 
         private WorkMode_t mode;
@@ -510,8 +515,18 @@ namespace CAN_Tool.ViewModels
 
         }
 
+        public void NewMessgeReceived(object sender, EventArgs e)
+        { 
+            switch(Mode)
+            {
+                case WorkMode_t.Omni: UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null); break;
+                case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage ((e as GotMessageEventArgs).receivedMessage), null); break;
+            }
+        }
+
         public MainWindowViewModel()
         {
+            
 
             canAdapter = new();
             OmniInstance = new Omni(CanAdapter);
@@ -521,6 +536,7 @@ namespace CAN_Tool.ViewModels
             RvcPage = new(this);
             ManualPage = new(this);
 
+            CanAdapter.GotNewMessage += NewMessgeReceived;
             var timer = new System.Windows.Threading.DispatcherTimer();
 
             timer.Tick += TimerTick;

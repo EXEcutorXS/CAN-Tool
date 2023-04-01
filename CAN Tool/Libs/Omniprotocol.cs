@@ -1402,8 +1402,6 @@ namespace OmniProtocol
 
         public event EventHandler NewDeviceAquired;
 
-        private SynchronizationContext UIContext;
-
         public ScottPlot.WpfPlot plot;
 
         static readonly Dictionary<int, string> defMeaningsYesNo = new() { { 0, "Нет" }, { 1, "Да" }, { 2, "Нет данных" }, { 3, "Нет данных" } };
@@ -1465,7 +1463,7 @@ namespace OmniProtocol
         private void UpdatePercent(int p) => CurrentTask.UpdatePercent(p);
 
 
-        private void ProcessCanMessage(CanMessage msg)
+        public void ProcessCanMessage(CanMessage msg)
         {
 
             OmniMessage m = new OmniMessage(msg);
@@ -1885,7 +1883,8 @@ namespace OmniProtocol
 
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
-            UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
+            //UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
+            currentDevice.BBErrors.Clear();
 
             OmniMessage msg = new OmniMessage
             {
@@ -2188,19 +2187,10 @@ namespace OmniProtocol
 
         public Omni(CanAdapter adapter)
         {
-            UIContext = SynchronizationContext.Current;
             if (adapter == null) throw new ArgumentNullException("Can Adapter reference can't be null");
             canAdapter = adapter;
-            adapter.GotNewMessage += Adapter_GotNewMessage;
             SeedStaticData();
-
         }
-
-        private void Adapter_GotNewMessage(object sender, EventArgs e)
-        {
-            //UIContext.Send(x => ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null);
-        }
-
     }
 
 }
