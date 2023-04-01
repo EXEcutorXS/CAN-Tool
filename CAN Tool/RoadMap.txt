@@ -1,3 +1,5 @@
 Localise entire program
 Add Timberline RVC-Control
+Add more RV-C protocol data
 Add regular CAN interface
+Add crc calculation function to firmware update

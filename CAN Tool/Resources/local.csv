@@ -821,3 +821,7 @@ reset_cpu	Reset MCU	Перезагрузка контроллера
 failures_mask	Mask failure codes	биты реакции на неисправности
 temperature_set	Temperature set	установить значение температуры
 clear_error_codes	Clear error codes	сброс неисправностей
+manual_test_mode_enter	Manual or test mode enter/exit	вход/выход в стадию M (ручное управление) или T (тестирование блока управления)
+manual_control	Manual device control	задание параметров устройств в стадии M (ручное управление)
+control_executive_devices	Executive devices control	управление устройствами
+executive_devices_onoff	Executive devices on/off	Включение/Выключение устройств

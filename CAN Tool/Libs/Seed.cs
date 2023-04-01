@@ -117,26 +117,26 @@ namespace OmniProtocol
             #endregion
 
             #region Command parameters init
-            commands[0].Parameters.Add(new() { StartByte = 2, BitLength = 8, GetMeaning = i => ("Устройство: " + Devices[i].Name + ";"), AnswerOnly = true }); ;
-            commands[0].Parameters.Add(new() { StartByte = 3, BitLength = 8, Meanings = { { 0, "12 Вольт" }, { 1, "24 Вольта" } }, AnswerOnly = true });
-            commands[0].Parameters.Add(new() { StartByte = 4, BitLength = 8, Name = "Верия ПО", AnswerOnly = true });
-            commands[0].Parameters.Add(new() { StartByte = 5, BitLength = 8, Name = "Модификация ПО", AnswerOnly = true });
+            commands[0].Parameters.Add(new() { StartByte = 2, BitLength = 8, GetMeaning = i => ("device: " + GetString($"d_{i}") + ";"), AnswerOnly = true }); ;
+            commands[0].Parameters.Add(new() { StartByte = 3, BitLength = 8, Meanings = { { 0, "12 volts" }, { 1, "24 volts" } }, AnswerOnly = true });
+            commands[0].Parameters.Add(new() { StartByte = 4, BitLength = 8, Name = "firmware", AnswerOnly = true });
+            commands[0].Parameters.Add(new() { StartByte = 5, BitLength = 8, Name = "modification", AnswerOnly = true });
 
-            commands[0].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "Время работы", UnitT = UnitType.Minute });
+            commands[1].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "working_time", UnitT = UnitType.Minute });
 
-            commands[0].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "Время работы", UnitT = UnitType.Minute });
+            commands[3].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "working_time", UnitT = UnitType.Minute });
 
-            commands[6].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "Время работы", UnitT = UnitType.Minute });
-            commands[6].Parameters.Add(new() { StartByte = 4, BitLength = 4, Name = "Режим работы", Meanings = { { 0, "обычный" }, { 1, "экономичный" }, { 2, "догреватель" }, { 3, "отопление" }, { 4, "отопительные системы" } } });
-            commands[6].Parameters.Add(new() { StartByte = 4, StartBit = 4, BitLength = 4, Name = "Режим догрева", Meanings = { { 0, "отключен" }, { 1, "автоматический" }, { 2, "ручной" } } });
-            commands[6].Parameters.Add(new() { StartByte = 5, BitLength = 16, Name = "Уставка температуры", UnitT = UnitType.Temp });
-            commands[6].Parameters.Add(new() { StartByte = 7, BitLength = 2, Name = "Работа помпы в ждущем режиме", Meanings = defMeaningsOnOff });
-            commands[6].Parameters.Add(new() { StartByte = 7, BitLength = 2, StartBit = 2, Name = "Работа помпы при заведённом двигателе", Meanings = defMeaningsOnOff });
+            commands[10].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "working_time", UnitT = UnitType.Minute });
+            commands[6].Parameters.Add(new() { StartByte = 4, BitLength = 4, Name = "working_mode", Meanings = { { 0, "t_regular" }, { 1, "t_eco" }, { 2, "t_additional_heater" }, { 3, "t_heater" }, { 4, "t_heating_systems" } } });
+            commands[6].Parameters.Add(new() { StartByte = 4, StartBit = 4, BitLength = 4, Name = "t_additional_heater_mode", Meanings = { { 0, "off" }, { 1, "t_auto" }, { 2, "t_manual" } } });
+            commands[6].Parameters.Add(new() { StartByte = 5, BitLength = 16, Name = "t_temp_setpoint", UnitT = UnitType.Temp });
+            commands[6].Parameters.Add(new() { StartByte = 7, BitLength = 2, Name = "t_pump_in_idle", Meanings = defMeaningsOnOff });
+            commands[6].Parameters.Add(new() { StartByte = 7, BitLength = 2, StartBit = 2, Name = "t_pump_while_engine_running", Meanings = defMeaningsOnOff });
 
-            commands[7].Parameters.Add(new() { StartByte = 2, BitLength = 8, Name = "Номер мощности" });
+            commands[7].Parameters.Add(new() { StartByte = 2, BitLength = 8, Name = "t_power_level" });
 
-            commands[7].Parameters.Add(new() { StartByte = 3, BitLength = 16, Name = "Температура перехода на большую мощность", AnswerOnly = true });
-            commands[7].Parameters.Add(new() { StartByte = 4, BitLength = 16, Name = "Температура перехода на меньшую мощность", AnswerOnly = true });
+            commands[7].Parameters.Add(new() { StartByte = 3, BitLength = 16, Name = "t_going_up_temperature", AnswerOnly = true });
+            commands[7].Parameters.Add(new() { StartByte = 4, BitLength = 16, Name = "t_going_down_temperature", AnswerOnly = true });
 
             commands[8].Parameters.Add(new() { StartByte = 2, BitLength = 2, StartBit = 0, Name = "Состояние клапана 1", Meanings = defMeaningsOnOff });
             commands[8].Parameters.Add(new() { StartByte = 2, BitLength = 2, StartBit = 2, Name = "Состояние клапана 2", Meanings = defMeaningsOnOff });
