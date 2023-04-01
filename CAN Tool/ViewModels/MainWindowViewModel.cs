@@ -43,11 +43,15 @@ namespace CAN_Tool.ViewModels
         public FirmwarePage FirmwarePage { set; get; }
         public ManualPage ManualPage { set; get; }
         public RvcPage RvcPage { set; get; }
+        public CanPage CanPage { set; get; }
 
         public bool OmniEnabled { set; get; }
         public bool RvcEnabled { set; get; }
 
         public bool AutoRedraw { set; get; } = true;
+
+        private bool canAdapterSettings = false;
+        public bool CanAdapterSettings { set=>Set(ref canAdapterSettings,value); get=>canAdapterSettings; } 
 
         CanAdapter canAdapter;
         public CanAdapter CanAdapter { get => canAdapter; }
@@ -521,6 +525,7 @@ namespace CAN_Tool.ViewModels
             {
                 case WorkMode_t.Omni: UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null); break;
                 case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage ((e as GotMessageEventArgs).receivedMessage), null); break;
+                case WorkMode_t.RegularCan: UIContext.Send(x => CanPage.ProcessMessage((e as GotMessageEventArgs).receivedMessage), null); break;
             }
         }
 
@@ -535,6 +540,7 @@ namespace CAN_Tool.ViewModels
             FirmwarePage = new(this);
             RvcPage = new(this);
             ManualPage = new(this);
+            CanPage = new(this);
 
             CanAdapter.GotNewMessage += NewMessgeReceived;
             var timer = new System.Windows.Threading.DispatcherTimer();

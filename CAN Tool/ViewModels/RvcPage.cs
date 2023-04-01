@@ -27,8 +27,6 @@ namespace CAN_Tool.ViewModels
 
         public UpdatableList<RvcMessage> MessageList { get; } = new();
 
-        private SynchronizationContext UIContext;
-
         public Dictionary<int,DGN> DgnList => RVC.RVC.DGNs;
 
         public bool SpamState { set; get; }
@@ -40,8 +38,6 @@ namespace CAN_Tool.ViewModels
         public RvcPage(MainWindowViewModel vm)
         {
             this.vm = vm;
-
-            UIContext = SynchronizationContext.Current;
 
             SaveRvcLogCommand = new LambdaCommand(OnSaveRvcLogCommandExecuted, x => true);
             SendRvcMessageCommand = new LambdaCommand(OnSendRvcMessageCommandExecuted, x => true);
@@ -63,7 +59,7 @@ namespace CAN_Tool.ViewModels
         public void ProcessMessage(CanMessage m)
         {
             if (m.RvcCompatible)
-                UIContext.Send(x => MessageList.TryToAdd(new RvcMessage(m)), null);
+                MessageList.TryToAdd(new RvcMessage(m));
         }
 
         public ICommand SaveRvcLogCommand { set; get; }

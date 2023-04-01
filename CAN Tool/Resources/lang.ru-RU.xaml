@@ -66,7 +66,7 @@
 <v:String x:Key="b_list_paneltemp">Т пульта</v:String>
 <v:String x:Key="b_list_inlettemp">Т вход</v:String>
 <v:String x:Key="b_list_error">Код.ош.</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="t_value">Значение</v:String>
 <v:String x:Key="t_description">Описание</v:String>
 <v:String x:Key="t_cancel">Отмена</v:String>
@@ -80,7 +80,7 @@
 <v:String x:Key="t_errors_found">Ошибок в памяти</v:String>
 <v:String x:Key="t_no_data">Нет данных</v:String>
 <v:String x:Key="t_liquid_level">Уровень жидкости</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="e_1">Перегрев</v:String>
 <v:String x:Key="e_2">Перегрев</v:String>
 <v:String x:Key="e_3">Ошибка датчика перегрева</v:String>
@@ -106,7 +106,7 @@
 <v:String x:Key="e_54">КЗ в цепи датчика потока</v:String>
 <v:String x:Key="e_55">Обрыв в цепи датчика температуры воздуха</v:String>
 <v:String x:Key="e_56">КЗ в цепи датчика температуры воздуха</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="e_57">КЗ в цепи датчика температуры 1 зоны</v:String>
 <v:String x:Key="e_58">Обрыв цепи датчика темп. 1 зоны</v:String>
 <v:String x:Key="e_59">КЗ цепи датчика температуры 2 зоны</v:String>
@@ -117,7 +117,7 @@
 <v:String x:Key="e_64">Обрывцепи датчика темп. 5 зоны</v:String>
 <v:String x:Key="e_65">КЗ цепи датчика температуры 5 зоны</v:String>
 <v:String x:Key="e_66">Обрывцепи датчика темп. 5 зоны</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="e_69">КЗ в цепи помпы 1</v:String>
 <v:String x:Key="e_70">Обрыв цепи помпы 1</v:String>
 <v:String x:Key="e_71">КЗ в цепи помпы 2</v:String>
@@ -141,10 +141,10 @@
 <v:String x:Key="e_91">Низкий уровень жидкости</v:String>
 <v:String x:Key="e_92">КЗ цепи датчика уровня</v:String>
 <v:String x:Key="e_93">Обрыв цепи датчика уровня</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="t_no_error_code">Нет кода ошибки</v:String>
 <v:String x:Key="t_error">Ошибка</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_0">ШИМ нагнетателя воздуха, Гц</v:String>
 <v:String x:Key="par_1">Длительность импульса ТН, мс</v:String>
 <v:String x:Key="par_2">Номинальное напряжение свечи, В</v:String>
@@ -173,23 +173,23 @@
 <v:String x:Key="par_25">Зона5 подключена (для систем отопления)</v:String>
 <v:String x:Key="par_26">максимальная темепература выхлопных газов</v:String>
 <v:String x:Key="par_27">производительность топливного насоса, мл/100 качков</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_28">уставка температуры ТЭНа для перехода в ждущий</v:String>
 <v:String x:Key="par_29">уставка температуры ТЭНа для выхода из ждущего</v:String>
 <v:String x:Key="par_30">уставка температуры ТЭНа для выхода из ждущего при разборе воды</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_31">уставка температуры жидкости подогревателя для перехода в ждущий</v:String>
 <v:String x:Key="par_32">уставка температуры жидкости подогревателя для выхода из ждущего</v:String>
 <v:String x:Key="par_33">уставка температуры жидкости подогревателя для выхода из ждущего при разборе воды при разборе воды</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_34">уставка температуры бака для перехода в ждущий</v:String>
 <v:String x:Key="par_35">уставка температуры бака для выхода из ждущего</v:String>
 <v:String x:Key="par_36">уставка температуры бака для выхода из ждущего при разборе воды при разборе воды</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_37">приоритет бытовой воды в системе отопления</v:String>
 <v:String x:Key="par_38">Пауза для начала разбора воды</v:String>
-<v:String x:Key=""></v:String>
-<v:String x:Key=""></v:String>
+ 
+ 
 <v:String x:Key="par_39">Дельта перехода вверх 0</v:String>
 <v:String x:Key="par_40">Дельта перехода вверх 1</v:String>
 <v:String x:Key="par_41">Дельта перехода вверх 2</v:String>
@@ -200,7 +200,7 @@
 <v:String x:Key="par_46">Дельта перехода вверх 7</v:String>
 <v:String x:Key="par_47">Дельта перехода вверх 8</v:String>
 <v:String x:Key="par_48">Дельта перехода вверх 9</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_49">Дельта перехода вниз 0</v:String>
 <v:String x:Key="par_50">Дельта перехода вниз 1</v:String>
 <v:String x:Key="par_51">Дельта перехода вниз 2</v:String>
@@ -211,19 +211,19 @@
 <v:String x:Key="par_56">Дельта перехода вниз 7</v:String>
 <v:String x:Key="par_57">Дельта перехода вниз 8</v:String>
 <v:String x:Key="par_58">Дельта перехода вниз 9</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_59">Номер помпы для зоны 1</v:String>
 <v:String x:Key="par_60">Номер помпы для зоны 2</v:String>
 <v:String x:Key="par_61">Номер помпы для зоны 3</v:String>
 <v:String x:Key="par_62">Номер помпы для зоны 4</v:String>
 <v:String x:Key="par_63">Номер помпы для зоны 5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_64">Ограничение ШИМ вентилятора зоны 1, %</v:String>
 <v:String x:Key="par_65">Ограничение ШИМ вентилятора зоны 2, %</v:String>
 <v:String x:Key="par_66">Ограничение ШИМ вентилятора зоны 3, %</v:String>
 <v:String x:Key="par_67">Ограничение ШИМ вентилятора зоны 4, %</v:String>
 <v:String x:Key="par_68">Ограничение ШИМ вентилятора зоны 5, %</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_69">Периодичность корректировки ШИМ вентиляторов, мс</v:String>
 <v:String x:Key="par_70">Формат времени (12/24 или AM/PM)</v:String>
 <v:String x:Key="par_71">Единицы измерения температуры (C/F)</v:String>
@@ -231,21 +231,21 @@
 <v:String x:Key="par_73">Окончание дневного времени суток, мин</v:String>
 <v:String x:Key="par_74">Яркость дисплея днем, %</v:String>
 <v:String x:Key="par_75">Яркость дисплея ночью, %</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_76">Температура включения печки салона автомобиля</v:String>
 <v:String x:Key="par_77">Работа помпы в ждущем режиме: 0 - не работает, иначе - работает</v:String>
 <v:String x:Key="par_78">Работа помпы при заведенном двигателе: 1 - работает, иначе - не работает</v:String>
 <v:String x:Key="par_79">Режим догревателя: 0 - отключен, 1 - автоматический, 2 - ручной</v:String>
 <v:String x:Key="par_80">запускаться или нет, если сигналка в сработанном состоянии после остановки</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_81">обычный режим: разница температур между уставкой и началом розжига</v:String>
 <v:String x:Key="par_82">экономичный режим: разница температур между уставкой и началом розжига</v:String>
 <v:String x:Key="par_83">догреватель: разница температур между уставкой и началом розжига</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_84">минимальная ступень мощности</v:String>
 <v:String x:Key="par_85">максимальная ступень мощности</v:String>
 <v:String x:Key="par_86">проценты от напряжения питания для определения заведенного двигателя</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_87">уставка температуры жидкостного подогревателя (отопление)</v:String>
 <v:String x:Key="par_88">режим отопления: разница температур между уставкой и началом розжига</v:String>
 <v:String x:Key="par_89">Язык: 0 - английский, 1 - русский</v:String>
@@ -255,15 +255,15 @@
 <v:String x:Key="par_93">сохраненное значение времени работы при срабатывании сигнализации, минуты</v:String>
 <v:String x:Key="par_94">сохраненное значение режима работы при срабатывании сигнализации: 0 - обычный, 1 - экономичный, 3 - отопление, 4 - отопительные системы</v:String>
 <v:String x:Key="par_95">настройка ручного режима вентиляции: 0 - выключение вентиляторов при достижении заданной температуры, 1 - вентилятор не останавливается</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_96">Время возникновения неисправности при повышенном напряжении, *200мс</v:String>
 <v:String x:Key="par_97">Время возникновения неисправности при пониженном напряжении, *200мс</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_98">Плата с подключением датчика темп. или сигнала завед. двигателя: 0-двигатель, 1-датчик температуры</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_99">падение температуры от уставки при котором вентиляторы зон начинают работать</v:String>
 <v:String x:Key="par_100">включать помпу изделия при работе ТЭНа: 1 - включать, 0 - выключать</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_101">температура бойлера</v:String>
 <v:String x:Key="par_102">время поддержания температуры в бойлере</v:String>
 <v:String x:Key="par_103">бойлер. гистерезис температуры</v:String>
@@ -285,47 +285,47 @@
 <v:String x:Key="par_122">FAN3_MANUAL</v:String>
 <v:String x:Key="par_123">FAN4_MANUAL</v:String>
 <v:String x:Key="par_124">FAN5_MANUAL</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_130">Проверка неисправностей вентиляторов зон: 0 - не проверять, 1 - проверять</v:String>
 <v:String x:Key="par_131">Использовать измеренное давление для корректировки ТН: 0 - не использовать, 1 - использовать</v:String>
 <v:String x:Key="par_132">Установить значение реакции на пониженное напряжение</v:String>
 <v:String x:Key="par_133">Установить значение реакции на повышенное напряжение</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_501">Уставка дневной температуры зоны 1, С</v:String>
 <v:String x:Key="par_502">Уставка дневной температуры зоны 2, С</v:String>
 <v:String x:Key="par_503">Уставка дневной температуры зоны 3, С</v:String>
 <v:String x:Key="par_504">Уставка дневной температуры зоны 4, С</v:String>
 <v:String x:Key="par_505">Уставка дневной температуры зоны 5, С</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_506">Уставка ночной температуры зоны 1, С</v:String>
 <v:String x:Key="par_507">Уставка ночной температуры зоны 2, С</v:String>
 <v:String x:Key="par_508">Уставка ночной температуры зоны 3, С</v:String>
 <v:String x:Key="par_509">Уставка ночной температуры зоны 4, С</v:String>
 <v:String x:Key="par_510">Уставка ночной температуры зоны 5, С</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_520">Мощность воздушника в ручном режиме зоны 1, %</v:String>
 <v:String x:Key="par_521">Мощность воздушника в ручном режиме зоны 2, %</v:String>
 <v:String x:Key="par_522">Мощность воздушника в ручном режиме зоны 3, %</v:String>
 <v:String x:Key="par_523">Мощность воздушника в ручном режиме зоны 4, %</v:String>
 <v:String x:Key="par_524">Мощность воздушника в ручном режиме зоны 5, %</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_525">Режим работы воздушника: 1-ручной, 0-авто</v:String>
 <v:String x:Key="par_526">Режим работы воздушника: 1-ручной, 0-авто</v:String>
 <v:String x:Key="par_527">Режим работы воздушника: 1-ручной, 0-авто</v:String>
 <v:String x:Key="par_528">Режим работы воздушника: 1-ручной, 0-авто</v:String>
 <v:String x:Key="par_529">Режим работы воздушника: 1-ручной, 0-авто</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_530">Максимальное время работы системы, часов</v:String>
 <v:String x:Key="par_531">Таймаут подсветки дисплея, секунд</v:String>
 <v:String x:Key="par_532">Режим хранения системы от промерзания, вкл/выкл</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_540">уставка температуры бака для перехода ТЭНа в ждущий в режиме StorageMode</v:String>
 <v:String x:Key="par_541">уставка температуры бака для выхода ТЭНа из ждущего в режиме StorageMode</v:String>
 <v:String x:Key="par_542">уставка температуры жидкости бака для перехода котла в ждущий в режиме StorageMode</v:String>
 <v:String x:Key="par_543">уставка температуры жидкости бака для выхода котла из ждущего в режиме StorageMode</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="par_600">номер устройства на шине CAN RV-C</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="bb_1">счетчик запусков</v:String>
 <v:String x:Key="bb_2">счетчик запусков на вентиляции</v:String>
 <v:String x:Key="bb_3">счетчик запусков завершенных без неисправностей</v:String>
@@ -348,21 +348,21 @@
 <v:String x:Key="bb_20">количество запусков с первой попытки</v:String>
 <v:String x:Key="bb_21">количество запусков со второй попытки</v:String>
 <v:String x:Key="bb_22">количество незапусков (попытки розжига исчерпаны)</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="bb_23">время работы на малой мощности</v:String>
 <v:String x:Key="bb_24">время работы на средней мощности</v:String>
 <v:String x:Key="bb_25">время работы на максимальной мощности</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="bb_26">время работы ТЭНа, с</v:String>
 <v:String x:Key="bb_27">время работы на 10 мощности</v:String>
 <v:String x:Key="bb_28">счетчик запусков помпы</v:String>
 <v:String x:Key="bb_29">время работы только помпы</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_1">Стадия</v:String>
 <v:String x:Key="var_2">Режим работы</v:String>
 <v:String x:Key="var_3">Общее время работы, c</v:String>
 <v:String x:Key="var_4">Время работы на режиме, c</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_5">Напряжение питания, В*100</v:String>
 <v:String x:Key="var_6">Температура ИП</v:String>
 <v:String x:Key="var_7">Температура корп</v:String>
@@ -382,7 +382,7 @@
 <v:String x:Key="var_21">Заданные проценты мощности свечи</v:String>
 <v:String x:Key="var_22">Калибровочное значение термопары ИП</v:String>
 <v:String x:Key="var_23">Калибровочное значение термопары корпуса</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_24">Код неисправности</v:String>
 <v:String x:Key="var_25">Код неисправности. Количество морганий (миганий)</v:String>
 <v:String x:Key="var_26">Байт неисправностей1</v:String>
@@ -393,7 +393,7 @@
 <v:String x:Key="var_31">Байт неисправностей6</v:String>
 <v:String x:Key="var_32">Байт неисправностей7</v:String>
 <v:String x:Key="var_33">Байт неисправностей8</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_34">Попытка розжига</v:String>
 <v:String x:Key="var_35">Разрешен ждущий режим</v:String>
 <v:String x:Key="var_36">Минимальное значение ИП</v:String>
@@ -409,7 +409,7 @@
 <v:String x:Key="var_46">Состояние помпы (ВКЛ/ВЫКЛ)</v:String>
 <v:String x:Key="var_47">Состояние сигнализации (сигнал есть/нет)</v:String>
 <v:String x:Key="var_48">Состояние двигателя (заведен/остановлен)</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_49">АЦП канал 0</v:String>
 <v:String x:Key="var_50">АЦП канал 1</v:String>
 <v:String x:Key="var_51">АЦП канал 2</v:String>
@@ -420,86 +420,86 @@
 <v:String x:Key="var_56">АЦП канал 7</v:String>
 <v:String x:Key="var_57">АЦП канал 8</v:String>
 <v:String x:Key="var_58">АЦП канал 9</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_59">Температура процессора</v:String>
 <v:String x:Key="var_60">Атмосферное давление, кПа</v:String>
 <v:String x:Key="var_61">Температура бака в системах отопления</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_62">Состояние свечи (ВКЛ/ВЫКЛ)</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_65">Состояние зоны 1 (ВКЛ/ВЫКЛ)</v:String>
 <v:String x:Key="var_66">Состояние зоны 2 (ВКЛ/ВЫКЛ)</v:String>
 <v:String x:Key="var_67">Состояние зоны 3 (ВКЛ/ВЫКЛ)</v:String>
 <v:String x:Key="var_68">Состояние зоны 4 (ВКЛ/ВЫКЛ)</v:String>
 <v:String x:Key="var_69">Состояние зоны 5 (ВКЛ/ВЫКЛ)</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_70">Температура в зоне 1</v:String>
 <v:String x:Key="var_71">Температура в зоне 2</v:String>
 <v:String x:Key="var_72">Температура в зоне 3</v:String>
 <v:String x:Key="var_73">Температура в зоне 4</v:String>
 <v:String x:Key="var_74">Температура в зоне 5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_75">Уставка день зоны 1</v:String>
 <v:String x:Key="var_76">Уставка день зоны 2</v:String>
 <v:String x:Key="var_77">Уставка день зоны 3</v:String>
 <v:String x:Key="var_78">Уставка день зоны 4</v:String>
 <v:String x:Key="var_79">Уставка день зоны 5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_80">Уставка ночь зоны 1</v:String>
 <v:String x:Key="var_81">Уставка ночь зоны 2</v:String>
 <v:String x:Key="var_82">Уставка ночь зоны 3</v:String>
 <v:String x:Key="var_83">Уставка ночь зоны 4</v:String>
 <v:String x:Key="var_84">Уставка ночь зоны 5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_85">Ручной режим зона 1</v:String>
 <v:String x:Key="var_86">Ручной режим зона 2</v:String>
 <v:String x:Key="var_87">Ручной режим зона 3</v:String>
 <v:String x:Key="var_88">Ручной режим зона 4</v:String>
 <v:String x:Key="var_89">Ручной режим зона 5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_90">Процент мощности зоны 1</v:String>
 <v:String x:Key="var_91">Процент мощности зоны 2</v:String>
 <v:String x:Key="var_92">Процент мощности зоны 3</v:String>
 <v:String x:Key="var_93">Процент мощности зоны 4</v:String>
 <v:String x:Key="var_94">Процент мощности зоны 5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_95">Текущее значение ШИМ зоны 1</v:String>
 <v:String x:Key="var_96">Текущее значение ШИМ зоны 2</v:String>
 <v:String x:Key="var_97">Текущее значение ШИМ зоны 3</v:String>
 <v:String x:Key="var_98">Текущее значение ШИМ зоны 4</v:String>
 <v:String x:Key="var_99">Текущее значение ШИМ зоны 5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_100">Заданное значение ШИМ зоны 1</v:String>
 <v:String x:Key="var_101">Заданное значение ШИМ зоны 2</v:String>
 <v:String x:Key="var_102">Заданное значение ШИМ зоны 3</v:String>
 <v:String x:Key="var_103">Заданное значение ШИМ зоны 4</v:String>
 <v:String x:Key="var_104">Заданное значение ШИМ зоны 5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_105">Уровень в баке</v:String>
 <v:String x:Key="var_106">Температура в баке</v:String>
 <v:String x:Key="var_107">Забортная температура</v:String>
 <v:String x:Key="var_108">Разбор воды</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_109">Помпа нагревателя</v:String>
 <v:String x:Key="var_110">Помпа 1</v:String>
 <v:String x:Key="var_111">Помпа 2</v:String>
 <v:String x:Key="var_112">Помпа 3</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_113">Секунда</v:String>
 <v:String x:Key="var_114">Минута</v:String>
 <v:String x:Key="var_115">Час</v:String>
 <v:String x:Key="var_116">День</v:String>
 <v:String x:Key="var_117">Месяц</v:String>
 <v:String x:Key="var_118">Год</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="var_119">Кнопка нагревателя</v:String>
 <v:String x:Key="var_120">Кнопка ТЭНа</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_1">Стадия</v:String>
 <v:String x:Key="vars_2">Режим</v:String>
 <v:String x:Key="vars_3">Вр.Работы</v:String>
 <v:String x:Key="vars_4">Вр.Реж.</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_5">U, В</v:String>
 <v:String x:Key="vars_6">Тплам</v:String>
 <v:String x:Key="vars_7">Ткорп</v:String>
@@ -519,7 +519,7 @@
 <v:String x:Key="vars_21">Св. %</v:String>
 <v:String x:Key="vars_22">К.З. ИП</v:String>
 <v:String x:Key="vars_23">К.З. Корп</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_24">Неиспр</v:String>
 <v:String x:Key="vars_25">Неиспр.Миг</v:String>
 <v:String x:Key="vars_26">Б.неиспр0</v:String>
@@ -530,7 +530,7 @@
 <v:String x:Key="vars_31">Б.неиспр5</v:String>
 <v:String x:Key="vars_32">Б.неиспр6</v:String>
 <v:String x:Key="vars_33">Б.неиспр7</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_34">ПопыткаРозж</v:String>
 <v:String x:Key="vars_35">Ждущ.Реж</v:String>
 <v:String x:Key="vars_36">ИП min</v:String>
@@ -546,7 +546,7 @@
 <v:String x:Key="vars_46">Помпа</v:String>
 <v:String x:Key="vars_47">Сигнализация</v:String>
 <v:String x:Key="vars_48">Двигатель</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_49">АЦП 0</v:String>
 <v:String x:Key="vars_50">АЦП 1</v:String>
 <v:String x:Key="vars_51">АЦП 2</v:String>
@@ -557,93 +557,93 @@
 <v:String x:Key="vars_56">АЦП 7</v:String>
 <v:String x:Key="vars_57">АЦП 8</v:String>
 <v:String x:Key="vars_58">АЦП 9</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_59">Тcpu</v:String>
 <v:String x:Key="vars_60">Давл.,кПа</v:String>
 <v:String x:Key="vars_61">Тбака</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_62">Реле</v:String>
-<v:String x:Key=""></v:String>
-<v:String x:Key=""></v:String>
-<v:String x:Key=""></v:String>
+ 
+ 
+ 
 <v:String x:Key="vars_65">З1 Вкл</v:String>
 <v:String x:Key="vars_66">З2 Вкл</v:String>
 <v:String x:Key="vars_67">З3 Вкл</v:String>
 <v:String x:Key="vars_68">З4 Вкл</v:String>
 <v:String x:Key="vars_69">З5 Вкл</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_70">Темп.з 1</v:String>
 <v:String x:Key="vars_71">Темп.з 2</v:String>
 <v:String x:Key="vars_72">Темп.з 3</v:String>
 <v:String x:Key="vars_73">Темп.з 4</v:String>
 <v:String x:Key="vars_74">Темп.з 5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_75">Уст.день з.1</v:String>
 <v:String x:Key="vars_76">Уст.день з.2</v:String>
 <v:String x:Key="vars_77">Уст.день з.3</v:String>
 <v:String x:Key="vars_78">Уст.день з.4</v:String>
 <v:String x:Key="vars_79">Уст.день з.5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_80">Уст.ночь з.1</v:String>
 <v:String x:Key="vars_81">Уст.ночь з.2</v:String>
 <v:String x:Key="vars_82">Уст.ночь з.3</v:String>
 <v:String x:Key="vars_83">Уст.ночь з.4</v:String>
 <v:String x:Key="vars_84">Уст.ночь з.5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_85">Руч.з.1</v:String>
 <v:String x:Key="vars_86">Руч.з.2</v:String>
 <v:String x:Key="vars_87">Руч.з.3</v:String>
 <v:String x:Key="vars_88">Руч.з.4</v:String>
 <v:String x:Key="vars_89">Руч.з.5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_90">Руч.ШИМ з.1</v:String>
 <v:String x:Key="vars_91">Руч.ШИМ з.2</v:String>
 <v:String x:Key="vars_92">Руч.ШИМ з.3</v:String>
 <v:String x:Key="vars_93">Руч.ШИМ з.4</v:String>
 <v:String x:Key="vars_94">Руч.ШИМ з.5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_95">Тек.ШИМ з1</v:String>
 <v:String x:Key="vars_96">Тек.ШИМ з2</v:String>
 <v:String x:Key="vars_97">Тек.ШИМ з3</v:String>
 <v:String x:Key="vars_98">Тек.ШИМ з4</v:String>
 <v:String x:Key="vars_99">Тек.ШИМ з5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_100">Зад.ШИМ з.1</v:String>
 <v:String x:Key="vars_101">Зад.ШИМ з.2</v:String>
 <v:String x:Key="vars_102">Зад.ШИМ з.3</v:String>
 <v:String x:Key="vars_103">Зад.ШИМ з.4</v:String>
 <v:String x:Key="vars_104">Зад.ШИМ з.5</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_105">Ур.бак</v:String>
 <v:String x:Key="vars_106">Темп.бака</v:String>
 <v:String x:Key="vars_107">Нар.темп.</v:String>
 <v:String x:Key="vars_108">Раз.воды</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_109">Помпа нагр.</v:String>
 <v:String x:Key="vars_110">Помпа 1</v:String>
 <v:String x:Key="vars_111">Помпа 2</v:String>
 <v:String x:Key="vars_112">Помпа 3</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_113">Сек</v:String>
 <v:String x:Key="vars_114">Мин</v:String>
 <v:String x:Key="vars_115">Час</v:String>
 <v:String x:Key="vars_116">День</v:String>
 <v:String x:Key="vars_117">Мес</v:String>
 <v:String x:Key="vars_118">Год</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="vars_119">Кнопка нагревателя</v:String>
 <v:String x:Key="vars_120">Кнопка ТЭНа</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="m_0-1">Ожидание команды</v:String>
 <v:String x:Key="m_0-2">Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)</v:String>
 <v:String x:Key="m_0-3">Сохранение данных о пуске после завершения работы</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="m_1-0">Стартовая диагностика</v:String>
 <v:String x:Key="m_1-1">Страгивание нагнетателя воздуха</v:String>
 <v:String x:Key="m_1-2">Ожидание снижения температуры (жидкости у жидкостных или воздуха у воздушных</v:String>
 <v:String x:Key="m_1-3">Проверка датчика корпуса на неостылость при пуске</v:String>
 <v:String x:Key="m_1-4">Ждущий</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="m_2-0">Разогрев свечи</v:String>
 <v:String x:Key="m_2-1">Первая попытка розжига (основная циклограмма)</v:String>
 <v:String x:Key="m_2-2">Продувка между розжигами</v:String>
@@ -654,7 +654,7 @@
 <v:String x:Key="m_2-7">Подготовка к розжигу</v:String>
 <v:String x:Key="m_2-8">Первая попытка розжига (альтернативная циклограмма)</v:String>
 <v:String x:Key="m_2-9">Вторая попытка розжига (альтернативная циклограмма)</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="m_3-0">Работа на 0 ступени мощности, движемся сверху</v:String>
 <v:String x:Key="m_3-1">Работа на 1 ступени мощности, движемся сверху</v:String>
 <v:String x:Key="m_3-2">Работа на 2 ступени мощности, движемся сверху</v:String>
@@ -690,7 +690,7 @@
 <v:String x:Key="m_3-32">Розжиг по датчику давления после срыва пламени во время работы</v:String>
 <v:String x:Key="m_3-34">Автокаллибровка перед вентиляцией</v:String>
 <v:String x:Key="m_3-35">Вентиляция</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="m_3-40">Вентиляция на 0 мощности</v:String>
 <v:String x:Key="m_3-41">Вентиляция на 1 мощности</v:String>
 <v:String x:Key="m_3-42">Вентиляция на 2 мощности</v:String>
@@ -701,7 +701,7 @@
 <v:String x:Key="m_3-47">Вентиляция на 7 мощности</v:String>
 <v:String x:Key="m_3-48">Вентиляция на 8 мощности</v:String>
 <v:String x:Key="m_3-49">Вентиляция на 9 мощности</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="m_3-50">Режим работы на 0 ступени мощности</v:String>
 <v:String x:Key="m_3-51">Режим работы на 1 ступени мощности</v:String>
 <v:String x:Key="m_3-52">Режим работы на 2 ступени мощности</v:String>
@@ -712,19 +712,19 @@
 <v:String x:Key="m_3-57">Режим работы на 7 ступени мощности</v:String>
 <v:String x:Key="m_3-58">Режим работы на 8 ступени мощности</v:String>
 <v:String x:Key="m_3-59">Режим работы на 9 ступени мощности</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="m_4-0">Нормальное завершения работы</v:String>
 <v:String x:Key="m_4-1">Продувка при перегреве</v:String>
 <v:String x:Key="m_4-2">Продувка при обрыве датчиков ИП или корпуса</v:String>
 <v:String x:Key="m_4-3">Продувка при неисправностях помпы, ТН, НВ или превышении количества срывов пламени</v:String>
 <v:String x:Key="m_4-4">Завершение работы без ТН</v:String>
 <v:String x:Key="m_4-5">Завершение работы без свечи и ТН</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="m_5-0">Проверка платы</v:String>
 <v:String x:Key="m_5-1">Калибровка коллекторного НВ</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="m_6-0">Ручной режим работы. Параметры работы задаются по последовательному каналу</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="d_0">Любой</v:String>
 <v:String x:Key="d_1">14ТС Мини</v:String>
 <v:String x:Key="d_2">2 Планар 2</v:String>
@@ -804,7 +804,7 @@
 <v:String x:Key="buffer_data_transmitting_old">Заполнение буферного массива для последующей записи во флэш</v:String>
 <v:String x:Key="memory_control">Управления памятью (Мультипакет)</v:String>
 <v:String x:Key="buffer_data_transmitting">Заполнение буферного массива для последующей записи во флэш</v:String>
-<v:String x:Key=""></v:String>
+ 
 <v:String x:Key="whos_here">Кто здесь?</v:String>
 <v:String x:Key="start_device">пуск устройства</v:String>
 <v:String x:Key="stop_device">остановка устройства</v:String>

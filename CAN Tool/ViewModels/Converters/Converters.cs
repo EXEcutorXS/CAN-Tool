@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using RVC;
+using System.Linq;
 
 namespace CAN_Tool.ViewModels.Converters
 {
@@ -49,9 +50,43 @@ namespace CAN_Tool.ViewModels.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return System.Convert.ToInt32((string)value, 10);
+            try
+            {
+                string tempString = (string)value;
+                string temp2String = tempString.Where(x => char.IsDigit(x)).ToString();
+                return System.Convert.ToInt32((string)value, 10);
+            }
+            catch {
+                return 0;
+                  }
         }
     }
+
+    public class HexStringToIntConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return $"{value:X}";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            try
+            {
+                string tempString = (string)value;
+                var arr = tempString.Where(x => char.IsDigit(x) || char.ToLower(x) == 'a' || char.ToLower(x) == 'b' || char.ToLower(x) == 'c' || char.ToLower(x) == 'd' || char.ToLower(x) == 'e' || char.ToLower(x) == 'f').ToArray();
+                string res = new string(arr);
+                Int64 tmp = System.Convert.ToInt64(res, 16);
+                if (tmp > Int32.MaxValue) { return Int32.MaxValue; }
+                if (tmp< Int32.MinValue) { return Int32.MinValue; }
+
+                return System.Convert.ToInt32(res, 16);
+            }
+            catch { return 0; }
+
+        }
+    }
+
 
     public class FuelPumpIndicatorConverter : IValueConverter
     {

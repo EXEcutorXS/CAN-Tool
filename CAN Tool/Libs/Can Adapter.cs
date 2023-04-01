@@ -57,7 +57,7 @@ namespace Can_Adapter
         private byte[] data = new byte[8];
 
         [AffectsTo(nameof(VerboseInfo), nameof(DataAsText))]
-        public virtual byte[] Data
+        public byte[] Data
         {
             get => data;
 

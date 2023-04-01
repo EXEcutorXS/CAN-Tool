@@ -16,6 +16,7 @@
         <c:RegularCanToVisibleConverter x:Key="RegularCanToVisible" />
         <c:OmniToVisibleConverter x:Key="OmniToVisible" />
         <c:RvcToVisibleConverter x:Key="RvcToVisible" />
+        <c:HexStringToIntConverter x:Key="HexConverter" />
 
     </Window.Resources>
     <Window.DataContext>
@@ -70,7 +71,8 @@
                         </StackPanel>
 
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right" >
+                        <CheckBox x:Name="AdapterSettings" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="CAN adapter settings" FontSize="20" IsChecked="{Binding CanAdapterSettings}"></CheckBox>
                         <CheckBox x:Name="ExpertMode" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="{DynamicResource b_expert}" FontSize="20" Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
                         <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Dark" FontSize="20" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
                         <CheckBox x:Name="ImperialUnits" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Imperial" FontSize="20" IsChecked="{Binding OmniInstance.UseImperial}" Checked="ImperialUnits_Checked" Unchecked="ImperialUnits_Checked"></CheckBox>
@@ -86,7 +88,7 @@
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_exit}" Margin="10" Click="ExitButtonClick" FlowDirection="RightToLeft" />
                     </StackPanel>
                 </DockPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" SelectedIndex="3" SelectionChanged="CanBitrateField_SelectionChanged">
                         <ComboBox.ItemsSource>
                             <col:ArrayList>
@@ -108,7 +110,20 @@
 
             </StackPanel>
         </Grid>
-                <DockPanel Visibility="{Binding Mode,Converter={StaticResource OmniToVisible}}" DockPanel.Dock="Top" Cursor="">
+        <DockPanel Visibility="{Binding Mode, Converter={StaticResource RegularCanToVisible}}" DockPanel.Dock="Top" >
+            <StackPanel Grid.Row="0" Orientation="Horizontal" DockPanel.Dock="Top" >
+                <TextBox ToolTip="ID" MinWidth="160" Margin="10" Text="{Binding CanPage.ConstructedMessage.Id,Converter={StaticResource HexConverter},UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                <TextBox ToolTip="DLC" MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.DLC,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                <TextBox ToolTip="Enter data in HEX format" MinWidth="200" Margin="10" Text="{Binding CanPage.ConstructedMessage.Data,Converter = {StaticResource DataConverter},UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.RTR,Mode=OneWayToSource}" Margin="10">RTR</CheckBox>
+                <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.IDE,Mode=OneWayToSource}" Margin="10">IDE</CheckBox>
+                <TextBox  MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.DataAsText,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                <Button Margin="10" Command="{Binding CanPage.SendCanMessageCommand}">Send</Button>
+                <TextBox ToolTip="Interval" MinWidth="70" Margin="10" Text="{Binding CanPage.SendInterval,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}"></TextBox>
+                <CheckBox ToolTip="Autosend" Margin="10" FontSize="25" IsChecked="{Binding CanPage.AutoSend, Mode=OneWayToSource}">Autosend</CheckBox>
+            </StackPanel>
+        </DockPanel>
+        <DockPanel Visibility="{Binding Mode,Converter={StaticResource OmniToVisible}}" DockPanel.Dock="Top">
                 <ListBox DockPanel.Dock="Top" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
