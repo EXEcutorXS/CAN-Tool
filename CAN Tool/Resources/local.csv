@@ -834,6 +834,7 @@ t_working_mode	Working mode	Режим работы
 t_regular	Regular	Обычный
 t_eco	Eco	Экологичный
 t_additional_heater	Additional heater	Догреватель
+t_additional_heater_mode	Additional heater mode	Режим работы догревателя
 t_preheater	Preheater	Подогреватель
 t_heating_systems	Heating systems	Отопительные системы
 t_auto	Auto	Авто

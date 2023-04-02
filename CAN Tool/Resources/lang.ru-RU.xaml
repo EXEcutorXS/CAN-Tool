@@ -834,6 +834,7 @@
 <v:String x:Key="t_regular">Обычный</v:String>
 <v:String x:Key="t_eco">Экологичный</v:String>
 <v:String x:Key="t_additional_heater">Догреватель</v:String>
+<v:String x:Key="t_additional_heater_mode">Режим работы догревателя</v:String>
 <v:String x:Key="t_preheater">Подогреватель</v:String>
 <v:String x:Key="t_heating_systems">Отопительные системы</v:String>
 <v:String x:Key="t_auto">Авто</v:String>

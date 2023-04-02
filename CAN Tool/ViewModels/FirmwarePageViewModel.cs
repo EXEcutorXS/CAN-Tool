@@ -25,7 +25,7 @@ namespace CAN_Tool.ViewModels
         public byte[] Data;
     }
 
-    internal class FirmwarePage : ViewModel
+    internal class FirmwarePageViewModel : ViewModel
     {
         private int fragmentSize = 512;
 
@@ -495,7 +495,7 @@ namespace CAN_Tool.ViewModels
             return (VM.SelectedConnectedDevice != null && VM.SelectedConnectedDevice.ID.Type == 123 && fragments.Count > 0);
         }
 
-        public FirmwarePage(MainWindowViewModel vm)
+        public FirmwarePageViewModel(MainWindowViewModel vm)
         {
             VM = vm;
 

@@ -40,10 +40,10 @@ namespace CAN_Tool.ViewModels
 
         public List<SolidColorBrush> Brushes => brushes;
 
-        public FirmwarePage FirmwarePage { set; get; }
-        public ManualPage ManualPage { set; get; }
-        public RvcPage RvcPage { set; get; }
-        public CanPage CanPage { set; get; }
+        public FirmwarePageViewModel FirmwarePage { set; get; }
+        public ManualPageViewModel ManualPage { set; get; }
+        public RvcPageViewModel RvcPage { set; get; }
+        public CanPageViewModel CanPage { set; get; }
 
         public bool OmniEnabled { set; get; }
         public bool RvcEnabled { set; get; }
@@ -80,7 +80,7 @@ namespace CAN_Tool.ViewModels
         }
         
 
-        OmniMessage customMessage = new OmniMessage();
+        OmniMessage customMessage = new OmniMessage() { PGN=1};
 
         public Dictionary<int, OmniCommand> CommandList { get; } = Omni.commands;
 

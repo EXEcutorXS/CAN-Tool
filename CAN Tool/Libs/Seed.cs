@@ -83,7 +83,7 @@ namespace OmniProtocol
             PGNs.Add(33, new() { id = 33, name = "t_serial_number", multipack = true });
             PGNs.Add(34, new() { id = 34, name = "t_read_flash_by_address_req" });
             PGNs.Add(35, new() { id = 35, name = "t_read_flash_by_address_ans" });
-            PGNs.Add(36, new() { id = 36, name = "t_valves _status_probe_valve_failures" });
+            PGNs.Add(36, new() { id = 36, name = "t_valves_status_probe_valve_failures" });
             PGNs.Add(37, new() { id = 37, name = "t_air_heater_temperatures", multipack = true });
             PGNs.Add(38, new() { id = 38, name = "t_panel_temperature" });
             PGNs.Add(39, new() { id = 39, name = "t_drivers_status" });
@@ -101,7 +101,7 @@ namespace OmniProtocol
             commands.Add(5, new() { Id = 5, Name = "t_reset_failures" });
             commands.Add(6, new() { Id = 6, Name = "t_liquid_heater_set_parameters" });
             commands.Add(7, new() { Id = 7, Name = "t_request_deltas" });
-            commands.Add(8, new() { Id = 8, Name = "t_valves_control”" });
+            commands.Add(8, new() { Id = 8, Name = "t_valves_control" });
             commands.Add(9, new() { Id = 9, Name = "t_air_heater_set_parameters" });
             commands.Add(10, new() { Id = 10, Name = "t_start_vent" });
             commands.Add(20, new() { Id = 20, Name = "t_calibration" });
@@ -113,7 +113,7 @@ namespace OmniProtocol
             commands.Add(67, new() { Id = 67, Name = "t_manual_test_mode_enter" });
             commands.Add(68, new() { Id = 68, Name = "t_manual_control" });
             commands.Add(69, new() { Id = 69, Name = "t_control_executive_devices" });
-            commands.Add(70, new() { Id = 69, Name = "t_executive_devices_onoff" });//TODO исправить номер
+            commands.Add(70, new() { Id = 70, Name = "t_executive_devices_onoff" });
             #endregion
 
             #region Command parameters init
@@ -124,7 +124,7 @@ namespace OmniProtocol
 
             commands[1].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Minute });
 
-            commands[3].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Minute });
+            commands[4].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Minute });
 
             commands[10].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Minute });
             commands[6].Parameters.Add(new() { StartByte = 4, BitLength = 4, Name = "t_working_mode", Meanings = { { 0, "t_regular" }, { 1, "t_eco" }, { 2, "t_additional_heater" }, { 3, "t_preheater" }, { 4, "t_heating_systems" } } });

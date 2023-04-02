@@ -16,6 +16,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
+using static CAN_Tool.Libs.Helper;
 
 namespace CAN_Tool
 {
@@ -251,7 +252,7 @@ namespace CAN_Tool
                 StackPanel panel = new();
                 panel.Orientation = System.Windows.Controls.Orientation.Horizontal;
                 Label label = new();
-                label.Content = p.Name;
+                label.Content = GetString(p.Name);
                 label.Name = $"label_{counter}";
                 label.Margin = new Thickness(10);
                 label.VerticalAlignment = System.Windows.VerticalAlignment.Center;
@@ -259,7 +260,7 @@ namespace CAN_Tool
                 if (p.Meanings != null && p.Meanings.Count > 0)
                 {
                     ComboBox cb = new();
-                    cb.ItemsSource = p.Meanings;
+                    cb.ItemsSource = p.Meanings.Select(s=>new KeyValuePair<int, string> (s.Key, GetString(s.Value)));
                     cb.DisplayMemberPath = "Value";
                     cb.SelectionChanged += UpdateCommand;
                     cb.Name = $"field_{counter}";
@@ -624,6 +625,28 @@ namespace CAN_Tool
             }
         }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CanMessage m = new();
+            Random r = new(DateTime.Now.Millisecond);
+            m.IDE = (r.Next(0, 255)%2)==0;
+            m.RTR = (r.Next(0, 255) % 2) == 0;
+            if (m.IDE)
+                m.Id = r.Next(0, 0x1FFFFFFF);
+            else
+                m.Id = r.Next(0, 0x7FF);
+            m.DLC = (byte)r.Next(1, 9);
+            for (int i = 0; i < m.DLC; i++)
+                m.Data[i] = (byte)r.Next(0, 256);
+
+            vm.CanPage.MessageList.TryToAdd(m);
+        }
+
+        private void CanListDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (CanMessageList.SelectedItem!=null)
+                vm.CanPage.ConstructedMessage.Update(CanMessageList.SelectedItem as CanMessage);
+        }
     }
 
 

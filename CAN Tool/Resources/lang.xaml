@@ -834,6 +834,7 @@
 <v:String x:Key="t_regular">Regular</v:String>
 <v:String x:Key="t_eco">Eco</v:String>
 <v:String x:Key="t_additional_heater">Additional heater</v:String>
+<v:String x:Key="t_additional_heater_mode">Additional heater mode</v:String>
 <v:String x:Key="t_preheater">Preheater</v:String>
 <v:String x:Key="t_heating_systems">Heating systems</v:String>
 <v:String x:Key="t_auto">Auto</v:String>

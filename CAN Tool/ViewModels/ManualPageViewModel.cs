@@ -14,7 +14,7 @@ using System.Windows.Input;
 namespace CAN_Tool.ViewModels
 {
 
-    internal class ManualPage : ViewModel
+    internal class ManualPageViewModel : ViewModel
     {
         public MainWindowViewModel Vm { set; get; }
 
@@ -179,7 +179,7 @@ namespace CAN_Tool.ViewModels
             Task.Run(() => Vm.OmniInstance.SendMessage(msg));
         }
 
-        public ManualPage(MainWindowViewModel vm)
+        public ManualPageViewModel(MainWindowViewModel vm)
         {
             Vm = vm;
 

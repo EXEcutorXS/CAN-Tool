@@ -17,6 +17,7 @@
         <c:OmniToVisibleConverter x:Key="OmniToVisible" />
         <c:RvcToVisibleConverter x:Key="RvcToVisible" />
         <c:HexStringToIntConverter x:Key="HexConverter" />
+        <c:HexStringToUlongConverter x:Key="HexToUlongConverter" />
 
     </Window.Resources>
     <Window.DataContext>
@@ -61,7 +62,7 @@
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="5">
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
-                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="ModeSelector" Margin="10" MinWidth="70" ItemsSource="{Binding WorkModes}" SelectedItem="{Binding Mode}" />
+                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="ModeSelector" Margin="10" MinWidth="70" ItemsSource="{Binding WorkModes}" SelectedIndex="2" SelectedItem="{Binding Mode}" />
 
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton" Margin="10" Content="{DynamicResource b_open}" Command="{Binding OpenPortCommand}" />
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton_Copy" Margin="10" Content="{DynamicResource b_close}" Command="{Binding ClosePortCommand}" />
@@ -112,16 +113,41 @@
         </Grid>
         <DockPanel Visibility="{Binding Mode, Converter={StaticResource RegularCanToVisible}}" DockPanel.Dock="Top" >
             <StackPanel Grid.Row="0" Orientation="Horizontal" DockPanel.Dock="Top" >
+                <TextBlock VerticalAlignment="Center" Margin="10" Text="ID:" FontSize="25"/>
                 <TextBox ToolTip="ID" MinWidth="160" Margin="10" Text="{Binding CanPage.ConstructedMessage.Id,Converter={StaticResource HexConverter},UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                <TextBlock VerticalAlignment="Center" Margin="10" Text="DLC:" FontSize="25" />
                 <TextBox ToolTip="DLC" MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.DLC,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                <TextBox ToolTip="Enter data in HEX format" MinWidth="200" Margin="10" Text="{Binding CanPage.ConstructedMessage.Data,Converter = {StaticResource DataConverter},UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.RTR,Mode=OneWayToSource}" Margin="10">RTR</CheckBox>
-                <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.IDE,Mode=OneWayToSource}" Margin="10">IDE</CheckBox>
-                <TextBox  MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.DataAsText,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                <TextBlock VerticalAlignment="Center" Margin="10" Text="Data:" FontSize="25" />
+                <TextBox ToolTip="Enter data in HEX format" MinWidth="200" Margin="10" Text="{Binding CanPage.ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource HexToUlongConverter}}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.RTR}" Margin="10" FontSize="20">RTR</CheckBox>
+                <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.IDE}" Margin="10" FontSize="20">IDE</CheckBox>
+                <TextBox  MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.DataAsText,Mode=OneWay}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" Cursor="" />
                 <Button Margin="10" Command="{Binding CanPage.SendCanMessageCommand}">Send</Button>
                 <TextBox ToolTip="Interval" MinWidth="70" Margin="10" Text="{Binding CanPage.SendInterval,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}"></TextBox>
                 <CheckBox ToolTip="Autosend" Margin="10" FontSize="25" IsChecked="{Binding CanPage.AutoSend, Mode=OneWayToSource}">Autosend</CheckBox>
+                <Button Content="Add random message" Click="Button_Click"/>
             </StackPanel>
+            <DataGrid x:Name="CanMessageList" DockPanel.Dock="Top" ItemsSource="{Binding CanPage.MessageList,Mode=OneWay}" AutoGenerateColumns="false" Margin="15" MouseDoubleClick="CanListDoubleClick">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Fresh}" Value="true">
+                                <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Fresh}" Value="false">
+                                <Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding IdAsText,Mode=OneWay}"></DataGridTextColumn>
+                    <DataGridCheckBoxColumn Header="IDE" Binding="{Binding IDE,Mode=OneWay}"></DataGridCheckBoxColumn>
+                    <DataGridCheckBoxColumn Header="RTR" Binding="{Binding RTR,Mode=OneWay}"></DataGridCheckBoxColumn>
+                    <DataGridTextColumn Header="DLC" Binding="{Binding DLC,Mode=OneWay}"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Data" Binding="{Binding DataAsText,Mode=OneWay}"></DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
         </DockPanel>
         <DockPanel Visibility="{Binding Mode,Converter={StaticResource OmniToVisible}}" DockPanel.Dock="Top">
                 <ListBox DockPanel.Dock="Top" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}">
@@ -444,10 +470,14 @@
                                     </Grid.RowDefinitions>
 
                                     <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                    <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Type:</TextBlock>
                                         <TextBox ToolTip="Type" Width="40" Margin="5 10" Text="{Binding CustomMessage.ReceiverType,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                                        <TextBox ToolTip="Adress" Width="30" Margin="5 10" Text="{Binding CustomMessage.ReceiverAddress,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                                        <TextBox ToolTip="PGN" Width="40" Margin="5 10" Text="{Binding Path=CustomMessage.PGN,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                                        <TextBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.Data,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource DataConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Adr:</TextBlock>
+                                    <TextBox ToolTip="Adress" Width="30" Margin="5 10" Text="{Binding CustomMessage.ReceiverAddress,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">PGN:</TextBlock>
+                                    <TextBox ToolTip="PGN" Width="40" Margin="5 10" Text="{Binding Path=CustomMessage.PGN,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Data:</TextBlock>
+                                    <TextBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource HexToUlongConverter}}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
                                         <TextBox ToolTip="Data Preview " MaxHeight="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsText,Mode=OneWay}" IsReadOnly="True" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
                                         <Button Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}">
                                             <Button.Content>
@@ -455,11 +485,6 @@
                                             </Button.Content>
                                         </Button>
                                     </StackPanel>
-                                    <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}" Text="Type      Adr   PGN          Data                                                    Preview"></TextBlock>
-
-                                    </StackPanel>
-
                                 </Grid>
                                 <TextBlock DockPanel.Dock="Right" MaxHeight="200" Margin="10" Text="{Binding Path=CustomMessage.VerboseInfo, Mode=OneWay}"></TextBlock>
                             </DockPanel>
@@ -519,6 +544,7 @@
 
                                 <Border HorizontalAlignment="Center" Margin="5" CornerRadius="10" BorderBrush="Gainsboro" BorderThickness="1">
                                     <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontSize="25" VerticalAlignment="Center" Margin="10">Data preview:</TextBlock>
                                         <TextBlock x:Name="CommandPrevirew" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="10" Text="{Binding CustomMessage.DataAsText,Mode=OneWay}"></TextBlock>
                                         <Button Margin="10" Command="{Binding Path=SendCustomMessageCommand}">
                                             <Button.Content>
@@ -766,6 +792,7 @@
                                     <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding ManualAirBlower,Mode=OneWay}" HorizontalAlignment="Center" FontSize="20" />
                                     <Rectangle x:Name="SetRevRect" Grid.Column="0" Grid.Row="3" Margin="10"></Rectangle>
                                     <ProgressBar Foreground="Blue" Grid.Column="0" Grid.Row="3" Value="{Binding ManualAirBlower,Mode=OneWay }" Maximum="90" Orientation="Vertical" Width="{Binding ElementName=SetRevRect,Path=ActualHeight}" Height="{Binding ElementName=SetRevRect,Path=ActualWidth}" MouseWheel="ManualAirMouseWheelEventHandler"></ProgressBar>
+                                
 
                                     <TextBlock Grid.Column="1" Grid.Row="0" FontSize="20" Text="{DynamicResource b_air_measured}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                     <TextBlock Grid.Column="1" Grid.Row="1" FontSize="20" Text="{Binding Vm.SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>

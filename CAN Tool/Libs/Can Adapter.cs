@@ -47,7 +47,7 @@ namespace Can_Adapter
         }
 
         private int dlc;
-        [AffectsTo(nameof(VerboseInfo), nameof(RvcCompatible))]
+        [AffectsTo(nameof(VerboseInfo), nameof(RvcCompatible),nameof(DataAsText))]
         public int DLC
         {
             set => Set(ref dlc, value);
@@ -56,7 +56,7 @@ namespace Can_Adapter
 
         private byte[] data = new byte[8];
 
-        [AffectsTo(nameof(VerboseInfo), nameof(DataAsText))]
+        [AffectsTo(nameof(VerboseInfo), nameof(DataAsText),nameof(DataAsULong))]
         public byte[] Data
         {
             get => data;
@@ -65,13 +65,46 @@ namespace Can_Adapter
         }
 
 
+        [AffectsTo(nameof(VerboseInfo), nameof(DataAsText), nameof(Data))]
+        public ulong DataAsULong
+        {
+            /*
+            set => Set(ref dataAsLong, value);
+            get => dataAsLong;
+            */
+
+            get {
+                UInt64 ret = 0;
+                ret += ((ulong)(data[0]) << 56);
+                ret += ((ulong)(data[1]) << 48);
+                ret += ((ulong)(data[2]) << 40);
+                ret += ((ulong)(data[3]) << 32);
+                ret += ((ulong)(data[4]) << 24);
+                ret += ((ulong)(data[5]) << 16);
+                ret += ((ulong)(data[6]) << 8);
+                ret += (ulong)(data[7]);
+                
+                return ret;
+            }
+            set
+               {
+                var newData = new byte[8];
+                for (int i = 0; i < 8; i++)
+                {
+                    newData[7 - i] = (byte)((value >> (i * 8)) & 0xFF);
+                }
+                Data = newData;
+               }
+        }
+
+
         public string DataAsText => GetDataInTextFormat("", " ");
 
         public string GetDataInTextFormat(string beforeString = "", string afterString = "")
         {
             StringBuilder sb = new("");
-            foreach (var item in Data)
-                sb.Append($"{beforeString}{item:X02}{afterString}");
+            for(int i = 8-DLC; i< 8;i++)
+                sb.Append($"{beforeString}{Data[i]:X02}{afterString}");
             return sb.ToString();
         }
 
@@ -82,6 +115,9 @@ namespace Can_Adapter
         public bool RvcCompatible => IDE && DLC == 8 && !RTR;
 
         public string IdAsText => IDE ? string.Format("{0:X08}", Id) : string.Format("{0:X03}", Id);
+        
+        private bool fresh;
+        public bool Fresh { set => Set(ref fresh, value); get => fresh; }
 
 
         public override string ToString()
@@ -92,9 +128,22 @@ namespace Can_Adapter
 
         public CanMessage()
         {
+            refTask = Task.Run(Refresh);
+            IDE = true;
+            DLC = 8;
+            RTR = false;
+        }
+
+        Task refTask;
+
+        private void Refresh()
+        {
+            Fresh = true;
+            Thread.Sleep(300);
+            Fresh = false;
 
         }
-        public CanMessage(string str)
+        public CanMessage(string str):base()
         {
             switch (str[0])
             {
@@ -171,6 +220,8 @@ namespace Can_Adapter
             IDE = m.IDE;
             RTR = m.RTR;
             Id = m.Id;
+            DLC = m.DLC;
+            refTask = Task.Run(Refresh);
         }
 
         public virtual string VerboseInfo => ToString();

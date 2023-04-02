@@ -154,8 +154,9 @@ namespace OmniProtocol
             get => id;
             internal set => Set(ref id, value);
         }
+        private string recourceId;
 
-        public string Name { internal set; get; }
+        public string Name { internal set=> recourceId = value; get => GetString(recourceId); }
 
         private readonly List<OmniPgnParameter> _Parameters = new();
         public List<OmniPgnParameter> Parameters => _Parameters;

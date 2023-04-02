@@ -87,6 +87,30 @@ namespace CAN_Tool.ViewModels.Converters
         }
     }
 
+    public class HexStringToUlongConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((ulong)value).ToString("X");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            try
+            {
+                string tempString = (string)value;
+                var arr = tempString.Where(x => char.IsDigit(x) || char.ToLower(x) == 'a' || char.ToLower(x) == 'b' || char.ToLower(x) == 'c' || char.ToLower(x) == 'd' || char.ToLower(x) == 'e' || char.ToLower(x) == 'f').ToArray();
+                string res = new string(arr);
+                if (res.Length>16)
+                    res=res.Substring(0,16);
+                UInt64 tmp = System.Convert.ToUInt64(res, 16);
+                return tmp;
+            }
+            catch { return 0; }
+
+        }
+    }
+
 
     public class FuelPumpIndicatorConverter : IValueConverter
     {

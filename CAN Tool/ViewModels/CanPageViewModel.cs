@@ -18,7 +18,7 @@ using CAN_Tool.Libs;
 namespace CAN_Tool.ViewModels
 {
 
-    internal class CanPage : ViewModel
+    internal class CanPageViewModel : ViewModel
     {
         private MainWindowViewModel vm;
         public MainWindowViewModel VM => vm;
@@ -33,7 +33,12 @@ namespace CAN_Tool.ViewModels
 
         public int SendInterval { set; get; } = 100;
 
-        public CanPage(MainWindowViewModel vm)
+        private UInt64 ulng=0;
+        
+        public UInt64 Ulng { set => Set(ref ulng, value); get => ulng; }
+
+
+        public CanPageViewModel(MainWindowViewModel vm)
         {
             this.vm = vm;
 

@@ -18,7 +18,7 @@ using CAN_Tool.Libs;
 namespace CAN_Tool.ViewModels
 {
 
-    internal class RvcPage : ViewModel
+    internal class RvcPageViewModel : ViewModel
     {
         private MainWindowViewModel vm;
         public MainWindowViewModel VM => vm;
@@ -35,7 +35,7 @@ namespace CAN_Tool.ViewModels
 
         public int SpamInterval { set; get; } = 100;
 
-        public RvcPage(MainWindowViewModel vm)
+        public RvcPageViewModel(MainWindowViewModel vm)
         {
             this.vm = vm;
 
