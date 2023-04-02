@@ -14,6 +14,8 @@ using System.ComponentModel;
 using RVC;
 using Can_Adapter;
 using CAN_Tool.Libs;
+using System.Windows.Interop;
+
 
 namespace CAN_Tool.ViewModels
 {
@@ -31,9 +33,11 @@ namespace CAN_Tool.ViewModels
 
         public bool SpamState { set; get; }
 
-        public System.Windows.Threading.DispatcherTimer SpamTimer { set; get; }
+        public System.Timers.Timer SpamTimer { set; get; }
 
         public int SpamInterval { set; get; } = 100;
+        
+        public bool RandomDgn { set; get; } = false;
 
         public RvcPageViewModel(MainWindowViewModel vm)
         {
@@ -42,12 +46,19 @@ namespace CAN_Tool.ViewModels
             SaveRvcLogCommand = new LambdaCommand(OnSaveRvcLogCommandExecuted, x => true);
             SendRvcMessageCommand = new LambdaCommand(OnSendRvcMessageCommandExecuted, x => true);
 
-            SpamTimer = new();
-            SpamTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
-            SpamTimer.Tick += SpamTimerTick;
+            SpamTimer = new(10);
+            SpamTimer.Elapsed  += SpamTimerTick;
+            SpamTimer.Start();
         }
         private int spamCounter = 0;
 
+
+        private bool spamEnabled;
+        public bool SpamEnabled
+        {
+            get => spamEnabled;
+            set => Set(ref spamEnabled, value);
+        }
 
         private RvcMessage selectedMessage;
         public RvcMessage SelectedMessage
@@ -75,10 +86,20 @@ namespace CAN_Tool.ViewModels
 
         private void SpamTimerTick(object sender, EventArgs e)
         {
+            spamCounter++;
             if (spamCounter > SpamInterval)
             {
                 spamCounter = 0;
-                OnSendRvcMessageCommandExecuted(null);
+                if (SpamEnabled)
+                {
+                    if (RandomDgn)
+                    {
+                        CanMessage msg = new RvcMessage() { Dgn = new Random((int)DateTime.Now.Ticks).Next(0, 0x1FFFF) }.GetCanMessage();
+                        vm.CanAdapter.Transmit(msg);
+                    }
+                    else
+                        OnSendRvcMessageCommandExecuted(null);
+                }
             }
         }
 
