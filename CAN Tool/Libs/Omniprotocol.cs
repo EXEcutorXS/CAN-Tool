@@ -1404,9 +1404,9 @@ namespace OmniProtocol
 
         public ScottPlot.WpfPlot plot;
 
-        static readonly Dictionary<int, string> defMeaningsYesNo = new() { { 0, "No" }, { 1, "Yes" }, { 2, "No data" }, { 3, "No data" } };
-        static readonly Dictionary<int, string> defMeaningsOnOff = new() { { 0, "Off" }, { 1, "On" }, { 2, "No data" }, { 3, "No data" } };
-        static readonly Dictionary<int, string> defMeaningsAllow = new() { { 0, "Enabled" }, { 1, "Disabled" }, { 2, "No data" }, { 3, "No data" } };
+        static readonly Dictionary<int, string> defMeaningsYesNo = new() { { 0, "t_no" }, { 1, "t_yes" }, { 2, "t_no_data" }, { 3, "t_no_data" } };
+        static readonly Dictionary<int, string> defMeaningsOnOff = new() { { 0, "t_off" }, { 1, "t_on" }, { 2, "t_no_data" }, { 3, "t_no_data" } };
+        static readonly Dictionary<int, string> defMeaningsAllow = new() { { 0, "t_disabled" }, { 1, "t_enabled" }, { 2, "t_no_data" }, { 3, "t_no_data" } };
         static readonly Dictionary<int, string> Stages = new() { { 0, "STAGE_Z" }, { 1, "STAGE_P" }, { 2, "STAGE_H" }, { 3, "STAGE_W" }, { 4, "STAGE_F" }, { 5, "STAGE_T" }, { 6, "STAGE_M" } };
 
         public bool UseImperial { set; get; }

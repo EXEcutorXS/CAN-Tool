@@ -761,67 +761,105 @@ d_124	Mobile App	Мобильное приложение
 d_126	Control device	Устройство управления
 u_voltage	V	В
 u_pressure	kPa	кПа
-empty_command	Empty command	Пустая комманда
-control_command	Control command	Команда управления
-receiver_command_ack	Received command ack	Подтверждение на принятую комманду
-spn_request	SPN request	Запрос параметра или набора данных по определенному номеру (SPN)
-spn_answer	SPN answer	Ответ на запрос параметра или набора данных по определенному номеру (SPN)
-parameter_write	Parameter or data write	Запись параметра или набора данных устройства
-pgn_request	PGN request	Запрос параметров по PGN
-flash_conf_read_write	Read/Write configuration in flash	Запись/чтение параметров работы (конигурация) в/из flash-памяти
-black_box_operation	Black box operations	Работа с ЧЯ
-stage_mode_failures	Stage,Mode Fail Codes and warnings	Стадия, режим, код неисправности, код предупреждения
-voltage_pressure_current	Voltage, pressure, motor current	Напряжение питания, атмосферное давление, ток двигателя
-blower_fp_plug_relay	Blower revs, fuel pump, glow plug, relay	Обороты НВ, частота ТН, свеча, реле
-liquid_heater_temperatures	Liquid heater temperatures	Температуры жидкостных подогревателей
-flame_process	Flame process observing	Слежение за пламенем
-adc0-3	ADC channels 0..3	АЦП 0-3 каналы
-adc4-7	ADC channels 4..7	АЦП 4-7 каналы
-adc8-11	ADC channels 8..11	АЦП 8-11 канал
-firmware_version	Firmware version and date	Версия и дата программного обеспечения
-hcu_parameters	Heating system control unit parameters	Параметры от центрального блока управления для подогревателя в системе отопления
-failures	Failures	Неисправности
-daytime_setpoins	Daytime temp setpoints	Дневные уставки температуры зон
-nighttime_setpoints	Nighttime temp setpoints	Ночные уставки температуры зон
-fan_manual_control	Zone fan manual control	Ручное управления вентиляторами зон
-fan_setpoints	Zone fans power setpoints	Заданное значение скорости вентиляторов зон
-fan_current_speed	Fan current speed	Текущая скорость вентиляторов зон
-zone_control	Zone control and current temperatures	Управление зонами и текущие температуры
-hcu_status	Heating system status parameters	Статус систем отопления
-total_working_time	Total working time	Общее время наработки подогревателя
-pressure_parametes	Pressure parameters	Параметры давления
-remote_wire_engine_air_temp	Status of alarm wire,engine,ambient temperature	Состояние сигнализации, двигателя автомобиля. Температура датчика воздуха. Напряжение канала двигателя автомобиля
-working_time	Working time	Время работы
-liquid_heater_setup	Liquid heater setup	Параметры работы жидкостного подогревателя
-serial_number	Serial number	Серийный номер изделия (мультипакет)
-read_flash_by_address_req	Read flash by address request	Считать данные из flash по адресу
-read_flash_by_address_ans	Read flash by adress answer	Передача данных на запрос по PGN 34
-valves _status_probe_valve_failures	Valves status, probe status, valves failures	Передача состояния клапанов, зонда, кода неисправности клапанов
-air_heater_temperatures	Air heater temperatures	Температуры воздушных отопителей (мультипакет)
-panel_temperature	Panel temperature sensor data	Температура датчика в пульте
-drivers_status	Fuel pump, glow plug, pump driver statuses	Статусы драйверов ТН, свечи, помпа, реле
-memory_control_old	Memory control (obsolete)	Управления памятью (Мультипакет)
-buffer_data_transmitting_old	Memory buffer transmitting (obsolete)	Заполнение буферного массива для последующей записи во флэш
-memory_control	Memory control	Управления памятью (Мультипакет)
-buffer_data_transmitting	Memory buffer transmitting	Заполнение буферного массива для последующей записи во флэш
 		
-whos_here	Who is here?	Кто здесь?
-start_device	Device start	пуск устройства
-stop_device	Device stop	остановка устройства
-start_pump	Start only pump	пуск только помпы
-reset_failures	Clear failure codes	сброс неисправностей
-liquid_heater_set_parameters	Liquid heater set parameters	задать параметры работы жидкостного подогревателя
-request_deltas	Request power mode transition steps	запрос температурных переходов по режимам жидкостного подогревателя
-valves_control	Valves control	задать состояние клапанов устройства ”Блок управления клапанами”
-air_heater_set_parameters	Air heater set_parameters	задать параметры работы воздушного отопителя
-start_vent	Ventilation start	запуск в режиме вентиляции (для воздушных отопителей)
-calibration	Thermocouples calibration start	калибровка термопар
-set_pwm_freq	Set air blower PWM frequency 	задать параметры частоты ШИМ нагнетателя воздуха
-reset_cpu	Reset MCU	Перезагрузка контроллера
-failures_mask	Mask failure codes	биты реакции на неисправности
-temperature_set	Temperature set	установить значение температуры
-clear_error_codes	Clear error codes	сброс неисправностей
-manual_test_mode_enter	Manual or test mode enter/exit	вход/выход в стадию M (ручное управление) или T (тестирование блока управления)
-manual_control	Manual device control	задание параметров устройств в стадии M (ручное управление)
-control_executive_devices	Executive devices control	управление устройствами
-executive_devices_onoff	Executive devices on/off	Включение/Выключение устройств
+t_empty_command	Empty command	Пустая комманда
+t_control_command	Control command	Команда управления
+t_receiver_command_ack	Received command ack	Подтверждение на принятую комманду
+t_spn_request	SPN request	Запрос параметра или набора данных по определенному номеру (SPN)
+t_spn_answer	SPN answer	Ответ на запрос параметра или набора данных по определенному номеру (SPN)
+t_parameter_write	Parameter or data write	Запись параметра или набора данных устройства
+t_pgn_request	PGN request	Запрос параметров по PGN
+t_flash_conf_read_write	Read/Write configuration in flash	Запись/чтение параметров работы (конигурация) в/из flash-памяти
+t_black_box_operation	Black box operations	Работа с ЧЯ
+t_stage_mode_failures	Stage,Mode Fail Codes and warnings	Стадия, режим, код неисправности, код предупреждения
+t_voltage_pressure_current	Voltage, pressure, motor current	Напряжение питания, атмосферное давление, ток двигателя
+t_blower_fp_plug_relay	Blower revs, fuel pump, glow plug, relay	Обороты НВ, частота ТН, свеча, реле
+t_liquid_heater_temperatures	Liquid heater temperatures	Температуры жидкостных подогревателей
+t_flame_process	Flame process observing	Слежение за пламенем
+t_adc0-3	ADC channels 0..3	АЦП 0-3 каналы
+t_adc4-7	ADC channels 4..7	АЦП 4-7 каналы
+t_adc8-11	ADC channels 8..11	АЦП 8-11 канал
+t_firmware_version	Firmware version and date	Версия и дата программного обеспечения
+t_hcu_parameters	Heating system control unit parameters	Параметры от центрального блока управления для подогревателя в системе отопления
+t_failures	Failures	Неисправности
+t_daytime_setpoins	Daytime temp setpoints	Дневные уставки температуры зон
+t_nighttime_setpoints	Nighttime temp setpoints	Ночные уставки температуры зон
+t_fan_manual_control	Zone fan manual control	Ручное управления вентиляторами зон
+t_fan_setpoints	Zone fans power setpoints	Заданное значение скорости вентиляторов зон
+t_fan_current_speed	Fan current speed	Текущая скорость вентиляторов зон
+t_zone_control	Zone control and current temperatures	Управление зонами и текущие температуры
+t_hcu_status	Heating system status parameters	Статус систем отопления
+t_total_working_time	Total working time	Общее время наработки подогревателя
+t_pressure_parametes	Pressure parameters	Параметры давления
+t_remote_wire_engine_air_temp	Status of alarm wire,engine,ambient temperature	Состояние сигнализации, двигателя автомобиля. Температура датчика воздуха. Напряжение канала двигателя автомобиля
+t_working_time	Working time	Время работы
+t_liquid_heater_setup	Liquid heater setup	Параметры работы жидкостного подогревателя
+t_read_flash_by_address_req	Read flash by address request	Считать данные из flash по адресу
+t_read_flash_by_address_ans	Read flash by adress answer	Передача данных на запрос по PGN 34
+t_valves _status_probe_valve_failures	Valves status, probe status, valves failures	Передача состояния клапанов, зонда, кода неисправности клапанов
+t_air_heater_temperatures	Air heater temperatures	Температуры воздушных отопителей (мультипакет)
+t_panel_temperature	Panel temperature sensor data	Температура датчика в пульте
+t_drivers_status	Fuel pump, glow plug, pump driver statuses	Статусы драйверов ТН, свечи, помпа, реле
+t_memory_control_old	Memory control (obsolete)	Управления памятью (Мультипакет)
+t_buffer_data_transmitting_old	Memory buffer transmitting (obsolete)	Заполнение буферного массива для последующей записи во флэш
+t_memory_control	Memory control	Управления памятью (Мультипакет)
+t_buffer_data_transmitting	Memory buffer transmitting	Заполнение буферного массива для последующей записи во флэш
+		
+t_whos_here	Who is here?	Кто здесь?
+t_start_device	Device start	пуск устройства
+t_stop_device	Device stop	остановка устройства
+t_start_pump	Start only pump	пуск только помпы
+t_reset_failures	Clear failure codes	сброс неисправностей
+t_liquid_heater_set_parameters	Liquid heater set parameters	задать параметры работы жидкостного подогревателя
+t_request_deltas	Request power mode transition steps	запрос температурных переходов по режимам жидкостного подогревателя
+t_valves_control	Valves control	задать состояние клапанов устройства ”Блок управления клапанами”
+t_air_heater_set_parameters	Air heater set_parameters	задать параметры работы воздушного отопителя
+t_start_vent	Ventilation start	запуск в режиме вентиляции (для воздушных отопителей)
+t_calibration	Thermocouples calibration start	калибровка термопар
+t_set_pwm_freq	Set air blower PWM frequency 	задать параметры частоты ШИМ нагнетателя воздуха
+t_reset_cpu	Reset MCU	Перезагрузка контроллера
+t_failures_mask	Mask failure codes	биты реакции на неисправности
+t_temperature_set	Temperature set	установить значение температуры
+t_clear_error_codes	Clear error codes	сброс неисправностей
+t_manual_test_mode_enter	Manual or test mode enter/exit	вход/выход в стадию M (ручное управление) или T (тестирование блока управления)
+t_manual_control	Manual device control	задание параметров устройств в стадии M (ручное управление)
+t_control_executive_devices	Executive devices control	управление устройствами
+t_executive_devices_onoff	Executive devices on/off	Включение/Выключение устройств
+t_device	Device	Устройство
+t_12 volts	12 Volts	12 вольт
+t_24 volts	24 Volts	24 вольта
+t_firmware	Firmware	Версия ПО
+t_modification	Modification	Модификация ПО
+t_working_mode	Working mode	Режим работы
+t_regular	Regular	Обычный
+t_eco	Eco	Экологичный
+t_additional_heater	Additional heater	Догреватель
+t_preheater	Preheater	Подогреватель
+t_heating_systems	Heating systems	Отопительные системы
+t_auto	Auto	Авто
+t_manual	Manual	Ручной
+t_temp_setpoint	Temperature setpoint	Уставка температуры
+t_pump_in_idle	Pump in idle mode	Помпа в ждущем режиме
+t_pump_while_engine_running	Pump while engine running	Помпа при работающем двигателе
+t_power_level	Power level	Ступень мощности
+t_going_up_temperature	Power up temperature	Температура для перехода по мощности вверх
+t_going_down_temperature	Power down temperature	Температура для перехода по мощности вниз
+t_valve_1_state	Valve 1 state	Состояние клапана 1
+t_valve_2_state	Valve 2 state	Состояние клапана 2
+t_valve_3_state	Valve 3 state	Состояние клапана 3
+t_valve_4_state	Valve 4 state	Состояние клапана 4
+t_valve_5_state	Valve 5 state	Состояние клапана 5
+t_valve_6_state	Valve 6 state	Состояние клапана 6
+t_valve_7_state	Valve 7 state	Состояние клапана 7
+t_valve_8_state	Valve 8 state	Состояние клапана 8
+t_not used	Not used	Не используется
+t_work_by_pcb_temp	Work by PCB temperature	Работа по температуре платы
+t_work_by_panel_sensor_temp	Work by panel temperature sensor 	Работа по температуре пульта
+t_work_by_external_sensor	Work by external sensor	работа по температуре выносного датчика
+t_work_by_power	Work by power	Работа по мощности
+t_enabled	Enabled	Включено
+t_disabled	Disabled	Выключено
+t_on	On	Вкл
+t_off	OFF	Выкл
+t_yes	YES	Да
+t_no	No	Нет
