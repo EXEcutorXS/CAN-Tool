@@ -417,7 +417,7 @@ namespace OmniProtocol
         {
             StringBuilder retString = new();
             long rawValue = getRaw(Data, p.BitLength, p.StartBit, p.StartByte, p.Signed);
-            retString.Append(p.Name + ": ");
+            retString.Append(GetString(p.Name) + ": ");
             if (p.CustomDecoder != null)
                 return p.CustomDecoder(Data);
 
@@ -474,13 +474,13 @@ namespace OmniProtocol
             retString.Append($"{sender}({TransmitterAddress})->{receiver}({ReceiverAddress});;");
 
 
-            retString.Append(pgn.name + ";;");
+            retString.Append(GetString(pgn.name) + ";;");
             if (pgn.multipack)
                 retString.Append($"Мультипакет №{Data[0]};");
-            if (PGN == 1 && Omni.commands.ContainsKey(Data[1]))
+            if (PGN == 1 && Omni.commands.ContainsKey(Data[1] + Data[0]*256))
             {
-                OmniCommand cmd = Omni.commands[Data[1]];
-                retString.Append(cmd.Name + ";");
+                OmniCommand cmd = Omni.commands[Data[1] + Data[0] * 256];
+                retString.Append(GetString(cmd.Name) + ";");
                 if (cmd.Parameters != null)
                     foreach (OmniPgnParameter p in cmd.Parameters)
                         retString.Append(PrintParameter(p));

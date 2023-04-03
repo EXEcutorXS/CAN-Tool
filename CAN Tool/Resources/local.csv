@@ -813,7 +813,7 @@ t_reset_failures	Clear failure codes	сброс неисправностей
 t_liquid_heater_set_parameters	Liquid heater set parameters	задать параметры работы жидкостного подогревателя
 t_request_deltas	Request power mode transition steps	запрос температурных переходов по режимам жидкостного подогревателя
 t_valves_control	Valves control	задать состояние клапанов устройства ”Блок управления клапанами”
-t_air_heater_set_parameters	Air heater set_parameters	задать параметры работы воздушного отопителя
+t_air_heater_set_parameters	Air heater set parameters	задать параметры работы воздушного отопителя
 t_start_vent	Ventilation start	запуск в режиме вентиляции (для воздушных отопителей)
 t_calibration	Thermocouples calibration start	калибровка термопар
 t_set_pwm_freq	Set air blower PWM frequency 	задать параметры частоты ШИМ нагнетателя воздуха
@@ -864,3 +864,50 @@ t_on	On	Вкл
 t_off	OFF	Выкл
 t_yes	YES	Да
 t_no	No	Нет
+t_enable_idle_while_working_by_temp_sensor	Idle enable while working by temp sensor	Разрешение/запрещение ждущего режима (при работе по датчику температуры)
+t_enable_blower_while_idle	Enable air blower while idle	Разрешение вращения нагнетателя воздуха на ждущем режиме
+t_set_room_temperature	Set room temperature	Уставка температуры помещения
+t_power_setpoint	Power setpoint	Заданное значение мощности
+t_1st_tcouple_cal	1st Tcouple	Калибровочное значение термопары 1
+t_2nd_tcouple_cal	2nd Tcouple	Калибровочное значение термопары 2
+t_prescaler	Prescaler	Предделитель
+t_pwm_period	PWM period	Период ШИМ
+t_required_freq	Required frequency	требуемая частота
+t_action_after_reset	After reset action	Действие после перезагрузки
+t_stay_in_boot	Stay in bootloader	Оставаться в загрузчике
+t_to_main_program_without_delay	To main program without delay	Переход в основную программу без задержки
+t_5_sec_in_boot	5 seconds in bootloader	5 секунд в загрузчике
+t_mask_all	Mask every failure	Игнорирование всех неисправностей
+t_mask_fp_failures	Mask fuel pump failures	Игнорирование неисправностей ТН
+t_mask_flamebreak_fails	Mask flame break failures	Игнорирование срывов пламени
+t_mask_glow_plug_failures	Mask glow plug failures	Игнорирование неисправностей свечи
+t_mask_blower_failures	MAsk air blower_failures	Игнорирование неисправностей НВ
+t_mask_sensors_failures	Mask sensor failures	Игнорирование неисправностей датчиков
+t_mask_pump_failures	Mask pump failures	Игнорирование неисправностей помпы
+t_mask_overheating_failures	Mask overheating failures	Игнорирование перегревов
+t_liquid_temp	Liquid temperature	Температура жидкости
+t_overheat_temp	Overheat temperature	Температура перегрева
+t_flame_temperature	Flame temperature	Температура пламени
+t_body_temp	Body temperature	Температура корпуса
+t_air_temp	Air temperature	Температура воздуха
+t_temp_value	Value	Значение температуры
+t_ener_m	Enter manual mode	Вход в режим М
+t_leave_m	Leave manual mode	Выход из режима М
+t_enter_t	Enter test mode	Выход из режима Т
+t_leave_t	Leave test mode	Вход в режим Т
+t_pump_state	Pump state	Состояние помпы
+t_blower_revs	Blower revs	Обороты нагнетателя
+t_glow_plug	Glow plug power	Мощность свечи
+t_fuel_pump_freq	Fuel pump frequency	Частота ТН
+t_exec_dev_type	Executove device type	Тип устройства
+t_fpx10	Fuel pump (Hz*10)	ТН, Гц*10
+t_relay01	Relay (0/1)	Реле(0/1)
+t_glow_plug_perc	Glow plug %	Свеча %
+t_pump_perc	Pump %	Помпа %
+t_blower_perc	Blower PWM %	Шим НВ,%
+t_blower_revs_rps	Blower speed(RPS)	Обороты НВ, об/с
+t_fuel_pump_state	Fuel pump state	Состояние ТН
+t_relay_state	Relay state	Состояние реле
+t_glow_plug_state	Glow plug state	Состояние свечи
+t_blower_state	Blower state	Состояние НВ
+t_not_used	Not used	Не используется

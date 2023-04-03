@@ -277,6 +277,7 @@ namespace CAN_Tool
                     tb.TextChanged += UpdateCommand;
                     tb.Margin = new Thickness(10);
                     tb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+                    tb.Style = (Style)App.Current.TryFindResource("MaterialDesignOutlinedTextBox");
                     panel.Children.Add(tb);
                 }
                 mainWindowViewModel.CommandParametersArray[counter++] = p.DefaultValue;
