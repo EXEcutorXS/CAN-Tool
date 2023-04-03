@@ -15,6 +15,7 @@ using System.ComponentModel;
 using OmniProtocol;
 using CAN_Tool.Libs;
 using System.Threading;
+using System.Windows.Data;
 
 namespace RVC
 {
@@ -29,11 +30,11 @@ namespace RVC
         {
             DGN newDgn;
 
-            newDgn = new DGN(true) { Dgn = 0x1FF9C, Name = "THERMOSTAT_AMBIENT_STATUS" };
+            newDgn = new DGN(1) { Dgn = 0x1FF9C, Name = "THERMOSTAT_AMBIENT_STATUS" };
             newDgn.Parameters.Add(new Parameter { Name = "Ambient temperature", ShortName = "Tamb", Type = parameterType.temperature, Size = parameterSize.uint16, firstByte = 1 });
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FFE4, Name = "FURNACE_STATUS" };
+            newDgn = new DGN(1) { Dgn = 0x1FFE4, Name = "FURNACE_STATUS" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -83,7 +84,7 @@ namespace RVC
             });
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FFE3, Name = "FURNACE_COMMAND" };
+            newDgn = new DGN(1) { Dgn = 0x1FFE3, Name = "FURNACE_COMMAND" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -112,7 +113,7 @@ namespace RVC
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FFF7, Name = "WATERHEATER_STATUS" };
+            newDgn = new DGN(1) { Dgn = 0x1FFF7, Name = "WATERHEATER_STATUS" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -211,7 +212,7 @@ namespace RVC
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FFF6, Name = "WATERHEATER_COMMAND" };
+            newDgn = new DGN(1) { Dgn = 0x1FFF6, Name = "WATERHEATER_COMMAND" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -228,7 +229,7 @@ namespace RVC
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FFE2, Name = "THERMOSTAT_STATUS_1" };
+            newDgn = new DGN(1) { Dgn = 0x1FFE2, Name = "THERMOSTAT_STATUS_1" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -286,7 +287,7 @@ namespace RVC
             DGNs.Add(newDgn.Dgn, newDgn);
 
 
-            newDgn = new DGN(true) { Dgn = 0x1FEF9, Name = "THERMOSTAT_COMMAND_1" };
+            newDgn = new DGN(1) { Dgn = 0x1FEF9, Name = "THERMOSTAT_COMMAND_1" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -344,7 +345,7 @@ namespace RVC
             DGNs.Add(newDgn.Dgn, newDgn);
 
 
-            newDgn = new DGN(true) { Dgn = 0x1FEFA, Name = "THERMOSTAT_STATUS_2" };
+            newDgn = new DGN(1) { Dgn = 0x1FEFA, Name = "THERMOSTAT_STATUS_2" };
             newDgn.Parameters.Add(new Parameter
             {
                 Name = "Current schedule instatnce",
@@ -374,7 +375,7 @@ namespace RVC
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FEF8, Name = "THERMOSTAT_COMMAND_2" };
+            newDgn = new DGN(1) { Dgn = 0x1FEF8, Name = "THERMOSTAT_COMMAND_2" };
             newDgn.Parameters.Add(new Parameter
             {
                 Name = "Current schedule instatnce",
@@ -404,7 +405,7 @@ namespace RVC
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FEF7, Name = "THERMOSTAT_SCHEDULE_STATUS_1" };
+            newDgn = new DGN(2) { Dgn = 0x1FEF7, Name = "THERMOSTAT_SCHEDULE_STATUS_1" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -450,11 +451,11 @@ namespace RVC
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FEF5, Name = "THERMOSTAT_SCHEDULE_COMMAND_1", Parameters = DGNs[0x1FEF7].Parameters };
+            newDgn = new DGN(1) { Dgn = 0x1FEF5, Name = "THERMOSTAT_SCHEDULE_COMMAND_1", Parameters = DGNs[0x1FEF7].Parameters };
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FEF6, Name = "THERMOSTAT_SCHEDULE_STATUS_2" };
+            newDgn = new DGN(2) { Dgn = 0x1FEF6, Name = "THERMOSTAT_SCHEDULE_STATUS_2" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -540,11 +541,11 @@ namespace RVC
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FEF4, Name = "THERMOSTAT_SCHEDULE_COMMAND_2", Parameters = DGNs[0x1FEF6].Parameters };
+            newDgn = new DGN(1) { Dgn = 0x1FEF4, Name = "THERMOSTAT_SCHEDULE_COMMAND_2", Parameters = DGNs[0x1FEF6].Parameters };
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN(true) { Dgn = 0x1FE97, Name = "CIRCULATION_PUMP_STATUS" };
+            newDgn = new DGN(1) { Dgn = 0x1FE97, Name = "CIRCULATION_PUMP_STATUS" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -584,7 +585,7 @@ namespace RVC
             });
             DGNs.Add(newDgn.Dgn, newDgn);
 
-            newDgn = new DGN() { Dgn = 0x1FFFF, Name = "DATE_TIME_STATUS" };
+            newDgn = new DGN(0) { Dgn = 0x1FFFF, Name = "DATE_TIME_STATUS" };
 
             newDgn.Parameters.Add(new Parameter
             {
@@ -723,12 +724,17 @@ namespace RVC
         public List<Parameter> Parameters { set; get; }
         public bool HasInstance { set; get; } = false;
         public string DisplayName => $"{Dgn:X05} {Name}";
-
-        public DGN(bool addInstance = false)
+        public int idLength; //Describes how many bytes in data are id of packet
+        public DGN(int idLen = 0)
         {
             HasInstance = true;
             Parameters = new List<Parameter>();
-            if (addInstance) this.Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = parameterType.instance, Size = parameterSize.uint8, firstByte = 0, Id = true });
+
+            if (idLen>0)
+            {
+                Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = parameterType.instance, Size = parameterSize.uint8, firstByte = 0, Id = true });
+                idLength = idLen;
+            }
         }
 
         public string Decode(byte[] data)
@@ -901,7 +907,7 @@ namespace RVC
             return retString;
         }
     }
-    public sealed class RvcMessage : ViewModel, IComparable, IUpdatable<RvcMessage>
+    public sealed class RvcMessage : CanMessage, IComparable, IUpdatable<RvcMessage>
     {
         private byte priority;
 
@@ -917,14 +923,8 @@ namespace RVC
         public byte SourceAdress { set => Set(ref sourceAdress, value); get => sourceAdress; }
         private byte[] data = new byte[8];
         [AffectsTo(nameof(VerboseInfo), nameof(Instance), nameof(DataAsText))]
-        public byte[] Data { set => Set(ref data, value); get => data; }
+        
         public byte Instance => Data[0];
-
-        public string DataAsText => $"{Data[0]:X02} {Data[1]:X02} {Data[2]:X02} {Data[3]:X02} {Data[4]:X02} {Data[5]:X02} {Data[6]:X02} {Data[7]:X02}";
-
-        private bool fresh;
-
-        public bool Fresh { get => fresh; set => Set(ref fresh, value); }
 
         public IEnumerable<Parameter> Parameters => (RVC.DGNs.ContainsKey(Dgn)) ? RVC.DGNs[Dgn].Parameters : null;
 
@@ -935,7 +935,7 @@ namespace RVC
             SourceAdress = 100;
 
             Fresh = true;
-            Task.Run(() => { Thread.Sleep(300); this.Fresh = false; });
+            
         }
 
         public RvcMessage(CanMessage msg):base()
@@ -987,9 +987,7 @@ namespace RVC
             return ret;
         }
 
-        public string VerboseInfo => PrintParameters().Replace(';', '\n');
-
-        public int Id => throw new NotImplementedException();
+        public new string VerboseInfo => PrintParameters().Replace(';', '\n');
 
         public string PrintParameters()
         {
@@ -1003,7 +1001,7 @@ namespace RVC
             return GetCanMessage().GetHashCode();
         }
 
-        public int CompareTo(object other)
+        public new int CompareTo(object other)
         {
             var o = other as RvcMessage;
             if (Dgn != o.Dgn)
@@ -1018,20 +1016,15 @@ namespace RVC
             SourceAdress = item.SourceAdress;
             Priority = item.Priority;
             Fresh = true;
-            Task.Run(() => { Thread.Sleep(300); Fresh = false; });
+            updatetick = DateTime.Now.Ticks;
         }
 
         public bool IsSimmiliarTo(RvcMessage item)
         {
             if (Dgn != item.Dgn) return false;
-            if (item.Parameters == null) return true;
-            List<Parameter> param = new();
-            param = item.Parameters.Where(p => p.Id == true).ToList<Parameter>();
-            if (param.Count == 0) return true;
-            foreach (Parameter p in param)
-                if (p.RawData(item.Data) == p.RawData(Data)) continue;
-                else
-                    return false;
+            if (!RVC.DGNs.ContainsKey(Dgn)) return true;
+            for(int i = 0; i < RVC.DGNs[Dgn].idLength;i++)
+                if (Data[i]!=item.Data[i]) return false;
             return true;
 
         }

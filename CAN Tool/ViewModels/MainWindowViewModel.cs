@@ -45,9 +45,6 @@ namespace CAN_Tool.ViewModels
         public RvcPageViewModel RvcPage { set; get; }
         public CanPageViewModel CanPage { set; get; }
 
-        public bool OmniEnabled { set; get; }
-        public bool RvcEnabled { set; get; }
-
         public bool AutoRedraw { set; get; } = true;
 
         private bool canAdapterSettings = false;
@@ -156,8 +153,6 @@ namespace CAN_Tool.ViewModels
             Thread.Sleep(20);
             CanAdapter.StartNormal();
             Thread.Sleep(20);
-            if (Mode == WorkMode_t.Omni)
-                ExecuteCommand(1, new byte[8]); // Request devices on the bus
         }
         private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !CanAdapter.PortOpened);
 
@@ -455,7 +450,6 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new();
             msg.TransmitterType = 126;
             msg.TransmitterAddress = 6;
-            msg.ReceiverId = SelectedConnectedDevice.ID;
             msg.PGN = 1;
             msg.Data = new byte[8];
             msg.Data[0] = (byte)(cmdNum >> 8);
@@ -466,7 +460,12 @@ namespace CAN_Tool.ViewModels
         }
 
 
-        
+
+        private void RefreshTimerTick(object sender, EventArgs e)
+        {
+            foreach (var m in OmniInstance.Messages)
+                m.FreshCheck();
+        }
 
         private void TimerTick(object sender, EventArgs e)
         {
@@ -494,7 +493,6 @@ namespace CAN_Tool.ViewModels
                 OmniInstance.SendMessage(msg);
                 Task.Delay(50);
             }
-
         }
 
 
@@ -543,11 +541,14 @@ namespace CAN_Tool.ViewModels
             CanPage = new(this);
 
             CanAdapter.GotNewMessage += NewMessgeReceived;
-            var timer = new System.Windows.Threading.DispatcherTimer();
 
-            timer.Tick += TimerTick;
-            timer.Interval = new TimeSpan(0, 0, 1);
+            var timer = new System.Timers.Timer(1000);
+            timer.Elapsed += TimerTick;
             timer.Start();
+
+            var refreshTimer = new System.Timers.Timer(250);
+            refreshTimer.Elapsed += RefreshTimerTick;
+            refreshTimer.Start();
 
             OmniInstance.NewDeviceAquired += NewDeviceHandler;
 

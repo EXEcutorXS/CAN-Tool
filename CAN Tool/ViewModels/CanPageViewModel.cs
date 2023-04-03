@@ -6,14 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.ComponentModel;
 using RVC;
 using Can_Adapter;
 using CAN_Tool.Libs;
+using System.Timers;
 
 namespace CAN_Tool.ViewModels
 {
@@ -29,7 +28,7 @@ namespace CAN_Tool.ViewModels
 
         public bool AutoSend { set; get; } = false;
 
-        public System.Windows.Threading.DispatcherTimer AutoSendTimer { set; get; }
+        private Timer autoSendTimer;
 
         public int SendInterval { set; get; } = 100;
 
@@ -42,10 +41,9 @@ namespace CAN_Tool.ViewModels
         {
             this.vm = vm;
 
-            AutoSendTimer = new();
-            AutoSendTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
-            AutoSendTimer.Tick += SpamTimerTick;
-
+            autoSendTimer = new(200);
+            autoSendTimer.Elapsed += SpamTimerTick;
+            autoSendTimer.Start();
             SaveCanLogCommand = new LambdaCommand(OnSaveCanLogCommandExecuted, x => true);
             SendCanMessageCommand = new LambdaCommand(OnSendCanMessageCommandExecuted, x => true);
         }
@@ -76,6 +74,10 @@ namespace CAN_Tool.ViewModels
 
                 vm.CanAdapter.Transmit(ConstructedMessage);
             }
+
+            foreach (var m in MessageList)
+                m.FreshCheck();
+
         }
 
         public ICommand SendCanMessageCommand { set; get; }

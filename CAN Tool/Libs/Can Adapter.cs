@@ -119,6 +119,7 @@ namespace Can_Adapter
         private bool fresh;
         public bool Fresh { set => Set(ref fresh, value); get => fresh; }
 
+        public long updatetick;
 
         public override string ToString()
         {
@@ -128,21 +129,14 @@ namespace Can_Adapter
 
         public CanMessage()
         {
-            refTask = Task.Run(Refresh);
             IDE = true;
             DLC = 8;
             RTR = false;
-        }
-
-        Task refTask;
-
-        private void Refresh()
-        {
             Fresh = true;
-            Thread.Sleep(300);
-            Fresh = false;
-
+            updatetick = DateTime.Now.Ticks;
         }
+
+        
         public CanMessage(string str):base()
         {
             switch (str[0])
@@ -221,7 +215,14 @@ namespace Can_Adapter
             RTR = m.RTR;
             Id = m.Id;
             DLC = m.DLC;
-            refTask = Task.Run(Refresh);
+            Fresh = true;
+            updatetick = DateTime.Now.Ticks;
+        }
+
+        public void FreshCheck()
+        {
+            if (fresh && (DateTime.Now.Ticks - updatetick > 3000000))
+                Fresh = false;
         }
 
         public virtual string VerboseInfo => ToString();
@@ -265,8 +266,10 @@ namespace Can_Adapter
         public int FailedMessagesCounter { private set => Set(ref failedMessagesCounter, value); get => failedMessagesCounter; }
 
         private int lastSecondReceived;
+        private int lastSecondTransmitted;
         private int currentSecodeReceived;
-        private System.Windows.Threading.DispatcherTimer oneSecondTimer;
+        private int currentSecodeTransmitted;
+        private System.Timers.Timer oneSecondTimer;
 
         //public int LastSecondReceived { get => lastSecondReceived; set => Set(ref lastSecondReceived, value); }
 
@@ -309,6 +312,31 @@ namespace Can_Adapter
         public void Stop() => serialPort.Write("C\r");
         public void SetBitrate(int bitrate) => serialPort.Write($"S{bitrate}\r");
 
+        public void TransmitFast(CanMessage msg)
+        {
+
+            TxDone = false;
+            TxFail = false;
+
+            if (serialPort.IsOpen == false)
+                return;
+            StringBuilder str = new("");
+            if (msg.IDE && msg.RTR)
+                str.Append('R');
+            if (!msg.IDE && msg.RTR)
+                str.Append('r');
+            if (msg.IDE && !msg.RTR)
+                str.Append('T');
+            if (!msg.IDE && !msg.RTR)
+                str.Append('t');
+            str.Append(msg.IdAsText);
+            str.Append(msg.DLC);
+            str.Append(msg.GetDataInTextFormat());
+            str.Append('\r');
+
+            serialPort.Write(str.ToString());
+            currentSecodeTransmitted++;
+        }
 
         public void Transmit(CanMessage msg)
         {
@@ -333,7 +361,7 @@ namespace Can_Adapter
             str.Append('\r');
 
             serialPort.Write(str.ToString());
-            
+            currentSecodeTransmitted++;
             for (int i = 0; i < 20; i++)
             {
                 Task.Delay(1);
@@ -366,7 +394,7 @@ namespace Can_Adapter
             str.Append('\r');
 
             serialPort.Write(str.ToString());
-
+            currentSecodeTransmitted++;
             for (int i = 0; i < 1000; i++)
             {
                 Thread.Sleep(1);
@@ -378,8 +406,12 @@ namespace Can_Adapter
 
         public bool TransmitForSure(CanMessage msg, int tries)
         {
-            while (TransmitWithCheck(msg) == false && tries-- > 0) ;
-            if (tries == 0) return false;
+            while (TransmitWithCheck(msg) == false && tries-- > 0)
+                currentSecodeTransmitted++;
+            if (tries == 0)
+            {
+                return false;
+            }
             else
                 return true;
 
@@ -434,7 +466,7 @@ namespace Can_Adapter
             }
         }
 
-        public string Status => $"Bus use:{lastSecondReceived} msg/s,Faults:{failedMessagesCounter}";
+        public string Status => $"Bus use: Rx/Tx(Total):{lastSecondReceived}/{lastSecondTransmitted}({lastSecondTransmitted+lastSecondReceived}) ,Faults:{failedMessagesCounter}";
 
         public CanAdapter()
         {
@@ -442,16 +474,17 @@ namespace Can_Adapter
             serialPort.BaudRate = 256000;
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             UIContext = SynchronizationContext.Current;
-            oneSecondTimer = new();
-            oneSecondTimer.Tick += EverySecond;
-            oneSecondTimer.Interval = new TimeSpan(0,0,1);
+            oneSecondTimer = new(1000);
+            oneSecondTimer.Elapsed += EverySecond;
             oneSecondTimer.Start();
         }
 
         private void EverySecond(object sender, EventArgs e)
         {
             lastSecondReceived = currentSecodeReceived;
+            lastSecondTransmitted = currentSecodeTransmitted;
             currentSecodeReceived= 0;
+            currentSecodeTransmitted= 0;
             OnPropertyChanged(nameof(Status));
         }
         

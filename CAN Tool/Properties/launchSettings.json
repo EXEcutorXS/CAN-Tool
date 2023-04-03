@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CAN Tool": {
+      "commandName": "Project",
+      "hotReloadEnabled": false
+    }
+  }
+}

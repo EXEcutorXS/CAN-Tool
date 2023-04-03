@@ -263,7 +263,7 @@ namespace OmniProtocol
         public OmniMessage() : base()
         {
             Fresh = true;
-            Task.Run(() => { Thread.Sleep(300); Fresh = false; });
+            updatetick = DateTime.Now.Ticks;
             DLC = 8;
             RTR = false;
             IDE = true;
@@ -280,10 +280,6 @@ namespace OmniProtocol
             Id = m.Id;
             return;
         }
-
-        private bool fresh;
-
-        public bool Fresh { get => fresh; set => Set(ref fresh, value); }
 
         [AffectsTo(nameof(VerboseInfo))]
         public int PGN
@@ -416,6 +412,7 @@ namespace OmniProtocol
             }
             return ret;
         }
+
         public string PrintParameter(OmniPgnParameter p)
         {
             StringBuilder retString = new();
@@ -503,7 +500,7 @@ namespace OmniProtocol
             ReceiverId = item.ReceiverId;
             Data = item.Data;
             Fresh = true;
-            Task.Run(() => { Thread.Sleep(300); Fresh = false; });
+            updatetick = DateTime.Now.Ticks;
         }
 
 

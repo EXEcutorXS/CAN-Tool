@@ -33,7 +33,8 @@ namespace CAN_Tool.ViewModels
 
         public bool SpamState { set; get; }
 
-        public System.Timers.Timer SpamTimer { set; get; }
+        public System.Timers.Timer SpamTimer;
+        public System.Timers.Timer RefreshTimer;
 
         public int SpamInterval { set; get; } = 100;
         
@@ -46,9 +47,13 @@ namespace CAN_Tool.ViewModels
             SaveRvcLogCommand = new LambdaCommand(OnSaveRvcLogCommandExecuted, x => true);
             SendRvcMessageCommand = new LambdaCommand(OnSendRvcMessageCommandExecuted, x => true);
 
-            SpamTimer = new(10);
+            SpamTimer = new(1);
             SpamTimer.Elapsed  += SpamTimerTick;
             SpamTimer.Start();
+
+            RefreshTimer = new(200);
+            RefreshTimer.Elapsed += RefreshTimerTick;
+            RefreshTimer.Start();
         }
         private int spamCounter = 0;
 
@@ -84,6 +89,12 @@ namespace CAN_Tool.ViewModels
             File.WriteAllText(path, log);
         }
 
+        private void RefreshTimerTick(object sender, EventArgs e)
+        {
+            foreach (var m in MessageList)
+                m.FreshCheck();
+        }
+
         private void SpamTimerTick(object sender, EventArgs e)
         {
             spamCounter++;
@@ -95,7 +106,7 @@ namespace CAN_Tool.ViewModels
                     if (RandomDgn)
                     {
                         CanMessage msg = new RvcMessage() { Dgn = new Random((int)DateTime.Now.Ticks).Next(0, 0x1FFFF) }.GetCanMessage();
-                        vm.CanAdapter.Transmit(msg);
+                        vm.CanAdapter.TransmitFast(msg);
                     }
                     else
                         OnSendRvcMessageCommandExecuted(null);
