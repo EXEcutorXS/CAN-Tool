@@ -145,7 +145,7 @@ namespace OmniProtocol
             commands[8].Parameters.Add(new() { StartByte = 3, BitLength = 2, StartBit = 2, Name = "t_valve_6_state", Meanings = defMeaningsOnOff });
             commands[8].Parameters.Add(new() { StartByte = 3, BitLength = 2, StartBit = 4, Name = "t_valve_7_state", Meanings = defMeaningsOnOff });
             commands[8].Parameters.Add(new() { StartByte = 3, BitLength = 2, StartBit = 6, Name = "t_valve_8_state", Meanings = defMeaningsOnOff });
-            commands[8].Parameters.Add(new() { StartByte = 4, BitLength = 1, StartBit = 0, Meanings = { { 0, "t_clear_error_codes" } } });
+            commands[8].Parameters.Add(new() { StartByte = 4, BitLength = 1, StartBit = 0, Meanings = { { 0, "t_do_not_clear_codes" }, { 1, "t_clear_error_codes" } } });
 
             commands[9].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Minute });
             commands[9].Parameters.Add(new() { StartByte = 4, BitLength = 4, Name = "t_working_mode", Meanings = { { 0, "t_not_used" }, { 1, "t_work_by_pcb_temp" }, { 2, "t_work_by_panel_sensor_temp" }, { 3, "t_work_by_external_sensor" }, { 4, "t_work_by_power" } } });

@@ -615,7 +615,6 @@ namespace OmniProtocol
     }
     public class StatusVariable : ViewModel, IUpdatable<StatusVariable>, IComparable
     {
-
         public StatusVariable(int var) : base()
         {
             Id = var;
@@ -626,10 +625,7 @@ namespace OmniProtocol
             markShape = App.Settings.MarkShapes[Id];
 
         }
-        public StatusVariable()
-        {
-
-        }
+        
         public int Id { get; set; }
 
         private long rawVal;
@@ -822,16 +818,15 @@ namespace OmniProtocol
 
         private DateTime capturedTime;
 
-
-
+        [AffectsTo(nameof(TaskStatus))]
         public int PercentComplete
         {
             get => percentComplete;
             set => Set(ref percentComplete, value);
-
         }
 
         string name;
+        [AffectsTo(nameof(TaskStatus))]
         public string Name
         {
             get => name;
@@ -842,6 +837,7 @@ namespace OmniProtocol
 
         bool done = false;
 
+        [AffectsTo(nameof(TaskStatus))]
         public bool Done
         {
             get { return done; }
@@ -849,6 +845,7 @@ namespace OmniProtocol
         }
 
         bool cancelled;
+        [AffectsTo(nameof(TaskStatus))]
         public bool Cancelled
         {
             get { return cancelled; }
@@ -892,7 +889,7 @@ namespace OmniProtocol
         }
 
         private bool occupied;
-
+        [AffectsTo(nameof(TaskStatus))]
         public bool Occupied
         {
             get { return occupied; }
@@ -900,7 +897,7 @@ namespace OmniProtocol
         }
 
         private string failReason;
-
+        [AffectsTo(nameof(TaskStatus))]
         public string FailReason
         {
             get { return failReason; }
@@ -908,7 +905,7 @@ namespace OmniProtocol
         }
 
         private bool failed;
-
+        [AffectsTo(nameof(TaskStatus))]
         public bool Failed
         {
             get { return failed; }
@@ -932,9 +929,26 @@ namespace OmniProtocol
             capturedTime = DateTime.Now;
             return true;
         }
+
         public void UpdatePercent(int p)
         {
             PercentComplete = p;
+        }
+
+        public string TaskStatus
+        {
+            get
+            {
+                if (!Done && !Cancelled && !Failed && Occupied)
+                    return GetString(Name) + " " + GetString("t_in_progress");
+                if (Done)
+                    return GetString(Name) + " " + GetString("t_done_in") + " " + $"{LastOperationDuration.Value.TotalSeconds:F3} " + GetString("u_s");
+                if (Cancelled)
+                    return GetString(Name) + " " + GetString("t_cancelled");
+                if (Failed)
+                    return GetString(Name) + " " + GetString("t_failed") + ", " + GetString(FailReason);
+                return "";
+            }
         }
 
     }
@@ -1285,7 +1299,8 @@ namespace OmniProtocol
         {
             Log.Insert(0, (MainParameters)Parameters.Clone());
 
-            if (!isLogWriting) return;
+            if (!isLogWriting) 
+                return;
 
             if (LogCurrentPos < LogData[0].Length)
             {
@@ -1299,6 +1314,8 @@ namespace OmniProtocol
                 LogStop();
                 LogDataOverrun?.Invoke(this, null);
             }
+
+            
         }
 
         public void LogInit(int length = 86400)
@@ -1425,22 +1442,11 @@ namespace OmniProtocol
 
         OmniTask currentTask = new();
 
+        SynchronizationContext UIContext = SynchronizationContext.Current;
 
 
-        public string TaskStatus {get
-            {
-                if (currentTask.Name == "Ready")
-                    return "";
-                if (!currentTask.Done && !currentTask.Cancelled && !currentTask.Failed && currentTask.Occupied)
-                    return GetString(currentTask.Name) + " " + GetString("in_progress");
-                if (currentTask.Done)
-                    return GetString(currentTask.Name) + " " + GetString("done_in") + " " + currentTask.LastOperationDuration.Value.TotalSeconds + GetString("u_s");
-                if (currentTask.Cancelled)
-                    return GetString(currentTask.Name) + " " + GetString("cancelled");
-                if (currentTask.Failed)
-                    return GetString(currentTask.Name) + " " + GetString("failed") + ", " + GetString(currentTask.FailReason);
-                return "";
-            } } 
+
+        
 
         public OmniTask CurrentTask
         {
@@ -1787,7 +1793,7 @@ namespace OmniProtocol
 
         public async void ReadBlackBoxData(DeviceId id)
         {
-            if (!Capture("Чтение параметров чёрного ящика")) return;
+            if (!Capture("t_reading_bb_parameters")) return;
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(d => d.ID == id);
             if (currentDevice == null) return;
             ReadingBBErrorsMode = false;
@@ -1876,14 +1882,13 @@ namespace OmniProtocol
 
         public async void ReadErrorsBlackBox(DeviceId id)
         {
-            if (!Capture("Чтение ошибок из чёрного ящика")) return;
+            if (!Capture("t_reading_b_errors")) return;
             ReadingBBErrorsMode = true;
 
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
-            //UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
-            currentDevice.BBErrors.Clear();
-
+            UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
+            
             OmniMessage msg = new OmniMessage
             {
                 PGN = 8,
@@ -1933,7 +1938,7 @@ namespace OmniProtocol
 
         public void EraseCommonBlackBox(DeviceId id)
         {
-            if (!Capture("Стирание параметров чёрного ящика")) return;
+            if (!Capture("t_bb_common_erasing")) return;
 
             OmniMessage msg = new OmniMessage();
             msg.PGN = 8;
@@ -1954,7 +1959,7 @@ namespace OmniProtocol
 
         public void EraseErrorsBlackBox(DeviceId id)
         {
-            if (!Capture("Стирание ошибок чёрного ящика")) return;
+            if (!Capture("t_bb_errors_erasing")) return;
 
             OmniMessage msg = new OmniMessage();
             msg.PGN = 8;
@@ -1974,7 +1979,7 @@ namespace OmniProtocol
         }
         public async void ReadAllParameters(DeviceId id)
         {
-            if (!Capture("Чтение параметров из Flash")) return;
+            if (!Capture("t_reading_flash_parameters")) return;
             int cnt = 0;
 
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
@@ -2090,7 +2095,7 @@ namespace OmniProtocol
 
         public async void SaveParameters(DeviceId id)
         {
-            if (!Capture("Сохранение параметров во Flash")) return;
+            if (!Capture("t_saving_params_to_flash")) return;
             var dev = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id));
             if (dev == null) return;
             OmniMessage msg = new OmniMessage();
@@ -2130,7 +2135,7 @@ namespace OmniProtocol
 
         public void ResetParameters(DeviceId id)
         {
-            if (!Capture("Стирание пареметров")) return;
+            if (!Capture("t_config_erase")) return;
             var dev = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(id));
             if (dev == null) return;
             OmniMessage msg = new OmniMessage();

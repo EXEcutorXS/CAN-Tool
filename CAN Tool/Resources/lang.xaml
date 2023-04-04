@@ -727,7 +727,7 @@
 
 <v:String x:Key="d_0">Any</v:String>
 <v:String x:Key="d_1">14TS Mini</v:String>
-<v:String x:Key="d_2">Planar</v:String>
+<v:String x:Key="d_2">Planar 2</v:String>
 <v:String x:Key="d_3">Planar 44D</v:String>
 <v:String x:Key="d_4">30TSD</v:String>
 <v:String x:Key="d_5">30TSG</v:String>
@@ -820,6 +820,7 @@
 <v:String x:Key="t_reset_cpu">Reset MCU</v:String>
 <v:String x:Key="t_failures_mask">Mask failure codes</v:String>
 <v:String x:Key="t_temperature_set">Temperature set</v:String>
+<v:String x:Key="t_do_not_clear_codes">Don't clear error codes</v:String>
 <v:String x:Key="t_clear_error_codes">Clear error codes</v:String>
 <v:String x:Key="t_manual_test_mode_enter">Manual or test mode enter/exit</v:String>
 <v:String x:Key="t_manual_control">Manual device control</v:String>
@@ -911,4 +912,21 @@
 <v:String x:Key="t_glow_plug_state">Glow plug state</v:String>
 <v:String x:Key="t_blower_state">Blower state</v:String>
 <v:String x:Key="t_not_used">Not used</v:String>
+
+<v:String x:Key="u_s">s</v:String>
+<v:String x:Key="u_hz">Hz</v:String>
+<v:String x:Key="u_kpa">kPa</v:String>
+<v:String x:Key="u_rps">RPS</v:String>
+
+<v:String x:Key="t_in_progress">in progress</v:String>
+<v:String x:Key="t_done_in">done in</v:String>
+<v:String x:Key="t_canelled">cancelled</v:String>
+<v:String x:Key="t_failed">failed</v:String>
+<v:String x:Key="t_reading_bb_parameters">Reading black box parameters</v:String>
+<v:String x:Key="t_reading_b_errors">Reading black box errors</v:String>
+<v:String x:Key="t_bb_errors_erasing">Erasing black box errors</v:String>
+<v:String x:Key="t_bb_common_erasing">Erasing black box data</v:String>
+<v:String x:Key="t_reading_flash_parameters">Reading config from flash</v:String>
+<v:String x:Key="t_saving_params_to_flash">Saving config to flash</v:String>
+<v:String x:Key="t_config_erase">Erasing config from flash</v:String>
 </ResourceDictionary>

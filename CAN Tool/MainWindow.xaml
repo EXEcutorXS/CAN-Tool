@@ -1,4 +1,4 @@
-﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:rvc="clr-namespace:RVC" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:acan="clr-namespace:OmniProtocol" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" xmlns:col="clr-namespace:System.Collections;assembly=mscorlib" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:sctplt="clr-namespace:ScottPlot;assembly=ScottPlot" Title="Adver CAN-Tool" Height="900" Width="1500" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:CAN_Tool" xmlns:rvc="clr-namespace:RVC" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" mc:Ignorable="d" xmlns:col="clr-namespace:System.Collections;assembly=mscorlib" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:sctplt="clr-namespace:ScottPlot;assembly=ScottPlot" Title="Adver CAN-Tool" Height="900" Width="1500" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
@@ -42,7 +42,7 @@
     <DockPanel>
         <StatusBar x:Name="MyStatusbar" DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
             <StatusBarItem HorizontalAlignment="Left">
-                <TextBlock FontSize="20" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniInstance.TaskStatus}" Margin="10"></TextBlock>
+                <TextBlock FontSize="20" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniInstance.CurrentTask.TaskStatus}" Margin="10"></TextBlock>
             </StatusBarItem>
             <ProgressBar Width="300" Value="{Binding OmniInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0" Visibility="{Binding OmniInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></ProgressBar>
             <StatusBarItem HorizontalAlignment="Left">
@@ -111,7 +111,7 @@
 
             </StackPanel>
         </Grid>
-        <DockPanel Visibility="{Binding Mode, Converter={StaticResource RegularCanToVisible}}" DockPanel.Dock="Top" >
+        <DockPanel Visibility="{Binding Mode, Converter={StaticResource RegularCanToVisible}}" d:Visibility="Visible" DockPanel.Dock="Top" >
             <StackPanel Grid.Row="0" Orientation="Horizontal" DockPanel.Dock="Top" >
                 <TextBlock VerticalAlignment="Center" Margin="10" Text="ID:" FontSize="25"/>
                 <TextBox ToolTip="ID" MinWidth="160" Margin="10" Text="{Binding CanPage.ConstructedMessage.Id,Converter={StaticResource HexConverter},UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
@@ -471,11 +471,30 @@
 
                                     <StackPanel Grid.Row="0" Orientation="Horizontal">
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Type:</TextBlock>
-                                        <TextBox ToolTip="Type" Width="40" Margin="5 10" Text="{Binding CustomMessage.ReceiverType,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                                    <TextBox ToolTip="Type" MinWidth="50" Margin="5 10" FontSize="25"  TextAlignment="Center" VerticalAlignment="Center">
+                                        <Binding Path="CustomMessage.ReceiverType" UpdateSourceTrigger="PropertyChanged" Mode="OneWayToSource" >
+                                            <Binding.ValidationRules>
+                                                <v:RangeRule Min="0" Max="127" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
+
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Adr:</TextBlock>
-                                    <TextBox ToolTip="Adress" Width="30" Margin="5 10" Text="{Binding CustomMessage.ReceiverAddress,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                                    <TextBox ToolTip="Adress" MinWidth="40" Margin="5 10" FontSize="25" TextAlignment="Center" VerticalAlignment="Center">
+                                        <Binding Path="CustomMessage.ReceiverAddress" UpdateSourceTrigger="PropertyChanged" Mode="OneWayToSource">
+                                            <Binding.ValidationRules>
+                                                <v:RangeRule Min="0" Max="7" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">PGN:</TextBlock>
-                                    <TextBox ToolTip="PGN" Width="40" Margin="5 10" Text="{Binding Path=CustomMessage.PGN,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                                    <TextBox ToolTip="PGN" MinWidth="40" Margin="5 10" FontSize="25" TextAlignment="Center" VerticalAlignment="Center">
+                                        <Binding Path="CustomMessage.PGN" UpdateSourceTrigger="PropertyChanged" Mode="OneWayToSource">
+                                            <Binding.ValidationRules>
+                                                <v:RangeRule Min="0" Max="511" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Data:</TextBlock>
                                     <TextBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource HexToUlongConverter}}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
                                         <TextBox ToolTip="Data Preview " MaxHeight="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsText,Mode=OneWay}" IsReadOnly="True" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
@@ -498,7 +517,7 @@
                                                     <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}"></Setter>
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding Fresh}" Value="false">
-                                                    <Setter Property="Background" Value="{DynamicResource MaterialDesignBackground}"></Setter>
+                                                    <Setter Property="Background" Value="{DynamicResource MaterialDesignCheckBoxDisabled}"></Setter>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -666,10 +685,14 @@
                                         <materialDesign:ColorPicker Margin="20" x:Name="ColorPicker" DockPanel.Dock="Left" MouseLeftButtonUp="ColorPicker_MouseLeftButtonUp" StylusUp="ColorPicker_StylusUp" MinHeight="200" />
                                     </DockPanel>
                                 </Expander>
-                                <WpfPlot Name="Chart"></WpfPlot>
-                            </DockPanel>
-                        </Grid>
-                    </TabItem>
+                            <Grid DockPanel.Dock="Bottom">
+                            <WpfPlot MinHeight="600" VerticalAlignment="Stretch" Name="Chart"></WpfPlot>
+                            </Grid>
+                        </DockPanel>
+                        
+                    </Grid>
+                    
+                </TabItem>
                     <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
@@ -848,45 +871,53 @@
                     </TabItem>
                 </TabControl>
             </DockPanel>
-        <TabControl DockPanel.Dock="Top" Style="{DynamicResource MaterialDesignFilledTabControl}" Visibility="{Binding Mode,Converter={StaticResource RvcToVisible}}">
+        <TabControl DockPanel.Dock="Top" Style="{DynamicResource MaterialDesignFilledTabControl}" Visibility="{Binding Mode,Converter={StaticResource RvcToVisible}}" d:Visibility="Visible">
             <TabItem Header="Control">
 
             </TabItem>
             <TabItem Header="{DynamicResource b_messages}">
-                <DockPanel>
-                    <TextBox DockPanel.Dock="Right" Text="{Binding RvcPage.ConstructedMessage.VerboseInfo,Mode=OneWay}" Margin="10" Style="{DynamicResource MaterialDesignDataGridTextColumnEditingStyle}" />
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                        <StackPanel>
-                            <!--ComboBox Style="{DynamicResource MaterialDesignOutlinedComboBox}" Margin="10" ItemsSource="{Binding RvcPage.DgnList}" SelectedItem="{Binding RvcPage.ConstructedMessage.Dgn,Converter={StaticResource ToDgn},Mode=OneWayToSource}" DisplayMemberPath="Value.DisplayName" /-->
-                            <TextBox Text="{Binding RvcPage.ConstructedMessage.Dgn,Converter={StaticResource HexConverter},UpdateSourceTrigger=PropertyChanged}" Margin="10" Style="{DynamicResource MaterialDesignOutlinedTextBox}"></TextBox>
-                            <TextBlock HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}"></TextBlock>
-                        </StackPanel>
-                        <StackPanel>
-                            <TextBox Text="{Binding RvcPage.ConstructedMessage.SourceAdress,UpdateSourceTrigger=PropertyChanged}" Margin="10" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                            <TextBlock HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}"> SA</TextBlock>
-                        </StackPanel>
-                        <StackPanel>
-                            <TextBox Text="{Binding RvcPage.ConstructedMessage.Priority,UpdateSourceTrigger=PropertyChanged}" Margin="10" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                            <TextBlock HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}"> Priority</TextBlock>
-                        </StackPanel>
-                        <StackPanel>
-                            <TextBox Text="{Binding RvcPage.ConstructedMessage.Data,Converter={StaticResource DataConverter},UpdateSourceTrigger=PropertyChanged}" Margin="10" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                            <TextBlock HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}"> Data</TextBlock>
-                        </StackPanel>
-                        <StackPanel>
-                            <TextBox x:Name="DataBox" Text="{Binding RvcPage.ConstructedMessage.DataAsText,Mode=OneWay}" Margin="10" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                            <TextBlock HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}"> Data check</TextBlock>
-                        </StackPanel>
-                        <Button Margin="20" Command="{Binding RvcPage.SendRvcMessageCommand}">
+                <DockPanel >
+                    <Grid DockPanel.Dock="Right" Background="{DynamicResource MaterialDesignCardBackground}">
+                        <Border CornerRadius="10" Margin="10" BorderThickness="2" Background="{DynamicResource MaterialDesignDarkBackground}">
+                        <TextBox  Text="{Binding RvcPage.ConstructedMessage.VerboseInfo,Mode=OneWay}" Margin="5"  />
+                    </Border>
+                    </Grid>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="{DynamicResource MaterialDesignCardBackground}">
+
+                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10">DGN:</TextBlock>
+                        <TextBox Text="{Binding RvcPage.ConstructedMessage.Dgn,Converter={StaticResource HexConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center"></TextBox>
+                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> SA</TextBlock>
+                        <TextBox Text="{Binding RvcPage.ConstructedMessage.SourceAdress,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
+                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Priority:</TextBlock>
+                        <TextBox Text="{Binding RvcPage.ConstructedMessage.Priority,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
+                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Data:</TextBlock>
+                        <TextBox Text="{Binding RvcPage.ConstructedMessage.Data,Converter={StaticResource DataConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10" > Preview:</TextBlock>
+                        <TextBox x:Name="DataBox" Text="{Binding RvcPage.ConstructedMessage.DataAsText,Mode=OneWay}" FontSize="25" Margin="10" VerticalAlignment="Center" />
+                        <Button Margin="10" Command="{Binding RvcPage.SendRvcMessageCommand}">
                             <Button.Content>
                                 <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                             </Button.Content>
                         </Button>
-                        <TextBox Text="{Binding RvcPage.SpamInterval}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" VerticalAlignment="Center" Margin="10"></TextBox>
-                        <CheckBox IsChecked="{Binding RvcPage.SpamEnabled}">Spam</CheckBox>
-                        <CheckBox IsChecked="{Binding RvcPage.RandomDgn}">Random</CheckBox>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="{DynamicResource MaterialDesignCardBackground}">
+
+                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Spam interval:</TextBlock>
+                        <TextBox ToolTip="In milliseconds" FontSize="25" Margin="10" VerticalAlignment="Center" MinWidth="40" TextAlignment="Center">
+                            <TextBox.Text>
+                                <Binding Path="RvcPage.SpamInterval" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <v:RangeRule Min="6" Max="1000"/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <CheckBox ToolTip="Enable spam function" IsChecked="{Binding RvcPage.SpamEnabled}" FontSize="25" Margin="10">Spam</CheckBox>
+                        <CheckBox ToolTip="Can corrupt data if DGN match registred" IsChecked="{Binding RvcPage.RandomDgn}" FontSize="25" Margin="10">Randomise DGN</CheckBox>
                         <Button Margin="10" Content="Save Log" Command="{Binding RvcPage.SaveRvcLogCommand}" />
                     </StackPanel>
+
+         
 
                     <DataGrid x:Name="RVCMessageList" SelectedItem="{Binding RvcPage.SelectedMessage,Mode=OneWayToSource}" DockPanel.Dock="Left" Margin="10" ItemsSource="{Binding RvcPage.MessageList}" AutoGenerateColumns="False">
                         <DataGrid.RowStyle>
@@ -909,7 +940,9 @@
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <TextBlock DockPanel.Dock="Left" Text="{Binding ElementName=RVCMessageList, Path=SelectedItem.VerboseInfo}" />
+                    <Border BorderBrush="{DynamicResource MaterialDesignCardBackground}" CornerRadius="10" BorderThickness="3" Margin="10">
+                    <TextBlock DockPanel.Dock="Left" Text="{Binding ElementName=RVCMessageList, Path=SelectedItem.VerboseInfo}" Margin="10" FontSize="15"/>
+                    </Border>
 
                 </DockPanel>
             </TabItem>

@@ -77,7 +77,7 @@ namespace CAN_Tool.ViewModels
         }
         
 
-        OmniMessage customMessage = new OmniMessage() { PGN=1};
+        OmniMessage customMessage = new OmniMessage() { PGN=0,ReceiverAddress=0,ReceiverType=27};
 
         public Dictionary<int, OmniCommand> CommandList { get; } = Omni.commands;
 
@@ -450,6 +450,7 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new();
             msg.TransmitterType = 126;
             msg.TransmitterAddress = 6;
+            msg.ReceiverId = selectedConnectedDevice.ID;
             msg.PGN = 1;
             msg.Data = new byte[8];
             msg.Data[0] = (byte)(cmdNum >> 8);

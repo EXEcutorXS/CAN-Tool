@@ -727,7 +727,7 @@
 
 <v:String x:Key="d_0">Любой</v:String>
 <v:String x:Key="d_1">14ТС Мини</v:String>
-<v:String x:Key="d_2">2 Планар 2</v:String>
+<v:String x:Key="d_2">Планар 2</v:String>
 <v:String x:Key="d_3">Планар 44Д</v:String>
 <v:String x:Key="d_4">30ТСД</v:String>
 <v:String x:Key="d_5">30ТСГ</v:String>
@@ -820,6 +820,7 @@
 <v:String x:Key="t_reset_cpu">Перезагрузка контроллера</v:String>
 <v:String x:Key="t_failures_mask">биты реакции на неисправности</v:String>
 <v:String x:Key="t_temperature_set">установить значение температуры</v:String>
+<v:String x:Key="t_do_not_clear_codes">Не сбрасывать неисправности</v:String>
 <v:String x:Key="t_clear_error_codes">сброс неисправностей</v:String>
 <v:String x:Key="t_manual_test_mode_enter">вход/выход в стадию M (ручное управление) или T (тестирование блока управления)</v:String>
 <v:String x:Key="t_manual_control">задание параметров устройств в стадии M (ручное управление)</v:String>
@@ -911,4 +912,21 @@
 <v:String x:Key="t_glow_plug_state">Состояние свечи</v:String>
 <v:String x:Key="t_blower_state">Состояние НВ</v:String>
 <v:String x:Key="t_not_used">Не используется</v:String>
+
+<v:String x:Key="u_s">с</v:String>
+<v:String x:Key="u_hz">Гц</v:String>
+<v:String x:Key="u_kpa">кПа</v:String>
+<v:String x:Key="u_rps">Об/с</v:String>
+
+<v:String x:Key="t_in_progress">в процессе</v:String>
+<v:String x:Key="t_done_in">выполнено за</v:String>
+<v:String x:Key="t_canelled">отменено</v:String>
+<v:String x:Key="t_failed">сбой выполнения</v:String>
+<v:String x:Key="t_reading_bb_parameters">Чтение параметров чёрного ящика</v:String>
+<v:String x:Key="t_reading_b_errors">Чтение ошибок из черного ящика</v:String>
+<v:String x:Key="t_bb_errors_erasing">Стирание ошибок чёрного ящика</v:String>
+<v:String x:Key="t_bb_common_erasing">Стирание параметров чёрного ящика</v:String>
+<v:String x:Key="t_reading_flash_parameters">Чтение параметров из Flash</v:String>
+<v:String x:Key="t_saving_params_to_flash">Сохранение параметров во Flash</v:String>
+<v:String x:Key="t_config_erase">Стирание пареметров</v:String>
 </ResourceDictionary>

@@ -15,7 +15,7 @@ using RVC;
 using Can_Adapter;
 using CAN_Tool.Libs;
 using System.Windows.Interop;
-
+using System.ComponentModel.DataAnnotations;
 
 namespace CAN_Tool.ViewModels
 {
@@ -33,12 +33,14 @@ namespace CAN_Tool.ViewModels
 
         public bool SpamState { set; get; }
 
-        public System.Timers.Timer SpamTimer;
         public System.Timers.Timer RefreshTimer;
 
+        
         public int SpamInterval { set; get; } = 100;
         
         public bool RandomDgn { set; get; } = false;
+
+        Task spamTask;
 
         public RvcPageViewModel(MainWindowViewModel vm)
         {
@@ -47,16 +49,33 @@ namespace CAN_Tool.ViewModels
             SaveRvcLogCommand = new LambdaCommand(OnSaveRvcLogCommandExecuted, x => true);
             SendRvcMessageCommand = new LambdaCommand(OnSendRvcMessageCommandExecuted, x => true);
 
-            SpamTimer = new(1);
-            SpamTimer.Elapsed  += SpamTimerTick;
-            SpamTimer.Start();
-
-            RefreshTimer = new(200);
+            RefreshTimer = new(250);
             RefreshTimer.Elapsed += RefreshTimerTick;
             RefreshTimer.Start();
-        }
-        private int spamCounter = 0;
 
+            spamTask =  Task.Run(SpamFunction);
+
+        }
+
+        private void SpamFunction()
+        {
+            while (true)
+            {
+                Thread.Sleep(SpamInterval);
+
+                if (SpamEnabled)
+                {
+                    if (RandomDgn)
+                    {
+                        CanMessage msg = new RvcMessage() { Dgn = new Random((int)DateTime.Now.Ticks).Next(0, 0x1FFFF) }.GetCanMessage();
+                        vm.CanAdapter.TransmitFast(msg);
+                    }
+                    else
+                        vm.CanAdapter.TransmitFast(ConstructedMessage.GetCanMessage());
+                }
+
+            }
+        }
 
         private bool spamEnabled;
         public bool SpamEnabled
@@ -93,25 +112,8 @@ namespace CAN_Tool.ViewModels
         {
             foreach (var m in MessageList)
                 m.FreshCheck();
-        }
-
-        private void SpamTimerTick(object sender, EventArgs e)
-        {
-            spamCounter++;
-            if (spamCounter > SpamInterval)
-            {
-                spamCounter = 0;
-                if (SpamEnabled)
-                {
-                    if (RandomDgn)
-                    {
-                        CanMessage msg = new RvcMessage() { Dgn = new Random((int)DateTime.Now.Ticks).Next(0, 0x1FFFF) }.GetCanMessage();
-                        vm.CanAdapter.TransmitFast(msg);
-                    }
-                    else
-                        OnSendRvcMessageCommandExecuted(null);
-                }
-            }
+            if (spamTask.Status != TaskStatus.Running && spamTask.Status != TaskStatus.WaitingToRun && spamTask.Status != TaskStatus.Created)
+                spamTask = Task.Run(SpamFunction);
         }
 
         public ICommand SendRvcMessageCommand { set; get; }

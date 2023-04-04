@@ -727,7 +727,7 @@ m_6-0	Manual mode	Ручной режим работы. Параметры ра�
 		
 d_0	Any	Любой
 d_1	14TS Mini	14ТС Мини
-d_2	Planar	2 Планар 2
+d_2	Planar 2	Планар 2
 d_3	Planar 44D	Планар 44Д
 d_4	30TSD	30ТСД
 d_5	30TSG	30ТСГ
@@ -820,6 +820,7 @@ t_set_pwm_freq	Set air blower PWM frequency 	задать параметры ч�
 t_reset_cpu	Reset MCU	Перезагрузка контроллера
 t_failures_mask	Mask failure codes	биты реакции на неисправности
 t_temperature_set	Temperature set	установить значение температуры
+t_do_not_clear_codes	Don't clear error codes	Не сбрасывать неисправности
 t_clear_error_codes	Clear error codes	сброс неисправностей
 t_manual_test_mode_enter	Manual or test mode enter/exit	вход/выход в стадию M (ручное управление) или T (тестирование блока управления)
 t_manual_control	Manual device control	задание параметров устройств в стадии M (ручное управление)
@@ -911,3 +912,20 @@ t_relay_state	Relay state	Состояние реле
 t_glow_plug_state	Glow plug state	Состояние свечи
 t_blower_state	Blower state	Состояние НВ
 t_not_used	Not used	Не используется
+		
+u_s	s	с
+u_hz	Hz	Гц
+u_kpa	kPa	кПа
+u_rps	RPS	Об/с
+		
+t_in_progress	in progress	в процессе
+t_done_in	done in	выполнено за
+t_canelled	cancelled	отменено
+t_failed	failed	сбой выполнения
+t_reading_bb_parameters	Reading black box parameters	Чтение параметров чёрного ящика
+t_reading_b_errors	Reading black box errors	Чтение ошибок из черного ящика
+t_bb_errors_erasing	Erasing black box errors	Стирание ошибок чёрного ящика
+t_bb_common_erasing	Erasing black box data	Стирание параметров чёрного ящика
+t_reading_flash_parameters	Reading config from flash	Чтение параметров из Flash
+t_saving_params_to_flash	Saving config to flash	Сохранение параметров во Flash
+t_config_erase	Erasing config from flash	Стирание пареметров
