@@ -22,6 +22,9 @@ using RVC;
 using System.Windows.Markup;
 using System.Security.AccessControl;
 using System.Drawing.Text;
+using System.Windows.Threading;
+using Microsoft.Win32;
+using System.Windows;
 
 namespace CAN_Tool.ViewModels
 {
@@ -48,7 +51,7 @@ namespace CAN_Tool.ViewModels
         public bool AutoRedraw { set; get; } = true;
 
         private bool canAdapterSettings = false;
-        public bool CanAdapterSettings { set=>Set(ref canAdapterSettings,value); get=>canAdapterSettings; } 
+        public bool CanAdapterSettings { set => Set(ref canAdapterSettings, value); get => canAdapterSettings; }
 
         CanAdapter canAdapter;
         public CanAdapter CanAdapter { get => canAdapter; }
@@ -66,7 +69,7 @@ namespace CAN_Tool.ViewModels
 
         public WpfPlot myChart;
 
-        
+
 
         private OmniMessage selectedMessage;
 
@@ -75,20 +78,15 @@ namespace CAN_Tool.ViewModels
             get => selectedMessage;
             set => Set(ref selectedMessage, value);
         }
-        
 
-        OmniMessage customMessage = new OmniMessage() { PGN=0,ReceiverAddress=0,ReceiverType=27};
+
+        OmniMessage customMessage = new OmniMessage() { PGN = 0, ReceiverAddress = 0, ReceiverType = 27 };
 
         public Dictionary<int, OmniCommand> CommandList { get; } = Omni.commands;
 
         public OmniMessage CustomMessage { get => customMessage; set => customMessage.Update(value); }
 
         public double[] CommandParametersArray;
-
-
-
-        
-
 
         private string portName = "";
         public string PortName
@@ -97,16 +95,12 @@ namespace CAN_Tool.ViewModels
             set => Set(ref portName, value);
         }
 
-
-
         private BindingList<string> _PortList = new BindingList<string>();
         public BindingList<string> PortList
         {
             get => _PortList;
             set => Set(ref _PortList, value);
         }
-
-
 
         public ICommand SetAdapterNormalModeCommand { get; }
 
@@ -142,9 +136,6 @@ namespace CAN_Tool.ViewModels
                 PortName = PortList[^1];
         }
 
-
-
-
         public ICommand OpenPortCommand { get; }
         private void OnOpenPortCommandExecuted(object parameter)
         {
@@ -156,8 +147,6 @@ namespace CAN_Tool.ViewModels
         }
         private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !CanAdapter.PortOpened);
 
-
-
         public ICommand ClosePortCommand { get; }
         private void OnClosePortCommandExecuted(object parameter)
         {
@@ -166,7 +155,47 @@ namespace CAN_Tool.ViewModels
         }
         private bool CanClosePortCommandExecute(object parameter) => (CanAdapter.PortOpened);
 
+        public ICommand LoadFromLogCommand { get; }
 
+        private async Task loadLogAsync(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            foreach (string line in lines)
+            {
+                var parts = line.Split(' ');
+                CanMessage m = new();
+                m.Id = Convert.ToInt32(parts[0],16);
+                m.DLC = Convert.ToInt32(parts[1],16);
+                m.IDE = true;
+                m.RTR = false;
+
+                for (int i = 2; i < parts.Length; i++)
+                    m.Data[i-2] = Convert.ToByte(parts[i],16);
+
+                canAdapter.InjectMessage(m);
+                await Task.Delay(100);
+
+            }
+        }
+
+        private async void OnLoadFromLogCommandExecuted(object parameter)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.DefaultExt = ".txt"; // Default file extension
+            dialog.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
+
+            bool? result = dialog.ShowDialog();
+
+            // Process open file dialog box results
+            if (result == true)
+            {
+                // Open document
+                string filename = dialog.FileName;
+                
+                await loadLogAsync(filename);
+            }
+        }
+        
 
         public ICommand StartHeaterCommand { get; }
         private void OnStartHeaterCommandExecuted(object parameter)
@@ -543,14 +572,16 @@ namespace CAN_Tool.ViewModels
 
             CanAdapter.GotNewMessage += NewMessgeReceived;
 
-            var timer = new System.Timers.Timer(1000);
-            timer.Elapsed += TimerTick;
-            timer.Start();
 
+            var timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(0, 0, 1);
+            timer.Tick += TimerTick;
+            timer.Start();
+            
             var refreshTimer = new System.Timers.Timer(250);
             refreshTimer.Elapsed += RefreshTimerTick;
             refreshTimer.Start();
-
+            
             OmniInstance.NewDeviceAquired += NewDeviceHandler;
 
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
@@ -578,6 +609,7 @@ namespace CAN_Tool.ViewModels
             LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
             LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
             ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);
+            LoadFromLogCommand = new LambdaCommand(OnLoadFromLogCommandExecuted, null);
 
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
             SaveReportCommand = new LambdaCommand(OnSaveReportCommandExecuted, CanSaveReportCommandExecute);

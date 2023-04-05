@@ -16,681 +16,13 @@ using OmniProtocol;
 using CAN_Tool.Libs;
 using System.Threading;
 using System.Windows.Data;
+using static CAN_Tool.Libs.Helper;
+using CAN_Tool;
 
 namespace RVC
 {
-    static class RVC
-    {
-        static RVC()
-        {
-            SeedData();
-        }
 
-        public static void SeedData()
-        {
-            DGN newDgn;
-
-            newDgn = new DGN(1) { Dgn = 0x1FF9C, Name = "THERMOSTAT_AMBIENT_STATUS" };
-            newDgn.Parameters.Add(new Parameter { Name = "Ambient temperature", ShortName = "Tamb", Type = parameterType.temperature, Size = parameterSize.uint16, firstByte = 1 });
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(1) { Dgn = 0x1FFE4, Name = "FURNACE_STATUS" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Operating mode",
-                ShortName = "Op mode",
-                Type = parameterType.list,
-                Size = parameterSize.uint2,
-                firstByte = 1,
-                Meanings = { [0] = "Automatic", [1] = "Manual" }
-            });
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Heat Source",
-                ShortName = "Heat Src",
-                Type = parameterType.list,
-                Size = parameterSize.uint6,
-                firstByte = 1,
-                firstBit = 2,
-                Meanings = { [0] = "Combustion", [1] = "AC power primary", [2] = "AC power secondary", [3] = "Engine Heat" }
-            });
-
-            newDgn.Parameters.Add(new Parameter { Name = "Circulation fan speed", ShortName = "Fan%", Type = parameterType.percent, firstByte = 2, firstBit = 0 });
-            newDgn.Parameters.Add(new Parameter { Name = "Heat output level", ShortName = "Heat%", Type = parameterType.percent, firstByte = 3, firstBit = 0 });
-            newDgn.Parameters.Add(new Parameter { Name = "Dead band", ShortName = "Db", Type = parameterType.custom, firstByte = 4, coefficient = 0.1, Unit = "C" });
-            newDgn.Parameters.Add(new Parameter { Name = "Dead band level 2", ShortName = "Db2", Type = parameterType.custom, firstByte = 5, coefficient = 0.1, Unit = "C" });
-            newDgn.Parameters.Add(new Parameter { Name = "Zone overcurrent status", ShortName = "Zone OC", Type = parameterType.boolean, Size = parameterSize.uint2, firstByte = 6, firstBit = 0 });
-            newDgn.Parameters.Add(new Parameter { Name = "Zone undercurrent status", ShortName = "Zone UC", Type = parameterType.boolean, Size = parameterSize.uint2, firstByte = 6, firstBit = 2 });
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Zone temperature status",
-                ShortName = "Zone t Status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 6,
-                firstBit = 4,
-                Meanings = { [0] = "Normal", [1] = "Warning" }
-            });
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Zone analog input status",
-                ShortName = "Zone an",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 6,
-                firstBit = 6,
-                Meanings = { [0] = "Off(Inactive)", [1] = "On(Active)" }
-            });
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(1) { Dgn = 0x1FFE3, Name = "FURNACE_COMMAND" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Operating mode",
-                ShortName = "Op mode",
-                Type = parameterType.list,
-                Size = parameterSize.uint2,
-                firstByte = 1,
-                Meanings = { [0] = "Automatic", [1] = "Manual" }
-            });
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Heat Source",
-                ShortName = "Heat Src",
-                Type = parameterType.list,
-                Size = parameterSize.uint6,
-                firstByte = 1,
-                firstBit = 2,
-                Meanings = { [0] = "Combustion", [1] = "AC power primary", [2] = "AC power secondary", [3] = "Engine Heat" }
-            });
-
-            newDgn.Parameters.Add(new Parameter { Name = "Circulation fan speed", ShortName = "Fan%", Type = parameterType.percent, firstByte = 2, firstBit = 0 });
-            newDgn.Parameters.Add(new Parameter { Name = "Heat output level", ShortName = "Heat%", Type = parameterType.percent, firstByte = 3, firstBit = 0 });
-            newDgn.Parameters.Add(new Parameter { Name = "Dead band", ShortName = "Db", Type = parameterType.custom, firstByte = 4, coefficient = 0.1, Unit = "C" });
-            newDgn.Parameters.Add(new Parameter { Name = "Dead band level 2", ShortName = "Db2", Type = parameterType.custom, firstByte = 5, coefficient = 0.1, Unit = "C" });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(1) { Dgn = 0x1FFF7, Name = "WATERHEATER_STATUS" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Operating modes",
-                ShortName = "Mode",
-                Type = parameterType.list,
-                Size = parameterSize.uint8,
-                firstByte = 1,
-                Meanings = { [0] = "off", [1] = "combustion", [2] = "electric", [3] = "gas/electric (both)", [4] = "test combustion (forced on)", [5] = "test combustion (forced on)", [6] = "test electric (forced on)" }
-            });
-
-            newDgn.Parameters.Add(new Parameter { Name = "Set point temperature", ShortName = "SP T", Type = parameterType.temperature, Size = parameterSize.uint16, firstByte = 2 });
-
-            newDgn.Parameters.Add(new Parameter { Name = "Water temperature", ShortName = "Twater", Type = parameterType.temperature, Size = parameterSize.uint16, firstByte = 4 });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Thermostat status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 6,
-                firstBit = 0,
-                Meanings = { [0] = "set point met", [1] = "set point not met (heat is being applied)" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Burner status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 6,
-                firstBit = 2,
-                Meanings = { [0] = "off", [1] = "burner is lit" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "AC element status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 6,
-                firstBit = 4,
-                Meanings = { [0] = "AC element is inactive", [1] = "AC element is active)" }
-            });
-
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "High temperature limit switch status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 6,
-                firstBit = 6,
-                Meanings = { [0] = "limit switch not tripped", [1] = "limit switch tripped" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Failure to ignite status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 7,
-                firstBit = 0,
-                Meanings = { [0] = "no failure", [1] = "device has failed to ignite" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "AC power failure status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 7,
-                firstBit = 2,
-                Meanings = { [0] = "AC power present", [1] = "AC power not present" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "DC power failure status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 7,
-                firstBit = 4,
-                Meanings = { [0] = "DC power present", [1] = "DC power not present" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "DC power warning status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 7,
-                firstBit = 6,
-                Meanings = { [0] = "DC power sufficient", [1] = "DC power warning" }
-            });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(1) { Dgn = 0x1FFF6, Name = "WATERHEATER_COMMAND" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Operating modes",
-                ShortName = "Mode",
-                Type = parameterType.list,
-                Size = parameterSize.uint8,
-                firstByte = 1,
-                Meanings = { [0] = "off", [1] = "combustion", [2] = "electric", [3] = "gas/electric (both)", [4] = "test combustion (forced on)", [5] = "test combustion (forced on)", [6] = "test electric (forced on)" }
-            });
-
-            newDgn.Parameters.Add(new Parameter { Name = "Set point temperature", ShortName = "SP T", Type = parameterType.temperature, Size = parameterSize.uint16, firstByte = 2 });
-            newDgn.Parameters.Add(new Parameter { Name = "Electric Element Level", ShortName = "Elec lvl", Type = parameterType.natural, Size = parameterSize.uint4, firstByte = 6 });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(1) { Dgn = 0x1FFE2, Name = "THERMOSTAT_STATUS_1" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Operating mode",
-                Type = parameterType.list,
-                Size = parameterSize.uint4,
-                firstByte = 1,
-                Meanings = { [0] = "Off", [1] = "Cool", [2] = "Heat", [3] = "Auto heat/Cool", [4] = "Fan only", [5] = "Aux heat", [6] = "Window Defrost/Dehumidify" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Fan mode",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 1,
-                firstBit = 4,
-                Meanings = { [0] = "Auto", [1] = "On" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Schedule mode",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 1,
-                firstBit = 6,
-                Meanings = { [0] = "Disabled", [1] = "Enabled" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Fan speed",
-                Type = parameterType.percent,
-                Size = parameterSize.uint8,
-                firstByte = 2,
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Setopint temp - Heat",
-                Type = parameterType.temperature,
-                Size = parameterSize.uint16,
-                firstByte = 3,
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Setopint temp - Cool",
-                Type = parameterType.temperature,
-                Size = parameterSize.uint16,
-                firstByte = 5,
-            });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-
-            newDgn = new DGN(1) { Dgn = 0x1FEF9, Name = "THERMOSTAT_COMMAND_1" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Operating mode",
-                Type = parameterType.list,
-                Size = parameterSize.uint4,
-                firstByte = 1,
-                Meanings = { [0] = "Off", [1] = "Cool", [2] = "Heat", [3] = "Auto heat/Cool", [4] = "Fan only", [5] = "Aux heat", [6] = "Window Defrost/Dehumidify" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Fan mode",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 1,
-                firstBit = 4,
-                Meanings = { [0] = "Auto", [1] = "On" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Schedule mode",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 1,
-                firstBit = 6,
-                Meanings = { [0] = "Disabled", [1] = "Enabled" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Fan speed",
-                Type = parameterType.percent,
-                Size = parameterSize.uint8,
-                firstByte = 2,
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Setopint temp - Heat",
-                Type = parameterType.temperature,
-                Size = parameterSize.uint16,
-                firstByte = 3,
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Setopint temp - Cool",
-                Type = parameterType.temperature,
-                Size = parameterSize.uint16,
-                firstByte = 5,
-            });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-
-            newDgn = new DGN(1) { Dgn = 0x1FEFA, Name = "THERMOSTAT_STATUS_2" };
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Current schedule instatnce",
-                Type = parameterType.list,
-                Size = parameterSize.uint8,
-                firstByte = 1,
-                Meanings = { [0] = "Sleep", [1] = "Wake", [2] = "Away", [3] = "Return", [250] = "Storage" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Number of schedule instances",
-                Type = parameterType.custom,
-                Size = parameterSize.uint8,
-                firstByte = 2,
-            });
-
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Reduced noise mode",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 3,
-                Meanings = { [0] = "Disabled", [1] = "Endabled" }
-            });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(1) { Dgn = 0x1FEF8, Name = "THERMOSTAT_COMMAND_2" };
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Current schedule instatnce",
-                Type = parameterType.list,
-                Size = parameterSize.uint8,
-                firstByte = 1,
-                Meanings = { [0] = "Sleep", [1] = "Wake", [2] = "Away", [3] = "Return", [250] = "Storage", [251] = "Reset to \"current\" instance" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Number of schedule instances",
-                Type = parameterType.custom,
-                Size = parameterSize.uint8,
-                firstByte = 2,
-            });
-
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Reduced noise mode",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 3,
-                Meanings = { [0] = "Disabled", [1] = "Endabled" }
-            });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(2) { Dgn = 0x1FEF7, Name = "THERMOSTAT_SCHEDULE_STATUS_1" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Schedule mode instance",
-                Type = parameterType.list,
-                Size = parameterSize.uint8,
-                firstByte = 1,
-                Id = true,
-                Meanings = { [0] = "Sleep", [1] = "Wake", [2] = "Away", [3] = "Return", [250] = "Storage" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Start hour",
-                Type = parameterType.custom,
-                Size = parameterSize.uint8,
-                firstByte = 2,
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Start minute",
-                Type = parameterType.custom,
-                Size = parameterSize.uint8,
-                firstByte = 3,
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Setopint temp - Heat",
-                Type = parameterType.temperature,
-                Size = parameterSize.uint16,
-                firstByte = 4,
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Setopint temp - Cool",
-                Type = parameterType.temperature,
-                Size = parameterSize.uint16,
-                firstByte = 6,
-            });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(1) { Dgn = 0x1FEF5, Name = "THERMOSTAT_SCHEDULE_COMMAND_1", Parameters = DGNs[0x1FEF7].Parameters };
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(2) { Dgn = 0x1FEF6, Name = "THERMOSTAT_SCHEDULE_STATUS_2" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Schedule mode instance",
-                Type = parameterType.list,
-                Size = parameterSize.uint8,
-                firstByte = 1,
-                Id = true,
-                Meanings = { [0] = "Sleep", [1] = "Wake", [2] = "Away", [3] = "Return", [250] = "Storage" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Sunday",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 2,
-                firstBit = 0,
-                Meanings = { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
-            });
-
-
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Monday",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 2,
-                firstBit = 2,
-                Meanings = { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Tuesday",
-                Type = parameterType.list,
-                Size = parameterSize.uint2,
-                firstByte = 2,
-                firstBit = 4,
-                Meanings = { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Wednesday",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 2,
-                firstBit = 6,
-                Meanings = { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Thursday",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 3,
-                firstBit = 0,
-                Meanings = { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Friday",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 3,
-                firstBit = 2,
-                Meanings = { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Saturday",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 3,
-                firstBit = 4,
-                Meanings = { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
-            });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(1) { Dgn = 0x1FEF4, Name = "THERMOSTAT_SCHEDULE_COMMAND_2", Parameters = DGNs[0x1FEF6].Parameters };
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(1) { Dgn = 0x1FE97, Name = "CIRCULATION_PUMP_STATUS" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Output status",
-                Type = parameterType.list,
-                Size = parameterSize.uint4,
-                firstByte = 1,
-                Meanings = { [0] = "Off", [1] = "On", [5] = "Test (Forced On)" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Pump Overcurrent Status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 2,
-                Meanings = { [0] = "No overcurrent detected", [1] = "Overcurrent detected" }
-            });
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Pump Undercurrent Status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 2,
-                firstBit = 2,
-                Meanings = { [0] = "No undercurrent detected", [1] = "Undercurrent detected" }
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Pump Temperature Status",
-                Type = parameterType.boolean,
-                Size = parameterSize.uint2,
-                firstByte = 1,
-                firstBit = 4,
-                Meanings = { [0] = "Temperature normal", [1] = "Temperature warning" }
-            });
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN(0) { Dgn = 0x1FFFF, Name = "DATE_TIME_STATUS" };
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Year",
-                Type = parameterType.natural
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Month",
-                Type = parameterType.natural,
-                firstByte = 1
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Day of month",
-                Type = parameterType.natural,
-                firstByte = 2
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Day of week",
-                Type = parameterType.natural,
-                firstByte = 3
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Hour",
-                Type = parameterType.natural,
-                firstByte = 4
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Minute",
-                Type = parameterType.natural,
-                firstByte = 5
-            });
-
-            newDgn.Parameters.Add(new Parameter
-            {
-                Name = "Second",
-                Type = parameterType.natural,
-                firstByte = 6
-            });
-
-            DGNs.Add(newDgn.Dgn, newDgn);
-
-            newDgn = new DGN() { Dgn = 0x1FE99, Name = "WATERHEATER_STATUS_2" };
-
-            newDgn.Parameters.Add(new Parameter()
-            {
-                Name = "Electric Element Level",
-                Size = parameterSize.uint4,
-                firstByte = 1
-            });
-
-            newDgn.Parameters.Add(new Parameter()
-            {
-                Name = "Max Electric Element Leve",
-                Size = parameterSize.uint4,
-                firstByte = 1,
-                firstBit = 4
-            });
-
-            newDgn.Parameters.Add(new Parameter()
-            {
-                Name = "Engine Preheat",
-                Size = parameterSize.uint4,
-                firstByte = 2,
-                Type = parameterType.list,
-                Meanings = { [0] = "Off", [1] = "On", [5] = "Test(Forced On)" }
-            });
-
-            newDgn.Parameters.Add(new Parameter()
-            {
-                Name = "Coolant Level Warning",
-                Size = parameterSize.uint2,
-                firstByte = 2,
-                firstBit = 4,
-                Type = parameterType.boolean,
-                Meanings = { [0] = "Coolant level sufficient", [1] = "Coolant level low" }
-            });
-
-            newDgn.Parameters.Add(new Parameter()
-            {
-                Name = "Hot Water Priority",
-                Size = parameterSize.uint2,
-                firstByte = 2,
-                firstBit = 4,
-                Type = parameterType.list,
-                Meanings = { [0] = "Domestic water priority", [1] = "Heating priority" }
-            });
-            DGNs.Add(newDgn.Dgn, newDgn);
-        }
-
-        public static Dictionary<int, DGN> DGNs = new Dictionary<int, DGN>();
-
-    }
-
-
-    public enum parameterSize
+    public enum paramSize
     {
         uint2, //uint2
         uint4,
@@ -732,7 +64,7 @@ namespace RVC
 
             if (idLen>0)
             {
-                Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = parameterType.instance, Size = parameterSize.uint8, firstByte = 0, Id = true });
+                Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = parameterType.instance, Size = paramSize.uint8, firstByte = 0, Id = true });
                 idLength = idLen;
             }
         }
@@ -754,7 +86,7 @@ namespace RVC
     {
         public string Name;
         public string ShortName;
-        public parameterSize Size = parameterSize.uint8;
+        public paramSize Size = paramSize.uint8;
         public parameterType Type = parameterType.natural;
         public byte firstByte = 0;
         public byte firstBit = 0;
@@ -763,8 +95,7 @@ namespace RVC
         public double shift = 0;
         public string Unit = "";
         public bool Id = false;
-        public Control assignedLabel;
-        public Control assignedField;
+
         public Parameter()
         {
             Meanings = new Dictionary<uint, string>();
@@ -774,17 +105,17 @@ namespace RVC
         {
             switch (Size)
             {
-                case parameterSize.uint2: return (uint)(data[firstByte] >> firstBit) & 0x3;
-                case parameterSize.uint4: return (uint)(data[firstByte] >> firstBit) & 0xF;
-                case parameterSize.uint6: return (uint)(data[firstByte] >> firstBit) & 0x3F;
-                case parameterSize.uint8: return (data[firstByte]);
-                case parameterSize.uint16: return (uint)(data[firstByte] + data[firstByte + 1] * 256);
-                case parameterSize.uint32: return (uint)(data[firstByte] + data[firstByte + 1] * 0x100 + data[firstByte + 2] * 0x10000 + data[firstByte + 3] * 0x1000000);
+                case paramSize.uint2: return (uint)(data[firstByte] >> firstBit) & 0x3;
+                case paramSize.uint4: return (uint)(data[firstByte] >> firstBit) & 0xF;
+                case paramSize.uint6: return (uint)(data[firstByte] >> firstBit) & 0x3F;
+                case paramSize.uint8: return (data[firstByte]);
+                case paramSize.uint16: return (uint)(data[firstByte] + data[firstByte + 1] * 256);
+                case paramSize.uint32: return (uint)(data[firstByte] + data[firstByte + 1] * 0x100 + data[firstByte + 2] * 0x10000 + data[firstByte + 3] * 0x1000000);
                 default: throw new ArgumentException("Bad parameter size");
             }
         }
 
-        public string ToString(byte[] data, bool useFarenheit = false)
+        public string ToString(byte[] data)
         {
             string retString = Name + ": ";
 
@@ -793,38 +124,38 @@ namespace RVC
 
             switch (Size)
             {
-                case parameterSize.uint2: rawData = (uint)((data[firstByte] >> firstBit) & 0x3); break;
-                case parameterSize.uint4: rawData = (uint)((data[firstByte] >> firstBit) & 0xF); break;
-                case parameterSize.uint6: rawData = (uint)((data[firstByte] >> firstBit) & 0x3F); break;
-                case parameterSize.uint8: rawData = (uint)(data[firstByte]); break;
-                case parameterSize.uint16: rawData = (uint)(data[firstByte] + data[firstByte + 1] * 256); break;
-                case parameterSize.uint32: rawData = (uint)(data[firstByte] + data[firstByte + 1] * 0x100 + data[firstByte + 2] * 0x10000 + data[firstByte + 3] * 0x1000000); break;
+                case paramSize.uint2: rawData = (uint)((data[firstByte] >> firstBit) & 0x3); break;
+                case paramSize.uint4: rawData = (uint)((data[firstByte] >> firstBit) & 0xF); break;
+                case paramSize.uint6: rawData = (uint)((data[firstByte] >> firstBit) & 0x3F); break;
+                case paramSize.uint8: rawData = (uint)(data[firstByte]); break;
+                case paramSize.uint16: rawData = (uint)(data[firstByte] + data[firstByte + 1] * 256); break;
+                case paramSize.uint32: rawData = (uint)(data[firstByte] + data[firstByte + 1] * 0x100 + data[firstByte + 2] * 0x10000 + data[firstByte + 3] * 0x1000000); break;
                 default: throw new ArgumentException("Bad parameter size");
             }
 
             switch (Size)
             {
-                case parameterSize.uint2:
+                case paramSize.uint2:
                     if (rawData == 2) return retString += "Error";
                     if (rawData == 3) return retString += "No Data";
                     break;
-                case parameterSize.uint4:
+                case paramSize.uint4:
                     if (rawData == 14) return retString += "Error";
                     if (rawData == 15) return retString += "No Data";
                     break;
-                case parameterSize.uint6:
+                case paramSize.uint6:
                     if (rawData == 62) return retString += "Error";
                     if (rawData == 63) return retString += "No Data";
                     break;
-                case parameterSize.uint8:
+                case paramSize.uint8:
                     if (rawData == byte.MaxValue - 1) return retString += "Error";
                     if (rawData == byte.MaxValue) return retString += "No Data";
                     break;
-                case parameterSize.uint16:
+                case paramSize.uint16:
                     if (rawData == UInt16.MaxValue - 1) return retString += "Error";
                     if (rawData == UInt16.MaxValue) return retString += "No Data";
                     break;
-                case parameterSize.uint32:
+                case paramSize.uint32:
                     if (rawData == UInt32.MaxValue - 1) return retString += "Error";
                     if (rawData == UInt32.MaxValue) return retString += "No Data";
                     break;
@@ -851,9 +182,9 @@ namespace RVC
                 case parameterType.amperage:
                     switch (Size)
                     {
-                        case parameterSize.uint8: tempValue = rawData; break;
-                        case parameterSize.uint16: tempValue = -1600 + rawData * 0.05; break;
-                        case parameterSize.uint32: tempValue = -2000000000.0 + rawData * 0.001; break;
+                        case paramSize.uint8: tempValue = rawData; break;
+                        case paramSize.uint16: tempValue = -1600 + rawData * 0.05; break;
+                        case paramSize.uint32: tempValue = -2000000000.0 + rawData * 0.001; break;
                         default: throw new Exception("Wrong size for Amperage field");
                     }
                     retString += tempValue.ToString() + "A";
@@ -861,8 +192,8 @@ namespace RVC
                 case parameterType.voltage:
                     switch (Size)
                     {
-                        case parameterSize.uint8: tempValue = rawData; break;
-                        case parameterSize.uint16: tempValue = rawData * 0.05; break;
+                        case paramSize.uint8: tempValue = rawData; break;
+                        case paramSize.uint16: tempValue = rawData * 0.05; break;
                         default: throw new Exception("Wrong size for Voltage field");
                     }
                     retString += tempValue.ToString() + "V";
@@ -871,12 +202,15 @@ namespace RVC
                 case parameterType.temperature:
                     switch (Size)
                     {
-                        case parameterSize.uint8: tempValue = -40 + rawData; break;
-                        case parameterSize.uint16: tempValue = -273 + rawData * 0.03125; break;
+                        case paramSize.uint8: tempValue = -40 + rawData; break;
+                        case paramSize.uint16: tempValue = -273 + rawData * 0.03125; break;
                         default: throw new Exception("Wrong size for Temperature field");
                     }
-                    if (useFarenheit) tempValue = tempValue * 9.0 / 5.0 + 32;
-                    retString += tempValue.ToString() + (useFarenheit ? "F" : "C");
+                    retString += ImperialConverter(tempValue, UnitType.Temp).ToString("F2");
+                    if (App.Settings.UseImperial)
+                        retString += " F°";
+                    else
+                        retString += " C°";
                     break;
                 case parameterType.custom:
                     tempValue = rawData;
@@ -885,8 +219,8 @@ namespace RVC
                 case parameterType.boolean:
                     switch (rawData)
                     {
-                        case 0: retString += (Meanings.Count == 2) ? Meanings[0] : "False"; break;
-                        case 1: retString += (Meanings.Count == 2) ? Meanings[1] : "True"; break;
+                        case 0: retString += (Meanings.Count > 1) ? Meanings[0] : "False"; break;
+                        case 1: retString += (Meanings.Count > 1) ? Meanings[1] : "True"; break;
                         case 2: retString += "Error"; break;
                         case 3: retString += "Not supported"; break;
                     }
@@ -954,7 +288,6 @@ namespace RVC
             Data = msg.Data;
 
             Fresh = true;
-            Task.Run(() => { Thread.Sleep(300); this.Fresh = false; });
         }
 
         public CanMessage GetCanMessage()

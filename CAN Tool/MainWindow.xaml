@@ -73,7 +73,7 @@
 
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right" >
-                        <CheckBox x:Name="AdapterSettings" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="CAN adapter settings" FontSize="20" IsChecked="{Binding CanAdapterSettings}"></CheckBox>
+                        <CheckBox x:Name="AdapterSettings" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="CAN adapter settings" FontSize="20" IsChecked="{Binding CanAdapterSettings}" Cursor="Hand"></CheckBox>
                         <CheckBox x:Name="ExpertMode" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="{DynamicResource b_expert}" FontSize="20" Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
                         <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Dark" FontSize="20" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
                         <CheckBox x:Name="ImperialUnits" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Imperial" FontSize="20" IsChecked="{Binding OmniInstance.UseImperial}" Checked="ImperialUnits_Checked" Unchecked="ImperialUnits_Checked"></CheckBox>
@@ -89,7 +89,7 @@
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_exit}" Margin="10" Click="ExitButtonClick" FlowDirection="RightToLeft" />
                     </StackPanel>
                 </DockPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Visible">
                     <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" SelectedIndex="3" SelectionChanged="CanBitrateField_SelectionChanged">
                         <ComboBox.ItemsSource>
                             <col:ArrayList>
@@ -107,6 +107,7 @@
                     <Button Content="{DynamicResource b_listen}" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                     <Button Content="{DynamicResource b_self_reception}" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                     <Button Content="{DynamicResource b_stop}" Margin="10" Command="{Binding StopCanAdapterCommand}" />
+                    <Button Content="{DynamicResource b_load_can_log}" Margin="10" Command="{Binding LoadFromLogCommand}" Cursor="Hand" />
                 </StackPanel>
 
             </StackPanel>
@@ -871,7 +872,7 @@
                     </TabItem>
                 </TabControl>
             </DockPanel>
-        <TabControl DockPanel.Dock="Top" Style="{DynamicResource MaterialDesignFilledTabControl}" Visibility="{Binding Mode,Converter={StaticResource RvcToVisible}}" d:Visibility="Visible">
+        <TabControl DockPanel.Dock="Top" Style="{DynamicResource MaterialDesignFilledTabControl}" DataContext="{Binding RvcPage}" Visibility="{Binding VM.Mode,Converter={StaticResource RvcToVisible}}" d:Visibility="Visible" >
             <TabItem Header="Control">
 
             </TabItem>
@@ -879,22 +880,22 @@
                 <DockPanel >
                     <Grid DockPanel.Dock="Right" Background="{DynamicResource MaterialDesignCardBackground}">
                         <Border CornerRadius="10" Margin="10" BorderThickness="2" Background="{DynamicResource MaterialDesignDarkBackground}">
-                        <TextBox  Text="{Binding RvcPage.ConstructedMessage.VerboseInfo,Mode=OneWay}" Margin="5"  />
+                        <TextBox  Text="{Binding ConstructedMessage.VerboseInfo,Mode=OneWay}" Margin="5"  />
                     </Border>
                     </Grid>
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="{DynamicResource MaterialDesignCardBackground}">
 
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10">DGN:</TextBlock>
-                        <TextBox Text="{Binding RvcPage.ConstructedMessage.Dgn,Converter={StaticResource HexConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center"></TextBox>
+                        <TextBox Text="{Binding ConstructedMessage.Dgn,Converter={StaticResource HexConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center"></TextBox>
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> SA</TextBlock>
-                        <TextBox Text="{Binding RvcPage.ConstructedMessage.SourceAdress,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
+                        <TextBox Text="{Binding ConstructedMessage.SourceAdress,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Priority:</TextBlock>
-                        <TextBox Text="{Binding RvcPage.ConstructedMessage.Priority,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
+                        <TextBox Text="{Binding ConstructedMessage.Priority,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Data:</TextBlock>
-                        <TextBox Text="{Binding RvcPage.ConstructedMessage.Data,Converter={StaticResource DataConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding ConstructedMessage.Data,Converter={StaticResource DataConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center"/>
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10" > Preview:</TextBlock>
-                        <TextBox x:Name="DataBox" Text="{Binding RvcPage.ConstructedMessage.DataAsText,Mode=OneWay}" FontSize="25" Margin="10" VerticalAlignment="Center" />
-                        <Button Margin="10" Command="{Binding RvcPage.SendRvcMessageCommand}">
+                        <TextBox x:Name="DataBox" Text="{Binding ConstructedMessage.DataAsText,Mode=OneWay}" FontSize="25" Margin="10" VerticalAlignment="Center" />
+                        <Button Margin="10" Command="{Binding SendRvcMessageCommand}">
                             <Button.Content>
                                 <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                             </Button.Content>
@@ -905,21 +906,21 @@
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Spam interval:</TextBlock>
                         <TextBox ToolTip="In milliseconds" FontSize="25" Margin="10" VerticalAlignment="Center" MinWidth="40" TextAlignment="Center">
                             <TextBox.Text>
-                                <Binding Path="RvcPage.SpamInterval" UpdateSourceTrigger="PropertyChanged">
+                                <Binding Path="SpamInterval" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
                                         <v:RangeRule Min="6" Max="1000"/>
                                     </Binding.ValidationRules>
                                 </Binding>
                             </TextBox.Text>
                         </TextBox>
-                        <CheckBox ToolTip="Enable spam function" IsChecked="{Binding RvcPage.SpamEnabled}" FontSize="25" Margin="10">Spam</CheckBox>
-                        <CheckBox ToolTip="Can corrupt data if DGN match registred" IsChecked="{Binding RvcPage.RandomDgn}" FontSize="25" Margin="10">Randomise DGN</CheckBox>
-                        <Button Margin="10" Content="Save Log" Command="{Binding RvcPage.SaveRvcLogCommand}" />
+                        <CheckBox ToolTip="Enable spam function" IsChecked="{Binding SpamEnabled}" FontSize="25" Margin="10">Spam</CheckBox>
+                        <CheckBox ToolTip="Can corrupt data if DGN match registred" IsChecked="{Binding RandomDgn}" FontSize="25" Margin="10">Randomise DGN</CheckBox>
+                        <Button Margin="10" Content="Save Log" Command="{Binding SaveRvcLogCommand}" />
                     </StackPanel>
 
          
 
-                    <DataGrid x:Name="RVCMessageList" SelectedItem="{Binding RvcPage.SelectedMessage,Mode=OneWayToSource}" DockPanel.Dock="Left" Margin="10" ItemsSource="{Binding RvcPage.MessageList}" AutoGenerateColumns="False">
+                    <DataGrid x:Name="RVCMessageList" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" DockPanel.Dock="Left" Margin="10" ItemsSource="{Binding MessageList}" SelectionChanged="RVCMessageList_SelectionChanged" AutoGenerateColumns="False">
                         <DataGrid.RowStyle>
                             <Style TargetType="DataGridRow">
                                 <Style.Triggers>
@@ -941,15 +942,12 @@
                     </DataGrid>
 
                     <Border BorderBrush="{DynamicResource MaterialDesignCardBackground}" CornerRadius="10" BorderThickness="3" Margin="10">
-                    <TextBlock DockPanel.Dock="Left" Text="{Binding ElementName=RVCMessageList, Path=SelectedItem.VerboseInfo}" Margin="10" FontSize="15"/>
+                    <TextBlock DockPanel.Dock="Left" Text="{Binding SelectedMessage.VerboseInfo,Mode=OneWay}" Margin="10" FontSize="18"/>
                     </Border>
 
                 </DockPanel>
             </TabItem>
             <TabItem Header="{DynamicResource b_commands}">
-
-            </TabItem>
-            <TabItem Header="Stress tester">
 
             </TabItem>
         </TabControl>

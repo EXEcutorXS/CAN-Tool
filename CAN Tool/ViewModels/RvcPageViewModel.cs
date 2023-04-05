@@ -53,7 +53,7 @@ namespace CAN_Tool.ViewModels
             RefreshTimer.Elapsed += RefreshTimerTick;
             RefreshTimer.Start();
 
-            spamTask =  Task.Run(SpamFunction);
+            //spamTask =  Task.Run(SpamFunction);
 
         }
 
@@ -112,7 +112,7 @@ namespace CAN_Tool.ViewModels
         {
             foreach (var m in MessageList)
                 m.FreshCheck();
-            if (spamTask.Status != TaskStatus.Running && spamTask.Status != TaskStatus.WaitingToRun && spamTask.Status != TaskStatus.Created)
+            if (spamTask!=null && spamTask.Status != TaskStatus.Running && spamTask.Status != TaskStatus.WaitingToRun && spamTask.Status != TaskStatus.Created)
                 spamTask = Task.Run(SpamFunction);
         }
 

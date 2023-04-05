@@ -17,6 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using static CAN_Tool.Libs.Helper;
+using RVC;
 
 namespace CAN_Tool
 {
@@ -647,6 +648,17 @@ namespace CAN_Tool
         {
             if (CanMessageList.SelectedItem!=null)
                 vm.CanPage.ConstructedMessage.Update(CanMessageList.SelectedItem as CanMessage);
+        }
+
+        private void RVCMessageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
+            try
+            {
+                vm.RvcPage.SelectedMessage = (RvcMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
+            }
+            catch { }
+
         }
     }
 

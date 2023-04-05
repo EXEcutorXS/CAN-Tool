@@ -219,6 +219,7 @@ namespace Can_Adapter
             updatetick = DateTime.Now.Ticks;
         }
 
+        
         public void FreshCheck()
         {
             if (fresh && (DateTime.Now.Ticks - updatetick > 3000000))
@@ -464,6 +465,11 @@ namespace Can_Adapter
                 else
                     currentBuf[ptr++] = (char)newByte;
             }
+        }
+
+        public void InjectMessage(CanMessage m)
+        {
+            GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = m });
         }
 
         public string Status => $"Bus use: Rx/Tx(Total):{lastSecondReceived}/{lastSecondTransmitted}({lastSecondTransmitted+lastSecondReceived}) ,Faults:{failedMessagesCounter}";
