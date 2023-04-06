@@ -53,7 +53,7 @@ namespace CAN_Tool.ViewModels
             RefreshTimer.Elapsed += RefreshTimerTick;
             RefreshTimer.Start();
 
-            //spamTask =  Task.Run(SpamFunction);
+            spamTask =  Task.Run(SpamFunction);
 
         }
 
