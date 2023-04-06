@@ -67,7 +67,9 @@
 <v:String x:Key="b_list_inlettemp">Т вход</v:String>
 <v:String x:Key="b_list_error">Код.ош.</v:String>
 <v:String x:Key="b_load_can_log">Загрузить из лога</v:String>
+<v:String x:Key="b_send_from_log">Транслировать из лога</v:String>
 
+<v:String x:Key="t_delay">Задержка</v:String>
 <v:String x:Key="t_value">Значение</v:String>
 <v:String x:Key="t_description">Описание</v:String>
 <v:String x:Key="t_cancel">Отмена</v:String>

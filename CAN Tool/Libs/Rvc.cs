@@ -21,21 +21,9 @@ using CAN_Tool;
 
 namespace RVC
 {
-
-    public enum paramSize
-    {
-        uint2, //uint2
-        uint4,
-        uint6,
-        uint8,
-        uint16,
-        uint32,
-    };
-
-    public enum parameterType
+    public enum paramTyp
     {
         boolean,
-        list,
         instance,
         percent,
         temperature,
@@ -64,7 +52,7 @@ namespace RVC
 
             if (idLen>0)
             {
-                Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = parameterType.instance, Size = paramSize.uint8, firstByte = 0, Id = true });
+                Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = paramTyp.instance, Size = 8, fstByte = 0, Id = true });
                 idLength = idLen;
             }
         }
@@ -86,31 +74,36 @@ namespace RVC
     {
         public string Name;
         public string ShortName;
-        public paramSize Size = paramSize.uint8;
-        public parameterType Type = parameterType.natural;
-        public byte firstByte = 0;
-        public byte firstBit = 0;
+        public byte Size = 8;
+        public paramTyp Type = paramTyp.natural;
+        public byte fstByte = 0;
+        public byte frstFit = 0;
         public Dictionary<uint, string> Meanings;
         public double coefficient = 1;
         public double shift = 0;
         public string Unit = "";
         public bool Id = false;
 
+        public Parameter(string name)
+        {
+            Name = name;
+        }
+
         public Parameter()
         {
-            Meanings = new Dictionary<uint, string>();
+         
         }
 
         public uint RawData(byte[] data)
         {
             switch (Size)
             {
-                case paramSize.uint2: return (uint)(data[firstByte] >> firstBit) & 0x3;
-                case paramSize.uint4: return (uint)(data[firstByte] >> firstBit) & 0xF;
-                case paramSize.uint6: return (uint)(data[firstByte] >> firstBit) & 0x3F;
-                case paramSize.uint8: return (data[firstByte]);
-                case paramSize.uint16: return (uint)(data[firstByte] + data[firstByte + 1] * 256);
-                case paramSize.uint32: return (uint)(data[firstByte] + data[firstByte + 1] * 0x100 + data[firstByte + 2] * 0x10000 + data[firstByte + 3] * 0x1000000);
+                case 2: return (uint)(data[fstByte] >> frstFit) & 0x3;
+                case 4: return (uint)(data[fstByte] >> frstFit) & 0xF;
+                case 6: return (uint)(data[fstByte] >> frstFit) & 0x3F;
+                case 8: return (data[fstByte]);
+                case 16: return (uint)(data[fstByte] + data[fstByte + 1] * 256);
+                case 32: return (uint)(data[fstByte] + data[fstByte + 1] * 0x100 + data[fstByte + 2] * 0x10000 + data[fstByte + 3] * 0x1000000);
                 default: throw new ArgumentException("Bad parameter size");
             }
         }
@@ -124,86 +117,92 @@ namespace RVC
 
             switch (Size)
             {
-                case paramSize.uint2: rawData = (uint)((data[firstByte] >> firstBit) & 0x3); break;
-                case paramSize.uint4: rawData = (uint)((data[firstByte] >> firstBit) & 0xF); break;
-                case paramSize.uint6: rawData = (uint)((data[firstByte] >> firstBit) & 0x3F); break;
-                case paramSize.uint8: rawData = (uint)(data[firstByte]); break;
-                case paramSize.uint16: rawData = (uint)(data[firstByte] + data[firstByte + 1] * 256); break;
-                case paramSize.uint32: rawData = (uint)(data[firstByte] + data[firstByte + 1] * 0x100 + data[firstByte + 2] * 0x10000 + data[firstByte + 3] * 0x1000000); break;
+                case 2: rawData = (uint)((data[fstByte] >> frstFit) & 0x3); break;
+                case 4: rawData = (uint)((data[fstByte] >> frstFit) & 0xF); break;
+                case 6: rawData = (uint)((data[fstByte] >> frstFit) & 0x3F); break;
+                case 8: rawData = (uint)(data[fstByte]); break;
+                case 16: rawData = (uint)(data[fstByte] + data[fstByte + 1] * 256); break;
+                case 32: rawData = (uint)(data[fstByte] + data[fstByte + 1] * 0x100 + data[fstByte + 2] * 0x10000 + data[fstByte + 3] * 0x1000000); break;
                 default: throw new ArgumentException("Bad parameter size");
             }
 
             switch (Size)
             {
-                case paramSize.uint2:
+                case 2:
                     if (rawData == 2) return retString += "Error";
                     if (rawData == 3) return retString += "No Data";
                     break;
-                case paramSize.uint4:
+                case 4:
                     if (rawData == 14) return retString += "Error";
                     if (rawData == 15) return retString += "No Data";
                     break;
-                case paramSize.uint6:
+                case 6:
                     if (rawData == 62) return retString += "Error";
                     if (rawData == 63) return retString += "No Data";
                     break;
-                case paramSize.uint8:
+                case 8:
                     if (rawData == byte.MaxValue - 1) return retString += "Error";
                     if (rawData == byte.MaxValue) return retString += "No Data";
                     break;
-                case paramSize.uint16:
+                case 16:
                     if (rawData == UInt16.MaxValue - 1) return retString += "Error";
                     if (rawData == UInt16.MaxValue) return retString += "No Data";
                     break;
-                case paramSize.uint32:
+                case 32:
                     if (rawData == UInt32.MaxValue - 1) return retString += "Error";
                     if (rawData == UInt32.MaxValue) return retString += "No Data";
                     break;
             }
 
+            if (Meanings != null)
+            { 
+            if (Meanings.ContainsKey(rawData)) return retString += Meanings[rawData];
+            else return retString+$"No meaning for {rawData}";
+            }
+
             switch (Type)
             {
-                case parameterType.percent:
+                case paramTyp.percent:
                     tempValue = rawData / 2;
                     retString += tempValue.ToString() + "%";
                     break;
-                case parameterType.instance:
+                case paramTyp.instance:
                     tempValue = rawData;
                     retString += (rawData == 0) ? "For everyone" : "#" + tempValue.ToString();
                     break;
-                case parameterType.hertz:
+                case paramTyp.hertz:
                     tempValue = rawData;
                     retString += tempValue.ToString() + " Hz";
                     break;
-                case parameterType.watts:
+                case paramTyp.watts:
                     tempValue = rawData;
                     retString += tempValue.ToString() + " W";
                     break;
-                case parameterType.amperage:
+                case paramTyp.amperage:
                     switch (Size)
                     {
-                        case paramSize.uint8: tempValue = rawData; break;
-                        case paramSize.uint16: tempValue = -1600 + rawData * 0.05; break;
-                        case paramSize.uint32: tempValue = -2000000000.0 + rawData * 0.001; break;
-                        default: throw new Exception("Wrong size for Amperage field");
+                        case 8: tempValue = rawData; break;
+                        case 16: tempValue = -1600 + rawData * 0.05; break;
+                        case 32: tempValue = -2000000000.0 + rawData * 0.001; break;
+                        default: throw new Exception("Wrong size for current field");
                     }
                     retString += tempValue.ToString() + "A";
                     break;
-                case parameterType.voltage:
+                case paramTyp.voltage:
                     switch (Size)
                     {
-                        case paramSize.uint8: tempValue = rawData; break;
-                        case paramSize.uint16: tempValue = rawData * 0.05; break;
-                        default: throw new Exception("Wrong size for Voltage field");
+                        case 8: tempValue = rawData; break;
+                        case 16: tempValue = rawData * 0.05; break;
+                        default: throw new Exception("Wrong size for voltage field");
                     }
                     retString += tempValue.ToString() + "V";
                     break;
 
-                case parameterType.temperature:
+                case paramTyp.temperature:
                     switch (Size)
                     {
-                        case paramSize.uint8: tempValue = -40 + rawData; break;
-                        case paramSize.uint16: tempValue = -273 + rawData * 0.03125; break;
+                        case 8: tempValue = -40 + rawData; break;
+                        case 16: tempValue = -273 + rawData * 0.03125; break;
                         default: throw new Exception("Wrong size for Temperature field");
                     }
                     retString += ImperialConverter(tempValue, UnitType.Temp).ToString("F2");
@@ -212,26 +211,20 @@ namespace RVC
                     else
                         retString += " C°";
                     break;
-                case parameterType.custom:
+                case paramTyp.custom:
                     tempValue = rawData;
                     retString += $"{tempValue * coefficient + shift} {Unit}";
                     break;
-                case parameterType.boolean:
+                case paramTyp.boolean:
                     switch (rawData)
                     {
-                        case 0: retString += (Meanings.Count > 1) ? Meanings[0] : "False"; break;
-                        case 1: retString += (Meanings.Count > 1) ? Meanings[1] : "True"; break;
+                        case 0: retString += "False"; break;
+                        case 1: retString += "True"; break;
                         case 2: retString += "Error"; break;
                         case 3: retString += "Not supported"; break;
                     }
                     break;
-                case parameterType.list:
-                    if (!Meanings.ContainsKey(rawData))
-                        retString += $"no meaning for \"{rawData}!\"";
-                    else
-                        retString += Meanings[rawData];
-                    break;
-                case parameterType.natural:
+                case paramTyp.natural:
                     retString += rawData.ToString();
                     break;
 

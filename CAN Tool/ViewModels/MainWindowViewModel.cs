@@ -102,6 +102,9 @@ namespace CAN_Tool.ViewModels
             set => Set(ref _PortList, value);
         }
 
+        int messageDelay=100;
+        public int MessageDelay { get => messageDelay; set => Set(ref messageDelay, value); }
+
         public ICommand SetAdapterNormalModeCommand { get; }
 
         private void OnSetAdapterNormalModeCommandExecuted(object Parameter) => CanAdapter.StartNormal();
@@ -173,7 +176,7 @@ namespace CAN_Tool.ViewModels
                     m.Data[i-2] = Convert.ToByte(parts[i],16);
 
                 canAdapter.InjectMessage(m);
-                await Task.Delay(100);
+                await Task.Delay(MessageDelay);
 
             }
         }
@@ -195,7 +198,47 @@ namespace CAN_Tool.ViewModels
                 await loadLogAsync(filename);
             }
         }
-        
+
+        public ICommand SendFromLogCommand { get; }
+
+        private async Task sendLogAsync(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            foreach (string line in lines)
+            {
+                var parts = line.Split(' ');
+                CanMessage m = new();
+                m.Id = Convert.ToInt32(parts[0], 16);
+                m.DLC = Convert.ToInt32(parts[1], 16);
+                m.IDE = true;
+                m.RTR = false;
+
+                for (int i = 2; i < parts.Length; i++)
+                    m.Data[i - 2] = Convert.ToByte(parts[i], 16);
+
+                canAdapter.TransmitFast(m);
+                await Task.Delay(MessageDelay);
+
+            }
+        }
+
+        private async void OnSendFromLogCommandExecuted(object parameter)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.DefaultExt = ".txt"; // Default file extension
+            dialog.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
+
+            bool? result = dialog.ShowDialog();
+
+            // Process open file dialog box results
+            if (result == true)
+            {
+                // Open document
+                string filename = dialog.FileName;
+
+                await sendLogAsync(filename);
+            }
+        }
 
         public ICommand StartHeaterCommand { get; }
         private void OnStartHeaterCommandExecuted(object parameter)
@@ -610,6 +653,7 @@ namespace CAN_Tool.ViewModels
             LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
             ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);
             LoadFromLogCommand = new LambdaCommand(OnLoadFromLogCommandExecuted, null);
+            SendFromLogCommand = new LambdaCommand(OnSendFromLogCommandExecuted, null);
 
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
             SaveReportCommand = new LambdaCommand(OnSaveReportCommandExecuted, CanSaveReportCommandExecute);

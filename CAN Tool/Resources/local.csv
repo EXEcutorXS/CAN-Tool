@@ -67,7 +67,9 @@ b_list_paneltemp	Pan.Temp	Т пульта
 b_list_inlettemp	In.Temp	Т вход
 b_list_error	Err.code	Код.ош.
 b_load_can_log	Load from log	Загрузить из лога
+b_send_from_log	Send from log	Транслировать из лога
 		
+t_delay	Delay	Задержка
 t_value	Value	Значение
 t_description	Description	Описание
 t_cancel	Cancel	Отмена
