@@ -567,7 +567,7 @@
                             <DockPanel DockPanel.Dock="Right">
                                 <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedMessage.VerboseInfo,Mode=OneWay}"></TextBlock>
                                 <Expander x:Name="LogExpander" ExpandDirection="Up" Header="Message Log" DockPanel.Dock="Bottom">
-                                    <RichTextBox x:Name="LogField" IsReadOnly="True" VerticalScrollBarVisibility="Visible" />
+                                    <TextBox  x:Name="LogField" IsReadOnly="True" VerticalScrollBarVisibility="Visible" />
                                 </Expander>
                             </DockPanel>
                         </DockPanel>
