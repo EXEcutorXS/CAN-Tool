@@ -107,8 +107,9 @@
                     <Button Content="{DynamicResource b_listen}" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
                     <Button Content="{DynamicResource b_self_reception}" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
                     <Button Content="{DynamicResource b_stop}" Margin="10" Command="{Binding StopCanAdapterCommand}" />
-                    <Button Content="{DynamicResource b_load_can_log}" Margin="10" Command="{Binding LoadFromLogCommand}" Cursor="Hand" />
+                    <Button Content="{DynamicResource b_load_can_log}" Margin="10" Command="{Binding LoadFromLogCommand}" />
                     <Button Content="{DynamicResource b_send_from_log}" Margin="10" Command="{Binding SendFromLogCommand}" Cursor="Hand" />
+                    <Button Content="{Binding ToggleCanLogButtonName}" Margin="10" Command="{Binding ToggleCanLogCommand}" />
                     <TextBlock VerticalAlignment="Center" Margin="10" Text="{DynamicResource t_delay}" FontSize="25" />
                     <TextBox VerticalAlignment="Center" Margin="10" FontSize="25" MinWidth="40">
                         <TextBox.Text>

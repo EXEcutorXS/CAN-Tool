@@ -6,6 +6,8 @@
 <v:String x:Key="b_listen">Listen</v:String>
 <v:String x:Key="b_self_reception">Self reception</v:String>
 <v:String x:Key="b_stop">Stop</v:String>
+<v:String x:Key="b_start_can_log">Start CAN Log</v:String>
+<v:String x:Key="b_stop_can_log">Stop CAN Log</v:String>
 <v:String x:Key="b_exit">Exit</v:String>
 <v:String x:Key="b_common">Common</v:String>
 <v:String x:Key="b_water_pump">Water pump</v:String>

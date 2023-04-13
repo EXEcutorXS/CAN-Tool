@@ -6,6 +6,8 @@
 <v:String x:Key="b_listen">Прослушивание</v:String>
 <v:String x:Key="b_self_reception">Самоприём</v:String>
 <v:String x:Key="b_stop">Остановить</v:String>
+<v:String x:Key="b_start_can_log">Записать лог CAN</v:String>
+<v:String x:Key="b_stop_can_log">Остановить лог CAN</v:String>
 <v:String x:Key="b_exit">Выход</v:String>
 <v:String x:Key="b_common">Общие данные</v:String>
 <v:String x:Key="b_water_pump">Помпа</v:String>

@@ -6,6 +6,8 @@ b_normal	Normal	Нормальный
 b_listen	Listen	Прослушивание
 b_self_reception	Self reception	Самоприём
 b_stop	Stop	Остановить
+b_start_can_log	Start CAN Log	Записать лог CAN
+b_stop_can_log	Stop CAN Log	Остановить лог CAN
 b_exit	Exit	Выход
 b_common	Common	Общие данные
 b_water_pump	Water pump	Помпа

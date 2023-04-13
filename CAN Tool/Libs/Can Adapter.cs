@@ -126,6 +126,11 @@ namespace Can_Adapter
             return $"L:{DLC} IDE:{IdeAsString} RTR:{RtrAsString} ID:0x{IdAsText} Data:{GetDataInTextFormat(" ")}";
         }
 
+        public string ToShortString()
+        {
+            return $"{IdeAsString} {RtrAsString} {DLC} {IdAsText} {GetDataInTextFormat(" ")}";
+        }
+
 
         public CanMessage()
         {

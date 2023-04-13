@@ -25,6 +25,7 @@ using System.Drawing.Text;
 using System.Windows.Threading;
 using Microsoft.Win32;
 using System.Windows;
+using System.Text;
 
 namespace CAN_Tool.ViewModels
 {
@@ -102,7 +103,41 @@ namespace CAN_Tool.ViewModels
             set => Set(ref _PortList, value);
         }
 
-        int messageDelay=100;
+        private string toggleCanLogButtonName = GetString("b_start_can_log");
+        public string ToggleCanLogButtonName { get => toggleCanLogButtonName; set => Set(ref toggleCanLogButtonName, value); } 
+
+        private bool canLogging = false;
+
+        private string canLogFileName = "";
+
+
+        public ICommand ToggleCanLogCommand { get; }
+
+        private FileStream canLogStream;
+
+        private void OnToggleCanLogCommandExecuted(object Parameter)
+        {
+            if (canLogging)
+            {
+                canLogging = false;
+                ToggleCanLogButtonName = GetString("b_start_can_log");
+                canLogStream.Flush();
+                canLogStream.Close();
+            }
+            else
+            {
+                canLogging = true;
+                ToggleCanLogButtonName = GetString("b_stop_can_log");
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CAN Log_" + DateTime.Now.ToLongTimeString().Replace(':','.') + ".txt";
+                canLogStream = File.Create(path);
+                canLogFileName = canLogStream.Name;
+            }
+        }
+
+
+        private bool CanToggleCanLogCommandExecute(object Parameter) => CanAdapter.PortOpened;
+
+        int messageDelay = 100;
         public int MessageDelay { get => messageDelay; set => Set(ref messageDelay, value); }
 
         public ICommand SetAdapterNormalModeCommand { get; }
@@ -167,13 +202,13 @@ namespace CAN_Tool.ViewModels
             {
                 var parts = line.Split(' ');
                 CanMessage m = new();
-                m.Id = Convert.ToInt32(parts[0],16);
-                m.DLC = Convert.ToInt32(parts[1],16);
+                m.Id = Convert.ToInt32(parts[0], 16);
+                m.DLC = Convert.ToInt32(parts[1], 16);
                 m.IDE = true;
                 m.RTR = false;
 
                 for (int i = 2; i < parts.Length; i++)
-                    m.Data[i-2] = Convert.ToByte(parts[i],16);
+                    m.Data[i - 2] = Convert.ToByte(parts[i], 16);
 
                 canAdapter.InjectMessage(m);
                 await Task.Delay(MessageDelay);
@@ -194,7 +229,7 @@ namespace CAN_Tool.ViewModels
             {
                 // Open document
                 string filename = dialog.FileName;
-                
+
                 await loadLogAsync(filename);
             }
         }
@@ -388,7 +423,7 @@ namespace CAN_Tool.ViewModels
         }
         private bool CanReadBlackBoxDataExecute(object parameter) =>
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
- 
+
 
 
         public ICommand ReadBlackBoxErrorsCommand { get; }
@@ -408,7 +443,7 @@ namespace CAN_Tool.ViewModels
         }
         private bool CanEraseBlackBoxErrorsExecute(object parameter) =>
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
-    
+
 
 
         public ICommand EraseBlackBoxDataCommand { get; }
@@ -420,7 +455,7 @@ namespace CAN_Tool.ViewModels
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
 
 
-        
+
         public ICommand SaveReportCommand { get; }
         private void OnSaveReportCommandExecuted(object parameter)
         {
@@ -468,7 +503,7 @@ namespace CAN_Tool.ViewModels
         }
         private bool CanSaveReportCommandExecute(object parameter) =>
         (selectedConnectedDevice != null && (SelectedConnectedDevice.BBErrors.Count > 0 || SelectedConnectedDevice.BBValues.Count > 0));
-        
+
 
 
         public ICommand SendCustomMessageCommand { get; }
@@ -591,18 +626,24 @@ namespace CAN_Tool.ViewModels
         }
 
         public void NewMessgeReceived(object sender, EventArgs e)
-        { 
-            switch(Mode)
+        {
+            switch (Mode)
             {
                 case WorkMode_t.Omni: UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null); break;
-                case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage ((e as GotMessageEventArgs).receivedMessage), null); break;
+                case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage((e as GotMessageEventArgs).receivedMessage), null); break;
                 case WorkMode_t.RegularCan: UIContext.Send(x => CanPage.ProcessMessage((e as GotMessageEventArgs).receivedMessage), null); break;
             }
+
+            if (canLogging && canLogStream != null && canLogStream.CanWrite)
+            {
+                canLogStream.Write(Encoding.ASCII.GetBytes((e as GotMessageEventArgs).receivedMessage.ToShortString() + Environment.NewLine));
+            }
+
         }
 
         public MainWindowViewModel()
         {
-            
+
 
             canAdapter = new();
             OmniInstance = new Omni(CanAdapter);
@@ -620,11 +661,11 @@ namespace CAN_Tool.ViewModels
             timer.Interval = new TimeSpan(0, 0, 1);
             timer.Tick += TimerTick;
             timer.Start();
-            
+
             var refreshTimer = new System.Timers.Timer(250);
             refreshTimer.Elapsed += RefreshTimerTick;
             refreshTimer.Start();
-            
+
             OmniInstance.NewDeviceAquired += NewDeviceHandler;
 
             OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
@@ -657,6 +698,8 @@ namespace CAN_Tool.ViewModels
 
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
             SaveReportCommand = new LambdaCommand(OnSaveReportCommandExecuted, CanSaveReportCommandExecute);
+
+            ToggleCanLogCommand = new LambdaCommand(OnToggleCanLogCommandExecuted, CanToggleCanLogCommandExecute);
 
 
             CustomMessage.TransmitterAddress = 6;
