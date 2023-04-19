@@ -8,6 +8,7 @@ namespace RVC
         static readonly Dictionary<int, string> defMeaningsYesNo = new() { { 0, "t_no" }, { 1, "t_yes" }, { 2, "t_error" }, { 3, "t_no_data" } };
         static readonly Dictionary<int, string> defMeaningsOnOff = new() { { 0, "t_off" }, { 1, "t_on" }, { 2, "t_error" }, { 3, "t_no_data" } };
         static readonly Dictionary<int, string> defMeaningsEnabledDisabled = new() { { 0, "t_disabled" }, { 1, "t_enabled" }, { 2, "t_error" }, { 3, "t_no_data" } };
+        /*
         static readonly Dictionary<int, string> operatingStatusesSimple = new() {
             { 0, "Device is disabled and not operating. Generally a fault condition or the result of a manual override" },
             { 1, "Device is disabled, but is running. Generally a fault conditions or the result of a manual override." },
@@ -19,7 +20,7 @@ namespace RVC
             { 1, "Device is disabled, but is running. Generally a fault condition or the result of a manual override." },
             { 2, "Device is enabled, but is waiting for some conditions to be fulfilled before it will start running." },
             { 3, "Device is enabled and running." } };
-
+        */
         public static Dictionary<int, DGN> DGNs = new Dictionary<int, DGN>();
 
         static RVC()
@@ -687,8 +688,8 @@ namespace RVC
             DGNs.Add(newDgn.Dgn, newDgn);
 
             newDgn = new() { Name = "DM_RV", Dgn = 0x1FECA, idLength = 0 };
-            newDgn.Parameters.Add(new () { Name = "Operating Status", frstByte = 0, frstBit = 0, Size = 2, Meanings = operatingStatusesSimple });
-            newDgn.Parameters.Add(new () { Name = "Operating Status", frstByte = 0, frstBit = 2, Size = 2, Meanings = operatingStatusesIntel });
+            newDgn.Parameters.Add(new () { Name = "Operating Status", frstByte = 0, frstBit = 0, Size = 2, Meanings = mnsMkr("Disabled","Enabled") });
+            newDgn.Parameters.Add(new () { Name = "Operating Status", frstByte = 0, frstBit = 2, Size = 2, Meanings = mnsMkr("Standby/Idle","Running") });
             newDgn.Parameters.Add(new () { Name = "Yellow lamp status", frstByte = 0, frstBit = 4, Size = 2, Meanings = defMeaningsOnOff });
             newDgn.Parameters.Add(new () { Name = "Red lamp status", frstByte = 0, frstBit = 5, Size = 2, Meanings = defMeaningsOnOff });
             newDgn.Parameters.Add(new () { Name = "DSA", frstByte = 1, frstBit = 0, Id = true });
