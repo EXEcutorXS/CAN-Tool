@@ -667,7 +667,7 @@ namespace RVC
                 Name = "Hot Water Priority",
                 Size = 2,
                 frstByte = 2,
-                frstBit = 4,
+                frstBit = 6,
                 Type = paramTyp.natural,
                 Meanings = new() { [0] = "Domestic water priority", [1] = "Heating priority" }
             });
