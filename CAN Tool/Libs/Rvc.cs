@@ -52,7 +52,7 @@ namespace RVC
 
             if (idLen>0)
             {
-                Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = paramTyp.instance, Size = 8, fstByte = 0, Id = true });
+                Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = paramTyp.instance, Size = 8, frstByte = 0, Id = true });
                 idLength = idLen;
             }
         }
@@ -76,9 +76,9 @@ namespace RVC
         public string ShortName;
         public byte Size = 8;
         public paramTyp Type = paramTyp.natural;
-        public byte fstByte = 0;
-        public byte frstFit = 0;
-        public Dictionary<uint, string> Meanings;
+        public byte frstByte = 0;
+        public byte frstBit = 0;
+        public Dictionary<int, string> Meanings;
         public double coefficient = 1;
         public double shift = 0;
         public string Unit = "";
@@ -98,14 +98,35 @@ namespace RVC
         {
             switch (Size)
             {
-                case 2: return (uint)(data[fstByte] >> frstFit) & 0x3;
-                case 4: return (uint)(data[fstByte] >> frstFit) & 0xF;
-                case 6: return (uint)(data[fstByte] >> frstFit) & 0x3F;
-                case 8: return (data[fstByte]);
-                case 16: return (uint)(data[fstByte] + data[fstByte + 1] * 256);
-                case 32: return (uint)(data[fstByte] + data[fstByte + 1] * 0x100 + data[fstByte + 2] * 0x10000 + data[fstByte + 3] * 0x1000000);
+                case 2: return (uint)(data[frstByte] >> frstBit) & 0x3;
+                case 4: return (uint)(data[frstByte] >> frstBit) & 0xF;
+                case 6: return (uint)(data[frstByte] >> frstBit) & 0x3F;
+                case 8: return (data[frstByte]);
+                case 16: return (uint)(data[frstByte] + data[frstByte + 1] * 256);
+                case 32: return (uint)(data[frstByte] + data[frstByte + 1] * 0x100 + data[frstByte + 2] * 0x10000 + data[frstByte + 3] * 0x1000000);
                 default: throw new ArgumentException("Bad parameter size");
             }
+        }
+
+        public static long getRaw(byte[] data, int bitLength, int startBit, int startByte)
+        {
+            long ret;
+            switch (bitLength)
+            {
+                case 1: ret = data[startByte] >> startBit & 0b1; break;
+                case 2: ret = data[startByte] >> startBit & 0b11; break;
+                case 3: ret = data[startByte] >> startBit & 0b111; break;
+                case 4: ret = data[startByte] >> startBit & 0b1111; break;
+                case 5: ret = data[startByte] >> startBit & 0b11111; break;
+                case 6: ret = data[startByte] >> startBit & 0b111111; break;
+                case 7: ret = data[startByte] >> startBit & 0b1111111; break;
+                case 8: ret = data[startByte]; break;
+                case 16: ret = BitConverter.ToUInt16(new byte[] { data[startByte ], data[startByte+1] });      break;
+                case 24: ret = data[startByte+2] * 65536 + data[startByte + 1] * 256 + data[startByte];      break;
+                case 32: ret = BitConverter.ToUInt32(new byte[] { data[startByte ], data[startByte + 1], data[startByte + 2], data[startByte + 3] });  break;
+                default: throw new Exception("Bad parameter size");
+            }
+            return ret;
         }
 
         public string ToString(byte[] data)
@@ -114,18 +135,27 @@ namespace RVC
 
             uint rawData = 0;
             double tempValue = 0;
-
+            /*
             switch (Size)
             {
-                case 2: rawData = (uint)((data[fstByte] >> frstFit) & 0x3); break;
-                case 4: rawData = (uint)((data[fstByte] >> frstFit) & 0xF); break;
-                case 6: rawData = (uint)((data[fstByte] >> frstFit) & 0x3F); break;
-                case 8: rawData = (uint)(data[fstByte]); break;
-                case 16: rawData = (uint)(data[fstByte] + data[fstByte + 1] * 256); break;
-                case 32: rawData = (uint)(data[fstByte] + data[fstByte + 1] * 0x100 + data[fstByte + 2] * 0x10000 + data[fstByte + 3] * 0x1000000); break;
+                case 2: rawData = (uint)((data[frstByte] >> frstBit) & 0x3); break;
+                case 4: rawData = (uint)((data[frstByte] >> frstBit) & 0xF); break;
+                case 6: rawData = (uint)((data[frstByte] >> frstBit) & 0x3F); break;
+                case 8: rawData = (uint)(data[frstByte]); break;
+                case 16: rawData = (uint)(data[frstByte] + data[frstByte + 1] * 256); break;
+                case 32: rawData = (uint)(data[frstByte] + data[frstByte + 1] * 0x100 + data[frstByte + 2] * 0x10000 + data[frstByte + 3] * 0x1000000); break;
                 default: throw new ArgumentException("Bad parameter size");
             }
+            */
+            rawData = (uint)getRaw(data, Size, frstBit, frstByte);
 
+            if (rawData == Math.Pow(2, Size) - 1)
+                return retString += (GetString("t_no_data") + $" ({rawData})");
+
+            if (rawData == Math.Pow(2, Size) - 2)
+                return retString += (GetString("t_error") + $" ({rawData})");
+
+            /*
             switch (Size)
             {
                 case 2:
@@ -153,10 +183,10 @@ namespace RVC
                     if (rawData == UInt32.MaxValue) return retString += "No Data";
                     break;
             }
-
+            */
             if (Meanings != null)
             { 
-            if (Meanings.ContainsKey(rawData)) return retString += Meanings[rawData];
+            if (Meanings.ContainsKey((int)rawData)) return retString += Meanings[(int)rawData];
             else return retString+$"No meaning for {rawData}";
             }
 

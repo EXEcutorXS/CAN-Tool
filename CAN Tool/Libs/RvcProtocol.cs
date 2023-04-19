@@ -1,10 +1,5 @@
-﻿using RVC;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+
 
 namespace RVC
 {
@@ -13,6 +8,17 @@ namespace RVC
         static readonly Dictionary<int, string> defMeaningsYesNo = new() { { 0, "t_no" }, { 1, "t_yes" }, { 2, "t_error" }, { 3, "t_no_data" } };
         static readonly Dictionary<int, string> defMeaningsOnOff = new() { { 0, "t_off" }, { 1, "t_on" }, { 2, "t_error" }, { 3, "t_no_data" } };
         static readonly Dictionary<int, string> defMeaningsEnabledDisabled = new() { { 0, "t_disabled" }, { 1, "t_enabled" }, { 2, "t_error" }, { 3, "t_no_data" } };
+        static readonly Dictionary<int, string> operatingStatusesSimple = new() {
+            { 0, "Device is disabled and not operating. Generally a fault condition or the result of a manual override" },
+            { 1, "Device is disabled, but is running. Generally a fault conditions or the result of a manual override." },
+            { 2, "Device is not operating, but will accept commands to operate.This is the'normal' OFF condition." },
+            { 3, "Device is operating and will accept command. This is the 'normal' ON condition." } };
+
+        static readonly Dictionary<int, string> operatingStatusesIntel = new() {
+            { 0, "Device is disabled and not operating" },
+            { 1, "Device is disabled, but is running. Generally a fault condition or the result of a manual override." },
+            { 2, "Device is enabled, but is waiting for some conditions to be fulfilled before it will start running." },
+            { 3, "Device is enabled and running." } };
 
         public static Dictionary<int, DGN> DGNs = new Dictionary<int, DGN>();
 
@@ -20,10 +26,10 @@ namespace RVC
         {
             SeedData();
         }
-        private static Dictionary<uint, string> mnsMkr(params string[] meanings)
-        { 
-        var ret = new Dictionary<uint, string>();
-            uint cnt = 0;
+        private static Dictionary<int, string> mnsMkr(params string[] meanings)
+        {
+            var ret = new Dictionary<int, string>();
+            int cnt = 0;
             foreach (var meaning in meanings)
                 ret.Add(cnt++, meaning);
             return ret;
@@ -33,45 +39,66 @@ namespace RVC
             DGN newDgn;
 
             newDgn = new DGN(1) { Dgn = 0x1FF9C, Name = "THERMOSTAT_AMBIENT_STATUS" };
-            newDgn.Parameters.Add(new ("Ambient temperature") {ShortName = "Tamb", Type = paramTyp.temperature, Size = 16, fstByte = 1 });
+            newDgn.Parameters.Add(new("Ambient temperature") { ShortName = "Tamb", Type = paramTyp.temperature, Size = 16, frstByte = 1 });
             DGNs.Add(newDgn.Dgn, newDgn);
 
             newDgn = new DGN(1) { Dgn = 0x1FFE4, Name = "FURNACE_STATUS" };
 
-            newDgn.Parameters.Add(new ("Operating mode") { ShortName = "Op mode", Type = paramTyp.natural, Size = 2, fstByte = 1, Meanings = new() { [0] = "Automatic", [1] = "Manual" }});
-            newDgn.Parameters.Add(new ("Heat Source") {ShortName = "Heat Src",Type = paramTyp.natural, Size = 6, fstByte = 1, frstFit = 2,
-                Meanings = new() { [0] = "Combustion", [1] = "AC power primary", [2] = "AC power secondary", [3] = "Engine Heat" }});
+            newDgn.Parameters.Add(new("Operating mode") { ShortName = "Op mode", Type = paramTyp.natural, Size = 2, frstByte = 1, Meanings = new() { [0] = "Automatic", [1] = "Manual" } });
+            newDgn.Parameters.Add(new("Heat Source")
+            {
+                ShortName = "Heat Src",
+                Type = paramTyp.natural,
+                Size = 6,
+                frstByte = 1,
+                frstBit = 2,
+                Meanings = new() { [0] = "Combustion", [1] = "AC power primary", [2] = "AC power secondary", [3] = "Engine Heat" }
+            });
 
-            newDgn.Parameters.Add(new ("Circulation fan speed") {ShortName = "Fan%", Type = paramTyp.percent, fstByte = 2, frstFit = 0 });
-            newDgn.Parameters.Add(new ("Heat output level") {ShortName = "Heat%", Type = paramTyp.percent, fstByte = 3, frstFit = 0 });
-            newDgn.Parameters.Add(new ("Dead band") {ShortName = "Db", Type = paramTyp.custom, fstByte = 4, coefficient = 0.1, Unit = "C" });
-            newDgn.Parameters.Add(new ("Dead band level 2") {ShortName = "Db2", Type = paramTyp.custom, fstByte = 5, coefficient = 0.1, Unit = "C" });
-            newDgn.Parameters.Add(new("Zone overcurrent status") {ShortName = "Zone OC", Type = paramTyp.boolean, Size = 2, fstByte = 6, frstFit = 0 });
-            newDgn.Parameters.Add(new ("Zone undercurrent status") {ShortName = "Zone UC", Type = paramTyp.boolean, Size = 2, fstByte = 6, frstFit = 2 });
-            newDgn.Parameters.Add(new ("Zone temperature status") {ShortName = "Zone t Status",Type = paramTyp.boolean,Size = 2,fstByte = 6,frstFit = 4,
-                Meanings = new() { [0] = "Normal", [1] = "Warning" }});
-            newDgn.Parameters.Add(new ("Zone analog input status") {ShortName = "Zone an",Type = paramTyp.boolean,Size = 2,fstByte = 6,frstFit = 6,
-                Meanings = new() { [0] = "Off(Inactive)", [1] = "On(Active)" }});
+            newDgn.Parameters.Add(new("Circulation fan speed") { ShortName = "Fan%", Type = paramTyp.percent, frstByte = 2, frstBit = 0 });
+            newDgn.Parameters.Add(new("Heat output level") { ShortName = "Heat%", Type = paramTyp.percent, frstByte = 3, frstBit = 0 });
+            newDgn.Parameters.Add(new("Dead band") { ShortName = "Db", Type = paramTyp.custom, frstByte = 4, coefficient = 0.1, Unit = "C" });
+            newDgn.Parameters.Add(new("Dead band level 2") { ShortName = "Db2", Type = paramTyp.custom, frstByte = 5, coefficient = 0.1, Unit = "C" });
+            newDgn.Parameters.Add(new("Zone overcurrent status") { ShortName = "Zone OC", Type = paramTyp.boolean, Size = 2, frstByte = 6, frstBit = 0 });
+            newDgn.Parameters.Add(new("Zone undercurrent status") { ShortName = "Zone UC", Type = paramTyp.boolean, Size = 2, frstByte = 6, frstBit = 2 });
+            newDgn.Parameters.Add(new("Zone temperature status")
+            {
+                ShortName = "Zone t Status",
+                Type = paramTyp.boolean,
+                Size = 2,
+                frstByte = 6,
+                frstBit = 4,
+                Meanings = new() { [0] = "Normal", [1] = "Warning" }
+            });
+            newDgn.Parameters.Add(new("Zone analog input status")
+            {
+                ShortName = "Zone an",
+                Type = paramTyp.boolean,
+                Size = 2,
+                frstByte = 6,
+                frstBit = 6,
+                Meanings = new() { [0] = "Off(Inactive)", [1] = "On(Active)" }
+            });
             DGNs.Add(newDgn.Dgn, newDgn);
 
             newDgn = new DGN(1) { Dgn = 0x1FFE3, Name = "FURNACE_COMMAND" };
 
-            newDgn.Parameters.Add(new ("Operating mode") {ShortName = "Op mode",Type = paramTyp.natural,Size = 2,fstByte = 1,Meanings = new() { [0] = "Automatic", [1] = "Manual" }});
+            newDgn.Parameters.Add(new("Operating mode") { ShortName = "Op mode", Type = paramTyp.natural, Size = 2, frstByte = 1, Meanings = new() { [0] = "Automatic", [1] = "Manual" } });
             newDgn.Parameters.Add(new Parameter
             {
                 Name = "Heat Source",
                 ShortName = "Heat Src",
                 Type = paramTyp.natural,
                 Size = 6,
-                fstByte = 1,
-                frstFit = 2,
+                frstByte = 1,
+                frstBit = 2,
                 Meanings = new() { [0] = "Combustion", [1] = "AC power primary", [2] = "AC power secondary", [3] = "Engine Heat" }
             });
 
-            newDgn.Parameters.Add(new Parameter { Name = "Circulation fan speed", ShortName = "Fan%", Type = paramTyp.percent, fstByte = 2, frstFit = 0 });
-            newDgn.Parameters.Add(new Parameter { Name = "Heat output level", ShortName = "Heat%", Type = paramTyp.percent, fstByte = 3, frstFit = 0 });
-            newDgn.Parameters.Add(new Parameter { Name = "Dead band", ShortName = "Db", Type = paramTyp.custom, fstByte = 4, coefficient = 0.1, Unit = "C" });
-            newDgn.Parameters.Add(new Parameter { Name = "Dead band level 2", ShortName = "Db2", Type = paramTyp.custom, fstByte = 5, coefficient = 0.1, Unit = "C" });
+            newDgn.Parameters.Add(new Parameter { Name = "Circulation fan speed", ShortName = "Fan%", Type = paramTyp.percent, frstByte = 2, frstBit = 0 });
+            newDgn.Parameters.Add(new Parameter { Name = "Heat output level", ShortName = "Heat%", Type = paramTyp.percent, frstByte = 3, frstBit = 0 });
+            newDgn.Parameters.Add(new Parameter { Name = "Dead band", ShortName = "Db", Type = paramTyp.custom, frstByte = 4, coefficient = 0.1, Unit = "C" });
+            newDgn.Parameters.Add(new Parameter { Name = "Dead band level 2", ShortName = "Db2", Type = paramTyp.custom, frstByte = 5, coefficient = 0.1, Unit = "C" });
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
@@ -83,21 +110,21 @@ namespace RVC
                 ShortName = "Mode",
                 Type = paramTyp.natural,
                 Size = 8,
-                fstByte = 1,
+                frstByte = 1,
                 Meanings = new() { [0] = "off", [1] = "combustion", [2] = "electric", [3] = "gas/electric (both)", [4] = "test combustion (forced on)", [5] = "test combustion (forced on)", [6] = "test electric (forced on)" }
             });
 
-            newDgn.Parameters.Add(new Parameter { Name = "Set point temperature", ShortName = "SP T", Type = paramTyp.temperature, Size = 16, fstByte = 2 });
+            newDgn.Parameters.Add(new Parameter { Name = "Set point temperature", ShortName = "SP T", Type = paramTyp.temperature, Size = 16, frstByte = 2 });
 
-            newDgn.Parameters.Add(new Parameter { Name = "Water temperature", ShortName = "Twater", Type = paramTyp.temperature, Size = 16, fstByte = 4 });
+            newDgn.Parameters.Add(new Parameter { Name = "Water temperature", ShortName = "Twater", Type = paramTyp.temperature, Size = 16, frstByte = 4 });
 
             newDgn.Parameters.Add(new Parameter
             {
                 Name = "Thermostat status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 6,
-                frstFit = 0,
+                frstByte = 6,
+                frstBit = 0,
                 Meanings = new() { [0] = "set point met", [1] = "set point not met (heat is being applied)" }
             });
 
@@ -106,8 +133,8 @@ namespace RVC
                 Name = "Burner status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 6,
-                frstFit = 2,
+                frstByte = 6,
+                frstBit = 2,
                 Meanings = new() { [0] = "off", [1] = "burner is lit" }
             });
 
@@ -116,8 +143,8 @@ namespace RVC
                 Name = "AC element status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 6,
-                frstFit = 4,
+                frstByte = 6,
+                frstBit = 4,
                 Meanings = new() { [0] = "AC element is inactive", [1] = "AC element is active)" }
             });
 
@@ -127,8 +154,8 @@ namespace RVC
                 Name = "High temperature limit switch status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 6,
-                frstFit = 6,
+                frstByte = 6,
+                frstBit = 6,
                 Meanings = new() { [0] = "limit switch not tripped", [1] = "limit switch tripped" }
             });
 
@@ -137,8 +164,8 @@ namespace RVC
                 Name = "Failure to ignite status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 7,
-                frstFit = 0,
+                frstByte = 7,
+                frstBit = 0,
                 Meanings = new() { [0] = "no failure", [1] = "device has failed to ignite" }
             });
 
@@ -147,8 +174,8 @@ namespace RVC
                 Name = "AC power failure status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 7,
-                frstFit = 2,
+                frstByte = 7,
+                frstBit = 2,
                 Meanings = new() { [0] = "AC power present", [1] = "AC power not present" }
             });
 
@@ -157,8 +184,8 @@ namespace RVC
                 Name = "DC power failure status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 7,
-                frstFit = 4,
+                frstByte = 7,
+                frstBit = 4,
                 Meanings = new() { [0] = "DC power present", [1] = "DC power not present" }
             });
 
@@ -167,8 +194,8 @@ namespace RVC
                 Name = "DC power warning status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 7,
-                frstFit = 6,
+                frstByte = 7,
+                frstBit = 6,
                 Meanings = new() { [0] = "DC power sufficient", [1] = "DC power warning" }
             });
 
@@ -182,12 +209,12 @@ namespace RVC
                 ShortName = "Mode",
                 Type = paramTyp.natural,
                 Size = 8,
-                fstByte = 1,
+                frstByte = 1,
                 Meanings = new() { [0] = "off", [1] = "combustion", [2] = "electric", [3] = "gas/electric (both)", [4] = "test combustion (forced on)", [5] = "test combustion (forced on)", [6] = "test electric (forced on)" }
             });
 
-            newDgn.Parameters.Add(new Parameter { Name = "Set point temperature", ShortName = "SP T", Type = paramTyp.temperature, Size = 16, fstByte = 2 });
-            newDgn.Parameters.Add(new Parameter { Name = "Electric Element Level", ShortName = "Elec lvl", Type = paramTyp.natural, Size = 4, fstByte = 6 });
+            newDgn.Parameters.Add(new Parameter { Name = "Set point temperature", ShortName = "SP T", Type = paramTyp.temperature, Size = 16, frstByte = 2 });
+            newDgn.Parameters.Add(new Parameter { Name = "Electric Element Level", ShortName = "Elec lvl", Type = paramTyp.natural, Size = 4, frstByte = 6 });
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
@@ -198,7 +225,7 @@ namespace RVC
                 Name = "Operating mode",
                 Type = paramTyp.natural,
                 Size = 4,
-                fstByte = 1,
+                frstByte = 1,
                 Meanings = new() { [0] = "Off", [1] = "Cool", [2] = "Heat", [3] = "Auto heat/Cool", [4] = "Fan only", [5] = "Aux heat", [6] = "Window Defrost/Dehumidify" }
             });
 
@@ -207,8 +234,8 @@ namespace RVC
                 Name = "Fan mode",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 1,
-                frstFit = 4,
+                frstByte = 1,
+                frstBit = 4,
                 Meanings = new() { [0] = "Auto", [1] = "On" }
             });
 
@@ -217,8 +244,8 @@ namespace RVC
                 Name = "Schedule mode",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 1,
-                frstFit = 6,
+                frstByte = 1,
+                frstBit = 6,
                 Meanings = new() { [0] = "Disabled", [1] = "Enabled" }
             });
 
@@ -227,7 +254,7 @@ namespace RVC
                 Name = "Fan speed",
                 Type = paramTyp.percent,
                 Size = 8,
-                fstByte = 2,
+                frstByte = 2,
             });
 
             newDgn.Parameters.Add(new()
@@ -235,7 +262,7 @@ namespace RVC
                 Name = "Setopint temp - Heat",
                 Type = paramTyp.temperature,
                 Size = 16,
-                fstByte = 3,
+                frstByte = 3,
             });
 
             newDgn.Parameters.Add(new()
@@ -243,7 +270,7 @@ namespace RVC
                 Name = "Setopint temp - Cool",
                 Type = paramTyp.temperature,
                 Size = 16,
-                fstByte = 5,
+                frstByte = 5,
             });
 
             DGNs.Add(newDgn.Dgn, newDgn);
@@ -256,7 +283,7 @@ namespace RVC
                 Name = "Operating mode",
                 Type = paramTyp.natural,
                 Size = 4,
-                fstByte = 1,
+                frstByte = 1,
                 Meanings = new() { [0] = "Off", [1] = "Cool", [2] = "Heat", [3] = "Auto heat/Cool", [4] = "Fan only", [5] = "Aux heat", [6] = "Window Defrost/Dehumidify" }
             });
 
@@ -265,8 +292,8 @@ namespace RVC
                 Name = "Fan mode",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 1,
-                frstFit = 4,
+                frstByte = 1,
+                frstBit = 4,
                 Meanings = new() { [0] = "Auto", [1] = "On" }
             });
 
@@ -275,8 +302,8 @@ namespace RVC
                 Name = "Schedule mode",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 1,
-                frstFit = 6,
+                frstByte = 1,
+                frstBit = 6,
                 Meanings = new() { [0] = "Disabled", [1] = "Enabled" }
             });
 
@@ -285,7 +312,7 @@ namespace RVC
                 Name = "Fan speed",
                 Type = paramTyp.percent,
                 Size = 8,
-                fstByte = 2,
+                frstByte = 2,
             });
 
             newDgn.Parameters.Add(new()
@@ -293,7 +320,7 @@ namespace RVC
                 Name = "Setopint temp - Heat",
                 Type = paramTyp.temperature,
                 Size = 16,
-                fstByte = 3,
+                frstByte = 3,
             });
 
             newDgn.Parameters.Add(new()
@@ -301,7 +328,7 @@ namespace RVC
                 Name = "Setopint temp - Cool",
                 Type = paramTyp.temperature,
                 Size = 16,
-                fstByte = 5,
+                frstByte = 5,
             });
 
             DGNs.Add(newDgn.Dgn, newDgn);
@@ -313,7 +340,7 @@ namespace RVC
                 Name = "Current schedule instatnce",
                 Type = paramTyp.natural,
                 Size = 8,
-                fstByte = 1,
+                frstByte = 1,
                 Meanings = new() { [0] = "Sleep", [1] = "Wake", [2] = "Away", [3] = "Return", [250] = "Storage" }
             });
 
@@ -322,7 +349,7 @@ namespace RVC
                 Name = "Number of schedule instances",
                 Type = paramTyp.custom,
                 Size = 8,
-                fstByte = 2,
+                frstByte = 2,
             });
 
 
@@ -331,7 +358,7 @@ namespace RVC
                 Name = "Reduced noise mode",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 3,
+                frstByte = 3,
                 Meanings = new() { [0] = "Disabled", [1] = "Endabled" }
             });
 
@@ -343,7 +370,7 @@ namespace RVC
                 Name = "Current schedule instatnce",
                 Type = paramTyp.natural,
                 Size = 8,
-                fstByte = 1,
+                frstByte = 1,
                 Meanings = new() { [0] = "Sleep", [1] = "Wake", [2] = "Away", [3] = "Return", [250] = "Storage", [251] = "Reset to \"current\" instance" }
             });
 
@@ -352,7 +379,7 @@ namespace RVC
                 Name = "Number of schedule instances",
                 Type = paramTyp.custom,
                 Size = 8,
-                fstByte = 2,
+                frstByte = 2,
             });
 
 
@@ -361,7 +388,7 @@ namespace RVC
                 Name = "Reduced noise mode",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 3,
+                frstByte = 3,
                 Meanings = new() { [0] = "Disabled", [1] = "Endabled" }
             });
 
@@ -374,7 +401,7 @@ namespace RVC
                 Name = "Schedule mode instance",
                 Type = paramTyp.natural,
                 Size = 8,
-                fstByte = 1,
+                frstByte = 1,
                 Id = true,
                 Meanings = new() { [0] = "Sleep", [1] = "Wake", [2] = "Away", [3] = "Return", [250] = "Storage" }
             });
@@ -384,7 +411,7 @@ namespace RVC
                 Name = "Start hour",
                 Type = paramTyp.custom,
                 Size = 8,
-                fstByte = 2,
+                frstByte = 2,
             });
 
             newDgn.Parameters.Add(new()
@@ -392,7 +419,7 @@ namespace RVC
                 Name = "Start minute",
                 Type = paramTyp.custom,
                 Size = 8,
-                fstByte = 3,
+                frstByte = 3,
             });
 
             newDgn.Parameters.Add(new()
@@ -400,7 +427,7 @@ namespace RVC
                 Name = "Setopint temp - Heat",
                 Type = paramTyp.temperature,
                 Size = 16,
-                fstByte = 4,
+                frstByte = 4,
             });
 
             newDgn.Parameters.Add(new()
@@ -408,7 +435,7 @@ namespace RVC
                 Name = "Setopint temp - Cool",
                 Type = paramTyp.temperature,
                 Size = 16,
-                fstByte = 6,
+                frstByte = 6,
             });
 
             DGNs.Add(newDgn.Dgn, newDgn);
@@ -424,7 +451,7 @@ namespace RVC
                 Name = "Schedule mode instance",
                 Type = paramTyp.natural,
                 Size = 8,
-                fstByte = 1,
+                frstByte = 1,
                 Id = true,
                 Meanings = new() { [0] = "Sleep", [1] = "Wake", [2] = "Away", [3] = "Return", [250] = "Storage" }
             });
@@ -434,8 +461,8 @@ namespace RVC
                 Name = "Sunday",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 2,
-                frstFit = 0,
+                frstByte = 2,
+                frstBit = 0,
                 Meanings = new() { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
             });
 
@@ -446,8 +473,8 @@ namespace RVC
                 Name = "Monday",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 2,
-                frstFit = 2,
+                frstByte = 2,
+                frstBit = 2,
                 Meanings = new() { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
             });
 
@@ -456,8 +483,8 @@ namespace RVC
                 Name = "Tuesday",
                 Type = paramTyp.natural,
                 Size = 2,
-                fstByte = 2,
-                frstFit = 4,
+                frstByte = 2,
+                frstBit = 4,
                 Meanings = new() { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
             });
 
@@ -466,8 +493,8 @@ namespace RVC
                 Name = "Wednesday",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 2,
-                frstFit = 6,
+                frstByte = 2,
+                frstBit = 6,
                 Meanings = new() { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
             });
 
@@ -476,8 +503,8 @@ namespace RVC
                 Name = "Thursday",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 3,
-                frstFit = 0,
+                frstByte = 3,
+                frstBit = 0,
                 Meanings = new() { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
             });
 
@@ -486,8 +513,8 @@ namespace RVC
                 Name = "Friday",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 3,
-                frstFit = 2,
+                frstByte = 3,
+                frstBit = 2,
                 Meanings = new() { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
             });
 
@@ -496,8 +523,8 @@ namespace RVC
                 Name = "Saturday",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 3,
-                frstFit = 4,
+                frstByte = 3,
+                frstBit = 4,
                 Meanings = new() { [0] = "Not scheduled for this day", [1] = "Schedule applies to this day" }
             });
 
@@ -514,7 +541,7 @@ namespace RVC
                 Name = "Output status",
                 Type = paramTyp.natural,
                 Size = 4,
-                fstByte = 1,
+                frstByte = 1,
                 Meanings = new() { [0] = "Off", [1] = "On", [5] = "Test (Forced On)" }
             });
 
@@ -523,7 +550,7 @@ namespace RVC
                 Name = "Pump Overcurrent Status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 2,
+                frstByte = 2,
                 Meanings = new() { [0] = "No overcurrent detected", [1] = "Overcurrent detected" }
             });
             newDgn.Parameters.Add(new()
@@ -531,8 +558,8 @@ namespace RVC
                 Name = "Pump Undercurrent Status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 2,
-                frstFit = 2,
+                frstByte = 2,
+                frstBit = 2,
                 Meanings = new() { [0] = "No undercurrent detected", [1] = "Undercurrent detected" }
             });
 
@@ -541,8 +568,8 @@ namespace RVC
                 Name = "Pump Temperature Status",
                 Type = paramTyp.boolean,
                 Size = 2,
-                fstByte = 1,
-                frstFit = 4,
+                frstByte = 1,
+                frstBit = 4,
                 Meanings = new() { [0] = "Temperature normal", [1] = "Temperature warning" }
             });
             DGNs.Add(newDgn.Dgn, newDgn);
@@ -559,108 +586,124 @@ namespace RVC
             {
                 Name = "Month",
                 Type = paramTyp.natural,
-                fstByte = 1
+                frstByte = 1
             });
 
             newDgn.Parameters.Add(new()
             {
                 Name = "Day of month",
                 Type = paramTyp.natural,
-                fstByte = 2
+                frstByte = 2
             });
 
-            newDgn.Parameters.Add(new ()
+            newDgn.Parameters.Add(new()
             {
                 Name = "Day of week",
                 Type = paramTyp.natural,
-                fstByte = 3
+                frstByte = 3
             });
 
-            newDgn.Parameters.Add(new ()
+            newDgn.Parameters.Add(new()
             {
                 Name = "Hour",
                 Type = paramTyp.natural,
-                fstByte = 4
+                frstByte = 4
             });
 
-            newDgn.Parameters.Add(new ()
+            newDgn.Parameters.Add(new()
             {
                 Name = "Minute",
                 Type = paramTyp.natural,
-                fstByte = 5
+                frstByte = 5
             });
 
-            newDgn.Parameters.Add(new ()
+            newDgn.Parameters.Add(new()
             {
                 Name = "Second",
                 Type = paramTyp.natural,
-                fstByte = 6
+                frstByte = 6
             });
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
             newDgn = new DGN() { Dgn = 0x1FE99, Name = "WATERHEATER_STATUS_2" };
 
-            newDgn.Parameters.Add(new ()
+            newDgn.Parameters.Add(new()
             {
                 Name = "Electric Element Level",
                 Size = 4,
-                fstByte = 1
+                frstByte = 1
             });
 
-            newDgn.Parameters.Add(new ()
+            newDgn.Parameters.Add(new()
             {
                 Name = "Max Electric Element Leve",
                 Size = 4,
-                fstByte = 1,
-                frstFit = 4
+                frstByte = 1,
+                frstBit = 4
             });
 
-            newDgn.Parameters.Add(new ()
+            newDgn.Parameters.Add(new()
             {
                 Name = "Engine Preheat",
                 Size = 4,
-                fstByte = 2,
+                frstByte = 2,
                 Type = paramTyp.natural,
                 Meanings = new() { [0] = "Off", [1] = "On", [5] = "Test(Forced On)" }
             });
 
-            newDgn.Parameters.Add(new ()
+            newDgn.Parameters.Add(new()
             {
                 Name = "Coolant Level Warning",
                 Size = 2,
-                fstByte = 2,
-                frstFit = 4,
+                frstByte = 2,
+                frstBit = 4,
                 Type = paramTyp.boolean,
                 Meanings = new() { [0] = "Coolant level sufficient", [1] = "Coolant level low" }
             });
 
-            newDgn.Parameters.Add(new ()
+            newDgn.Parameters.Add(new()
             {
                 Name = "Hot Water Priority",
                 Size = 2,
-                fstByte = 2,
-                frstFit = 4,
+                frstByte = 2,
+                frstBit = 4,
                 Type = paramTyp.natural,
                 Meanings = new() { [0] = "Domestic water priority", [1] = "Heating priority" }
             });
             DGNs.Add(newDgn.Dgn, newDgn);
 
             newDgn = new() { Name = "GENERATOR_DEMAND_STATUS", Dgn = 0xFF80, idLength = 0 };
-            newDgn.Parameters.Add(new Parameter() { Name = "Generator demand", fstByte = 0, frstFit = 0, Size = 2, Meanings = mnsMkr("No demand for generator", "Generator is demanded") } );
-            newDgn.Parameters.Add(new Parameter() { Name = "Internal generator demand", fstByte = 0, frstFit = 2, Size = 2, Meanings =  mnsMkr("No internal demand", "Internal AGS criterion is demanding generator") });
-            newDgn.Parameters.Add(new Parameter() { Name = "Network generator demand", fstByte = 0, frstFit = 4, Size = 2, Meanings =  mnsMkr("No demand from other network nodes", "Network device is demanding generator") });
-            newDgn.Parameters.Add(new Parameter() { Name = "External activity detected", fstByte = 0, frstFit = 6, Size = 2, Meanings = mnsMkr("Automatic starting is allowed", "Automatic starting is disabled due to the detection of external activity") });
-            newDgn.Parameters.Add(new Parameter() { Name = "Manual override detected", fstByte = 1, frstFit = 0, Size = 2, Meanings =  mnsMkr("Normal Operation", "Manual Override") });
-            newDgn.Parameters.Add(new Parameter() { Name = "Quiet time", fstByte = 1, frstFit = 2, Size = 2, Meanings =  mnsMkr("Unit is not in Quiet Time", "Unit is in Quiet Time") });
-            newDgn.Parameters.Add(new Parameter() { Name = "Quiet time override", fstByte = 1, frstFit = 4, Size = 2, Meanings =  mnsMkr("Normal operation", "Quiet Time is being overridden") });
-            newDgn.Parameters.Add(new Parameter() { Name = "Generator lock", fstByte = 0, frstFit = 6, Size = 2, Meanings =  mnsMkr("Normal operation", "Genset is locked. Node will not start generator for any reason") });
-            newDgn.Parameters.Add(new Parameter() { Name = "Network generator demand", fstByte = 0, frstFit = 4, Size = 2, Meanings =  mnsMkr("No demand from other network nodes", "Network device is demanding generator") });
-            newDgn.Parameters.Add(new Parameter() { Name = "Quiet time begin hour", fstByte = 2, frstFit = 0, Unit="h"});
+            newDgn.Parameters.Add(new () { Name = "Generator demand", frstByte = 0, frstBit = 0, Size = 2, Meanings = mnsMkr("No demand for generator", "Generator is demanded") });
+            newDgn.Parameters.Add(new () { Name = "Internal generator demand", frstByte = 0, frstBit = 2, Size = 2, Meanings = mnsMkr("No internal demand", "Internal AGS criterion is demanding generator") });
+            newDgn.Parameters.Add(new () { Name = "Network generator demand", frstByte = 0, frstBit = 4, Size = 2, Meanings = mnsMkr("No demand from other network nodes", "Network device is demanding generator") });
+            newDgn.Parameters.Add(new () { Name = "External activity detected", frstByte = 0, frstBit = 6, Size = 2, Meanings = mnsMkr("Automatic starting is allowed", "Automatic starting is disabled due to the detection of external activity") });
+            newDgn.Parameters.Add(new () { Name = "Manual override detected", frstByte = 1, frstBit = 0, Size = 2, Meanings = mnsMkr("Normal Operation", "Manual Override") });
+            newDgn.Parameters.Add(new () { Name = "Quiet time", frstByte = 1, frstBit = 2, Size = 2, Meanings = mnsMkr("Unit is not in Quiet Time", "Unit is in Quiet Time") });
+            newDgn.Parameters.Add(new () { Name = "Quiet time override", frstByte = 1, frstBit = 4, Size = 2, Meanings = mnsMkr("Normal operation", "Quiet Time is being overridden") });
+            newDgn.Parameters.Add(new () { Name = "Generator lock", frstByte = 0, frstBit = 6, Size = 2, Meanings = mnsMkr("Normal operation", "Genset is locked. Node will not start generator for any reason") });
+            newDgn.Parameters.Add(new () { Name = "Network generator demand", frstByte = 0, frstBit = 4, Size = 2, Meanings = mnsMkr("No demand from other network nodes", "Network device is demanding generator") });
+            newDgn.Parameters.Add(new () { Name = "Quiet time begin hour", frstByte = 2, frstBit = 0, Unit = "h" });
             DGNs.Add(newDgn.Dgn, newDgn);
+
+            newDgn = new() { Name = "DM_RV", Dgn = 0x1FECA, idLength = 0 };
+            newDgn.Parameters.Add(new () { Name = "Operating Status", frstByte = 0, frstBit = 0, Size = 2, Meanings = operatingStatusesSimple });
+            newDgn.Parameters.Add(new () { Name = "Operating Status", frstByte = 0, frstBit = 2, Size = 2, Meanings = operatingStatusesIntel });
+            newDgn.Parameters.Add(new () { Name = "Yellow lamp status", frstByte = 0, frstBit = 4, Size = 2, Meanings = defMeaningsOnOff });
+            newDgn.Parameters.Add(new () { Name = "Red lamp status", frstByte = 0, frstBit = 5, Size = 2, Meanings = defMeaningsOnOff });
+            newDgn.Parameters.Add(new () { Name = "DSA", frstByte = 1, frstBit = 0, Id = true });
+            newDgn.Parameters.Add(new () { Name = "SPN - MSB", frstByte = 2, frstBit = 0});
+            newDgn.Parameters.Add(new () { Name = "SPN - ISB", frstByte = 3, frstBit = 0 });
+            newDgn.Parameters.Add(new () { Name = "SPN - LSB", frstByte = 4, frstBit = 5, Size = 3 });
+            newDgn.Parameters.Add(new () { Name = "FMI", frstByte = 4, frstBit = 0, Size = 5 });
+            newDgn.Parameters.Add(new () { Name = "Occurrence count", frstByte = 5, frstBit = 0, Size = 6, Meanings = new() { { 0x7F, "Not available" } } });
+            newDgn.Parameters.Add(new () { Name = "DSA extension", frstByte = 6, frstBit = 0,  Id = true });
+            newDgn.Parameters.Add(new () { Name = "Bank select", frstByte = 7, frstBit = 0,  Meanings = new () { { 15, "Not supported" } } });
+            DGNs.Add(newDgn.Dgn, newDgn);
+
         }
 
-     
+
 
     }
 

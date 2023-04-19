@@ -181,7 +181,7 @@ par_27	Fuel pump performance	производительность топливн
 		
 par_28	Element off	уставка температуры ТЭНа для перехода в ждущий
 par_29	Element on temperature 	уставка температуры ТЭНа для выхода из ждущего
-par_30	Element on temperature (domesit water)	уставка температуры ТЭНа для выхода из ждущего при разборе воды
+par_30	Element on temperature (domestic water on)	уставка температуры ТЭНа для выхода из ждущего при разборе воды
 		
 par_31	Heater off temperature	уставка температуры жидкости подогревателя для перехода в ждущий
 par_32	Heater on temperature	уставка температуры жидкости подогревателя для выхода из ждущего
@@ -231,7 +231,7 @@ par_68	Fan5 PWM limitation, %	Ограничение ШИМ вентилятор
 		
 par_69	Fans PWM correction time, ms	Периодичность корректировки ШИМ вентиляторов, мс
 par_70	Time format (12/24 or AM/PM)	Формат времени (12/24 или AM/PM)
-par_71	Temperature units (C/F)	Единицы измерения температуры (C/F)
+par_71	Temperature units (1-F/2-C)	Единицы измерения температуры (1-F,2-C)
 par_72	Daytime from time, min	Начало дневного времени суток, мин
 par_73	Daytime to time, min	Окончание дневного времени суток, мин
 par_74	Brightness at day, %	Яркость дисплея днем, %
