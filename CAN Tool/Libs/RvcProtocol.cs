@@ -707,15 +707,15 @@ namespace RVC
             newDgn.Parameters.Add(new() { multipackNum = 0x84, Name = "Tank temperature", Type = paramTyp.temperature, frstByte = 2, Size = 16 });
             newDgn.Parameters.Add(new() { multipackNum = 0x84, Name = "Heater temperature", Type = paramTyp.temperature, frstByte = 4, Size = 16 });
 
-            newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "System timer", Unit="s", frstByte = 1, Size = 16 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "Water priority timer", Unit = "s", frstByte = 3, Size = 16 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "Pump timer", Unit = "s", frstByte = 5, Size = 16 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "System timer", Unit="s", frstByte = 1, Size = 24 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "Water priority timer", Unit = "s", frstByte = 4, Size = 16 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "Pump timer", Unit = "s", frstByte = 6, Size = 16 });
 
             newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Total heater hours", Unit = "m", frstByte = 1, Size = 24 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Versin 1", frstByte = 4, Size = 8 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Versin 1", frstByte = 5, Size = 8 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Versin 1", frstByte = 6, Size = 8 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Versin 1", frstByte = 7, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Version 1", frstByte = 4, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Version 2", frstByte = 5, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Version 3", frstByte = 6, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Version 4", frstByte = 7, Size = 8 });
             DGNs.Add(newDgn.Dgn, newDgn);
         }
 
