@@ -45,6 +45,7 @@ namespace RVC
         public bool HasInstance { set; get; } = false;
         public string DisplayName => $"{Dgn:X05} {Name}";
         public int idLength; //Describes how many bytes in data are id of packet
+        public bool MultiPack = false;
         public DGN(int idLen = 0)
         {
             HasInstance = true;
@@ -60,10 +61,12 @@ namespace RVC
         public string Decode(byte[] data)
         {
             string ret = Name + ": ;";
+            if (!MultiPack)
             foreach (Parameter p in Parameters)
-            {
                 ret += p.ToString(data) + "; ";
-            }
+            else
+                foreach (Parameter p in Parameters.Where(p => p.multipackNum == data[0]))
+                    ret += p.ToString(data) + "; ";
             return ret;
         }
 
@@ -83,6 +86,7 @@ namespace RVC
         public double shift = 0;
         public string Unit = "";
         public bool Id = false;
+        public byte multipackNum = 0;
 
         public Parameter(string name)
         {

@@ -702,6 +702,21 @@ namespace RVC
             newDgn.Parameters.Add(new () { Name = "Bank select", frstByte = 7, frstBit = 0,  Meanings = new () { { 15, "Not supported" } } });
             DGNs.Add(newDgn.Dgn, newDgn);
 
+            newDgn = new(1) { Name = "Timberline Extension", Dgn = 0x1EF65};
+            newDgn.Parameters.Add(new() { multipackNum = 0x84, Name = "Solenoid", frstByte = 1, Size = 2, Meanings = defMeaningsOnOff });
+            newDgn.Parameters.Add(new() { multipackNum = 0x84, Name = "Tank temperature", Type = paramTyp.temperature, frstByte = 2, Size = 16 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x84, Name = "Heater temperature", Type = paramTyp.temperature, frstByte = 4, Size = 16 });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "System timer", Unit="s", frstByte = 1, Size = 16 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "Water priority timer", Unit = "s", frstByte = 3, Size = 16 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "Pump timer", Unit = "s", frstByte = 5, Size = 16 });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Total heater hours", Unit = "m", frstByte = 1, Size = 24 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Versin 1", frstByte = 4, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Versin 1", frstByte = 5, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Versin 1", frstByte = 6, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Versin 1", frstByte = 7, Size = 8 });
+            DGNs.Add(newDgn.Dgn, newDgn);
         }
 
 
