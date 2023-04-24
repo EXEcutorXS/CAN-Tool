@@ -1466,7 +1466,7 @@ namespace OmniProtocol
 
         private void UpdatePercent(int p) => CurrentTask.UpdatePercent(p);
 
-
+ 
         public void ProcessCanMessage(CanMessage msg)
         {
 
@@ -1791,6 +1791,15 @@ namespace OmniProtocol
             Messages.TryToAdd(m);
         }
 
+        public void ProcessUartMessage(byte[] buf)
+        { 
+        
+        }
+
+        public void ProcessMessage(UInt16 pgn, byte[] data)
+        {
+        
+        }
         public async void ReadBlackBoxData(DeviceId id)
         {
             if (!Capture("t_reading_bb_parameters")) return;

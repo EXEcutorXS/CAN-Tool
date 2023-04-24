@@ -62,6 +62,9 @@
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="5">
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
+                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" Margin="10" MinWidth="40" ItemsSource="{Binding PhyProtocols}" SelectedItem="{Binding SelectedProtocol}">
+                        </ComboBox>
+                        
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="ModeSelector" Margin="10" MinWidth="70" ItemsSource="{Binding WorkModes}" SelectedIndex="2" SelectedItem="{Binding Mode}" />
 
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton" Margin="10" Content="{DynamicResource b_open}" Command="{Binding OpenPortCommand}" />

@@ -98,19 +98,6 @@ namespace RVC
          
         }
 
-        public uint RawData(byte[] data)
-        {
-            switch (Size)
-            {
-                case 2: return (uint)(data[frstByte] >> frstBit) & 0x3;
-                case 4: return (uint)(data[frstByte] >> frstBit) & 0xF;
-                case 6: return (uint)(data[frstByte] >> frstBit) & 0x3F;
-                case 8: return (data[frstByte]);
-                case 16: return (uint)(data[frstByte] + data[frstByte + 1] * 256);
-                case 32: return (uint)(data[frstByte] + data[frstByte + 1] * 0x100 + data[frstByte + 2] * 0x10000 + data[frstByte + 3] * 0x1000000);
-                default: throw new ArgumentException("Bad parameter size");
-            }
-        }
 
         public static long getRaw(byte[] data, int bitLength, int startBit, int startByte)
         {
@@ -139,18 +126,7 @@ namespace RVC
 
             uint rawData = 0;
             double tempValue = 0;
-            /*
-            switch (Size)
-            {
-                case 2: rawData = (uint)((data[frstByte] >> frstBit) & 0x3); break;
-                case 4: rawData = (uint)((data[frstByte] >> frstBit) & 0xF); break;
-                case 6: rawData = (uint)((data[frstByte] >> frstBit) & 0x3F); break;
-                case 8: rawData = (uint)(data[frstByte]); break;
-                case 16: rawData = (uint)(data[frstByte] + data[frstByte + 1] * 256); break;
-                case 32: rawData = (uint)(data[frstByte] + data[frstByte + 1] * 0x100 + data[frstByte + 2] * 0x10000 + data[frstByte + 3] * 0x1000000); break;
-                default: throw new ArgumentException("Bad parameter size");
-            }
-            */
+
             rawData = (uint)getRaw(data, Size, frstBit, frstByte);
 
             if (rawData == Math.Pow(2, Size) - 1)
@@ -159,40 +135,8 @@ namespace RVC
             if (rawData == Math.Pow(2, Size) - 2)
                 return retString += (GetString("t_error") + $" ({rawData})");
 
-            /*
-            switch (Size)
-            {
-                case 2:
-                    if (rawData == 2) return retString += "Error";
-                    if (rawData == 3) return retString += "No Data";
-                    break;
-                case 4:
-                    if (rawData == 14) return retString += "Error";
-                    if (rawData == 15) return retString += "No Data";
-                    break;
-                case 6:
-                    if (rawData == 62) return retString += "Error";
-                    if (rawData == 63) return retString += "No Data";
-                    break;
-                case 8:
-                    if (rawData == byte.MaxValue - 1) return retString += "Error";
-                    if (rawData == byte.MaxValue) return retString += "No Data";
-                    break;
-                case 16:
-                    if (rawData == UInt16.MaxValue - 1) return retString += "Error";
-                    if (rawData == UInt16.MaxValue) return retString += "No Data";
-                    break;
-                case 32:
-                    if (rawData == UInt32.MaxValue - 1) return retString += "Error";
-                    if (rawData == UInt32.MaxValue) return retString += "No Data";
-                    break;
-            }
-            */
-            if (Meanings != null)
-            { 
-            if (Meanings.ContainsKey((int)rawData)) return retString += Meanings[(int)rawData];
-            else return retString+$"No meaning for {rawData}";
-            }
+            if (Meanings != null && Meanings.ContainsKey((int)rawData))
+                return retString += $"{Meanings[(int)rawData]} ({(int)rawData})";
 
             switch (Type)
             {

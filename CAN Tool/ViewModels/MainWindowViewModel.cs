@@ -30,6 +30,7 @@ using System.Text;
 namespace CAN_Tool.ViewModels
 {
     public enum WorkMode_t { Omni, Rvc, RegularCan }
+    public enum PhyProt_t { CAN,UART }
 
     internal class MainWindowViewModel : ViewModel
     {
@@ -39,6 +40,12 @@ namespace CAN_Tool.ViewModels
 
         private WorkMode_t mode;
         public WorkMode_t Mode { set => Set(ref mode, value); get => mode; }
+
+        public PhyProt_t[] PhyProtocols => new PhyProt_t[2] { PhyProt_t.CAN, PhyProt_t.UART };
+
+        private PhyProt_t selectedProtocol;
+        public PhyProt_t SelectedProtocol { set => Set(ref selectedProtocol, value); get => selectedProtocol; }
+
 
         private readonly List<SolidColorBrush> brushes = new();
 
@@ -622,7 +629,6 @@ namespace CAN_Tool.ViewModels
         public bool deviceInManualMode(object parameter)
         {
             return (CanAdapter.PortOpened && SelectedConnectedDevice != null && SelectedConnectedDevice.ManualMode);
-
         }
 
         public void NewMessgeReceived(object sender, EventArgs e)
@@ -643,8 +649,7 @@ namespace CAN_Tool.ViewModels
 
         public MainWindowViewModel()
         {
-
-
+            
             canAdapter = new();
             OmniInstance = new Omni(CanAdapter);
 
@@ -655,6 +660,7 @@ namespace CAN_Tool.ViewModels
             CanPage = new(this);
 
             CanAdapter.GotNewMessage += NewMessgeReceived;
+
 
 
             var timer = new DispatcherTimer();
