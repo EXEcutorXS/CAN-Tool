@@ -305,8 +305,11 @@ namespace OmniProtocol
             PGNs[21].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, UnitT = UnitType.Temp, b = -75, Var = 106 });
             PGNs[21].parameters.Add(new() { Name = "Температура теплообменника", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, b = -75 });
             PGNs[21].parameters.Add(new() { Name = "Температура наружного воздуха", BitLength = 8, StartByte = 4, UnitT = UnitType.Temp, b = -75, Var = 107 });
+            PGNs[21].parameters.Add(new() { Name = "Разбор воды", BitLength = 8, StartByte = 5, Meanings = { {0, "Ожидание" }, { 1, "Продувка" }, { 2, "Розжиг" }, { 3, "Работа на мощности" } }});
             PGNs[21].parameters.Add(new() { Name = "Уровень жидкости в баке", BitLength = 8, StartByte = 6, Var = 105 });
+            PGNs[21].parameters.Add(new() { Name = "ТЭН активен", StartBit = 2, BitLength = 2, StartByte = 7, Meanings = defMeaningsYesNo});
             PGNs[21].parameters.Add(new() { Name = "Разбор воды", BitLength = 2, StartByte = 7, Meanings = defMeaningsYesNo, Var = 108 });
+            
 
             PGNs[22].parameters.Add(new() { Name = "Зона 1", BitLength = 2, StartByte = 0, StartBit = 0, Meanings = defMeaningsOnOff, Var = 65 });
             PGNs[22].parameters.Add(new() { Name = "Зона 2", BitLength = 2, StartByte = 0, StartBit = 2, Meanings = defMeaningsOnOff, Var = 66 });
