@@ -258,108 +258,146 @@ namespace OmniProtocol
 
 
     }
-    public class OmniMessage : CanMessage, IUpdatable<OmniMessage>
+    public class OmniMessage : ViewModel, IUpdatable<OmniMessage>, IComparable
     {
-        public OmniMessage() : base()
+
+        private bool fresh;
+        public bool Fresh { set => Set(ref fresh, value); get => fresh; }
+
+        public long updatetick;
+
+        private byte[] data = new byte[8];
+
+        public byte[] Data { set => Set(ref data, data); get => data; }
+
+        public OmniMessage()
         {
             Fresh = true;
             updatetick = DateTime.Now.Ticks;
-            DLC = 8;
-            RTR = false;
-            IDE = true;
             TransmitterType = 126;
             TransmitterAddress = 6;
             ReceiverAddress = 0;
-
+            Data = new byte[8];
         }
+
+        public CanMessage ToCanMessage()
+        {
+            CanMessage ret = new();
+            ret.Data = Data;
+            ret.DLC = 8;
+            ret.IDE = true;
+            ret.RTR = false;
+            ret.Id = PGN << 20 + receiverType << 13 + receiverAddress << 10 + transmitterType << 3 + transmitterAddress;
+            return ret;
+        }
+
         public OmniMessage(CanMessage m) : this()
         {
             if (m.DLC != 8 || m.RTR || !m.IDE)
                 throw new ArgumentException("CAN message is not compliant with OmniProtocol");
             Data = m.Data;
-            Id = m.Id;
+
+            PGN = (m.Id >> 20) & 0b111111111;
+            ReceiverType = (m.Id >> 13) & 0b1111111;
+            ReceiverAddress = (m.Id >> 10) & 0b111;
+            TransmitterType = (m.Id >> 3) & 0b1111111;
+            TransmitterAddress = m.Id & 0b111;
             return;
         }
+
+        public ulong DataAsULong
+        {
+            get
+            {
+                return BitConverter.ToUInt64(Data, 0);
+            }
+            set
+            {
+                Data = BitConverter.GetBytes(value);
+            }
+        }
+        public string DataAsText {
+            get
+            {
+                StringBuilder sb = new("");
+                for (int i = 8; i < 8; i++)
+                    sb.Append($"{Data[i]:X02} ");
+                return sb.ToString();
+            }
+        }
+        public void FreshCheck()
+        {
+            if (fresh && (DateTime.Now.Ticks - updatetick > 3000000))
+                Fresh = false;
+        }
+
+        private int pgn;
 
         [AffectsTo(nameof(VerboseInfo))]
         public int PGN
         {
-            get { return (Id >> 20) & 0x1FF; }
+            get => pgn;
             set
             {
                 if (value > 511)
                     throw new ArgumentException("PGN can't be over 511");
-                if (Id == value)
+                if (PGN == value)
                     return;
-                int temp = Id;
-                temp &= ~(0x1FF << 20);
-                temp |= value << 20;
-                Id = temp;
-
+                Set(ref pgn, value);
             }
         }
+        int receiverType;
+
         [AffectsTo(nameof(VerboseInfo))]
         public int ReceiverType
         {
-            get { return (Id >> 13) & 0b1111111; }
+            get => receiverType;
             set
             {
                 if (value > 127)
                     throw new ArgumentException("ReceiverType can't be over 127");
-                if (ReceiverType == value)
-                    return;
-                int temp = Id;
-                temp &= ~(0x7F << 13);
-                temp |= value << 13;
-                Id = temp;
+                Set(ref receiverType, value);
             }
         }
+        int receiverAddress;
+
         [AffectsTo(nameof(VerboseInfo))]
         public int ReceiverAddress
         {
-            get { return (Id >> 10) & 0b111; }
+            get => receiverAddress;
             set
             {
                 if (value > 7)
                     throw new ArgumentException("ReceiverAddress can't be over 7");
-                if (ReceiverAddress == value)
-                    return;
-                int temp = Id;
-                temp &= ~(0x7 << 10);
-                temp |= value << 10;
-                Id = temp;
-            }
+                Set(ref receiverAddress, value);
+                    }
         }
+
+        private int transmitterType;
+
         [AffectsTo(nameof(VerboseInfo))]
         public int TransmitterType
         {
-            get { return (Id >> 3) & 0x7F; }
+            get => transmitterType;
             set
             {
                 if (value > 127)
                     throw new ArgumentException("TransmitterType can't be over 127");
-                if (TransmitterType == value)
-                    return;
-                int temp = Id;
-                temp &= ~(0x7F << 3);
-                temp |= value << 3;
-                Id = temp;
+               Set(ref transmitterType, value);
             }
         }
+
+        int transmitterAddress;
+
         [AffectsTo(nameof(VerboseInfo))]
         public int TransmitterAddress
         {
-            get { return Id & 0b111; }
+            get => transmitterAddress;
             set
             {
                 if (value > 7)
                     throw new ArgumentException("TransmitterAddress can't be over 7");
-                if (TransmitterAddress == value)
-                    return;
-                int temp = Id;
-                temp &= ~(0x3);
-                temp |= value;
-                Id = temp;
+                Set(ref transmitterAddress, value);
             }
         }
 
@@ -439,6 +477,7 @@ namespace OmniProtocol
             retString.Append(';');
             return retString.ToString();
         }
+
         public override string ToString()
         {
             StringBuilder retString = new();
@@ -491,7 +530,7 @@ namespace OmniProtocol
                         retString.Append(PrintParameter(p));
             return retString.ToString();
         }
-        public override string VerboseInfo => GetVerboseInfo().Replace(';', '\n');
+        public string VerboseInfo => GetVerboseInfo().Replace(';', '\n');
 
         public void Update(OmniMessage item)
         {
@@ -515,11 +554,18 @@ namespace OmniProtocol
                 return false;
             return true;
         }
+
+        public int CompareTo(object other)
+        {
+            return pgn.CompareTo((other as OmniMessage).pgn);
+        }
     }
+
     public enum DeviceType
     {
         Binar, Planar, HCU, ValveControl, Bootloader, CookingPanel
     }
+
     public class Device
     {
         public int ID;
@@ -2162,7 +2208,7 @@ namespace OmniProtocol
 
         public void SendMessage(OmniMessage m)
         {
-            canAdapter.Transmit(m);
+            canAdapter.Transmit(m.ToCanMessage());
         }
 
         public void SendMessage(DeviceId from, DeviceId to, int pgn, byte[] data)

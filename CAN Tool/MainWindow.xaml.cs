@@ -510,7 +510,7 @@ namespace CAN_Tool
                 m.Data[7] = 0b11111100;
             else
                 m.Data[7] = 0b11111101;
-            vm.CanAdapter.Transmit(m);
+            vm.CanAdapter.Transmit(m.ToCanMessage());
         }
 
         private void ElementButton_Click(object sender, RoutedEventArgs e)
@@ -523,7 +523,7 @@ namespace CAN_Tool
                 m.Data[7] = 0b11110011;
             else
                 m.Data[7] = 0b11110111;
-            vm.CanAdapter.Transmit(m);
+            vm.CanAdapter.Transmit(m.ToCanMessage());
         }
 
 
@@ -536,7 +536,7 @@ namespace CAN_Tool
                 m.PGN = 25;
                 m.Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
                 m.Data[vm.SelectedConnectedDevice.Timber.Zones.IndexOf(vm.SelectedConnectedDevice.Timber.SelectedZone)] = Convert.ToByte((sender as ScrollBar).Value + 75);
-                vm.CanAdapter.Transmit(m);
+                vm.CanAdapter.Transmit(m.ToCanMessage());
             }
         }
 
@@ -549,7 +549,7 @@ namespace CAN_Tool
                 m.PGN = 26;
                 m.Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
                 m.Data[vm.SelectedConnectedDevice.Timber.Zones.IndexOf(vm.SelectedConnectedDevice.Timber.SelectedZone)] = Convert.ToByte((sender as ScrollBar).Value + 75);
-                vm.CanAdapter.Transmit(m);
+                vm.CanAdapter.Transmit(m.ToCanMessage());
             }
         }
 
@@ -570,7 +570,7 @@ namespace CAN_Tool
                     case 3: if (!vm.SelectedConnectedDevice.Timber.Zones[3].ManualMode) m.Data[5] = 0b01111111; else m.Data[5] = 0b00111111; break;
                     case 4: if (!vm.SelectedConnectedDevice.Timber.Zones[4].ManualMode) m.Data[6] = 0b11111101; else m.Data[6] = 0b11111100; break;
                 }
-                vm.CanAdapter.Transmit(m);
+                vm.CanAdapter.Transmit(m.ToCanMessage());
             }
         }
 
@@ -591,7 +591,7 @@ namespace CAN_Tool
                     case 3: if (!vm.SelectedConnectedDevice.Timber.Zones[3].State) m.Data[0] = 0b01111111; else m.Data[0] = 0b00111111; break;
                     case 4: if (!vm.SelectedConnectedDevice.Timber.Zones[4].State) m.Data[1] = 0b11111101; else m.Data[1] = 0b11111100; break;
                 }
-                vm.CanAdapter.Transmit(m);
+                vm.CanAdapter.Transmit(m.ToCanMessage());
             }
         }
         private void RadioChecked(object sender, RoutedEventArgs e)
@@ -623,7 +623,7 @@ namespace CAN_Tool
                 m.Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
                 m.Data[vm.SelectedConnectedDevice.Timber.Zones.IndexOf(vm.SelectedConnectedDevice.Timber.SelectedZone)] = Convert.ToByte((sender as ScrollBar).Value);
                 Thread.Sleep(80);
-                vm.CanAdapter.Transmit(m);
+                vm.CanAdapter.Transmit(m.ToCanMessage());
             }
         }
 

@@ -12,8 +12,6 @@ namespace CAN_Tool.Libs
 
         public bool IsSimmiliarTo(T item);
 
-        public int Id { get; }
-
     }
 
     public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>, IComparable

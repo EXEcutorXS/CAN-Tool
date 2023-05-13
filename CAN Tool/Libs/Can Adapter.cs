@@ -65,15 +65,11 @@ namespace Can_Adapter
         }
 
 
-        [AffectsTo(nameof(VerboseInfo), nameof(DataAsText), nameof(Data))]
+        //[AffectsTo(nameof(VerboseInfo), nameof(DataAsText), nameof(Data))]
         public ulong DataAsULong
         {
-            /*
-            set => Set(ref dataAsLong, value);
-            get => dataAsLong;
-            */
-
             get {
+                /*
                 UInt64 ret = 0;
                 ret += ((ulong)(data[0]) << 56);
                 ret += ((ulong)(data[1]) << 48);
@@ -83,17 +79,21 @@ namespace Can_Adapter
                 ret += ((ulong)(data[5]) << 16);
                 ret += ((ulong)(data[6]) << 8);
                 ret += (ulong)(data[7]);
-                
-                return ret;
+                */
+                return BitConverter.ToUInt64(data, 0);
+                //return ret;
             }
             set
                {
+                /*
                 var newData = new byte[8];
                 for (int i = 0; i < 8; i++)
                 {
                     newData[7 - i] = (byte)((value >> (i * 8)) & 0xFF);
                 }
-                Data = newData;
+                */
+
+                Data = BitConverter.GetBytes(value);
                }
         }
 

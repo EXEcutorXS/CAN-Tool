@@ -36,7 +36,7 @@ namespace CAN_Tool.ViewModels.Validators
             if ((number < Min) || (number > Max))
             {
                 return new ValidationResult(false,
-                  $"Please enter an age in the range: {Min}-{Max}.");
+                  $"Please enter a number in the range: {Min}-{Max}.");
             }
             return ValidationResult.ValidResult;
         }
