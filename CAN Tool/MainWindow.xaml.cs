@@ -148,10 +148,8 @@ namespace CAN_Tool
 
             UIcontext.Send(x =>
             {
-                if (LogExpander.IsExpanded)
-                {
-                    CanMessage msg = (args as GotMessageEventArgs).receivedMessage;
-                    OmniMessage m = new OmniMessage(msg);
+                if (LogExpander.IsExpanded) { 
+                    OmniMessage m = new OmniMessage((args as GotCanMessageEventArgs).receivedMessage);
                     LogField.AppendText(m.ToString());
                 }
             }, null);

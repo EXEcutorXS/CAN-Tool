@@ -14,10 +14,13 @@ using OmniProtocol;
 namespace Can_Adapter
 {
 
-    public class GotMessageEventArgs : EventArgs
+
+    public class GotCanMessageEventArgs : EventArgs
     {
-        public OmniMessage receivedMessage;
+        public CanMessage receivedMessage;
     }
+
+
 
     public class CanMessage : ViewModel, IUpdatable<CanMessage>, IComparable
     {
@@ -433,7 +436,7 @@ namespace Can_Adapter
                 case 'r':
                 case 'R':
                     var m = new CanMessage(new string(currentBuf));
-                    GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = new OmniMessage(m) });
+                    GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
                     UIContext.Send((x) => Messages.TryToAdd(m), null);
                     currentSecodeReceived++;
                     break;
@@ -475,7 +478,7 @@ namespace Can_Adapter
 
         public void InjectMessage(CanMessage m)
         {
-            GotNewMessage?.Invoke(this, new GotMessageEventArgs() { receivedMessage = new OmniMessage(m) });
+            GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
         }
 
         public string Status => $"Bus use: Rx/Tx(Total):{lastSecondReceived}/{lastSecondTransmitted}({lastSecondTransmitted+lastSecondReceived}) ,Faults:{failedMessagesCounter}";

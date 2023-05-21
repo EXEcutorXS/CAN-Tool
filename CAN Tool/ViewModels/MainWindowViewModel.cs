@@ -62,7 +62,12 @@ namespace CAN_Tool.ViewModels
         public bool CanAdapterSettings { set => Set(ref canAdapterSettings, value); get => canAdapterSettings; }
 
         CanAdapter canAdapter;
+
         public CanAdapter CanAdapter { get => canAdapter; }
+
+        UartAdapter uartAdapter;
+
+        public UartAdapter UartAdapter  { get => uartAdapter; }
 
         public Omni OmniInstance { set; get; }
 
@@ -633,25 +638,33 @@ namespace CAN_Tool.ViewModels
 
         public void NewMessgeReceived(object sender, EventArgs e)
         {
+            switch (selectedProtocol)
+            {
+                case PhyProt_t.CAN:
             switch (Mode)
             {
-                case WorkMode_t.Omni: UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotMessageEventArgs).receivedMessage), null); break;
-                case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage((e as GotMessageEventArgs).receivedMessage), null); break;
-                case WorkMode_t.RegularCan: UIContext.Send(x => CanPage.ProcessMessage((e as GotMessageEventArgs).receivedMessage), null); break;
+                case WorkMode_t.Omni: UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+                case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+                case WorkMode_t.RegularCan: UIContext.Send(x => CanPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
             }
+
 
             if (canLogging && canLogStream != null && canLogStream.CanWrite)
             {
-                canLogStream.Write(Encoding.ASCII.GetBytes((e as GotMessageEventArgs).receivedMessage.ToShortString() + Environment.NewLine));
+                canLogStream.Write(Encoding.ASCII.GetBytes((e as GotCanMessageEventArgs).receivedMessage.ToShortString() + Environment.NewLine));
             }
-
+                    break;
+                case PhyProt_t.UART:
+                    UIContext.Send(x => OmniInstance.ProcessOmniMessage((e as GotOmniMessageEventArgs).receivedMessage), null);
+                    break;
+        }
         }
 
         public MainWindowViewModel()
         {
             
             canAdapter = new();
-            OmniInstance = new Omni(CanAdapter);
+            OmniInstance = new Omni(CanAdapter,uartAdapter);
 
             OmniInstance.plot = myChart;
             FirmwarePage = new(this);

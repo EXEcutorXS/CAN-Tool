@@ -20,6 +20,10 @@ using static CAN_Tool.Libs.Helper;
 
 namespace OmniProtocol
 {
+    public class GotOmniMessageEventArgs : EventArgs
+    {
+        public OmniMessage receivedMessage;
+    }
 
     public class PGN
     {
@@ -1483,6 +1487,7 @@ namespace OmniProtocol
         public UpdatableList<OmniMessage> Messages => messages;
 
         private readonly CanAdapter canAdapter;
+        private readonly UartAdapter uartAdapter;
 
         public bool ReadingBBErrorsMode { get; set; } = false;
 
@@ -1512,11 +1517,14 @@ namespace OmniProtocol
 
         private void UpdatePercent(int p) => CurrentTask.UpdatePercent(p);
 
- 
-        public void ProcessCanMessage(CanMessage msg)
+        public void ProcessCanMessage(CanMessage m)
+        {
+            ProcessOmniMessage(new OmniMessage(m));
+        }
+
+        public void ProcessOmniMessage(OmniMessage m)
         {
 
-            OmniMessage m = new OmniMessage(msg);
             DeviceId id = m.TransmitterId;
 
             ConnectedDevice senderDevice = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(m.TransmitterId));
@@ -2208,7 +2216,10 @@ namespace OmniProtocol
 
         public void SendMessage(OmniMessage m)
         {
-            canAdapter.Transmit(m.ToCanMessage());
+            if ((bool)canAdapter?.PortOpened)
+                canAdapter.Transmit(m.ToCanMessage());
+            if (uartAdapter.SelectedPort.IsOpen)
+                uartAdapter.Transmit(m);
         }
 
         public void SendMessage(DeviceId from, DeviceId to, int pgn, byte[] data)
@@ -2243,10 +2254,11 @@ namespace OmniProtocol
 
         public static Dictionary<int, Device> Devices;
 
-        public Omni(CanAdapter adapter)
+        public Omni(CanAdapter canAdapter,UartAdapter uartAdapter)
         {
-            if (adapter == null) throw new ArgumentNullException("Can Adapter reference can't be null");
-            canAdapter = adapter;
+            if (canAdapter == null) throw new ArgumentNullException("Can Adapter reference can't be null");
+            this.canAdapter = canAdapter;
+            this.uartAdapter = uartAdapter;
             SeedStaticData();
         }
     }
