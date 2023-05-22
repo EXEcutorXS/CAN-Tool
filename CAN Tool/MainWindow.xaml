@@ -76,7 +76,7 @@
 
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
-                        <CheckBox x:Name="AdapterSettings" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="CAN adapter settings" FontSize="20" IsChecked="{Binding CanAdapterSettings}" Cursor="Hand"></CheckBox>
+                        <CheckBox x:Name="AdapterSettings" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Adapter settings" FontSize="20" IsChecked="{Binding CanAdapterSettings}" Cursor="Hand"></CheckBox>
                         <CheckBox x:Name="ExpertMode" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="{DynamicResource b_expert}" FontSize="20" Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
                         <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Dark" FontSize="20" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
                         <CheckBox x:Name="ImperialUnits" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Imperial" FontSize="20" IsChecked="{Binding OmniInstance.UseImperial}" Checked="ImperialUnits_Checked" Unchecked="ImperialUnits_Checked"></CheckBox>
@@ -121,6 +121,32 @@
                                 <v:RangeRule Min="7" Max="5000" />
                             </Binding.ValidationRules>
                         </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Visible">
+                    <ComboBox Margin="10" MinWidth="70" SelectedIndex="3" SelectedItem="{Binding UartAdapter.SelectedPort.BaudRate, Mode=OneWayToSource}">
+                        <ComboBox.ItemsSource>
+                            <col:ArrayList>
+                                <sys:Int32>2400</sys:Int32>
+                                <sys:Int32>2500</sys:Int32>
+                                <sys:Int32>4800</sys:Int32>
+                                <sys:Int32>9600</sys:Int32>
+                            </col:ArrayList>
+                        </ComboBox.ItemsSource>
+                    </ComboBox>
+                    <Button Content="{DynamicResource b_load_can_log}" Margin="10" Command="{Binding LoadFromLogCommand}" />
+                    <Button Content="{DynamicResource b_send_from_log}" Margin="10" Command="{Binding SendFromLogCommand}" Cursor="Hand" />
+                    <Button Content="{Binding ToggleUartLogButtonName}" Margin="10" Command="{Binding ToggleCanLogCommand}" />
+                    <TextBlock VerticalAlignment="Center" Margin="10" Text="{DynamicResource t_delay}" FontSize="25" />
+                    <TextBox VerticalAlignment="Center" Margin="10" FontSize="25" MinWidth="40">
+                        <TextBox.Text>
+                            <Binding Path="MessageDelay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <v:RangeRule Min="7" Max="5000" />
+                                </Binding.ValidationRules>
+                            </Binding>
                         </TextBox.Text>
                     </TextBox>
 

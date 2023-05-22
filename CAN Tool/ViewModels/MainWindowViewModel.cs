@@ -30,7 +30,7 @@ using System.Text;
 namespace CAN_Tool.ViewModels
 {
     public enum WorkMode_t { Omni, Rvc, RegularCan }
-    public enum PhyProt_t { CAN,UART }
+    public enum PhyProt_t { CAN, UART }
 
     internal class MainWindowViewModel : ViewModel
     {
@@ -67,7 +67,7 @@ namespace CAN_Tool.ViewModels
 
         UartAdapter uartAdapter;
 
-        public UartAdapter UartAdapter  { get => uartAdapter; }
+        public UartAdapter UartAdapter { get => uartAdapter; }
 
         public Omni OmniInstance { set; get; }
 
@@ -116,11 +116,19 @@ namespace CAN_Tool.ViewModels
         }
 
         private string toggleCanLogButtonName = GetString("b_start_can_log");
-        public string ToggleCanLogButtonName { get => toggleCanLogButtonName; set => Set(ref toggleCanLogButtonName, value); } 
+        public string ToggleCanLogButtonName { get => toggleCanLogButtonName; set => Set(ref toggleCanLogButtonName, value); }
 
         private bool canLogging = false;
 
         private string canLogFileName = "";
+
+        private string toggleUartLogButtonName = GetString("b_start_uart_log");
+        public string ToggleUartLogButtonName { get => toggleUartLogButtonName; set => Set(ref toggleUartLogButtonName, value); }
+
+        private bool uartLogging = false;
+
+        private string uartLogFileName = "";
+
 
 
         public ICommand ToggleCanLogCommand { get; }
@@ -140,7 +148,7 @@ namespace CAN_Tool.ViewModels
             {
                 canLogging = true;
                 ToggleCanLogButtonName = GetString("b_stop_can_log");
-                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CAN Log_" + DateTime.Now.ToLongTimeString().Replace(':','.') + ".txt";
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CAN Log_" + DateTime.Now.ToLongTimeString().Replace(':', '.') + ".txt";
                 canLogStream = File.Create(path);
                 canLogFileName = canLogStream.Name;
             }
@@ -148,6 +156,32 @@ namespace CAN_Tool.ViewModels
 
 
         private bool CanToggleCanLogCommandExecute(object Parameter) => CanAdapter.PortOpened;
+
+
+        public ICommand ToggleUartLogCommand { get; }
+
+        private FileStream uartLogStream;
+
+        private void OnToggleUartLogCommandExecuted(object Parameter)
+        {
+            if (uartLogging)
+            {
+                uartLogging = false;
+                ToggleUartLogButtonName = GetString("b_start_uart_log");
+                uartLogStream.Flush();
+                uartLogStream.Close();
+            }
+            else
+            {
+                uartLogging = true;
+                ToggleCanLogButtonName = GetString("b_stop_uart_log");
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UAR Log_" + DateTime.Now.ToLongTimeString().Replace(':', '.') + ".txt";
+                uartLogStream = File.Create(path);
+                uartLogFileName = uartLogStream.Name;
+            }
+        }
+
+        private bool CanToggleUartLogCommandExecute(object Parameter) => UartAdapter.SelectedPort.IsOpen;
 
         int messageDelay = 100;
         public int MessageDelay { get => messageDelay; set => Set(ref messageDelay, value); }
@@ -189,21 +223,32 @@ namespace CAN_Tool.ViewModels
         public ICommand OpenPortCommand { get; }
         private void OnOpenPortCommandExecuted(object parameter)
         {
-            CanAdapter.PortName = PortName;
-            CanAdapter.PortOpen();
-            Thread.Sleep(20);
-            CanAdapter.StartNormal();
-            Thread.Sleep(20);
+            if (SelectedProtocol == PhyProt_t.CAN)
+            {
+                CanAdapter.PortName = PortName;
+                CanAdapter.PortOpen();
+                Thread.Sleep(20);
+                CanAdapter.StartNormal();
+                Thread.Sleep(20);
+            }
+            if (SelectedProtocol == PhyProt_t.UART)
+            {
+                try
+                {
+                    UartAdapter.SelectedPort.Open();
+                }
+                catch { }
+            }
         }
-        private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && !CanAdapter.PortOpened);
+        private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && (!CanAdapter.PortOpened && SelectedProtocol == PhyProt_t.CAN || !UartAdapter.SelectedPort.IsOpen && SelectedProtocol==PhyProt_t.UART));
 
         public ICommand ClosePortCommand { get; }
         private void OnClosePortCommandExecuted(object parameter)
         {
             CanAdapter.PortClose();
-            OmniInstance.ConnectedDevices.Clear();
+            uartAdapter.SelectedPort.Close();
         }
-        private bool CanClosePortCommandExecute(object parameter) => (CanAdapter.PortOpened);
+        private bool CanClosePortCommandExecute(object parameter) => (CanAdapter.PortOpened || UartAdapter.SelectedPort.IsOpen);
 
         public ICommand LoadFromLogCommand { get; }
 
@@ -641,30 +686,34 @@ namespace CAN_Tool.ViewModels
             switch (selectedProtocol)
             {
                 case PhyProt_t.CAN:
-            switch (Mode)
-            {
-                case WorkMode_t.Omni: UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
-                case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
-                case WorkMode_t.RegularCan: UIContext.Send(x => CanPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
-            }
+                    switch (Mode)
+                    {
+                        case WorkMode_t.Omni: UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+                        case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+                        case WorkMode_t.RegularCan: UIContext.Send(x => CanPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+                    }
 
 
-            if (canLogging && canLogStream != null && canLogStream.CanWrite)
-            {
-                canLogStream.Write(Encoding.ASCII.GetBytes((e as GotCanMessageEventArgs).receivedMessage.ToShortString() + Environment.NewLine));
-            }
+                    if (canLogging && canLogStream != null && canLogStream.CanWrite)
+                    {
+                        canLogStream.Write(Encoding.ASCII.GetBytes((e as GotCanMessageEventArgs).receivedMessage.ToShortString() + Environment.NewLine));
+                    }
                     break;
                 case PhyProt_t.UART:
                     UIContext.Send(x => OmniInstance.ProcessOmniMessage((e as GotOmniMessageEventArgs).receivedMessage), null);
+                    if (uartLogging && uartLogStream != null && uartLogStream.CanWrite)
+                    {
+                        canLogStream.Write(Encoding.ASCII.GetBytes((e as GotOmniMessageEventArgs).receivedMessage.ToString() + Environment.NewLine));
+                    }
                     break;
-        }
+            }
         }
 
         public MainWindowViewModel()
         {
-            
+
             canAdapter = new();
-            OmniInstance = new Omni(CanAdapter,uartAdapter);
+            OmniInstance = new Omni(CanAdapter, uartAdapter);
 
             OmniInstance.plot = myChart;
             FirmwarePage = new(this);
