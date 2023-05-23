@@ -272,7 +272,8 @@ namespace OmniProtocol
 
         private byte[] data = new byte[8];
 
-        public byte[] Data { set => Set(ref data, data); get => data; }
+        [AffectsTo(nameof(DataAsText),nameof(DataAsULong),nameof(VerboseInfo))]
+        public byte[] Data { set { Array.Copy(value, data, 8); OnPropertyChanged(nameof(Data)); } get => data; }
 
         public OmniMessage()
         {
@@ -291,7 +292,7 @@ namespace OmniProtocol
             ret.DLC = 8;
             ret.IDE = true;
             ret.RTR = false;
-            ret.Id = PGN << 20 + receiverType << 13 + receiverAddress << 10 + transmitterType << 3 + transmitterAddress;
+            ret.Id = (PGN << 20) + (receiverType << 13) + (receiverAddress << 10) + (transmitterType << 3) + transmitterAddress;
             return ret;
         }
 
@@ -299,7 +300,7 @@ namespace OmniProtocol
         {
             if (m.DLC != 8 || m.RTR || !m.IDE)
                 throw new ArgumentException("CAN message is not compliant with OmniProtocol");
-            Data = m.Data;
+            m.Data.CopyTo(Data, 0);
 
             PGN = (m.Id >> 20) & 0b111111111;
             ReceiverType = (m.Id >> 13) & 0b1111111;
@@ -313,18 +314,28 @@ namespace OmniProtocol
         {
             get
             {
-                return BitConverter.ToUInt64(Data, 0);
+                byte[] bytes = new byte[8];
+                Data.CopyTo(bytes, 0);
+                Array.Reverse(bytes);
+                return BitConverter.ToUInt64(bytes, 0);
+                
             }
             set
             {
-                Data = BitConverter.GetBytes(value);
+                byte[] tempArr = BitConverter.GetBytes(value);
+                Array.Reverse(tempArr);
+                tempArr.CopyTo(Data,0);
+                OnPropertyChanged(nameof(Data));
+                OnPropertyChanged(nameof(DataAsText));
+                OnPropertyChanged(nameof(VerboseInfo));
             }
         }
+
         public string DataAsText {
             get
             {
                 StringBuilder sb = new("");
-                for (int i = 8; i < 8; i++)
+                for (int i = 0; i < 8; i++)
                     sb.Append($"{Data[i]:X02} ");
                 return sb.ToString();
             }
@@ -2218,7 +2229,7 @@ namespace OmniProtocol
         {
             if ((bool)canAdapter?.PortOpened)
                 canAdapter.Transmit(m.ToCanMessage());
-            if (uartAdapter.SelectedPort.IsOpen)
+            if (uartAdapter.SelectedPort!=null && uartAdapter.SelectedPort.IsOpen)
                 uartAdapter.Transmit(m);
         }
 
@@ -2257,6 +2268,7 @@ namespace OmniProtocol
         public Omni(CanAdapter canAdapter,UartAdapter uartAdapter)
         {
             if (canAdapter == null) throw new ArgumentNullException("Can Adapter reference can't be null");
+            if (uartAdapter == null) throw new ArgumentNullException("Uart Adapter reference can't be null");
             this.canAdapter = canAdapter;
             this.uartAdapter = uartAdapter;
             SeedStaticData();

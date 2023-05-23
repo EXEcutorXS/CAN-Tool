@@ -14,7 +14,7 @@ namespace CAN_Tool.Libs
 
     public class UartAdapter
     {
-        public SerialPort SelectedPort { set; get; }
+        public SerialPort SelectedPort { set; get; } = new();
 
         private bool escapeSequenceStarted = false;
 

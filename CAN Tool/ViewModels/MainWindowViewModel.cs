@@ -248,7 +248,7 @@ namespace CAN_Tool.ViewModels
             CanAdapter.PortClose();
             uartAdapter.SelectedPort.Close();
         }
-        private bool CanClosePortCommandExecute(object parameter) => (CanAdapter.PortOpened || UartAdapter.SelectedPort.IsOpen);
+        private bool CanClosePortCommandExecute(object parameter) => (CanAdapter.PortOpened || (UartAdapter.SelectedPort!=null && UartAdapter.SelectedPort.IsOpen));
 
         public ICommand LoadFromLogCommand { get; }
 
@@ -713,6 +713,8 @@ namespace CAN_Tool.ViewModels
         {
 
             canAdapter = new();
+            uartAdapter = new();
+
             OmniInstance = new Omni(CanAdapter, uartAdapter);
 
             OmniInstance.plot = myChart;
