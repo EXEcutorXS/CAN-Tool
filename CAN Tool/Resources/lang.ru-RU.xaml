@@ -231,7 +231,7 @@
 
 <v:String x:Key="par_69">Периодичность корректировки ШИМ вентиляторов, мс</v:String>
 <v:String x:Key="par_70">Формат времени (12/24 или AM/PM)</v:String>
-<v:String x:Key="par_71">Единицы измерения температуры (C/F)</v:String>
+<v:String x:Key="par_71">Единицы измерения температуры (1-F,2-C)</v:String>
 <v:String x:Key="par_72">Начало дневного времени суток, мин</v:String>
 <v:String x:Key="par_73">Окончание дневного времени суток, мин</v:String>
 <v:String x:Key="par_74">Яркость дисплея днем, %</v:String>
@@ -917,6 +917,7 @@
 <v:String x:Key="t_glow_plug_state">Состояние свечи</v:String>
 <v:String x:Key="t_blower_state">Состояние НВ</v:String>
 <v:String x:Key="t_not_used">Не используется</v:String>
+<v:String x:Key="t_no_firmware_data">Нет данных о ПО</v:String>
 
 <v:String x:Key="u_s">с</v:String>
 <v:String x:Key="u_hz">Гц</v:String>

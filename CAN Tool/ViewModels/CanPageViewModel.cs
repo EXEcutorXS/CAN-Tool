@@ -10,7 +10,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.ComponentModel;
 using RVC;
-using Can_Adapter;
+using CAN_Adapter;
 using CAN_Tool.Libs;
 using System.Timers;
 

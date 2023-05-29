@@ -1,5 +1,5 @@
 ﻿using OmniProtocol;
-using Can_Adapter;
+using CAN_Adapter;
 using CAN_Tool.Infrastructure.Commands;
 using CAN_Tool.ViewModels.Base;
 using ScottPlot;
@@ -308,7 +308,7 @@ namespace CAN_Tool.ViewModels
                 for (int i = 2; i < parts.Length; i++)
                     m.Data[i - 2] = Convert.ToByte(parts[i], 16);
 
-                canAdapter.TransmitFast(m);
+                canAdapter.Transmit(m);
                 await Task.Delay(MessageDelay);
 
             }

@@ -12,7 +12,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.ComponentModel;
 using RVC;
-using Can_Adapter;
+using CAN_Adapter;
 using CAN_Tool.Libs;
 using System.Windows.Interop;
 using System.ComponentModel.DataAnnotations;
@@ -68,10 +68,10 @@ namespace CAN_Tool.ViewModels
                     if (RandomDgn)
                     {
                         CanMessage msg = new RvcMessage() { Dgn = new Random((int)DateTime.Now.Ticks).Next(0, 0x1FFFF) }.GetCanMessage();
-                        vm.CanAdapter.TransmitFast(msg);
+                        vm.CanAdapter.Transmit(msg);
                     }
                     else
-                        vm.CanAdapter.TransmitFast(ConstructedMessage.GetCanMessage());
+                        vm.CanAdapter.Transmit(ConstructedMessage.GetCanMessage());
                 }
 
             }

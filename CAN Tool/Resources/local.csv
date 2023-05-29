@@ -917,6 +917,7 @@ t_relay_state	Relay state	Состояние реле
 t_glow_plug_state	Glow plug state	Состояние свечи
 t_blower_state	Blower state	Состояние НВ
 t_not_used	Not used	Не используется
+t_no_firmware_data	No firmware data	Нет данных о ПО
 		
 u_s	s	с
 u_hz	Hz	Гц

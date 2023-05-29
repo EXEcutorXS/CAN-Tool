@@ -321,8 +321,8 @@ namespace OmniProtocol
             PGNs[22].parameters.Add(new() { Name = "Температура зоны 3", BitLength = 8, StartByte = 4, UnitT = UnitType.Temp, b = -75, Var = 72 });
             PGNs[22].parameters.Add(new() { Name = "Температура зоны 4", BitLength = 8, StartByte = 5, UnitT = UnitType.Temp, b = -75, Var = 73 });
             PGNs[22].parameters.Add(new() { Name = "Температура зоны 5", BitLength = 8, StartByte = 6, UnitT = UnitType.Temp, b = -75, Var = 74 });
-            PGNs[22].parameters.Add(new() { Name = "Подогреватель", BitLength = 2, StartByte = 7, StartBit = 0, Meanings = defMeaningsOnOff, Var = 63 });
-            PGNs[22].parameters.Add(new() { Name = "ТЭН", BitLength = 2, StartByte = 7, StartBit = 2, Meanings = defMeaningsOnOff, Var = 64 });
+            PGNs[22].parameters.Add(new() { Name = "Подогреватель", BitLength = 2, StartByte = 7, StartBit = 0, Meanings = defMeaningsOnOff, Var = 119 });
+            PGNs[22].parameters.Add(new() { Name = "ТЭН", BitLength = 2, StartByte = 7, StartBit = 2, Meanings = defMeaningsOnOff, Var = 120 });
 
             PGNs[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType.Percent, Var = 100 });
             PGNs[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType.Percent, Var = 101 });

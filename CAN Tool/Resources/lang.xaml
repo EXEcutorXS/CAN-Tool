@@ -181,7 +181,7 @@
 
 <v:String x:Key="par_28">Element off</v:String>
 <v:String x:Key="par_29">Element on temperature </v:String>
-<v:String x:Key="par_30">Element on temperature (domesit water)</v:String>
+<v:String x:Key="par_30">Element on temperature (domestic water on)</v:String>
 
 <v:String x:Key="par_31">Heater off temperature</v:String>
 <v:String x:Key="par_32">Heater on temperature</v:String>
@@ -231,7 +231,7 @@
 
 <v:String x:Key="par_69">Fans PWM correction time, ms</v:String>
 <v:String x:Key="par_70">Time format (12/24 or AM/PM)</v:String>
-<v:String x:Key="par_71">Temperature units (C/F)</v:String>
+<v:String x:Key="par_71">Temperature units (1-F/2-C)</v:String>
 <v:String x:Key="par_72">Daytime from time, min</v:String>
 <v:String x:Key="par_73">Daytime to time, min</v:String>
 <v:String x:Key="par_74">Brightness at day, %</v:String>
@@ -917,6 +917,7 @@
 <v:String x:Key="t_glow_plug_state">Glow plug state</v:String>
 <v:String x:Key="t_blower_state">Blower state</v:String>
 <v:String x:Key="t_not_used">Not used</v:String>
+<v:String x:Key="t_no_firmware_data">No firmware data</v:String>
 
 <v:String x:Key="u_s">s</v:String>
 <v:String x:Key="u_hz">Hz</v:String>

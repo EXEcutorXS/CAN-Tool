@@ -1,4 +1,5 @@
-﻿using CAN_Tool.ViewModels.Base;
+﻿using CAN_Tool.Libs;
+using CAN_Tool.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,10 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using CAN_Tool.Libs;
-using OmniProtocol;
 
-namespace Can_Adapter
+namespace CAN_Adapter
 {
 
 
@@ -22,7 +21,7 @@ namespace Can_Adapter
 
 
 
-    public class CanMessage : ViewModel, IUpdatable<CanMessage>, IComparable
+    public class CanMessage : ViewModel, IComparable, IUpdatable<CanMessage>
     {
         private bool ide;
 
@@ -51,7 +50,7 @@ namespace Can_Adapter
         }
 
         private int dlc;
-        [AffectsTo(nameof(VerboseInfo), nameof(RvcCompatible),nameof(DataAsText))]
+        [AffectsTo(nameof(VerboseInfo), nameof(RvcCompatible), nameof(DataAsText))]
         public int DLC
         {
             set => Set(ref dlc, value);
@@ -60,7 +59,7 @@ namespace Can_Adapter
 
         private byte[] data = new byte[8];
 
-        [AffectsTo(nameof(VerboseInfo), nameof(DataAsText),nameof(DataAsULong))]
+        [AffectsTo(nameof(VerboseInfo), nameof(DataAsText), nameof(DataAsULong))]
         public byte[] Data
         {
             get => data;
@@ -68,37 +67,21 @@ namespace Can_Adapter
             set => Set(ref data, value);
         }
 
-
-        //[AffectsTo(nameof(VerboseInfo), nameof(DataAsText), nameof(Data))]
         public ulong DataAsULong
         {
-            get {
-                /*
-                UInt64 ret = 0;
-                ret += ((ulong)(data[0]) << 56);
-                ret += ((ulong)(data[1]) << 48);
-                ret += ((ulong)(data[2]) << 40);
-                ret += ((ulong)(data[3]) << 32);
-                ret += ((ulong)(data[4]) << 24);
-                ret += ((ulong)(data[5]) << 16);
-                ret += ((ulong)(data[6]) << 8);
-                ret += (ulong)(data[7]);
-                */
-                return BitConverter.ToUInt64(data, 0);
-                //return ret;
+            get
+            {
+                byte[] temp = new byte[data.Length];
+                data.CopyTo(temp, 0);
+                Array.Reverse(temp);
+                return BitConverter.ToUInt64(temp);
             }
             set
-               {
-                /*
-                var newData = new byte[8];
-                for (int i = 0; i < 8; i++)
-                {
-                    newData[7 - i] = (byte)((value >> (i * 8)) & 0xFF);
-                }
-                */
-
-                Data = BitConverter.GetBytes(value);
-               }
+            {
+                byte[] temp = BitConverter.GetBytes(value);
+                Array.Reverse(temp);
+                Data = temp;
+            }
         }
 
 
@@ -107,7 +90,7 @@ namespace Can_Adapter
         public string GetDataInTextFormat(string beforeString = "", string afterString = "")
         {
             StringBuilder sb = new("");
-            for(int i = 8-DLC; i< 8;i++)
+            for (int i = 8 - DLC; i < 8; i++)
                 sb.Append($"{beforeString}{Data[i]:X02}{afterString}");
             return sb.ToString();
         }
@@ -119,7 +102,7 @@ namespace Can_Adapter
         public bool RvcCompatible => IDE && DLC == 8 && !RTR;
 
         public string IdAsText => IDE ? string.Format("{0:X08}", Id) : string.Format("{0:X03}", Id);
-        
+
         private bool fresh;
         public bool Fresh { set => Set(ref fresh, value); get => fresh; }
 
@@ -145,8 +128,8 @@ namespace Can_Adapter
             updatetick = DateTime.Now.Ticks;
         }
 
-        
-        public CanMessage(string str):base()
+
+        public CanMessage(string str) : base()
         {
             switch (str[0])
             {
@@ -228,7 +211,7 @@ namespace Can_Adapter
             updatetick = DateTime.Now.Ticks;
         }
 
-        
+
         public void FreshCheck()
         {
             if (fresh && (DateTime.Now.Ticks - updatetick > 3000000))
@@ -251,10 +234,10 @@ namespace Can_Adapter
         }
     }
 
+    public enum AdapterStatus { Closed, Ready, TX }
 
     public class CanAdapter : ViewModel
     {
-
         private readonly char[] currentBuf = new char[1024];
 
         private int ptr = 0;
@@ -262,38 +245,33 @@ namespace Can_Adapter
         public UInt32 Version = 0;
 
         public int Bitrate = 250;
+
         public bool PortOpened => serialPort.IsOpen;
 
-        private bool txDone = true;
+        public bool TxDone { private set; get; }
 
-        private bool TxFail = true;
-        public bool TxDone { private set => Set(ref txDone, value); get => txDone; }
+        private int failedTransmissions;
+        public int FailedTransmissionsCount { set => Set(ref failedTransmissions, value); get => failedTransmissions; }
 
-        private int errorCounter = 0;
-        public int ErrorCounter { private set => Set(ref errorCounter, value); get => errorCounter; }
+        private int sucessedTransmissions;
+        public int SucessedTransmissionsCount { set => Set(ref sucessedTransmissions, value); get => sucessedTransmissions; }
 
-        private int failedMessagesCounter = 0;
-        public int FailedMessagesCounter { private set => Set(ref failedMessagesCounter, value); get => failedMessagesCounter; }
+        private int receivedMessagesCount;
+        public int ReceivedMessagesCount { set => Set(ref receivedMessagesCount, value); get => receivedMessagesCount; }
 
         private int lastSecondReceived;
         private int lastSecondTransmitted;
-        private int currentSecodeReceived;
-        private int currentSecodeTransmitted;
-        private System.Timers.Timer oneSecondTimer;
+        private int currentSecondReceived;
+        private int currentSecondTransmitted;
+        private System.Timers.Timer adapterTimer;
 
-        //public int LastSecondReceived { get => lastSecondReceived; set => Set(ref lastSecondReceived, value); }
-
-
-
-        private readonly SynchronizationContext UIContext;
+        public AdapterStatus Status { private set; get; } = AdapterStatus.Closed;
 
         private readonly SerialPort serialPort;
 
-        private readonly UpdatableList<CanMessage> _messages = new();
-
-        public UpdatableList<CanMessage> Messages { get => _messages; }
-
         public List<CanMessage> MessagesQueue { set; get; }
+
+        private long lastTxTick;
 
         public string PortName
         {
@@ -307,124 +285,61 @@ namespace Can_Adapter
             }
         }
 
-
         public event EventHandler GotNewMessage;
 
-        public event EventHandler TransmissionSuccess;
-
-        public event EventHandler ErrorReported;
-
-        public void PortOpen() => serialPort.Open();
-        public void PortClose() => serialPort.Close();
+        public void PortOpen()
+        {
+            serialPort.Open();
+            Status = AdapterStatus.Ready;
+        }
+        public void PortClose()
+        {
+            serialPort.Close();
+            Status = AdapterStatus.Closed;
+        }
         public void StartNormal() => serialPort.Write("O\r");
         public void StartListen() => serialPort.Write("L\r");
         public void StartSelfReception() => serialPort.Write("Y\r");
         public void Stop() => serialPort.Write("C\r");
         public void SetBitrate(int bitrate) => serialPort.Write($"S{bitrate}\r");
 
-        public void TransmitFast(CanMessage msg)
+        public void Transmit(CanMessage msg, int delay)
         {
-
-            TxDone = false;
-            TxFail = false;
-
-            if (serialPort.IsOpen == false)
-                return;
-            StringBuilder str = new("");
-            if (msg.IDE && msg.RTR)
-                str.Append('R');
-            if (!msg.IDE && msg.RTR)
-                str.Append('r');
-            if (msg.IDE && !msg.RTR)
-                str.Append('T');
-            if (!msg.IDE && !msg.RTR)
-                str.Append('t');
-            str.Append(msg.IdAsText);
-            str.Append(msg.DLC);
-            str.Append(msg.GetDataInTextFormat());
-            str.Append('\r');
-
-            serialPort.Write(str.ToString());
-            currentSecodeTransmitted++;
+            Transmit(msg);
+            Thread.Sleep(delay);
         }
 
         public void Transmit(CanMessage msg)
         {
 
-            TxDone = false;
-            TxFail = false;
-
             if (serialPort.IsOpen == false)
                 return;
-            StringBuilder str = new("");
-            if (msg.IDE && msg.RTR)
-                str.Append('R');
-            if (!msg.IDE && msg.RTR)
-                str.Append('r');
-            if (msg.IDE && !msg.RTR)
-                str.Append('T');
-            if (!msg.IDE && !msg.RTR)
-                str.Append('t');
-            str.Append(msg.IdAsText);
-            str.Append(msg.DLC);
-            str.Append(msg.GetDataInTextFormat());
-            str.Append('\r');
 
-            serialPort.Write(str.ToString());
-            currentSecodeTransmitted++;
-            for (int i = 0; i < 20; i++)
-            {
-                Task.Delay(1);
-                if (txDone || TxFail)
-                    return;
-            }
-            
-        }
-
-        public bool TransmitWithCheck(CanMessage msg)
-        {
-
-            TxDone = false;
-            TxFail = false;
-
-            if (serialPort.IsOpen == false)
-                return false;
-            StringBuilder str = new("");
-            if (msg.IDE && msg.RTR)
-                str.Append('R');
-            if (!msg.IDE && msg.RTR)
-                str.Append('r');
-            if (msg.IDE && !msg.RTR)
-                str.Append('T');
-            if (!msg.IDE && !msg.RTR)
-                str.Append('t');
-            str.Append(msg.IdAsText);
-            str.Append(msg.DLC);
-            str.Append(msg.GetDataInTextFormat());
-            str.Append('\r');
-
-            serialPort.Write(str.ToString());
-            currentSecodeTransmitted++;
-            for (int i = 0; i < 1000; i++)
+            int failCounter = 0;
+            while (Status != AdapterStatus.Ready && failCounter < 20)
             {
                 Thread.Sleep(1);
-                if (txDone) return true;
-                if (TxFail) return false;
+                failCounter++;
             }
-            return false;
-        }
 
-        public bool TransmitForSure(CanMessage msg, int tries)
-        {
-            while (TransmitWithCheck(msg) == false && tries-- > 0)
-                currentSecodeTransmitted++;
-            if (tries == 0)
-            {
-                return false;
-            }
-            else
-                return true;
+            StringBuilder str = new("");
+            if (msg.IDE && msg.RTR)
+                str.Append('R');
+            if (!msg.IDE && msg.RTR)
+                str.Append('r');
+            if (msg.IDE && !msg.RTR)
+                str.Append('T');
+            if (!msg.IDE && !msg.RTR)
+                str.Append('t');
+            str.Append(msg.IdAsText);
+            str.Append(msg.DLC);
+            str.Append(msg.GetDataInTextFormat());
+            str.Append('\r');
 
+            serialPort.Write(str.ToString());
+            lastTxTick = DateTime.Now.Ticks;
+            Status = AdapterStatus.TX;
+            currentSecondTransmitted++;
         }
 
         private void UartMessageProcess()
@@ -435,23 +350,26 @@ namespace Can_Adapter
                 case 't':
                 case 'r':
                 case 'R':
-                    var m = new CanMessage(new string(currentBuf));
-                    GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
-                    UIContext.Send((x) => Messages.TryToAdd(m), null);
-                    currentSecodeReceived++;
+                    try
+                    {
+                        var m = new CanMessage(new string(currentBuf));
+                        GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
+                        currentSecondReceived++;
+                        ReceivedMessagesCount++;
+                    }
+                    catch { }
                     break;
                 case 'z':
                 case 'Z':
-                    TxDone = true;
-                    TransmissionSuccess?.Invoke(this, new());
+                    Status = AdapterStatus.Ready;
+                    SucessedTransmissionsCount++;
                     break;
                 case '\a':
-                    TxFail = true;
-                    ErrorCounter++;
-                    Debug.WriteLine("<<ERROR>>", "CAN");
-                    ErrorReported?.Invoke(this, new());
+                    FailedTransmissionsCount++;
+                    Status = AdapterStatus.Ready;
                     break;
                 default:
+                    ptr = 0;
                     break;
 
             }
@@ -462,7 +380,7 @@ namespace Can_Adapter
             while (serialPort.IsOpen && serialPort.BytesToRead > 0)
             {
                 int newByte = serialPort.ReadByte();
-                if (newByte == 13 || newByte == 0 || newByte == 7 || newByte == 'Z' || newByte == 'z')
+                if (newByte == 13 || newByte == 0 || newByte == 7 || newByte == 'Z' || newByte == 'z' || newByte == '\a')
                 {
                     if (newByte == 13)
                         currentBuf[ptr] = '\0';
@@ -481,27 +399,34 @@ namespace Can_Adapter
             GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
         }
 
-        public string Status => $"Bus use: Rx/Tx(Total):{lastSecondReceived}/{lastSecondTransmitted}({lastSecondTransmitted+lastSecondReceived}) ,Faults:{failedMessagesCounter}";
+        public string StatusString => $"Bus use: Rx/Tx(Total):{lastSecondReceived}/{lastSecondTransmitted},Faults:{FailedTransmissionsCount}";
 
         public CanAdapter()
         {
             serialPort = new SerialPort();
-            serialPort.BaudRate = 256000;
+            serialPort.BaudRate = 250000;
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-            UIContext = SynchronizationContext.Current;
-            oneSecondTimer = new(1000);
-            oneSecondTimer.Elapsed += EverySecond;
-            oneSecondTimer.Start();
+            adapterTimer = new(15);
+            adapterTimer.Elapsed += timerTick;
+            adapterTimer.Start();
         }
 
-        private void EverySecond(object sender, EventArgs e)
+        private int tickCounter = 0;
+
+        private void timerTick(object sender, EventArgs e)
         {
-            lastSecondReceived = currentSecodeReceived;
-            lastSecondTransmitted = currentSecodeTransmitted;
-            currentSecodeReceived= 0;
-            currentSecodeTransmitted= 0;
-            OnPropertyChanged(nameof(Status));
+            tickCounter++;
+            if (tickCounter > 64)
+            {
+                tickCounter = 0;
+                lastSecondReceived = currentSecondReceived;
+                lastSecondTransmitted = currentSecondTransmitted;
+                currentSecondReceived = 0;
+                currentSecondTransmitted = 0;
+                OnPropertyChanged(nameof(StatusString));
+            }
+
         }
-        
+
     }
 }

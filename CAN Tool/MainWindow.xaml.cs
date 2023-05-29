@@ -1,5 +1,5 @@
 ﻿using OmniProtocol;
-using Can_Adapter;
+using CAN_Adapter;
 using CAN_Tool.ViewModels;
 using MaterialDesignThemes.Wpf;
 using ScottPlot.MarkerShapes;

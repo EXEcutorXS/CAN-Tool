@@ -1,4 +1,4 @@
-﻿using Can_Adapter;
+﻿using CAN_Adapter;
 using CAN_Tool.ViewModels.Base;
 using System;
 using System.Collections.Generic;
@@ -273,7 +273,7 @@ namespace OmniProtocol
         private byte[] data = new byte[8];
 
         [AffectsTo(nameof(DataAsText),nameof(DataAsULong),nameof(VerboseInfo))]
-        public byte[] Data { set { Array.Copy(value, data, 8); OnPropertyChanged(nameof(Data)); } get => data; }
+        public byte[] Data { set => Set(ref data,value); get => data; }
 
         public OmniMessage()
         {
@@ -300,8 +300,7 @@ namespace OmniProtocol
         {
             if (m.DLC != 8 || m.RTR || !m.IDE)
                 throw new ArgumentException("CAN message is not compliant with OmniProtocol");
-            m.Data.CopyTo(Data, 0);
-
+            Data = m.Data;
             PGN = (m.Id >> 20) & 0b111111111;
             ReceiverType = (m.Id >> 13) & 0b1111111;
             ReceiverAddress = (m.Id >> 10) & 0b111;
@@ -1219,7 +1218,7 @@ namespace OmniProtocol
                 if (firmware != null)
                     return $"{firmware[0]}.{firmware[1]}.{firmware[2]}.{firmware[3]}";
                 else
-                    return GetString("t_no_formware_data");
+                    return GetString("t_no_firmware_data");
             }
         }
 
@@ -1545,7 +1544,8 @@ namespace OmniProtocol
                 senderDevice = new ConnectedDevice(id);
                 ConnectedDevices.Add(senderDevice);
                 NewDeviceAquired?.Invoke(this, null);
-                Task.Run(() => RequestBasicData(id));
+                if (senderDevice.ID.Type!=123)        //Requesting basic data, but not for bootloaders
+                    Task.Run(() => RequestBasicData(id));
             }
 
             

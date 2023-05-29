@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Linq;
 
 namespace CAN_Tool.ViewModels
 {
@@ -29,6 +30,8 @@ namespace CAN_Tool.ViewModels
     {
         private int fragmentSize = 512;
 
+        private string log;
+        public string Log { get => log; private set => Set(ref log, value); }
         public int FragmentSize
         {
             get { return fragmentSize; }
@@ -40,6 +43,11 @@ namespace CAN_Tool.ViewModels
         #region SwitchToBootloaderCommand
         public ICommand SwitchToBootloaderCommand { get; }
 
+        private void LogWriteLine(string str)
+        {
+            //Debug.WriteLine(str);
+            Log = (str + Environment.NewLine) + Log;
+        }
         private void OnSwitchToBootloaderCommandExecuted(Object parameter)
         {
 
@@ -97,7 +105,7 @@ namespace CAN_Tool.ViewModels
             dialog.Filter = "Hex Files|*.hex";
             if (!(bool)dialog.ShowDialog()) return;
             fragments = parseHexFile(dialog.FileName, fragmentSize);
-            MessageBox.Show($"Hex is loaded, contains {fragments.Count} fragments.");
+            LogWriteLine($"Hex is loaded, contains {fragments.Count} fragments.");
         }
 
         #endregion
@@ -174,6 +182,7 @@ namespace CAN_Tool.ViewModels
         }
 
 
+
         private bool checkTransmittedData(int len, uint crc)
         {
             OmniMessage msg = new()
@@ -182,7 +191,7 @@ namespace CAN_Tool.ViewModels
                 ReceiverType = 123
             };
             msg.Data[0] = 2;
-            Debug.WriteLine("Waiting for check info");
+            //LogWriteLine("Waiting for check info");
             for (int i = 0; i < 6; i++)
             {
                 VM.SelectedConnectedDevice.flagTransmissionCheck = false;
@@ -194,12 +203,12 @@ namespace CAN_Tool.ViewModels
                 VM.CanAdapter.Transmit(msg.ToCanMessage());
                 WaitForFlag(ref VM.SelectedConnectedDevice.flagTransmissionCheck, 100);
 
-                Debug.WriteLine($"Len:{VM.SelectedConnectedDevice.receivedFragmentLength}/{len},CRC:0x{VM.SelectedConnectedDevice.receivedFragmentCrc:X}/0X{crc:X}");
+                LogWriteLine($"Len:{VM.SelectedConnectedDevice.receivedFragmentLength}/{len},CRC:0x{VM.SelectedConnectedDevice.receivedFragmentCrc:X}/0X{crc:X}");
                 if (crc == VM.SelectedConnectedDevice.receivedFragmentCrc && len == VM.SelectedConnectedDevice.receivedFragmentLength)
                     return true;
                 else
                 {
-                    Debug.WriteLine("###Transmission failed!");
+                    LogWriteLine("###Transmission failed!");
                     return false;
                 }
             }
@@ -250,7 +259,7 @@ namespace CAN_Tool.ViewModels
                 ReceiverType = 123
             };
 
-            Debug.WriteLine($"Starting {f.StartAdress:X} fragment transmission");
+            LogWriteLine($"Starting {f.StartAdress:X} fragment transmission");
             for (int k = 0; k < 16; k++)
             {
                 setFragmentAdr(f);
@@ -259,7 +268,8 @@ namespace CAN_Tool.ViewModels
                     return;
 
                 if (k == 15) { VM.OmniInstance.CurrentTask.onFail("Can't transmit data pack"); return; }
-                Debug.WriteLine($"Try: {k}");
+                if (k>0)
+                LogWriteLine($"Try: {k+1}");
                 crc = 0;
                 len = 0;
                 VM.SelectedConnectedDevice.receivedFragmentCrc = 0;
@@ -283,7 +293,7 @@ namespace CAN_Tool.ViewModels
                     msg.Data[6] = f.Data[i * 8 + 6];
                     msg.Data[7] = f.Data[i * 8 + 7];
                     VM.CanAdapter.Transmit(msg.ToCanMessage());
-                    Thread.Sleep(10);
+
                 }
                 if (checkTransmittedData(len, crc)) break;
             }
@@ -291,9 +301,9 @@ namespace CAN_Tool.ViewModels
 
         private void updateFirmware(List<CodeFragment> fragments)
         {
-            Debug.WriteLine("Starting Firmware updating procedure");
+            LogWriteLine("Starting Firmware updating procedure");
             VM.OmniInstance.CurrentTask.Capture("Memory Erasing");
-            Debug.WriteLine("Starting flash erasing");
+            LogWriteLine("Starting flash erasing");
             for (int i = 0; i < 4; i++)
             {
                 if (i == 3) { VM.OmniInstance.CurrentTask.onFail("Can't erase memory"); return; }
@@ -312,7 +322,7 @@ namespace CAN_Tool.ViewModels
                 VM.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
                 if (VM.OmniInstance.CurrentTask.CTS.IsCancellationRequested) return;
             }
-            Debug.WriteLine("Firmware updating success");
+            LogWriteLine("Firmware updating success");
             VM.OmniInstance.CurrentTask.onDone();
 
         }
@@ -331,7 +341,7 @@ namespace CAN_Tool.ViewModels
 
         private void bootloaderSetAdrLen(uint adress, int len)
         {
-            Debug.WriteLine($"Setting adress to 0X{adress:X}");
+            LogWriteLine($"Setting adress to 0X{adress:X}");
             AC2PMessage msg = new();
             msg.PGN = 100;
             msg.ReceiverType = 123;
@@ -378,7 +388,7 @@ namespace CAN_Tool.ViewModels
                 ReceiverType = 123
             };
 
-            Debug.WriteLine($"Starting {f.StartAdress:X} fragment transmission");
+            LogWriteLine($"Starting {f.StartAdress:X} fragment transmission");
             for (int i = 0; i < (f.Length + 7) / 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -401,9 +411,9 @@ namespace CAN_Tool.ViewModels
         }
         private void updateFirmwareOld(List<CodeFragment> fragments)
         {
-            Debug.WriteLine("Starting Firmware updating procedure");
+            LogWriteLine("Starting Firmware updating procedure");
             VM.AC2PInstance.CurrentTask.Capture("Memory Erasing");
-            Debug.WriteLine("Starting flash erasing");
+            LogWriteLine("Starting flash erasing");
             for (int i = 0; i < 4; i++)
             {
                 if (i == 3) { VM.AC2PInstance.CurrentTask.onFail("Can't erase memory"); return; }
@@ -425,16 +435,18 @@ namespace CAN_Tool.ViewModels
                 VM.AC2PInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
                 if (VM.AC2PInstance.CurrentTask.CTS.IsCancellationRequested) return;
             }
-            Debug.WriteLine("Firmware updating success");
+            LogWriteLine("Firmware updating success");
             VM.AC2PInstance.CurrentTask.onDone();
 
         }
         */
         #endregion
+
         public ICommand UpdateFirmwareCommand { get; }
 
         private List<CodeFragment> parseHexFile(string path, int maxFragment)
         {
+            fragments.Clear();
             CodeFragment current = new(maxFragment);
             uint pageAdress = 0;
             uint localAdress = 0;

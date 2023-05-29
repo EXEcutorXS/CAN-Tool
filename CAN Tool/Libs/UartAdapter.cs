@@ -7,7 +7,7 @@ using OmniProtocol;
 using System.IO.Ports;
 using Microsoft.VisualBasic;
 using System.Windows.Media.Animation;
-using Can_Adapter;
+using CAN_Adapter;
 
 namespace CAN_Tool.Libs
 {
