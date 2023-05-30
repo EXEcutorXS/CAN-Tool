@@ -918,6 +918,8 @@ t_glow_plug_state	Glow plug state	Состояние свечи
 t_blower_state	Blower state	Состояние НВ
 t_not_used	Not used	Не используется
 t_no_firmware_data	No firmware data	Нет данных о ПО
+t_date_time	Date/Time	Дата/Время
+t_day_night_backlight	Day/Night + Backlight	День/Ночь Подсветка
 		
 u_s	s	с
 u_hz	Hz	Гц

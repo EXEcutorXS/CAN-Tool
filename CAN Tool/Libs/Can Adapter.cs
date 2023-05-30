@@ -315,11 +315,13 @@ namespace CAN_Adapter
             if (serialPort.IsOpen == false)
                 return;
 
-            int failCounter = 0;
-            while (Status != AdapterStatus.Ready && failCounter < 20)
+            //int failCounter = 0;
+            long startWaitTick = DateTime.Now.Ticks;
+            while (Status != AdapterStatus.Ready && DateTime.Now.Ticks - startWaitTick < 30000) { }
+            if (Status == AdapterStatus.TX)
             {
-                Thread.Sleep(1);
-                failCounter++;
+                FailedTransmissionsCount++;
+                Status = AdapterStatus.Ready;
             }
 
             StringBuilder str = new("");

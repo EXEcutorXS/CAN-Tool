@@ -918,6 +918,8 @@
 <v:String x:Key="t_blower_state">Blower state</v:String>
 <v:String x:Key="t_not_used">Not used</v:String>
 <v:String x:Key="t_no_firmware_data">No firmware data</v:String>
+<v:String x:Key="t_date_time">Date/Time</v:String>
+<v:String x:Key="t_day_night_backlight">Day/Night + Backlight</v:String>
 
 <v:String x:Key="u_s">s</v:String>
 <v:String x:Key="u_hz">Hz</v:String>

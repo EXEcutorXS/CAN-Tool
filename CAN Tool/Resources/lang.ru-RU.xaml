@@ -918,6 +918,8 @@
 <v:String x:Key="t_blower_state">Состояние НВ</v:String>
 <v:String x:Key="t_not_used">Не используется</v:String>
 <v:String x:Key="t_no_firmware_data">Нет данных о ПО</v:String>
+<v:String x:Key="t_date_time">Дата/Время</v:String>
+<v:String x:Key="t_day_night_backlight">День/Ночь Подсветка</v:String>
 
 <v:String x:Key="u_s">с</v:String>
 <v:String x:Key="u_hz">Гц</v:String>
