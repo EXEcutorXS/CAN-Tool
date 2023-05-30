@@ -43,6 +43,12 @@ namespace CAN_Tool.ViewModels
         #region SwitchToBootloaderCommand
         public ICommand SwitchToBootloaderCommand { get; }
 
+        private void LogWrite(string str)
+        {
+            //Debug.WriteLine(str);
+            Log = (str) + Log;
+        }
+
         private void LogWriteLine(string str)
         {
             //Debug.WriteLine(str);
@@ -191,7 +197,7 @@ namespace CAN_Tool.ViewModels
                 ReceiverType = 123
             };
             msg.Data[0] = 2;
-            //LogWriteLine("Waiting for check info");
+            
             for (int i = 0; i < 6; i++)
             {
                 VM.SelectedConnectedDevice.flagTransmissionCheck = false;
@@ -259,7 +265,7 @@ namespace CAN_Tool.ViewModels
                 ReceiverType = 123
             };
 
-            LogWriteLine($"Starting {f.StartAdress:X} fragment transmission");
+            LogWrite($"Starting {f.StartAdress:X} fragment tx...");
             for (int k = 0; k < 16; k++)
             {
                 setFragmentAdr(f);
