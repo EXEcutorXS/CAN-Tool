@@ -45,15 +45,14 @@ namespace CAN_Tool.ViewModels
 
         private void LogWrite(string str)
         {
-            //Debug.WriteLine(str);
-            Log = (str) + Log;
+            Log += str;
         }
 
         private void LogWriteLine(string str)
         {
-            //Debug.WriteLine(str);
-            Log = (str + Environment.NewLine) + Log;
+            Log += str + Environment.NewLine;
         }
+
         private void OnSwitchToBootloaderCommandExecuted(Object parameter)
         {
 
@@ -209,7 +208,7 @@ namespace CAN_Tool.ViewModels
                 VM.CanAdapter.Transmit(msg.ToCanMessage());
                 WaitForFlag(ref VM.SelectedConnectedDevice.flagTransmissionCheck, 100);
 
-                LogWriteLine($"Len:{VM.SelectedConnectedDevice.receivedFragmentLength}/{len},CRC:0x{VM.SelectedConnectedDevice.receivedFragmentCrc:X}/0X{crc:X}");
+                LogWriteLine($"Len:{VM.SelectedConnectedDevice.receivedFragmentLength},CRC:0x{VM.SelectedConnectedDevice.receivedFragmentCrc:X08}");
                 if (crc == VM.SelectedConnectedDevice.receivedFragmentCrc && len == VM.SelectedConnectedDevice.receivedFragmentLength)
                     return true;
                 else
@@ -265,7 +264,7 @@ namespace CAN_Tool.ViewModels
                 ReceiverType = 123
             };
 
-            LogWrite($"Starting {f.StartAdress:X} fragment tx...");
+            LogWrite($"Fragment {f.StartAdress:X08}...");
             for (int k = 0; k < 16; k++)
             {
                 setFragmentAdr(f);

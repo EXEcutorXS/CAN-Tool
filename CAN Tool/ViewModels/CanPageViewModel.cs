@@ -70,7 +70,7 @@ namespace CAN_Tool.ViewModels
         
         public void customTextChanged(object sender, EventArgs args)
         {
-            SelectionStart
+            
         }
     }
 

@@ -922,7 +922,7 @@
                             <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding VM.SelectedConnectedDevice.FirmwareAsText}" />
                             <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding VM.SelectedConnectedDevice.ProductionDate}" />
                         </StackPanel>
-                        <TextBox DockPanel.Dock="Top" Text="{Binding Log,Mode=OneWay}" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="20" IsReadOnly="True"></TextBox>
+                        <TextBox x:Name="logField" DockPanel.Dock="Top" Text="{Binding Log,Mode=OneWay}" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="20" IsReadOnly="True" FontFamily="Courier New"></TextBox>
                         <StackPanel></StackPanel>
                     </DockPanel>
                 </TabItem>
