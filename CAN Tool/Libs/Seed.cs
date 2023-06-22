@@ -39,8 +39,9 @@ namespace OmniProtocol
             { 29, new (){ID=29, DevType=DeviceType.Binar}} ,
             { 31, new (){ID=31, DevType=DeviceType.Binar }} ,
             { 32, new (){ID=32, DevType=DeviceType.Binar }} ,
-            { 34, new (){ID=34, DevType=DeviceType.Binar, MaxBlower=90}} ,
-            { 35, new (){ID=35, DevType=DeviceType.Binar, MaxBlower=90}} ,
+            { 34, new (){ID=34, DevType=DeviceType.Binar, MaxBlower=150}} ,
+            { 35, new (){ID=35, DevType=DeviceType.Binar, MaxBlower=150}} ,
+            { 37, new (){ID=37, DevType=DeviceType.ExtensionBoard}} ,
             { 123, new (){ID=123, DevType=DeviceType.Bootloader }} ,
             { 126, new (){ID=126, DevType=DeviceType.HCU }},
             { 255, new (){ID=255}}
@@ -90,6 +91,9 @@ namespace OmniProtocol
             PGNs.Add(40, new() { id = 40, name = "t_date_time" });
             PGNs.Add(41, new() { id = 41, name = "t_day_night_backlight" });
             PGNs.Add(42, new() { id = 42, name = "t_pump_control" });
+            PGNs.Add(43, new() { id = 43, name = "t_generic_board_pwm_command" });
+            PGNs.Add(44, new() { id = 44, name = "t_generic_board_pwm_status" });
+            PGNs.Add(45, new() { id = 45, name = "t_generic_board_adc_status" });
             PGNs.Add(100, new() { id = 100, name = "t_memory_control_old", multipack = true });
             PGNs.Add(101, new() { id = 101, name = "t_buffer_data_transmitting_old" });
             PGNs.Add(105, new() { id = 105, name = "t_memory_control" });
@@ -402,6 +406,21 @@ namespace OmniProtocol
             PGNs[42].parameters.Add(new() { Name = "t_pump_2", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_off" }, { 1, "t_on" }, { 5, "t_forced" } } });
             PGNs[42].parameters.Add(new() { Name = "t_pump_3", BitLength = 8, StartByte = 2, Meanings = { { 0, "t_off" }, { 1, "t_on" }, { 5, "t_forced" } } });
             PGNs[42].parameters.Add(new() { Name = "t_pump_4", BitLength = 8, StartByte = 3, Meanings = { { 0, "t_off" }, { 1, "t_on" }, { 5, "t_forced" } } });
+            
+            PGNs[43].parameters.Add(new() { Name = "t_channel1_pwm_value", BitLength = 16, StartByte = 0 });
+            PGNs[43].parameters.Add(new() { Name = "t_channel2_pwm_value", BitLength = 16, StartByte = 2 });
+            PGNs[43].parameters.Add(new() { Name = "t_channel3_pwm_value", BitLength = 16, StartByte = 4 });
+            PGNs[43].parameters.Add(new() { Name = "t_channel4_pwm_value", BitLength = 16, StartByte = 6 });
+
+            PGNs[44].parameters.Add(new() { Name = "t_channel1_pwm_value", BitLength = 16, StartByte = 0 });
+            PGNs[44].parameters.Add(new() { Name = "t_channel2_pwm_value", BitLength = 16, StartByte = 2 });
+            PGNs[44].parameters.Add(new() { Name = "t_channel3_pwm_value", BitLength = 16, StartByte = 4 });
+            PGNs[44].parameters.Add(new() { Name = "t_channel4_pwm_value", BitLength = 16, StartByte = 6 });
+
+            PGNs[45].parameters.Add(new() { Name = "t_channel1_adc_value", BitLength = 16, StartByte = 0 });
+            PGNs[45].parameters.Add(new() { Name = "t_channel2_adc_value", BitLength = 16, StartByte = 2 });
+            PGNs[45].parameters.Add(new() { Name = "t_channel3_adc_value", BitLength = 16, StartByte = 4 });
+            PGNs[45].parameters.Add(new() { Name = "t_channel4_adc_value", BitLength = 16, StartByte = 6 });
 
 
             PGNs[100].parameters.Add(new() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning = r => $"{GetString("t_starting_address")}: 0X{(r + 0x8000000):X}" });

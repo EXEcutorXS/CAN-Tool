@@ -761,6 +761,7 @@
 <v:String x:Key="d_32">30SPG</v:String>
 <v:String x:Key="d_34">Binar 10D</v:String>
 <v:String x:Key="d_35">Binar 10B</v:String>
+<v:String x:Key="d_37">Extension board</v:String>
 <v:String x:Key="d_123">Bootloader</v:String>
 <v:String x:Key="d_124">Mobile App</v:String>
 <v:String x:Key="d_126">Control device</v:String>
@@ -937,4 +938,15 @@
 <v:String x:Key="t_reading_flash_parameters">Reading config from flash</v:String>
 <v:String x:Key="t_saving_params_to_flash">Saving config to flash</v:String>
 <v:String x:Key="t_config_erase">Erasing config from flash</v:String>
+<v:String x:Key="t_generic_board_pwm_command">Extension board PWM control</v:String>
+<v:String x:Key="t_generic_board_pwm_status">Extension board PWM status</v:String>
+<v:String x:Key="t_generic_board_adc_status">Extension board ADC status</v:String>
+<v:String x:Key="t_channel1_pwm_value">CH1 PWM Value</v:String>
+<v:String x:Key="t_channel2_pwm_value">CH2 PWM Value</v:String>
+<v:String x:Key="t_channel3_pwm_value">CH3 PWM Value</v:String>
+<v:String x:Key="t_channel4_pwm_value">CH4 PWM Value</v:String>
+<v:String x:Key="t_channel1_adc_value">Channel 1 ADC value</v:String>
+<v:String x:Key="t_channel2_adc_value">Channel 2 ADC value</v:String>
+<v:String x:Key="t_channel3_adc_value">Channel 3 ADC value</v:String>
+<v:String x:Key="t_channel4_adc_value">Channel 4 ADC value</v:String>
 </ResourceDictionary>

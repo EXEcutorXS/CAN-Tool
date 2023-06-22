@@ -577,7 +577,7 @@ namespace OmniProtocol
 
     public enum DeviceType
     {
-        Binar, Planar, HCU, ValveControl, Bootloader, CookingPanel
+        Binar, Planar, HCU, ValveControl, Bootloader, CookingPanel, ExtensionBoard
     }
 
     public class Device

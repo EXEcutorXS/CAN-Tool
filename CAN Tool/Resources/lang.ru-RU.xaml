@@ -761,6 +761,7 @@
 <v:String x:Key="d_32">30СПГ</v:String>
 <v:String x:Key="d_34">Бинар 10Д</v:String>
 <v:String x:Key="d_35">Бинар 10Б</v:String>
+<v:String x:Key="d_37">Плата расширения</v:String>
 <v:String x:Key="d_123">Программный загрузчик</v:String>
 <v:String x:Key="d_124">Мобильное приложение</v:String>
 <v:String x:Key="d_126">Устройство управления</v:String>
@@ -937,4 +938,15 @@
 <v:String x:Key="t_reading_flash_parameters">Чтение параметров из Flash</v:String>
 <v:String x:Key="t_saving_params_to_flash">Сохранение параметров во Flash</v:String>
 <v:String x:Key="t_config_erase">Стирание пареметров</v:String>
+<v:String x:Key="t_generic_board_pwm_command">Управление ШИМ платы расширения</v:String>
+<v:String x:Key="t_generic_board_pwm_status">Статус ШИМ платы расширения</v:String>
+<v:String x:Key="t_generic_board_adc_status">Статус АЦП платы расширения</v:String>
+<v:String x:Key="t_channel1_pwm_value">Заданное значение ШИМ 1 канала</v:String>
+<v:String x:Key="t_channel2_pwm_value">Заданное значение ШИМ 2 канала</v:String>
+<v:String x:Key="t_channel3_pwm_value">Заданное значение ШИМ 3 канала</v:String>
+<v:String x:Key="t_channel4_pwm_value">Заданное значение ШИМ 4 канала</v:String>
+<v:String x:Key="t_channel1_adc_value">Значение АЦП 1 канала</v:String>
+<v:String x:Key="t_channel2_adc_value">Значение АЦП 2 канала</v:String>
+<v:String x:Key="t_channel3_adc_value">Значение АЦП 3 канала</v:String>
+<v:String x:Key="t_channel4_adc_value">Значение АЦП 4 канала</v:String>
 </ResourceDictionary>

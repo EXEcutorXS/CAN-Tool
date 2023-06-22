@@ -761,6 +761,7 @@ d_31	14TSG Mini	14ТСГ Мини
 d_32	30SPG	30СПГ
 d_34	Binar 10D	Бинар 10Д
 d_35	Binar 10B	Бинар 10Б
+d_37	Extension board	Плата расширения
 d_123	Bootloader	Программный загрузчик
 d_124	Mobile App	Мобильное приложение
 d_126	Control device	Устройство управления
@@ -937,3 +938,14 @@ t_bb_common_erasing	Erasing black box data	Стирание параметров
 t_reading_flash_parameters	Reading config from flash	Чтение параметров из Flash
 t_saving_params_to_flash	Saving config to flash	Сохранение параметров во Flash
 t_config_erase	Erasing config from flash	Стирание пареметров
+t_generic_board_pwm_command	Extension board PWM control	Управление ШИМ платы расширения
+t_generic_board_pwm_status	Extension board PWM status	Статус ШИМ платы расширения
+t_generic_board_adc_status	Extension board ADC status	Статус АЦП платы расширения
+t_channel1_pwm_value	CH1 PWM Value	Заданное значение ШИМ 1 канала
+t_channel2_pwm_value	CH2 PWM Value	Заданное значение ШИМ 2 канала
+t_channel3_pwm_value	CH3 PWM Value	Заданное значение ШИМ 3 канала
+t_channel4_pwm_value	CH4 PWM Value	Заданное значение ШИМ 4 канала
+t_channel1_adc_value	Channel 1 ADC value	Значение АЦП 1 канала
+t_channel2_adc_value	Channel 2 ADC value	Значение АЦП 2 канала
+t_channel3_adc_value	Channel 3 ADC value	Значение АЦП 3 канала
+t_channel4_adc_value	Channel 4 ADC value	Значение АЦП 4 канала
