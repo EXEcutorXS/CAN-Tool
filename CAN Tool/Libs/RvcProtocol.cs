@@ -711,11 +711,31 @@ namespace RVC
             newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "Water priority timer", Unit = "s", frstByte = 4, Size = 16 });
             newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "Pump timer", Unit = "s", frstByte = 6, Size = 16 });
 
-            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Total heater hours", Unit = "m", frstByte = 1, Size = 24 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Version 1", frstByte = 4, Size = 8 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Version 2", frstByte = 5, Size = 8 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Version 3", frstByte = 6, Size = 8 });
-            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Version 4", frstByte = 7, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Total heater minutes", Unit = "m", frstByte = 1, Size = 24 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Heater version 1", frstByte = 4, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Heater version 2", frstByte = 5, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Heater version 3", frstByte = 6, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x86, Name = "Heater version 4", frstByte = 7, Size = 8 });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0x87, Name = "Minutes since start", frstByte = 1, Size = 24, Unit = "min" });
+            newDgn.Parameters.Add(new() { multipackNum = 0x87, Name = "Panel version 1", frstByte = 4, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x87, Name = "Panel version 2", frstByte = 5, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x87, Name = "Panel version 3", frstByte = 6, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x87, Name = "Panel version 4", frstByte = 7, Size = 8 });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0x88, Name = "HCU version 1", frstByte = 4, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x88, Name = "HCU version 2", frstByte = 5, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x88, Name = "HCU version 3", frstByte = 6, Size = 8 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x88, Name = "HCU version 4", frstByte = 7, Size = 8 });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0x89, Name = "System limitation", frstByte = 1, Size = 16,Unit = "min" });
+            newDgn.Parameters.Add(new() { multipackNum = 0x89, Name = "Water limitation", frstByte = 3, Size = 8, Unit = "min" });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0x8A, Name = "System limitation", frstByte = 1, Size = 16, Unit = "min" });
+            newDgn.Parameters.Add(new() { multipackNum = 0x8A, Name = "Water limitation", frstByte = 3, Size = 8, Unit = "min" });
+
+
+
             DGNs.Add(newDgn.Dgn, newDgn);
         }
 

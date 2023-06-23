@@ -14,8 +14,7 @@ using System.ComponentModel;
 using RVC;
 using CAN_Adapter;
 using CAN_Tool.Libs;
-using System.Windows.Interop;
-using System.ComponentModel.DataAnnotations;
+
 
 namespace CAN_Tool.ViewModels
 {

@@ -212,7 +212,7 @@ namespace RVC
             return retString;
         }
     }
-    public sealed class RvcMessage : CanMessage, IComparable, IUpdatable<RvcMessage>
+    public sealed class RvcMessage :  ViewModel, IComparable, IUpdatable<RvcMessage>
     {
         private byte priority;
 
@@ -230,6 +230,48 @@ namespace RVC
         [AffectsTo(nameof(VerboseInfo), nameof(Instance), nameof(DataAsText))]
         
         public byte Instance => Data[0];
+
+        [AffectsTo(nameof(VerboseInfo), nameof(DataAsText), nameof(DataAsULong))]
+        public byte[] Data
+        {
+            get => data;
+
+            set => Set(ref data, value);
+        }
+
+        public ulong DataAsULong
+        {
+            get
+            {
+                byte[] temp = new byte[data.Length];
+                data.CopyTo(temp, 0);
+                Array.Reverse(temp);
+                return BitConverter.ToUInt64(temp);
+            }
+            set
+            {
+                byte[] temp = BitConverter.GetBytes(value);
+                Array.Reverse(temp);
+                Data = temp;
+            }
+        }
+
+
+        public string DataAsText => GetDataInTextFormat("", " ");
+
+        public string GetDataInTextFormat(string beforeString = "", string afterString = "")
+        {
+            StringBuilder sb = new("");
+            for (int i = 0; i < 8; i++)
+                sb.Append($"{beforeString}{Data[i]:X02}{afterString}");
+            return sb.ToString();
+        }
+
+        private bool fresh;
+        public bool Fresh { set => Set(ref fresh, value); get => fresh; }
+
+        public long updatetick;
+
 
         public IEnumerable<Parameter> Parameters => (RVC.DGNs.ContainsKey(Dgn)) ? RVC.DGNs[Dgn].Parameters : null;
 
@@ -291,7 +333,7 @@ namespace RVC
             return ret;
         }
 
-        public new string VerboseInfo => PrintParameters().Replace(';', '\n');
+        public  string VerboseInfo => PrintParameters().Replace(';', '\n');
 
         public string PrintParameters()
         {
@@ -305,7 +347,7 @@ namespace RVC
             return GetCanMessage().GetHashCode();
         }
 
-        public new int CompareTo(object other)
+        public int CompareTo(object other)
         {
             var o = other as RvcMessage;
             if (Dgn != o.Dgn)

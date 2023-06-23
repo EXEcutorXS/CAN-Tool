@@ -1001,8 +1001,39 @@
 
                 </DockPanel>
             </TabItem>
-            <TabItem Header="{DynamicResource b_commands}">
+            <TabItem Header ="Timberline 1.5">
+                <DockPanel >
+                    <StackPanel DockPanel.Dock="Left">
+                        <Button Margin="5" Content="Heater on"></Button>
+                        <Button Margin="5" Content="Heater on"></Button>
+                        <Button Margin="5" Content="Element on"></Button>
+                        <Button Margin="5" Content="Element off"></Button>
+                        <Button Margin="5" Content="Water on"></Button>
+                        <Button Margin="5" Content="Water off"></Button>
+                        <Button Margin="5" Content="Sync time" Click="Button_Click_1"></Button>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Left">
+                        <StackPanel Orientation="Horizontal">
+                        <TextBlock  VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Day setpoint"></TextBlock>
+                            <TextBlock Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="30" VerticalAlignment="Center"/>
+                            <Button VerticalAlignment="Center" Margin="5" Content="Send" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Night setpoint"></TextBlock>
+                            <TextBlock Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="30" VerticalAlignment="Center" />
+                            <Button VerticalAlignment="Center" Margin="5" Content="Send" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Fan speed"></TextBlock>
+                            <TextBlock Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="30" VerticalAlignment="Center" />
+                            <Button VerticalAlignment="Center" Margin="5" Content="Send" />
+                        </StackPanel>
 
+                    </StackPanel>
+                    <DataGrid>
+                    </DataGrid>
+                </DockPanel>
+                
             </TabItem>
         </TabControl>
 
