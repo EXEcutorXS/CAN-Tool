@@ -663,6 +663,36 @@ namespace CAN_Tool
         {
 
         }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleHeater();
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleElement();
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleWater();
+        }
+
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleZone();
+        }
+
+        private void Button_Click_6(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.TogglePump();
+        }
+
+        private void Button_Click_7(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleFanManualMode();
+        }
     }
 
 

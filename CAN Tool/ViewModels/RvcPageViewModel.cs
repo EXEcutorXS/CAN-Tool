@@ -366,19 +366,19 @@ namespace CAN_Tool.ViewModels
         [AffectsTo(nameof(HeaterVersionString))]
         public byte[] HeaterVersion { set => Set(ref heaterVersion, value); get => heaterVersion; }
 
-        public string HeaterVersionString { get => $"{heaterVersion[0]:D03}.{heaterVersion[1]:D03}.{heaterVersion[2]:D03}.{heaterVersion[3]}:D03"; }
+        public string HeaterVersionString { get => $"{heaterVersion[0]:D03}.{heaterVersion[1]:D03}.{heaterVersion[2]:D03}.{heaterVersion[3]:D03}"; }
 
         private byte[] hcuVersion;
         [AffectsTo(nameof(HcuVersionString))]
         public byte[] HcuVersion { set => Set(ref hcuVersion, value); get => hcuVersion; }
 
-        public string HcuVersionString { get => $"{hcuVersion[0]:D03}.{hcuVersion[1]:D03}.{hcuVersion[2]:D03}.{hcuVersion[3]}:D03"; }
+        public string HcuVersionString { get => $"{hcuVersion[0]:D03}.{hcuVersion[1]:D03}.{hcuVersion[2]:D03}.{hcuVersion[3]:D03}"; }
 
         private byte[] panelVersion;
         [AffectsTo(nameof(PanelVersionString))]
         public byte[] PanelVersion { set => Set(ref panelVersion, value); get => panelVersion; }
 
-        public string PanelVersionString { get => $"{panelVersion[0]:D03}.{panelVersion[1]:D03}.{panelVersion[2]:D03}.{panelVersion[3]}:D03"; }
+        public string PanelVersionString { get => $"{panelVersion[0]:D03}.{panelVersion[1]:D03}.{panelVersion[2]:D03}.{panelVersion[3]:D03}"; }
 
     }
 

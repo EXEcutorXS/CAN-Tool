@@ -1005,23 +1005,27 @@
                     <StackPanel DockPanel.Dock="Left">
                         <StackPanel Orientation="Horizontal">
                             <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.HeaterEnabled}"/>
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Heater" Margin="5" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Heater" Margin="5" Click="Button_Click_2" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ElementEnabled}"/>
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Element" Margin="5" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Element" Margin="5" Click="Button_Click_3" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterEnabled}"/>
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Water" Margin="5" Cursor="Hand" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Water" Margin="5" Cursor="Hand" Click="Button_Click_4" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneEnabled}" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Zone Heating" Margin="5" Cursor="Hand" Click="Button_Click_5" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterPumpStatus}"/>
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Pump" Margin="5" Cursor="Hand" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Pump" Margin="5" Cursor="Hand" Click="Button_Click_6" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneManualFanMode}" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Fan manual" Margin="5" Cursor="Hand" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Fan manual" Margin="5" Cursor="Hand" Click="Button_Click_7" />
                         </StackPanel>
 
                         <Button Margin="5" Content="Sync time" Click="Button_Click_1"></Button>
@@ -1049,8 +1053,60 @@
                         </StackPanel>
 
                     </StackPanel>
-                    <DataGrid ItemsSource="{Binding Timberline15}">
-                    </DataGrid>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Tank Temperature: "/>
+                            <TextBlock Text="{Binding Timberline15.TankTemperature,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Heatexchanger Temperature: " />
+                            <TextBlock Text="{Binding Timberline15.HeatExchangerTemperature,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Heater Temperature: " />
+                            <TextBlock Text="{Binding Timberline15.HeaterTemperature,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Current setpoint: " />
+                            <TextBlock Text="{Binding Timberline15.CurrentSetpoint,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Day setpoint: " />
+                            <TextBlock Text="{Binding Timberline15.SetpointDay,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Night setpoint: " />
+                            <TextBlock Text="{Binding Timberline15.SetpointNight,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Fan measured speed: " />
+                            <TextBlock Text="{Binding Timberline15.ZoneFanMeasuredSpeed,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Fan manual speed: " />
+                            <TextBlock Text="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Heater version: " />
+                            <TextBlock Text="{Binding Timberline15.HeaterVersionString,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="HCU version: " />
+                            <TextBlock Text="{Binding Timberline15.HcuVersionString,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Panel version: " />
+                            <TextBlock Text="{Binding Timberline15.PanelVersionString,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Solenoid status: " />
+                            <TextBlock Text="{Binding Timberline15.SolenoidStatus,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Solenoid status: " />
+                            <TextBlock Text="{Binding Timberline15.SolenoidStatus,Mode=OneWay}" />
+                        </StackPanel>
+                    </StackPanel>
                 </DockPanel>
                 
             </TabItem>
