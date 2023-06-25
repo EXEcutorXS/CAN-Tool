@@ -20,59 +20,6 @@ using System.Runtime.CompilerServices;
 
 namespace CAN_Tool.ViewModels
 {
-    internal class DataBox : TextBox, INotifyPropertyChanged
-    {
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string PropertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
-        }
-
-        protected bool Set<T>(ref T field, T value, [CallerMemberName] string PropertyName = null)
-        {
-            if (!Equals(field, value))
-            {
-                field = value;
-                var attr = GetType().GetProperty(PropertyName)?.GetCustomAttribute(typeof(AffectsToAttribute));
-                if (attr != null)
-                {
-                    AffectsToAttribute at = (AffectsToAttribute)attr;
-                    foreach (var p in at.Props)
-                        OnPropertyChanged(p);
-                }
-
-                //2 Вариант
-                //foreach (var property in GetType().GetProperties()) OnPropertyChanged(property.Name);
-
-                OnPropertyChanged(PropertyName);
-                CommandManager.InvalidateRequerySuggested();  //   Фикc необновления статуса кнопок
-
-                return true;
-            }
-            else
-                return false;
-        }
-
-
-        private byte[] data;
-        public byte[] Data { set => Set(ref data, value); get => data; }
-
-        public string DataAsText => $"{Data[0]:02X} {Data[1]:02X} {Data[2]:02X} {Data[3]:02X} {Data[4]:02X} {Data[5]:02X} {Data[6]:02X} {Data[7]:02X} ";
-
-        public DataBox()
-        {
-            Text = "ff ff ff ff ff ff ff ff";
-            TextChanged += customTextChanged;
-        }
-
-        
-        public void customTextChanged(object sender, EventArgs args)
-        {
-            
-        }
-    }
 
     internal class CanPageViewModel : ViewModel
     {
