@@ -61,6 +61,9 @@ namespace CAN_Tool.ViewModels
         private bool canAdapterSettings = false;
         public bool CanAdapterSettings { set => Set(ref canAdapterSettings, value); get => canAdapterSettings; }
 
+        private string portButtonString = "Open";
+        public string PortButtonString { set => Set(ref portButtonString, value); get => portButtonString; }
+
         CanAdapter canAdapter;
 
         public CanAdapter CanAdapter { get => canAdapter; }
@@ -220,35 +223,44 @@ namespace CAN_Tool.ViewModels
                 PortName = PortList[^1];
         }
 
-        public ICommand OpenPortCommand { get; }
-        private void OnOpenPortCommandExecuted(object parameter)
+
+        public ICommand TogglePortCommand { get; }
+        private void OnTogglePortCommandExecuted(object parameter)
         {
             if (SelectedProtocol == PhyProt_t.CAN)
             {
-                CanAdapter.PortName = PortName;
-                CanAdapter.PortOpen();
-                Thread.Sleep(20);
-                CanAdapter.StartNormal();
-                Thread.Sleep(20);
+                if (!CanAdapter.PortOpened)
+                {
+                    CanAdapter.PortName = PortName;
+                    CanAdapter.PortOpen();
+                    PortButtonString = GetString("b_close");
+                    Thread.Sleep(20);
+                    CanAdapter.StartNormal();
+                    Thread.Sleep(20);
+                }
+                else
+                {
+                    CanAdapter.PortClose();
+                    PortButtonString = GetString("b_open");
+                }
             }
             if (SelectedProtocol == PhyProt_t.UART)
             {
                 try
                 {
                     UartAdapter.SelectedPort.Open();
+                    PortButtonString = GetString("b_close");
                 }
                 catch { }
             }
+            else
+            {
+                UartAdapter.SelectedPort.Close();
+                PortButtonString = GetString("b_close");
+            }
         }
-        private bool CanOpenPortCommandExecute(object parameter) => (PortName.StartsWith("COM") && (!CanAdapter.PortOpened && SelectedProtocol == PhyProt_t.CAN || !UartAdapter.SelectedPort.IsOpen && SelectedProtocol==PhyProt_t.UART));
+        private bool CanTogglePortCommandExecute(object parameter) => (PortName.StartsWith("COM")|| CanAdapter.PortOpened||UartAdapter.SelectedPort.IsOpen);
 
-        public ICommand ClosePortCommand { get; }
-        private void OnClosePortCommandExecuted(object parameter)
-        {
-            CanAdapter.PortClose();
-            uartAdapter.SelectedPort.Close();
-        }
-        private bool CanClosePortCommandExecute(object parameter) => (CanAdapter.PortOpened || (UartAdapter.SelectedPort!=null && UartAdapter.SelectedPort.IsOpen));
 
         public ICommand LoadFromLogCommand { get; }
 
@@ -738,8 +750,7 @@ namespace CAN_Tool.ViewModels
 
             OmniInstance.NewDeviceAquired += NewDeviceHandler;
 
-            OpenPortCommand = new LambdaCommand(OnOpenPortCommandExecuted, CanOpenPortCommandExecute);
-            ClosePortCommand = new LambdaCommand(OnClosePortCommandExecuted, CanClosePortCommandExecute);
+            TogglePortCommand = new LambdaCommand(OnTogglePortCommandExecuted, CanTogglePortCommandExecute);
             RefreshPortListCommand = new LambdaCommand(OnRefreshPortsCommandExecuted);
             ReadConfigCommand = new LambdaCommand(OnReadConfigCommandExecuted, CanReadConfigCommandExecute);
             ReadBlackBoxDataCommand = new LambdaCommand(OnReadBlackBoxDataCommandExecuted, CanReadBlackBoxDataExecute);

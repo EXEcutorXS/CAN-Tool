@@ -60,15 +60,14 @@
             <StackPanel>
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="5">
-                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="10" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
-                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="PortNameList" Margin="10" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
-                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" Margin="10" MinWidth="40" ItemsSource="{Binding PhyProtocols}" SelectedItem="{Binding SelectedProtocol}">
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="5" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
+                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="PortNameList" Margin="5" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
+                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" Margin="5" MinWidth="40" ItemsSource="{Binding PhyProtocols}" SelectedItem="{Binding SelectedProtocol}">
                         </ComboBox>
                         
-                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="ModeSelector" Margin="10" MinWidth="70" ItemsSource="{Binding WorkModes}" SelectedIndex="2" SelectedItem="{Binding Mode}" />
+                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="ModeSelector" Margin="5" MinWidth="70" ItemsSource="{Binding WorkModes}" SelectedIndex="2" SelectedItem="{Binding Mode}" />
 
-                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton" Margin="10" Content="{DynamicResource b_open}" Command="{Binding OpenPortCommand}" />
-                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" x:Name="PortOpenButton_Copy" Margin="10" Content="{DynamicResource b_close}" Command="{Binding ClosePortCommand}" />
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}"  Margin="5" Content="{Binding PortButtonString}" Command="{Binding TogglePortCommand}" Cursor="Hand" />
 
                         <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
 
@@ -1004,12 +1003,27 @@
             <TabItem Header ="Timberline 1.5">
                 <DockPanel >
                     <StackPanel DockPanel.Dock="Left">
-                        <Button Margin="5" Content="Heater on"></Button>
-                        <Button Margin="5" Content="Heater on"></Button>
-                        <Button Margin="5" Content="Element on"></Button>
-                        <Button Margin="5" Content="Element off"></Button>
-                        <Button Margin="5" Content="Water on"></Button>
-                        <Button Margin="5" Content="Water off"></Button>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.HeaterEnabled}"/>
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Heater" Margin="5" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ElementEnabled}"/>
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Element" Margin="5" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterEnabled}"/>
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Water" Margin="5" Cursor="Hand" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterPumpStatus}"/>
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Pump" Margin="5" Cursor="Hand" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneManualFanMode}" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Fan manual" Margin="5" Cursor="Hand" />
+                        </StackPanel>
+
                         <Button Margin="5" Content="Sync time" Click="Button_Click_1"></Button>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Left">
@@ -1028,9 +1042,14 @@
                             <TextBlock Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="30" VerticalAlignment="Center" />
                             <Button VerticalAlignment="Center" Margin="5" Content="Send" />
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Zone temp"></TextBlock>
+                            <TextBlock Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="30" VerticalAlignment="Center" />
+                            <Button VerticalAlignment="Center" Margin="5" Content="Send" />
+                        </StackPanel>
 
                     </StackPanel>
-                    <DataGrid>
+                    <DataGrid ItemsSource="{Binding Timberline15}">
                     </DataGrid>
                 </DockPanel>
                 

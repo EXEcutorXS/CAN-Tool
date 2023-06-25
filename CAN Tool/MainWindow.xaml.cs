@@ -661,11 +661,7 @@ namespace CAN_Tool
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            RvcMessage msg = new();
-            msg.Dgn = 0x1FFFF;
-            msg.Priority = 6;
-            msg.
-            vm.CanAdapter.Transmit(msg.GetCanMessage());
+
         }
     }
 

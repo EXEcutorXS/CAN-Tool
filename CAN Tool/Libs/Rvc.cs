@@ -214,6 +214,7 @@ namespace RVC
     }
     public sealed class RvcMessage :  ViewModel, IComparable, IUpdatable<RvcMessage>
     {
+
         private byte priority;
 
         [AffectsTo(nameof(VerboseInfo))]
@@ -226,7 +227,7 @@ namespace RVC
         private byte sourceAdress;
         [AffectsTo(nameof(VerboseInfo))]
         public byte SourceAdress { set => Set(ref sourceAdress, value); get => sourceAdress; }
-        private byte[] data = new byte[8];
+        private byte[] data;
         [AffectsTo(nameof(VerboseInfo), nameof(Instance), nameof(DataAsText))]
         
         public byte Instance => Data[0];
@@ -272,15 +273,21 @@ namespace RVC
 
         public long updatetick;
 
+        public void FreshCheck()
+        {
+            if (fresh && (DateTime.Now.Ticks - updatetick > 3000000))
+                Fresh = false;
+        }
+
 
         public IEnumerable<Parameter> Parameters => (RVC.DGNs.ContainsKey(Dgn)) ? RVC.DGNs[Dgn].Parameters : null;
 
-        public RvcMessage() : base()
+        public RvcMessage()
         {
             Priority = 6;
             Dgn = 0x1FFFF;
-            SourceAdress = 100;
-
+            SourceAdress = 101;
+            data = new byte[] { 255, 255, 255, 255, 255, 255, 255, 255 };
             Fresh = true;
             
         }
@@ -303,7 +310,7 @@ namespace RVC
             Fresh = true;
         }
 
-        public CanMessage GetCanMessage()
+        public CanMessage ToCanMessage()
         {
             var msg = new CanMessage();
             msg.Id = Priority << 26 | Dgn << 8 | SourceAdress;
@@ -321,7 +328,7 @@ namespace RVC
             if (!(obj is RvcMessage))
                 return false;
             var comp = obj as RvcMessage;
-            return GetCanMessage().Equals(comp.GetCanMessage());
+            return ToCanMessage().Equals(comp.ToCanMessage());
         }
 
         public override string ToString()
@@ -344,7 +351,7 @@ namespace RVC
 
         public override int GetHashCode()
         {
-            return GetCanMessage().GetHashCode();
+            return ToCanMessage().GetHashCode();
         }
 
         public int CompareTo(object other)
