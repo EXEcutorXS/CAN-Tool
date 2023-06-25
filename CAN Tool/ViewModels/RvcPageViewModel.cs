@@ -107,29 +107,17 @@ namespace CAN_Tool.ViewModels
                             break;
                         case 0x86: // Heater info
                             if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) HeaterTotalMinutes = D[1] + D[2] * 256 + D[3] * 65536;
-                            HeaterVersion[0] = D[4];
-                            HeaterVersion[1] = D[5];
-                            HeaterVersion[2] = D[6];
-                            HeaterVersion[3] = D[7];
+                            HeaterVersion = new byte[] {D[4],D[5],D[6],D[7]};
                             break;
                         case 0x87: //Panel Info
                             if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) PanelMinutesSinceStart = D[1] + D[2] * 256 + D[3] * 65536;
-                            PanelVersion[0] = D[4];
-                            PanelVersion[1] = D[5];
-                            PanelVersion[2] = D[6];
-                            PanelVersion[3] = D[7];
+                            PanelVersion = new byte[] { D[4], D[5], D[6], D[7] };
                             break;
                         case 0x88: //HCU info
-                            HcuVersion[0] = D[4];
-                            HcuVersion[1] = D[5];
-                            HcuVersion[2] = D[6];
-                            HcuVersion[3] = D[7];
+                            HcuVersion = new byte[] { D[4],D[5],D[6],D[7]};
                             break;
                         case 0x8A: //Timers config status
-                            HcuVersion[0] = D[4];
-                            HcuVersion[1] = D[5];
-                            HcuVersion[2] = D[6];
-                            HcuVersion[3] = D[7];
+                            
                             break;
                     }
 
@@ -142,7 +130,7 @@ namespace CAN_Tool.ViewModels
         {
             RvcMessage msg = new() { Dgn = 0x1FFF6 };
             msg.Data[0] = 1;
-            msg.Data[1] = (byte)(0b11111100 + (!HeaterEnabled ? 1 : 0) + ((ElementEnabled ? 1 : 0) << 1));
+            msg.Data[1] = (byte)(0b11110000 + (!HeaterEnabled ? 1 : 0) + ((ElementEnabled ? 1 : 0) << 1));
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
 
@@ -152,7 +140,7 @@ namespace CAN_Tool.ViewModels
         {
             RvcMessage msg = new() { Dgn = 0x1FFF6 };
             msg.Data[0] = 1;
-            msg.Data[1] = (byte)(0b11111100 + (HeaterEnabled ? 1 : 0) + ((!ElementEnabled ? 1 : 0) << 1));
+            msg.Data[1] = (byte)(0b11110000 + (HeaterEnabled ? 1 : 0) + ((!ElementEnabled ? 1 : 0) << 1));
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
@@ -184,7 +172,7 @@ namespace CAN_Tool.ViewModels
         {
             RvcMessage msg = new() { Dgn = 0x1FFE3};
             msg.Data[0] = 1;
-            msg.Data[1] = (byte)(0b111111 + (!ZoneManualFanMode ? 1 : 0));
+            msg.Data[1] = (byte)(0b11111100 + (!ZoneManualFanMode ? 1 : 0));
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }

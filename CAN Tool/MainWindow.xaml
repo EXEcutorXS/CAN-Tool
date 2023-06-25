@@ -91,7 +91,7 @@
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_exit}" Margin="10" Click="ExitButtonClick" FlowDirection="RightToLeft" />
                     </StackPanel>
                 </DockPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Visible">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Collapsed">
                     <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" SelectedIndex="3" SelectionChanged="CanBitrateField_SelectionChanged">
                         <ComboBox.ItemsSource>
                             <col:ArrayList>
@@ -124,7 +124,7 @@
                     </TextBox>
 
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Visible">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Collapsed">
                     <ComboBox Margin="10" MinWidth="70" SelectedIndex="3" SelectedItem="{Binding UartAdapter.SelectedPort.BaudRate, Mode=OneWayToSource}">
                         <ComboBox.ItemsSource>
                             <col:ArrayList>
@@ -1002,58 +1002,65 @@
             </TabItem>
             <TabItem Header ="Timberline 1.5">
                 <DockPanel >
-                    <StackPanel DockPanel.Dock="Left">
+                    <StackPanel DockPanel.Dock="Left" Margin="5">
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.HeaterEnabled}"/>
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.HeaterEnabled}" IsEnabled="false"/>
                             <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Heater" Margin="5" Click="Button_Click_2" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ElementEnabled}"/>
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ElementEnabled}" IsEnabled="false" />
                             <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Element" Margin="5" Click="Button_Click_3" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterEnabled}"/>
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterEnabled}" IsEnabled="false"/>
                             <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Water" Margin="5" Cursor="Hand" Click="Button_Click_4" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneEnabled}" />
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneEnabled}" IsEnabled="false"/>
                             <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Zone Heating" Margin="5" Cursor="Hand" Click="Button_Click_5" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterPumpStatus}"/>
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Pump" Margin="5" Cursor="Hand" Click="Button_Click_6" />
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterPumpStatus}" IsEnabled="false" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Pump override" Margin="5" Cursor="Hand" Click="Button_Click_6" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneManualFanMode}" />
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneManualFanMode}" IsEnabled="false"/>
                             <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Fan manual" Margin="5" Cursor="Hand" Click="Button_Click_7" />
                         </StackPanel>
 
                         <Button Margin="5" Content="Sync time" Click="Button_Click_1"></Button>
                     </StackPanel>
-                    <StackPanel DockPanel.Dock="Left">
-                        <StackPanel Orientation="Horizontal">
+                    <StackPanel DockPanel.Dock="Left" Margin="5" Orientation="Vertical" Width="400">
+                        <DockPanel  >
                         <TextBlock  VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Day setpoint"></TextBlock>
-                            <TextBlock Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="30" VerticalAlignment="Center"/>
-                            <Button VerticalAlignment="Center" Margin="5" Content="Send" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5"  Minimum="10" Maximum="32"></ScrollBar>
+                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointDay}" HorizontalAlignment="Right"/>
+                            
+                        </DockPanel>
+                        <DockPanel >
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Night setpoint"></TextBlock>
-                            <TextBlock Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="30" VerticalAlignment="Center" />
-                            <Button VerticalAlignment="Center" Margin="5" Content="Send" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Fan speed"></TextBlock>
-                            <TextBlock Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="30" VerticalAlignment="Center" />
-                            <Button VerticalAlignment="Center" Margin="5" Content="Send" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Zone temp"></TextBlock>
-                            <TextBlock Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="30" VerticalAlignment="Center" />
-                            <Button VerticalAlignment="Center" Margin="5" Content="Send" />
-                        </StackPanel>
+                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5"  Minimum="10" Maximum="32" />
+                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointNight}" HorizontalAlignment="Right" />
+                            
+
+                        </DockPanel>
+                        <DockPanel >
+                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Fan manual speed"></TextBlock>
+                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5"  Minimum="10" Maximum="100" />
+                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.ZoneManualFanSpeed}" HorizontalAlignment="Right" />
+                            
+                        </DockPanel>
+                        
+                        
 
                     </StackPanel>
-                    <StackPanel>
+                    <StackPanel  Margin="5" Width="300" HorizontalAlignment="Left">
+                        <StackPanel.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Margin" Value="3" />
+                            </Style>
+                        </StackPanel.Resources>
+                        
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Tank Temperature: "/>
                             <TextBlock Text="{Binding Timberline15.TankTemperature,Mode=OneWay}" />
@@ -1082,10 +1089,7 @@
                             <TextBlock Text="Fan measured speed: " />
                             <TextBlock Text="{Binding Timberline15.ZoneFanMeasuredSpeed,Mode=OneWay}" />
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Fan manual speed: " />
-                            <TextBlock Text="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" />
-                        </StackPanel>
+                        
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Heater version: " />
                             <TextBlock Text="{Binding Timberline15.HeaterVersionString,Mode=OneWay}" />
@@ -1102,10 +1106,20 @@
                             <TextBlock Text="Solenoid status: " />
                             <TextBlock Text="{Binding Timberline15.SolenoidStatus,Mode=OneWay}" />
                         </StackPanel>
+
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Solenoid status: " />
-                            <TextBlock Text="{Binding Timberline15.SolenoidStatus,Mode=OneWay}" />
+                            <TextBlock Text="System timer: " />
+                            <TextBlock Text="{Binding Timberline15.SystemEstimatedTime,Mode=OneWay}" />
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Water timer: " />
+                            <TextBlock Text="{Binding Timberline15.WaterEstimatedTime,Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Pump timer: " />
+                            <TextBlock Text="{Binding Timberline15.PumpEstimatedTime,Mode=OneWay}" />
+                        </StackPanel>
+
                     </StackPanel>
                 </DockPanel>
                 
