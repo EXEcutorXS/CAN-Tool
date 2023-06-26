@@ -105,9 +105,9 @@ namespace CAN_Tool.ViewModels
                             if (D[6] != 0xFF) ZoneManualFanSpeed = (byte)(D[6]/2);
                             break;
                         case 0x85: //Estimated time
-                            if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) systemEstimatedTime = D[1] + D[2] * 256 + D[3] * 65536;
+                            if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) SystemEstimatedTime = D[1] + D[2] * 256 + D[3] * 65536;
                             if (D[4] != 0xFF || D[5] != 0xFF) WaterEstimatedTime = D[4] + D[5] * 256;
-                            if (D[6] != 0xFF || D[7] != 0xFF) pumpEstimatedTime = D[6] + D[7] * 256;
+                            if (D[6] != 0xFF || D[7] != 0xFF) PumpEstimatedTime = D[6] + D[7] * 256;
                             break;
                         case 0x86: // Heater info
                             if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) HeaterTotalMinutes = D[1] + D[2] * 256 + D[3] * 65536;
@@ -161,7 +161,6 @@ namespace CAN_Tool.ViewModels
         public void TogglePump()
         {
             
-            {
                 RvcMessage msg = new() { Dgn = 0x1FE96 };
                 msg.Data[0] = 1;
                 if (!WaterPumpStatus)
@@ -170,7 +169,6 @@ namespace CAN_Tool.ViewModels
                     msg.Data[1] = 0b11110000;
 
                 NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
-            }
 
         }
 
@@ -196,7 +194,7 @@ namespace CAN_Tool.ViewModels
         {
             RvcMessage msg = new() { Dgn = 0x1FFE3 };
             msg.Data[0] = 1;
-            msg.Data[2] = (byte)(ZoneManualFanSpeed*2);
+            msg.Data[2] = (byte)(speed * 2);
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }

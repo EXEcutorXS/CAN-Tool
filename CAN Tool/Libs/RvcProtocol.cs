@@ -706,6 +706,7 @@ namespace RVC
             newDgn.Parameters.Add(new() { multipackNum = 0x84, Name = "Solenoid", frstByte = 1, Size = 2, Meanings = defMeaningsOnOff });
             newDgn.Parameters.Add(new() { multipackNum = 0x84, Name = "Tank temperature", Type = paramTyp.temperature, frstByte = 2, Size = 16 });
             newDgn.Parameters.Add(new() { multipackNum = 0x84, Name = "Heater temperature", Type = paramTyp.temperature, frstByte = 4, Size = 16 });
+            newDgn.Parameters.Add(new() { multipackNum = 0x84, Name = "Manual fan speed", Type = paramTyp.percent, frstByte = 6, Size = 8 });
 
             newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "System timer", Unit="s", frstByte = 1, Size = 24 });
             newDgn.Parameters.Add(new() { multipackNum = 0x85, Name = "Water priority timer", Unit = "s", frstByte = 4, Size = 16 });

@@ -708,6 +708,7 @@ namespace CAN_Tool
         {
             vm?.RvcPage.Timberline15.SetFanManualSpeed((byte)(sender as ScrollBar).Value);
         }
+
     }
 
 

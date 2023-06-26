@@ -1043,7 +1043,7 @@
                         <DockPanel >
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Fan manual speed"></TextBlock>
                             <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5" Minimum="10" Maximum="100" Value="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}"  ValueChanged="ScrollBar_ValueChanged_3" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.ZoneManualFanSpeed}" HorizontalAlignment="Right" />
+                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" HorizontalAlignment="Right" />
                             
                         </DockPanel>
 
