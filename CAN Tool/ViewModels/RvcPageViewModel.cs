@@ -66,7 +66,8 @@ namespace CAN_Tool.ViewModels
                     break;
                 case 0x1FFE2://Thermostat status 1
                     if (D[0] != 1) return;
-                    if ((D[1] & 0xF) != 0xF) return; ZoneEnabled = (D[1] & 0x2) == 2;
+                    if ((D[1] & 0xF) != 0xF)
+                        ZoneEnabled = (D[1] & 0x2) == 2;
                     if (D[3] != 0xFF || D[4] != 0xFF) CurrentSetpoint = (D[3] + D[4] * 256) / 32 - 273;
                     break;
 
@@ -147,9 +148,9 @@ namespace CAN_Tool.ViewModels
 
         public void ToggleWater()
         {
-            RvcMessage msg = new() { Dgn = 0x1FFF6 };
-            msg.Data[0] = 1;
-            msg.Data[1] = (byte)(0b11111100 + (!HeaterEnabled ? 1 : 0) + ((ElementEnabled ? 1 : 0) << 1));
+            RvcMessage msg = new() { Dgn = 0x1EF65 };
+            msg.Data[0] = 0x83;
+            msg.Data[1] = (byte)(0b11111100 + (!WaterEnabled ? 1 : 0));
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
