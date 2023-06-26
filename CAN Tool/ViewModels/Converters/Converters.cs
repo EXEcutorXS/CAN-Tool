@@ -100,7 +100,7 @@ namespace CAN_Tool.ViewModels.Converters
             try
             {
                 string tempString = (string)value;
-                var arr = tempString.Where(x => char.IsDigit(x) || char.ToLower(x) == 'a' || char.ToLower(x) == 'b' || char.ToLower(x) == 'c' || char.ToLower(x) == 'd' || char.ToLower(x) == 'e' || char.ToLower(x) == 'f').ToArray();
+                var arr = tempString.Where(x => char.IsDigit(x) || char.ToLower(x) >= 'a' && char.ToLower(x) <= 'f').ToArray();
                 string res = new string(arr);
                 if (res.Length>16)
                     res=res.Substring(0,16);

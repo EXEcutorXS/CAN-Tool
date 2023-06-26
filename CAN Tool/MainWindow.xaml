@@ -68,8 +68,6 @@
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="ModeSelector" Margin="5" MinWidth="70" ItemsSource="{Binding WorkModes}" SelectedIndex="2" SelectedItem="{Binding Mode}" />
 
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}"  Margin="5" Content="{Binding PortButtonString}" Command="{Binding TogglePortCommand}" Cursor="Hand" />
-                        <vm:DataBox />
-                        
 
                         <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
 
@@ -162,10 +160,9 @@
                 <TextBlock VerticalAlignment="Center" Margin="10" Text="DLC:" FontSize="25" />
                 <TextBox ToolTip="DLC" MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.DLC,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
                 <TextBlock VerticalAlignment="Center" Margin="10" Text="Data:" FontSize="25" />
-                <TextBox ToolTip="Enter data in HEX format" MinWidth="200" Margin="10" Text="{Binding CanPage.ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HexToUlongConverter}}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                <vm:DataBox ToolTip="Enter data in HEX format" Margin="10" Text="{Binding CanPage.ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" FontFamily="Courier" />
                 <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.RTR}" Margin="10" FontSize="20">RTR</CheckBox>
                 <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.IDE}" Margin="10" FontSize="20">IDE</CheckBox>
-                <TextBox MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.DataAsText,Mode=OneWay}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" Cursor="" />
                 <Button Margin="10" Command="{Binding CanPage.SendCanMessageCommand}">Send</Button>
                 <TextBox ToolTip="Interval" MinWidth="70" Margin="10" Style="{DynamicResource MaterialDesignOutlinedTextBox}">
                     <TextBox.Text>
@@ -554,9 +551,8 @@
                                         </TextBox.Text>
                                     </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Data:</TextBlock>
-                                    <TextBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource HexToUlongConverter}}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                                    <TextBox ToolTip="Data Preview " MaxHeight="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsText,Mode=OneWay}" IsReadOnly="True" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
-                                    <Button Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}">
+                                    <vm:DataBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
+                                    <Button Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}" Cursor="Hand">
                                         <Button.Content>
                                             <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                                         </Button.Content>
@@ -947,11 +943,9 @@
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> SA</TextBlock>
                         <TextBox Text="{Binding ConstructedMessage.SourceAdress,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Priority:</TextBlock>
-                        <TextBox Text="{Binding ConstructedMessage.Priority,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
+                        <TextBox Text="{Binding ConstructedMessage.Priority,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}" />
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Data:</TextBlock>
-                        <TextBox Text="{Binding ConstructedMessage.Data,Converter={StaticResource DataConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
-                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Preview:</TextBlock>
-                        <TextBox x:Name="DataBox" Text="{Binding ConstructedMessage.DataAsText,Mode=OneWay}" FontSize="25" Margin="10" VerticalAlignment="Center" />
+                        <vm:DataBox Text="{Binding ConstructedMessage.DataAsULong,Converter={StaticResource HexToUlongConverter},UpdateSourceTrigger=PropertyChanged,Mode=OneWayToSource}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}"  />
                         <Button Margin="10" Command="{Binding SendRvcMessageCommand}">
                             <Button.Content>
                                 <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
