@@ -694,19 +694,19 @@ namespace CAN_Tool
             vm.RvcPage.Timberline15.ToggleFanManualMode();
         }
 
-        private void ScrollBar_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void ScrollBar_ValueChanged_1(object sender, RoutedEventArgs e)
         {
-            vm.RvcPage.Timberline15.SetDaySetpoint((int)(sender as ScrollBar).Value);
+            vm?.RvcPage.Timberline15.SetDaySetpoint((int)(sender as ScrollBar).Value);
         }
 
-        private void ScrollBar_ValueChanged_2(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void ScrollBar_ValueChanged_2(object sender, RoutedEventArgs e)
         {
-            vm.RvcPage.Timberline15.SetNightSetpoint((int)(sender as ScrollBar).Value);
+            vm?.RvcPage.Timberline15.SetNightSetpoint((int)(sender as ScrollBar).Value);
         }
 
-        private void ScrollBar_ValueChanged_3(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void ScrollBar_ValueChanged_3(object sender, RoutedEventArgs e)
         {
-            vm.RvcPage.Timberline15.SetFanManualSpeed((byte)(sender as ScrollBar).Value);
+            vm?.RvcPage.Timberline15.SetFanManualSpeed((byte)(sender as ScrollBar).Value);
         }
     }
 

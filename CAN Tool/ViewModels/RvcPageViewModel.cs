@@ -320,8 +320,8 @@ namespace CAN_Tool.ViewModels
         private int currentSetpoint;
         public int CurrentSetpoint { set => Set(ref currentSetpoint, value); get => currentSetpoint; }
 
-        private int zoneManualFanSpeed;
-        public int ZoneManualFanSpeed { set => Set(ref zoneManualFanSpeed, value); get => zoneManualFanSpeed; }
+        private byte zoneManualFanSpeed;
+        public byte ZoneManualFanSpeed { set => Set(ref zoneManualFanSpeed, value); get => zoneManualFanSpeed; }
 
         private bool zoneManualFanMode;
         public bool ZoneManualFanMode { set => Set(ref zoneManualFanMode, value); get => zoneManualFanMode; }

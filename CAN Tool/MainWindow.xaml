@@ -1029,20 +1029,20 @@
                     <StackPanel DockPanel.Dock="Left" Margin="5" Orientation="Vertical" Width="430">
                         <DockPanel  >
                         <TextBlock  VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Day setpoint"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5"  Minimum="10" Maximum="32" ValueChanged="ScrollBar_ValueChanged_1"></ScrollBar>
+                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5"  Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointDay,Mode=OneWay}" ValueChanged="ScrollBar_ValueChanged_1"></ScrollBar>
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointDay}" HorizontalAlignment="Right"/>
                             
                         </DockPanel>
                         <DockPanel >
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Night setpoint"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5"  Minimum="10" Maximum="32" ValueChanged="ScrollBar_ValueChanged_2" />
+                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5" Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointNight,Mode=OneWay}"  ValueChanged="ScrollBar_ValueChanged_2" />
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointNight}" HorizontalAlignment="Right" />
                             
 
                         </DockPanel>
                         <DockPanel >
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Fan manual speed"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5"  Minimum="10" Maximum="100" ValueChanged="ScrollBar_ValueChanged_3" />
+                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5" Minimum="10" Maximum="100" Value="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}"  ValueChanged="ScrollBar_ValueChanged_3" />
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.ZoneManualFanSpeed}" HorizontalAlignment="Right" />
                             
                         </DockPanel>
