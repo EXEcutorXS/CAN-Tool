@@ -661,7 +661,7 @@ namespace CAN_Tool
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-
+            vm.RvcPage.Timberline15.SetTime(DateTime.Now);
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
