@@ -15,6 +15,7 @@ using RVC;
 using CAN_Adapter;
 using CAN_Tool.Libs;
 using System.Windows.Threading;
+using System.Windows.Interop;
 
 namespace CAN_Tool.ViewModels
 {
@@ -158,6 +159,17 @@ namespace CAN_Tool.ViewModels
 
         public void TogglePump()
         {
+            
+            {
+                RvcMessage msg = new() { Dgn = 0x1FE96 };
+                msg.Data[0] = 1;
+                if (!WaterPumpStatus)
+                    msg.Data[1] = 0b11110101;
+                else
+                    msg.Data[1] = 0b11110000;
+
+                NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            }
 
         }
 
