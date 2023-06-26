@@ -102,6 +102,7 @@ namespace CAN_Tool.ViewModels
                             if ((D[1] & 3) != 3) SolenoidStatus = (D[1] & 3) != 0;
                             if (D[2] != 0xFF || D[3] != 0xFF) TankTemperature = (D[2] + D[3] * 256) / 32 - 273;
                             if (D[4] != 0xFF || D[5] != 0xFF) HeaterTemperature = (D[4] + D[5] * 256) / 32 - 273;
+                            if (D[6] != 0xFF) ZoneManualFanSpeed = (byte)(D[6]/2);
                             break;
                         case 0x85: //Estimated time
                             if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) systemEstimatedTime = D[1] + D[2] * 256 + D[3] * 65536;
