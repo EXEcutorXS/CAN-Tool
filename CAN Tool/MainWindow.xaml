@@ -1026,7 +1026,7 @@
 
                         <Button Margin="5" Content="Sync time" Click="Button_Click_1"></Button>
                     </StackPanel>
-                    <StackPanel DockPanel.Dock="Left" Margin="5" Orientation="Vertical" Width="400">
+                    <StackPanel DockPanel.Dock="Left" Margin="5" Orientation="Vertical" Width="430">
                         <DockPanel  >
                         <TextBlock  VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Day setpoint"></TextBlock>
                             <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5"  Minimum="10" Maximum="32"></ScrollBar>
@@ -1046,8 +1046,14 @@
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.ZoneManualFanSpeed}" HorizontalAlignment="Right" />
                             
                         </DockPanel>
-                        
-                        
+
+                        <DockPanel>
+                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="RVC-Temperature"></TextBlock>
+                            <ScrollBar DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5" Minimum="10" Maximum="40" Value="{Binding Timberline15.RvcTemperature}"/>
+                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.RvcTemperature,Mode=OneWay}" HorizontalAlignment="Right" />
+                            <CheckBox DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}"  HorizontalAlignment="Right" IsChecked="{Binding Timberline15.BroadcastTemperature}"/>
+    
+                        </DockPanel>
 
                     </StackPanel>
                     <StackPanel  Margin="5" Width="300" HorizontalAlignment="Left">

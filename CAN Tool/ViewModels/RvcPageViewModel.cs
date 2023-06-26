@@ -14,7 +14,7 @@ using System.ComponentModel;
 using RVC;
 using CAN_Adapter;
 using CAN_Tool.Libs;
-
+using System.Windows.Threading;
 
 namespace CAN_Tool.ViewModels
 {
@@ -25,6 +25,7 @@ namespace CAN_Tool.ViewModels
 
     public class Timberline15Handler : ViewModel
     {
+        private DispatcherTimer timer;
 
         public event EventHandler NeedToTransmit;
 
@@ -257,6 +258,17 @@ namespace CAN_Tool.ViewModels
             hcuVersion = new byte[4];
             heaterVersion = new byte[4];
             panelVersion = new byte[4];
+
+            timer = new();
+            timer.Interval = new TimeSpan(0,0,5);
+            timer.Start();
+            timer.Tick += TimerCallback;
+        }
+
+        void TimerCallback(object sender, EventArgs e)
+        {
+            if (BroadcastTemperature)
+                OverrideTempSensor(RvcTemperature);
         }
 
         private int tankTemperature;
@@ -349,6 +361,12 @@ namespace CAN_Tool.ViewModels
 
         private int systemDuration;
         public int SystemDuration { set => Set(ref systemDuration, value); get => systemDuration; }
+
+        private bool broadcastTemperature;
+        public bool BroadcastTemperature { set => Set(ref broadcastTemperature, value); get => broadcastTemperature; }
+
+        private int rvcTemperature;
+        public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
 
 
         private byte[] heaterVersion;
