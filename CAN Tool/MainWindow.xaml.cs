@@ -659,56 +659,76 @@ namespace CAN_Tool
 
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void SetTimeButtonPressed(object sender, RoutedEventArgs e)
         {
             vm.RvcPage.Timberline15.SetTime(DateTime.Now);
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
+        private void ToggleHeaterButtonPressed(object sender, RoutedEventArgs e)
         {
             vm.RvcPage.Timberline15.ToggleHeater();
         }
 
-        private void Button_Click_3(object sender, RoutedEventArgs e)
+        private void ToggleElementButtonPressed(object sender, RoutedEventArgs e)
         {
             vm.RvcPage.Timberline15.ToggleElement();
         }
 
-        private void Button_Click_4(object sender, RoutedEventArgs e)
+        private void ToggleWaterButtonPressed(object sender, RoutedEventArgs e)
         {
             vm.RvcPage.Timberline15.ToggleWater();
         }
 
-        private void Button_Click_5(object sender, RoutedEventArgs e)
+        private void ToggleZoneButtonPressed(object sender, RoutedEventArgs e)
         {
             vm.RvcPage.Timberline15.ToggleZone();
         }
 
-        private void Button_Click_6(object sender, RoutedEventArgs e)
+        private void TogglePumpButtonPressed(object sender, RoutedEventArgs e)
         {
             vm.RvcPage.Timberline15.TogglePump();
         }
 
-        private void Button_Click_7(object sender, RoutedEventArgs e)
+        private void ToggleFanManualModeButtonPressed(object sender, RoutedEventArgs e)
         {
             vm.RvcPage.Timberline15.ToggleFanManualMode();
         }
 
-        private void ScrollBar_ValueChanged_1(object sender, RoutedEventArgs e)
+        private void DaySetPointValueChanged(object sender, RoutedEventArgs e)
         {
             vm?.RvcPage.Timberline15.SetDaySetpoint((int)(sender as ScrollBar).Value);
         }
 
-        private void ScrollBar_ValueChanged_2(object sender, RoutedEventArgs e)
+        private void NightSetPointValueChanged(object sender, RoutedEventArgs e)
         {
             vm?.RvcPage.Timberline15.SetNightSetpoint((int)(sender as ScrollBar).Value);
         }
 
-        private void ScrollBar_ValueChanged_3(object sender, RoutedEventArgs e)
+        private void ManualFanSpeedValueChanged(object sender, RoutedEventArgs e)
         {
             vm?.RvcPage.Timberline15.SetFanManualSpeed((byte)(sender as ScrollBar).Value);
         }
 
+        private void SystemDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.RvcPage.Timberline15.SetSystemDuration((int)(sender as ScrollBar).Value);
+        }
+
+        private void WaterDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.RvcPage.Timberline15.SetWaterDuration((int)(sender as ScrollBar).Value);
+        }
+
+        private void NightTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
+        {
+            vm?.RvcPage.Timberline15.SetNightStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
+        }
+
+        
+            private void DayStartChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
+        {
+            vm?.RvcPage.Timberline15.SetDayStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
+        }
     }
 
 

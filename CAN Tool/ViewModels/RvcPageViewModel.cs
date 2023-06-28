@@ -19,6 +19,8 @@ using System.Windows.Interop;
 
 namespace CAN_Tool.ViewModels
 {
+    public enum pumpStatus_t {off,on,overriden};
+
     public class NeedToTransmitEventArgs : EventArgs
     {
         public RvcMessage msgToTransmit;
@@ -56,8 +58,15 @@ namespace CAN_Tool.ViewModels
 
                 case 0x1FE97://Pump status
                     if (D[0] != 1) return;
-                    if (D[1] != 0xFF)
-                        WaterPumpStatus = (D[1] & 0xF) != 0;
+                    if ((D[1]&0xF) != 0xF)
+                        switch (D[1]&0xf)
+                        {
+                            case 0: WaterPumpStatus=pumpStatus_t.off; WaterPumpOverride = false; break;
+                            case 1: WaterPumpStatus = pumpStatus_t.on; WaterPumpOverride = false; break;
+                            case 5: WaterPumpStatus = pumpStatus_t.overriden; WaterPumpOverride = true; break;
+                            default: throw new ArgumentException("Wrong pump status");
+                        }
+                        
                     break;
                 case 0x1FFE4://Furnace status
                     if (D[0] != 1) return;
@@ -77,14 +86,14 @@ namespace CAN_Tool.ViewModels
                     if (D[0] != 1) return;
                     if (D[1] == 0)
                     {
-                        if (D[2] < 24) NightStartHour = D[2];
-                        if (D[3] < 60) NightStartMinute = D[3];
+                        if (D[2] < 24 && D[3] < 60)
+                            NightStart = new DateTime(1,1,1,D[2], D[3],1);
                         if (D[4] != 0xFF || D[5] != 0xFF) SetpointNight = (D[4] + D[5] * 256) / 32 - 273;
                     }
                     if (D[1] == 1)
                     {
-                        if (D[2] < 24) DayStartHour = D[2];
-                        if (D[3] < 60) DayStartMinute = D[3];
+                        if (D[2] < 24 && D[3] < 60)
+                            DayStart = new DateTime(1, 1, 1, D[2], D[3], 1);
                         if (D[4] != 0xFF || D[5] != 0xFF) SetpointDay = (D[4] + D[5] * 256) / 32 - 273;
                     }
                     break;
@@ -121,7 +130,8 @@ namespace CAN_Tool.ViewModels
                             HcuVersion = new byte[] { D[4],D[5],D[6],D[7]};
                             break;
                         case 0x8A: //Timers config status
-                            
+                            if (D[1] != 0xFF || D[2] != 0xFF) SystemDuration = D[1] + D[2] * 256;
+                            if (D[3] != 0xFF) WaterDuration = D[3];
                             break;
                     }
 
@@ -163,7 +173,7 @@ namespace CAN_Tool.ViewModels
             
                 RvcMessage msg = new() { Dgn = 0x1FE96 };
                 msg.Data[0] = 1;
-                if (!WaterPumpStatus)
+                if (WaterPumpStatus!=pumpStatus_t.overriden)
                     msg.Data[1] = 0b11110101;
                 else
                     msg.Data[1] = 0b11110000;
@@ -240,14 +250,66 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void SetSystemLimitationTime(int minutes)
+        public void SetSystemDuration(int minutes)
         {
+            if (minutes < 60) minutes = 60;
+            if (minutes > 7200) minutes = 7200;
 
+            RvcMessage msg = new();
+            msg.Dgn = 0x1EF65;
+            msg.Priority = 6;
+            msg.Data[0] = 0x89;
+            msg.Data[1] = (byte)(minutes&0xff);
+            msg.Data[2] = (byte)((minutes>>8) & 0xff);
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void SetWaterLimitationTime(int minutes)
+        public void SetWaterDuration(int minutes)
         {
+            if (minutes < 30) minutes = 30;
+            if (minutes > 60) minutes = 60;
 
+            RvcMessage msg = new();
+            msg.Dgn = 0x1EF65;
+            msg.Priority = 6;
+            msg.Data[0] = 0x89;
+            msg.Data[3] = (byte)(minutes & 0xff);
+            
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void SetDayStart(int hours,int minutes)
+        {
+            if (minutes > 59) minutes = 59;
+            if (hours > 23) minutes = 23;
+
+            RvcMessage msg = new();
+            msg.Dgn = 0x1FEF5;
+            msg.Priority = 6;
+            msg.Data[0] = 1;
+            msg.Data[1] = 1;
+            msg.Data[2] = (byte)hours;
+            msg.Data[3] = (byte)minutes;
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void SetNightStart(int hours, int minutes)
+        {
+            if (minutes > 59) minutes = 59;
+            if (hours > 23) minutes = 23;
+
+            RvcMessage msg = new();
+            msg.Dgn = 0x1FEF5;
+            msg.Priority = 6;
+            msg.Data[0] = 1;
+            msg.Data[1] = 0;
+            msg.Data[2] = (byte)hours;
+            msg.Data[3] = (byte)minutes;
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
         public void OverrideTempSensor(int temperature)
@@ -291,8 +353,11 @@ namespace CAN_Tool.ViewModels
         private int heaterTemperature;
         public int HeaterTemperature { set => Set(ref heaterTemperature, value); get => heaterTemperature; }
 
-        private bool waterPumpStatus;
-        public bool WaterPumpStatus { set => Set(ref waterPumpStatus, value); get => waterPumpStatus; }
+        private pumpStatus_t waterPumpStatus;
+        public pumpStatus_t WaterPumpStatus { set => Set(ref waterPumpStatus, value); get => waterPumpStatus; }
+
+        private bool waterPumpOverride;
+        public bool WaterPumpOverride { set => Set(ref waterPumpOverride, value); get => waterPumpOverride; }
 
         private bool solenoidStatus;
         public bool SolenoidStatus { set => Set(ref solenoidStatus, value); get => solenoidStatus; }
@@ -352,18 +417,6 @@ namespace CAN_Tool.ViewModels
         private int zoneTemperature;
         public int ZoneTemperature { set => Set(ref zoneTemperature, value); get => zoneTemperature; }
 
-        private int dayStartHour;
-        public int DayStartHour { set => Set(ref dayStartHour, value); get => dayStartHour; }
-
-        private int dayStartMinute;
-        public int DayStartMinute { set => Set(ref dayStartMinute, value); get => dayStartMinute; }
-
-        private int nightStartHour;
-        public int NightStartHour { set => Set(ref nightStartHour, value); get => nightStartHour; }
-
-        private int nightStartMinute;
-        public int NightStartMinute { set => Set(ref nightStartMinute, value); get => nightStartMinute; }
-
         private int heaterTotalMinutes;
         public int HeaterTotalMinutes { set => Set(ref heaterTotalMinutes, value); get => heaterTotalMinutes; }
 
@@ -378,6 +431,12 @@ namespace CAN_Tool.ViewModels
 
         private int rvcTemperature;
         public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
+
+        private DateTime? dayStart;
+        public DateTime? DayStart { set => Set(ref dayStart, value); get => dayStart; }
+
+        private DateTime? nightStart;
+        public DateTime? NightStart { set => Set(ref nightStart, value); get => nightStart; }
 
 
         private byte[] heaterVersion;
