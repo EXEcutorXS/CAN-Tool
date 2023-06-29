@@ -955,6 +955,7 @@
                         </StackPanel>
 
                         <Button Margin="5" Content="Sync time" Click="SetTimeButtonPressed"></Button>
+                        <Button Margin="5" Content="Clear errors" Click="ClearErrorsButtonPressed"></Button>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Left" Margin="5" Orientation="Vertical" Width="430">
                         <DockPanel>

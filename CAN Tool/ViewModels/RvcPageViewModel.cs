@@ -250,6 +250,16 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
+        public void ClearErrors()
+        {
+            RvcMessage msg = new();
+            msg.Dgn = 0x1FE65;
+            msg.Priority = 6;
+            msg.Data[0] = 0x81;
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
         public void SetSystemDuration(int minutes)
         {
             if (minutes < 60) minutes = 60;
