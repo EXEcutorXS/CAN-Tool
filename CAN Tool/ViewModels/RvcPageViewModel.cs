@@ -253,7 +253,7 @@ namespace CAN_Tool.ViewModels
         public void ClearErrors()
         {
             RvcMessage msg = new();
-            msg.Dgn = 0x1FE65;
+            msg.Dgn = 0x1EF65;
             msg.Priority = 6;
             msg.Data[0] = 0x81;
 
@@ -439,7 +439,7 @@ namespace CAN_Tool.ViewModels
         private bool broadcastTemperature;
         public bool BroadcastTemperature { set => Set(ref broadcastTemperature, value); get => broadcastTemperature; }
 
-        private int rvcTemperature;
+        private int rvcTemperature = 30;
         public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
 
         private DateTime? dayStart;
