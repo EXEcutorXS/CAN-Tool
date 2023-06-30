@@ -328,6 +328,7 @@
 <v:String x:Key="par_541">HCU_ELEMENT_IGNITION</v:String>
 <v:String x:Key="par_542">HEATER_LIQUID_SETPOINT</v:String>
 <v:String x:Key="par_543">HEATER_LIQUID_IGNITION</v:String>
+<v:String x:Key="par_544">FLOOR_UNDERHEATING_SETPOINT</v:String>
 
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
 

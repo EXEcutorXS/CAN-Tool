@@ -328,6 +328,7 @@ par_540	HCU_ELEMENT_SETPOINT	уставка температуры бака дл
 par_541	HCU_ELEMENT_IGNITION	уставка температуры бака для выхода ТЭНа из ждущего в режиме StorageMode
 par_542	HEATER_LIQUID_SETPOINT	уставка температуры жидкости бака для перехода котла в ждущий в режиме StorageMode
 par_543	HEATER_LIQUID_IGNITION	уставка температуры жидкости бака для выхода котла из ждущего в режиме StorageMode
+par_544	FLOOR_UNDERHEATING_SETPOINT	Уставка подогрева пола
 		
 par_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C
 		
