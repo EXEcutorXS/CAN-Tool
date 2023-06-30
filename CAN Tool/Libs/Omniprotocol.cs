@@ -1318,9 +1318,9 @@ namespace OmniProtocol
         public override string ToString()
         {
             if (deviceReference != null)
-                return deviceReference.Name;
+                return $"{deviceReference.Name}({id.Address})";
             else
-                return $"No device <{ID.Type}> in list";
+                return $"Device #<{ID.Type}>({id.Address})";
 
         }
 
