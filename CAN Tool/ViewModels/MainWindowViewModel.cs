@@ -85,8 +85,6 @@ namespace CAN_Tool.ViewModels
 
         public WpfPlot myChart;
 
-
-
         private OmniMessage selectedMessage;
 
         public OmniMessage SelectedMessage
@@ -94,7 +92,6 @@ namespace CAN_Tool.ViewModels
             get => selectedMessage;
             set => Set(ref selectedMessage, value);
         }
-
 
         OmniMessage customMessage = new OmniMessage() { PGN = 0, ReceiverAddress = 0, ReceiverType = 27 };
 
@@ -586,10 +583,6 @@ namespace CAN_Tool.ViewModels
             if (!CanAdapter.PortOpened) return false;
             return true;
         }
-
-
-
-
 
 
         public ICommand SaveLogCommand { get; }

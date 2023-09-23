@@ -20,7 +20,6 @@ namespace CAN_Adapter
     }
 
 
-
     public class CanMessage : ViewModel, IComparable, IUpdatable<CanMessage>
     {
         private bool ide;
