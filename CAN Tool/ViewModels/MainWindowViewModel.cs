@@ -240,8 +240,8 @@ namespace CAN_Tool.ViewModels
                 }
                 else
                 {
-                    CanAdapter.PortClose();
                     PortButtonString = GetString("b_open");
+                    CanAdapter.PortClose();
                 }
             }
             if (SelectedProtocol == PhyProt_t.UART)
