@@ -329,6 +329,24 @@
 <v:String x:Key="par_542">HEATER_LIQUID_SETPOINT</v:String>
 <v:String x:Key="par_543">HEATER_LIQUID_IGNITION</v:String>
 
+<v:String x:Key="par_544">UNDERFLOOR_HEATING_MODULE_CONNECTED</v:String>
+<v:String x:Key="par_545">UNDERFLOOR_HEATING_SETPOINT_CELSIUS</v:String>
+<v:String x:Key="par_546">UNDERFLOOR_HEATING_HYSTERESIS_CELSIUS</v:String>
+
+<v:String x:Key="par_547">ENGINE_PREHEAT_MODULE_CONNECTED</v:String>
+<v:String x:Key="par_548">ENGINE_PREHEAT_SETPOINT_CELSIUS</v:String>
+
+
+<v:String x:Key="par_550">DEFROSTING_ENABLING_SETPOINT_CELSIUS</v:String>
+<v:String x:Key="par_551">DEFROSTING_DISABLING_SETPOINT_CELSIUS</v:String>
+
+<v:String x:Key="par_552">ZONE 1 TEMP CORRECTION (+25)</v:String>
+<v:String x:Key="par_553">ZONE 2 TEMP CORRECTION (+25)</v:String>
+<v:String x:Key="par_554">ZONE 3 TEMP CORRECTION (+25)</v:String>
+<v:String x:Key="par_555">ZONE 4 TEMP CORRECTION (+25)</v:String>
+<v:String x:Key="par_556">ZONE 5 TEMP CORRECTION (+25)</v:String>
+
+
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
 
 <v:String x:Key="bb_1">Start counter</v:String>

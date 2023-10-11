@@ -329,6 +329,24 @@
 <v:String x:Key="par_542">уставка температуры жидкости бака для перехода котла в ждущий в режиме StorageMode</v:String>
 <v:String x:Key="par_543">уставка температуры жидкости бака для выхода котла из ждущего в режиме StorageMode</v:String>
 
+<v:String x:Key="par_544">Признак наличия функции тёплого пола</v:String>
+<v:String x:Key="par_545">Уставка тёплого пола</v:String>
+<v:String x:Key="par_546">Гистерезис работы тёплого пола</v:String>
+
+<v:String x:Key="par_547">Признак наличия функции предпускового подогрева</v:String>
+<v:String x:Key="par_548">Желаемая температура двигателя после подогрева</v:String>
+
+
+<v:String x:Key="par_550">Температура включения разморозки</v:String>
+<v:String x:Key="par_551">Температура выключения разморозки</v:String>
+
+<v:String x:Key="par_552">Коррекция температура зоны 1 (+25)</v:String>
+<v:String x:Key="par_553">Коррекция температура зоны 2 (+25)</v:String>
+<v:String x:Key="par_554">Коррекция температура зоны 3 (+25)</v:String>
+<v:String x:Key="par_555">Коррекция температура зоны 4 (+25)</v:String>
+<v:String x:Key="par_556">Коррекция температура зоны 5 (+25)</v:String>
+
+
 <v:String x:Key="par_600">номер устройства на шине CAN RV-C</v:String>
 
 <v:String x:Key="bb_1">счетчик запусков</v:String>

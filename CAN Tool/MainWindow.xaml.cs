@@ -729,6 +729,11 @@ namespace CAN_Tool
         {
             vm?.RvcPage.Timberline15.SetDayStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
         }
+
+        private void ClearErrorsButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm?.RvcPage.Timberline15.ClearErrors();
+        }
     }
 
 

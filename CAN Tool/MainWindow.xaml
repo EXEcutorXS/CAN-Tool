@@ -955,30 +955,31 @@
                         </StackPanel>
 
                         <Button Margin="5" Content="Sync time" Click="SetTimeButtonPressed"></Button>
+                        <Button Margin="5" Content="Clear errors" Click="ClearErrorsButtonPressed"></Button>
                     </StackPanel>
-                    <StackPanel DockPanel.Dock="Left" Margin="5" Orientation="Vertical" Width="430">
+                    <StackPanel DockPanel.Dock="Left" Margin="5" Orientation="Vertical" Width="550">
                         <DockPanel>
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Day setpoint,C°"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="200" Margin="5" Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointDay,Mode=OneWay}" ValueChanged="DaySetPointValueChanged"></ScrollBar>
+                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointDay,Mode=OneWay}" ValueChanged="DaySetPointValueChanged"></ScrollBar>
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointDay}" HorizontalAlignment="Right" />
 
                         </DockPanel>
                         <DockPanel>
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Night setpoint,C°"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="200" Margin="5" Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointNight,Mode=OneWay}" ValueChanged="NightSetPointValueChanged" />
+                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointNight,Mode=OneWay}" ValueChanged="NightSetPointValueChanged" />
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointNight}" HorizontalAlignment="Right" />
 
                         </DockPanel>
                         <DockPanel>
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Fan manual speed,%"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="200" Margin="5" Minimum="10" Maximum="100" Value="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" ValueChanged="ManualFanSpeedValueChanged" />
+                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="100" Value="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" ValueChanged="ManualFanSpeedValueChanged" />
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" HorizontalAlignment="Right" />
 
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="RVC-Temperature,C°"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="200" Margin="5" Minimum="10" Maximum="40" Value="{Binding Timberline15.RvcTemperature}" />
+                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="40" Value="{Binding Timberline15.RvcTemperature}" />
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.RvcTemperature,Mode=OneWay}" HorizontalAlignment="Right" />
                             <CheckBox DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" HorizontalAlignment="Right" IsChecked="{Binding Timberline15.BroadcastTemperature}" />
 
@@ -992,13 +993,13 @@
                         </DockPanel>
                         <DockPanel>
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="System Limit, minutes"></TextBlock>
-                            <ScrollBar SmallChange="60" LargeChange="60" DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5" Minimum="60" Maximum="7200" Value="{Binding Timberline15.SystemDuration,Mode=OneWay}" ValueChanged="SystemDurationValueChanged" />
+                            <ScrollBar SmallChange="60" LargeChange="60" DockPanel.Dock="Right" Orientation="Horizontal" Width="300" Margin="5" Minimum="60" Maximum="7200" Value="{Binding Timberline15.SystemDuration,Mode=OneWay}" ValueChanged="SystemDurationValueChanged" />
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SystemDuration,Mode=OneWay}" HorizontalAlignment="Right" />
 
                         </DockPanel>
                         <DockPanel>
                             <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Water Limit, minutes"></TextBlock>
-                            <ScrollBar SmallChange="1" LargeChange="5" DockPanel.Dock="Right" Orientation="Horizontal" Width="200" Margin="5" Minimum="30" Maximum="60" Value="{Binding Timberline15.WaterDuration,Mode=OneWay}" ValueChanged="WaterDurationValueChanged" />
+                            <ScrollBar SmallChange="1" LargeChange="5" DockPanel.Dock="Right" Orientation="Horizontal" Width="300" Margin="5" Minimum="30" Maximum="60" Value="{Binding Timberline15.WaterDuration,Mode=OneWay}" ValueChanged="WaterDurationValueChanged" />
                             <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.WaterDuration,Mode=OneWay}" HorizontalAlignment="Right" />
 
                         </DockPanel>

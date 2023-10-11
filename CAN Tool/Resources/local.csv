@@ -329,6 +329,24 @@ par_541	HCU_ELEMENT_IGNITION	уставка температуры бака дл
 par_542	HEATER_LIQUID_SETPOINT	уставка температуры жидкости бака для перехода котла в ждущий в режиме StorageMode
 par_543	HEATER_LIQUID_IGNITION	уставка температуры жидкости бака для выхода котла из ждущего в режиме StorageMode
 		
+par_544	UNDERFLOOR_HEATING_MODULE_CONNECTED	Признак наличия функции тёплого пола
+par_545	UNDERFLOOR_HEATING_SETPOINT_CELSIUS	Уставка тёплого пола
+par_546	UNDERFLOOR_HEATING_HYSTERESIS_CELSIUS	Гистерезис работы тёплого пола
+		
+par_547	ENGINE_PREHEAT_MODULE_CONNECTED	Признак наличия функции предпускового подогрева
+par_548	ENGINE_PREHEAT_SETPOINT_CELSIUS	Желаемая температура двигателя после подогрева
+		
+		
+par_550	DEFROSTING_ENABLING_SETPOINT_CELSIUS	Температура включения разморозки
+par_551	DEFROSTING_DISABLING_SETPOINT_CELSIUS	Температура выключения разморозки
+		
+par_552	ZONE 1 TEMP CORRECTION (+25)	Коррекция температура зоны 1 (+25)
+par_553	ZONE 2 TEMP CORRECTION (+25)	Коррекция температура зоны 2 (+25)
+par_554	ZONE 3 TEMP CORRECTION (+25)	Коррекция температура зоны 3 (+25)
+par_555	ZONE 4 TEMP CORRECTION (+25)	Коррекция температура зоны 4 (+25)
+par_556	ZONE 5 TEMP CORRECTION (+25)	Коррекция температура зоны 5 (+25)
+		
+		
 par_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C
 		
 bb_1	Start counter	счетчик запусков

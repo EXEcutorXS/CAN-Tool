@@ -162,7 +162,8 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new();
             msg.TransmitterType = 126;
             msg.TransmitterAddress = 6;
-            msg.ReceiverId = Vm.SelectedConnectedDevice.ID;
+            msg.ReceiverType = Vm.SelectedConnectedDevice.ID.Type;
+            msg.ReceiverAddress = 7;
             msg.PGN = 1;
             msg.Data = new byte[8];
             msg.Data[0] = 0;

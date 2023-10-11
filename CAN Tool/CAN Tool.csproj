@@ -16,6 +16,7 @@
     <None Remove="Images\23.jpg" />
     <None Remove="Images\27.jpg" />
     <None Remove="Images\34.jpg" />
+    <None Remove="Images\37.jpg" />
     <None Remove="Images\CANTool.ico" />
     <None Remove="Images\mouseWheel.png" />
   </ItemGroup>
@@ -46,6 +47,7 @@
     <Resource Include="Images\23.jpg" />
     <Resource Include="Images\27.jpg" />
     <Resource Include="Images\34.jpg" />
+    <Resource Include="Images\37.jpg" />
     <Resource Include="Images\CANTool.ico" />
     <Resource Include="Images\mouseWheel.png" />
   </ItemGroup>
