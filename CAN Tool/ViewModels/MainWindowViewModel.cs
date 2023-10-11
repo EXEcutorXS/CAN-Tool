@@ -232,6 +232,12 @@ namespace CAN_Tool.ViewModels
                     CanAdapter.PortOpen();
                     PortButtonString = GetString("b_close");
                     Thread.Sleep(20);
+                    canAdapter.SetBitrate(5); //250kb/sec
+                    Thread.Sleep(20);
+                    canAdapter.SetAceptCode(0);
+                    Thread.Sleep(20);
+                    canAdapter.SetMask(0);
+                    Thread.Sleep(20);
                     CanAdapter.StartNormal();
                     Thread.Sleep(20);
                 }

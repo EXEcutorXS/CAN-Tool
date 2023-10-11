@@ -301,6 +301,8 @@ namespace CAN_Adapter
         public void StartSelfReception() => serialPort.Write("Y\r");
         public void Stop() => serialPort.Write("C\r");
         public void SetBitrate(int bitrate) => serialPort.Write($"S{bitrate}\r");
+        public void SetMask(uint mask) => serialPort.Write($"m{mask:X08}\r");
+        public void SetAceptCode(uint code) => serialPort.Write($"M{code:X08}\r");
 
         public void Transmit(CanMessage msg, int delay)
         {
