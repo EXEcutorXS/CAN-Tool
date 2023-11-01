@@ -262,7 +262,7 @@ namespace CAN_Tool.ViewModels
                 PortButtonString = GetString("b_close");
             }
         }
-        private bool CanTogglePortCommandExecute(object parameter) => (PortName.StartsWith("COM")|| CanAdapter.PortOpened||UartAdapter.SelectedPort.IsOpen);
+        private bool CanTogglePortCommandExecute(object parameter) => (PortName.StartsWith("COM") || CanAdapter.PortOpened || UartAdapter.SelectedPort.IsOpen);
 
 
         public ICommand LoadFromLogCommand { get; }
@@ -435,7 +435,7 @@ namespace CAN_Tool.ViewModels
                         plt.Style(dataBackground: System.Drawing.Color.FromArgb(255, 40, 40, 40), figureBackground: System.Drawing.Color.DimGray);
                     else
                         plt.Style(dataBackground: System.Drawing.Color.WhiteSmoke, figureBackground: System.Drawing.Color.White);
-                    plt.Legend();
+                    plt.Legend(true, ScottPlot.Alignment.UpperLeft);
 
 
                 }
@@ -618,7 +618,17 @@ namespace CAN_Tool.ViewModels
             return SelectedConnectedDevice != null && SelectedConnectedDevice.LogCurrentPos > 0;
         }
 
+        public ICommand DefaultStyleCommand { get; }
 
+        private void OnDefaultStyleExecuted(object parameter)
+        {
+            for (int i = 0; i < 140; i++)
+            {
+                App.Settings.ShowFlag[i] = false;
+            }
+            
+
+        }
 
         public void ExecuteCommand(int cmdNum, params byte[] data)
         {
@@ -777,6 +787,7 @@ namespace CAN_Tool.ViewModels
             SendFromLogCommand = new LambdaCommand(OnSendFromLogCommandExecuted, null);
 
             SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
+            DefaultStyleCommand = new LambdaCommand(OnDefaultStyleExecuted, (x) => true);
             SaveReportCommand = new LambdaCommand(OnSaveReportCommandExecuted, CanSaveReportCommandExecute);
 
             ToggleCanLogCommand = new LambdaCommand(OnToggleCanLogCommandExecuted, CanToggleCanLogCommandExecute);

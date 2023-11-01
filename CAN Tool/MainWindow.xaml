@@ -671,10 +671,11 @@
                                 <Button Margin="10" Content="{DynamicResource b_start_log}" Command="{Binding LogStartCommand}"></Button>
                                 <Button Margin="10" Content="{DynamicResource b_stop_log}" Command="{Binding LogStopCommand}"></Button>
                                 <Button Margin="10" Content="{DynamicResource b_redraw}" Command="{Binding ChartDrawCommand}"></Button>
-                                <Button Margin="10" Content="{DynamicResource b_save_log}" Command="{Binding SaveLogCommand}"></Button>
+                                <Button Margin="10" Content="{DynamicResource b_save_log}" Command="{Binding SaveLogCommand}" Cursor="Hand"></Button>
                                 <CheckBox Margin="10" FontSize="20" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="{DynamicResource b_autoredraw}" IsChecked="{Binding AutoRedraw}" />
                                 <TextBlock Margin="10" FontSize="20" Text="{DynamicResource b_log_length}" VerticalAlignment="Center"></TextBlock>
                                 <TextBlock Margin="10" FontSize="20" Text="{Binding SelectedConnectedDevice.LogCurrentPos}" VerticalAlignment="Center"></TextBlock>
+                                <Button Margin="10" Content="{DynamicResource b_def_style}" Command="{Binding DefaultStyleCommand}" Cursor="Hand"></Button>
                             </StackPanel>
                             <Expander DockPanel.Dock="Top" Header="{DynamicResource b_dataset}">
                                 <DockPanel>
