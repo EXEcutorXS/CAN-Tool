@@ -26,6 +26,7 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using System.Windows;
 using System.Text;
+using ScottPlot.MarkerShapes;
 
 namespace CAN_Tool.ViewModels
 {
@@ -625,8 +626,45 @@ namespace CAN_Tool.ViewModels
             for (int i = 0; i < 140; i++)
             {
                 App.Settings.ShowFlag[i] = false;
+                App.Settings.LineStyles[i] = LineStyle.Solid;
+                App.Settings.MarkShapes[i] = MarkerShape.none;
             }
+
+            App.Settings.ShowFlag[6] = true;
+            App.Settings.Colors[6] = Colors.OrangeRed;
             
+
+            App.Settings.ShowFlag[7] = true;
+            App.Settings.Colors[7] = Colors.Orange;
+            
+
+            App.Settings.ShowFlag[15] = true;
+            App.Settings.Colors[15] = Colors.LightBlue;
+            
+
+            App.Settings.ShowFlag[16] = true;
+            App.Settings.Colors[16] = Colors.LightBlue;
+            App.Settings.LineStyles[16] = LineStyle.DashDot;
+
+            App.Settings.ShowFlag[17] = true;
+            App.Settings.Colors[17] = Colors.Green;
+
+            App.Settings.ShowFlag[21] = true;
+            App.Settings.Colors[21] = Colors.Red;
+
+            App.Settings.ShowFlag[40] = true;
+            App.Settings.Colors[40] = Colors.Yellow;
+
+            App.Settings.ShowFlag[41] = true;
+            App.Settings.Colors[41] = Colors.Yellow;
+            App.Settings.LineStyles[41] = LineStyle.Dash;
+
+
+
+
+
+
+
 
         }
 

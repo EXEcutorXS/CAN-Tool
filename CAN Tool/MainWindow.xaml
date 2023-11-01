@@ -675,7 +675,7 @@
                                 <CheckBox Margin="10" FontSize="20" Style="{StaticResource MaterialDesignFilterChipCheckBox}" Content="{DynamicResource b_autoredraw}" IsChecked="{Binding AutoRedraw}" />
                                 <TextBlock Margin="10" FontSize="20" Text="{DynamicResource b_log_length}" VerticalAlignment="Center"></TextBlock>
                                 <TextBlock Margin="10" FontSize="20" Text="{Binding SelectedConnectedDevice.LogCurrentPos}" VerticalAlignment="Center"></TextBlock>
-                                <Button Margin="10" Content="{DynamicResource b_def_style}" Command="{Binding DefaultStyleCommand}" Cursor="Hand"></Button>
+                                <Button Margin="10" Content="{DynamicResource b_def_set}" Command="{Binding DefaultStyleCommand}" Cursor="Hand"></Button>
                             </StackPanel>
                             <Expander DockPanel.Dock="Top" Header="{DynamicResource b_dataset}">
                                 <DockPanel>
