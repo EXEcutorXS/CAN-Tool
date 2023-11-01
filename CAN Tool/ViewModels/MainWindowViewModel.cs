@@ -250,18 +250,22 @@ namespace CAN_Tool.ViewModels
             }
             if (SelectedProtocol == PhyProt_t.UART)
             {
-                try
+                if (!UartAdapter.SelectedPort.IsOpen)
                 {
-                    UartAdapter.SelectedPort.Open();
-                    PortButtonString = GetString("b_close");
+                    try
+                    {
+                        UartAdapter.SelectedPort.Open();
+                        PortButtonString = GetString("b_close");
+                    }
+                    catch { }
                 }
-                catch { }
+                else
+                {
+                    UartAdapter.SelectedPort.Close();
+                    PortButtonString = GetString("b_open");
+                }
             }
-            else
-            {
-                UartAdapter.SelectedPort.Close();
-                PortButtonString = GetString("b_close");
-            }
+            
         }
         private bool CanTogglePortCommandExecute(object parameter) => (PortName.StartsWith("COM") || CanAdapter.PortOpened || UartAdapter.SelectedPort.IsOpen);
 

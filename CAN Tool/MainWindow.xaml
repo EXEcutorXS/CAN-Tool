@@ -67,7 +67,7 @@
                         
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="ModeSelector" Margin="5" MinWidth="70" ItemsSource="{Binding WorkModes}" SelectedIndex="2" SelectedItem="{Binding Mode}" />
 
-                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}"  Margin="5" Content="{Binding PortButtonString}" Command="{Binding TogglePortCommand}" Cursor="Hand" />
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}"  Margin="5" Content="{Binding PortButtonString,Mode=OneWay}" Command="{Binding TogglePortCommand}" Cursor="Hand" />
 
                         <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
 
