@@ -93,7 +93,7 @@ namespace OmniProtocol
             PGNs.Add(42, new() { id = 42, name = "t_pump_control" });
             PGNs.Add(43, new() { id = 43, name = "t_generic_board_pwm_command" });
             PGNs.Add(44, new() { id = 44, name = "t_generic_board_pwm_status" });
-            PGNs.Add(45, new() { id = 45, name = "t_generic_board_adc_status" });
+            PGNs.Add(45, new() { id = 45, name = "t_generic_board_temp" });
             PGNs.Add(100, new() { id = 100, name = "t_memory_control_old", multipack = true });
             PGNs.Add(101, new() { id = 101, name = "t_buffer_data_transmitting_old" });
             PGNs.Add(105, new() { id = 105, name = "t_memory_control" });
@@ -298,6 +298,18 @@ namespace OmniProtocol
             PGNs[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего.", BitLength = 8, StartByte = 5, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
             PGNs[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего при разборе воды.", BitLength = 8, StartByte = 6, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
 
+            PGNs[19].parameters.Add(new() { Name = "Уставка температуры для тёплого пола", BitLength = 8, StartByte = 1, b = -75, PackNumber = 3, UnitT = UnitType.Temp });
+            PGNs[19].parameters.Add(new() { Name = "Гистерезис работы тёплого пола ", BitLength = 8, StartByte = 2, PackNumber = 3, UnitT = UnitType.Temp });
+            PGNs[19].parameters.Add(new() { Name = "Уставка предпускового подогрева", BitLength = 8, StartByte = 3, b = -75, PackNumber = 3, UnitT = UnitType.Temp });
+            PGNs[19].parameters.Add(new() { Name = "Ограничение работы по времени предпускового подогрева, мин", BitLength = 16, StartByte = 4, PackNumber = 3, UnitT = UnitType.Minute });
+
+            PGNs[19].parameters.Add(new() { Name = "Подключенная зона 1", BitLength = 8, StartByte = 1, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" } , { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
+            PGNs[19].parameters.Add(new() { Name = "Подключенная зона 2", BitLength = 8, StartByte = 2, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
+            PGNs[19].parameters.Add(new() { Name = "Подключенная зона 3", BitLength = 8, StartByte = 3, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
+            PGNs[19].parameters.Add(new() { Name = "Подключенная зона 4", BitLength = 8, StartByte = 4, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
+            PGNs[19].parameters.Add(new() { Name = "Подключенная зона 5", BitLength = 8, StartByte = 5, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
+
+
             PGNs[20].parameters.Add(new() { Name = "Код неисправности", BitLength = 8, StartByte = 0 });
             PGNs[20].parameters.Add(new() { Name = "Количество морганий", BitLength = 8, StartByte = 1 });
             PGNs[20].parameters.Add(new() { Name = "Байт неисправностей 1", BitLength = 8, StartByte = 2 });
@@ -312,10 +324,11 @@ namespace OmniProtocol
             PGNs[21].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, UnitT = UnitType.Temp, b = -75, Var = 106 });
             PGNs[21].parameters.Add(new() { Name = "Температура теплообменника", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, b = -75 });
             PGNs[21].parameters.Add(new() { Name = "Температура наружного воздуха", BitLength = 8, StartByte = 4, UnitT = UnitType.Temp, b = -75, Var = 107 });
-            PGNs[21].parameters.Add(new() { Name = "Разбор воды", BitLength = 8, StartByte = 5, Meanings = { { 0, "Ожидание" }, { 1, "Продувка" }, { 2, "Розжиг" }, { 3, "Работа на мощности" } } });
+            PGNs[21].parameters.Add(new() { Name = "Иконка подогревателя", BitLength = 8, StartByte = 5, Meanings = { { 0, "Ожидание" }, { 1, "Продувка" }, { 2, "Розжиг" }, { 3, "Работа на мощности" } } });
             PGNs[21].parameters.Add(new() { Name = "Уровень жидкости в баке", BitLength = 8, StartByte = 6, Var = 105 });
+            PGNs[21].parameters.Add(new() { Name = "Режим хранения", BitLength = 2, StartByte = 7, Meanings = defMeaningsYesNo});
             PGNs[21].parameters.Add(new() { Name = "ТЭН активен", StartBit = 2, BitLength = 2, StartByte = 7, Meanings = defMeaningsYesNo });
-            PGNs[21].parameters.Add(new() { Name = "Разбор воды", BitLength = 2, StartByte = 7, Meanings = defMeaningsYesNo, Var = 108 });
+            
 
 
             PGNs[22].parameters.Add(new() { Name = "Зона 1", BitLength = 2, StartByte = 0, StartBit = 0, Meanings = defMeaningsOnOff, Var = 65 });
@@ -328,8 +341,10 @@ namespace OmniProtocol
             PGNs[22].parameters.Add(new() { Name = "Температура зоны 3", BitLength = 8, StartByte = 4, UnitT = UnitType.Temp, b = -75, Var = 72 });
             PGNs[22].parameters.Add(new() { Name = "Температура зоны 4", BitLength = 8, StartByte = 5, UnitT = UnitType.Temp, b = -75, Var = 73 });
             PGNs[22].parameters.Add(new() { Name = "Температура зоны 5", BitLength = 8, StartByte = 6, UnitT = UnitType.Temp, b = -75, Var = 74 });
-            PGNs[22].parameters.Add(new() { Name = "Подогреватель", BitLength = 2, StartByte = 7, StartBit = 0, Meanings = defMeaningsOnOff, Var = 119 });
-            PGNs[22].parameters.Add(new() { Name = "ТЭН", BitLength = 2, StartByte = 7, StartBit = 2, Meanings = defMeaningsOnOff, Var = 120 });
+            PGNs[22].parameters.Add(new() { Name = "Кнопка Подогреватель", BitLength = 2, StartByte = 7, StartBit = 0, Meanings = defMeaningsOnOff, Var = 119 });
+            PGNs[22].parameters.Add(new() { Name = "Кнопка ТЭН", BitLength = 2, StartByte = 7, StartBit = 2, Meanings = defMeaningsOnOff, Var = 120 });
+            PGNs[22].parameters.Add(new() { Name = "Кнопка Тёплый пол", BitLength = 2, StartByte = 7, StartBit = 4, Meanings = defMeaningsOnOff});
+            PGNs[22].parameters.Add(new() { Name = "Кнопка Предпусковой подогрев", BitLength = 2, StartByte = 7, StartBit = 5, Meanings = defMeaningsOnOff});
 
             PGNs[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType.Percent, Var = 100 });
             PGNs[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType.Percent, Var = 101 });
@@ -402,11 +417,14 @@ namespace OmniProtocol
             PGNs[41].parameters.Add(new() { Name = "t_nighttime_backlight", BitLength = 8, StartByte = 5, UnitT = UnitType.Percent });
             PGNs[41].parameters.Add(new() { Name = "t_display_sleep_time", BitLength = 16, StartByte = 6, UnitT = UnitType.Second });
 
-            PGNs[42].parameters.Add(new() { Name = "t_pump_1", BitLength = 8, StartByte = 0, Meanings = { { 0, "t_off" }, { 1, "t_on" }, { 5, "t_forced" } } });
-            PGNs[42].parameters.Add(new() { Name = "t_pump_2", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_off" }, { 1, "t_on" }, { 5, "t_forced" } } });
-            PGNs[42].parameters.Add(new() { Name = "t_pump_3", BitLength = 8, StartByte = 2, Meanings = { { 0, "t_off" }, { 1, "t_on" }, { 5, "t_forced" } } });
-            PGNs[42].parameters.Add(new() { Name = "t_pump_4", BitLength = 8, StartByte = 3, Meanings = { { 0, "t_off" }, { 1, "t_on" }, { 5, "t_forced" } } });
-            
+            PGNs[42].parameters.Add(new() { Name = "t_pump_heater", BitLength = 8, StartByte = 0, Meanings =  defMeaningsOnOff});
+            PGNs[42].parameters.Add(new() { Name = "t_pump_1", BitLength = 8, StartByte = 1, Meanings =  defMeaningsOnOff });
+            PGNs[42].parameters.Add(new() { Name = "t_pump_2", BitLength = 8, StartByte = 2, Meanings =  defMeaningsOnOff });
+            PGNs[42].parameters.Add(new() { Name = "t_pump_3", BitLength = 8, StartByte = 3, Meanings =  defMeaningsOnOff });
+            PGNs[42].parameters.Add(new() { Name = "t_pump_aux_1", BitLength = 8, StartByte = 4, Meanings = defMeaningsOnOff });
+            PGNs[42].parameters.Add(new() { Name = "t_pump_aux_2", BitLength = 8, StartByte = 5, Meanings = defMeaningsOnOff });
+            PGNs[42].parameters.Add(new() { Name = "t_pump_aux_3", BitLength = 8, StartByte = 6, Meanings = defMeaningsOnOff });
+
             PGNs[43].parameters.Add(new() { Name = "t_channel1_pwm_value", BitLength = 16, StartByte = 0 });
             PGNs[43].parameters.Add(new() { Name = "t_channel2_pwm_value", BitLength = 16, StartByte = 2 });
             PGNs[43].parameters.Add(new() { Name = "t_channel3_pwm_value", BitLength = 16, StartByte = 4 });
@@ -417,10 +435,10 @@ namespace OmniProtocol
             PGNs[44].parameters.Add(new() { Name = "t_channel3_pwm_value", BitLength = 16, StartByte = 4 });
             PGNs[44].parameters.Add(new() { Name = "t_channel4_pwm_value", BitLength = 16, StartByte = 6 });
 
-            PGNs[45].parameters.Add(new() { Name = "t_channel1_adc_value", BitLength = 16, StartByte = 0 });
-            PGNs[45].parameters.Add(new() { Name = "t_channel2_adc_value", BitLength = 16, StartByte = 2 });
-            PGNs[45].parameters.Add(new() { Name = "t_channel3_adc_value", BitLength = 16, StartByte = 4 });
-            PGNs[45].parameters.Add(new() { Name = "t_channel4_adc_value", BitLength = 16, StartByte = 6 });
+            PGNs[45].parameters.Add(new() { Name = "t_channel1_temperature", BitLength = 16, StartByte = 0, a = 0.1, UnitT = UnitType.Temp, Signed = true });
+            PGNs[45].parameters.Add(new() { Name = "t_channel2_temperature", BitLength = 16, StartByte = 2, a = 0.1, UnitT = UnitType.Temp, Signed = true });
+            PGNs[45].parameters.Add(new() { Name = "t_channel3_temperature", BitLength = 16, StartByte = 4, a = 0.1, UnitT = UnitType.Temp, Signed = true });
+            PGNs[45].parameters.Add(new() { Name = "t_channel4_temperature", BitLength = 16, StartByte = 6, a = 0.1, UnitT = UnitType.Temp, Signed = true });
 
 
             PGNs[100].parameters.Add(new() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning = r => $"{GetString("t_starting_address")}: 0X{(r + 0x8000000):X}" });

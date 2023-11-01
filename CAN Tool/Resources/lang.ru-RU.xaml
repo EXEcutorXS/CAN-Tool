@@ -958,7 +958,7 @@
 <v:String x:Key="t_config_erase">Стирание пареметров</v:String>
 <v:String x:Key="t_generic_board_pwm_command">Управление ШИМ платы расширения</v:String>
 <v:String x:Key="t_generic_board_pwm_status">Статус ШИМ платы расширения</v:String>
-<v:String x:Key="t_generic_board_adc_status">Статус АЦП платы расширения</v:String>
+<v:String x:Key="t_generic_board_temp">Показания температуры платы расширения</v:String>
 <v:String x:Key="t_channel1_pwm_value">Заданное значение ШИМ 1 канала</v:String>
 <v:String x:Key="t_channel2_pwm_value">Заданное значение ШИМ 2 канала</v:String>
 <v:String x:Key="t_channel3_pwm_value">Заданное значение ШИМ 3 канала</v:String>

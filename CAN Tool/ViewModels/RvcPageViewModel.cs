@@ -80,6 +80,8 @@ namespace CAN_Tool.ViewModels
                     if ((D[1] & 0xF) != 0xF)
                         ZoneEnabled = (D[1] & 0x2) == 2;
                     if (D[3] != 0xFF || D[4] != 0xFF) CurrentSetpoint = (D[3] + D[4] * 256) / 32 - 273;
+                    if (((D[1] >> 6) & 3) != 3)
+                        ScheduleMode = (D[1] >> 6 & 3) != 0;
                     break;
 
                 case 0x1FEF7://Thermostat schedule 1
@@ -196,6 +198,15 @@ namespace CAN_Tool.ViewModels
             RvcMessage msg = new() { Dgn = 0x1FFE3};
             msg.Data[0] = 1;
             msg.Data[1] = (byte)(0b11111100 + (!ZoneManualFanMode ? 1 : 0));
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void ToggleScheduleMode()
+        {
+            RvcMessage msg = new() { Dgn = 0x1FEF9 };
+            msg.Data[0] = 1;
+            msg.Data[1] = (byte)(0b00111111 + ((!ScheduleMode ? 1 : 0)<<6));
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
@@ -438,6 +449,9 @@ namespace CAN_Tool.ViewModels
 
         private bool broadcastTemperature;
         public bool BroadcastTemperature { set => Set(ref broadcastTemperature, value); get => broadcastTemperature; }
+
+        private bool scheduleMode;
+        public bool ScheduleMode { set => Set(ref scheduleMode, value); get => scheduleMode; }
 
         private int rvcTemperature = 30;
         public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }

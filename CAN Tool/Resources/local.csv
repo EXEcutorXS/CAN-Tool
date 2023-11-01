@@ -958,7 +958,7 @@ t_saving_params_to_flash	Saving config to flash	Сохранение парам�
 t_config_erase	Erasing config from flash	Стирание пареметров
 t_generic_board_pwm_command	Extension board PWM control	Управление ШИМ платы расширения
 t_generic_board_pwm_status	Extension board PWM status	Статус ШИМ платы расширения
-t_generic_board_adc_status	Extension board ADC status	Статус АЦП платы расширения
+t_generic_board_temp	Extension board temperatures	Показания температуры платы расширения
 t_channel1_pwm_value	CH1 PWM Value	Заданное значение ШИМ 1 канала
 t_channel2_pwm_value	CH2 PWM Value	Заданное значение ШИМ 2 канала
 t_channel3_pwm_value	CH3 PWM Value	Заданное значение ШИМ 3 канала

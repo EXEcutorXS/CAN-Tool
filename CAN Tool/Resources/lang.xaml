@@ -958,7 +958,7 @@
 <v:String x:Key="t_config_erase">Erasing config from flash</v:String>
 <v:String x:Key="t_generic_board_pwm_command">Extension board PWM control</v:String>
 <v:String x:Key="t_generic_board_pwm_status">Extension board PWM status</v:String>
-<v:String x:Key="t_generic_board_adc_status">Extension board ADC status</v:String>
+<v:String x:Key="t_generic_board_temp">Extension board temperatures</v:String>
 <v:String x:Key="t_channel1_pwm_value">CH1 PWM Value</v:String>
 <v:String x:Key="t_channel2_pwm_value">CH2 PWM Value</v:String>
 <v:String x:Key="t_channel3_pwm_value">CH3 PWM Value</v:String>

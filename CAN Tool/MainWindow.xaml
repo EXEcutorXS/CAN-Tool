@@ -953,6 +953,10 @@
                             <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneManualFanMode}" IsEnabled="false" />
                             <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Fan manual" Margin="5" Cursor="Hand" Click="ToggleFanManualModeButtonPressed" />
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ScheduleMode}" IsEnabled="false" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Schedule mode" Margin="5" Cursor="Hand" Click="ToggleScheduleModeButtonPressed" />
+                        </StackPanel>
 
                         <Button Margin="5" Content="Sync time" Click="SetTimeButtonPressed"></Button>
                         <Button Margin="5" Content="Clear errors" Click="ClearErrorsButtonPressed"></Button>

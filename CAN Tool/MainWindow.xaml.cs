@@ -694,6 +694,11 @@ namespace CAN_Tool
             vm.RvcPage.Timberline15.ToggleFanManualMode();
         }
 
+        private void ToggleScheduleModeButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleScheduleMode();
+        }
+
         private void DaySetPointValueChanged(object sender, RoutedEventArgs e)
         {
             vm?.RvcPage.Timberline15.SetDaySetpoint((int)(sender as ScrollBar).Value);
