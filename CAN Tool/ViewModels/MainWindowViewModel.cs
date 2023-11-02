@@ -664,6 +664,9 @@ namespace CAN_Tool.ViewModels
                     case 41:
                         v.Display = true;
                         v.ChartBrush = new SolidColorBrush(Colors.Yellow); break;
+                    default:
+                        v.Display = false;
+                        break;
 
                 }
             }
