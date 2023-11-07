@@ -265,7 +265,7 @@ namespace CAN_Tool.ViewModels
                     PortButtonString = GetString("b_open");
                 }
             }
-            
+
         }
         private bool CanTogglePortCommandExecute(object parameter) => (PortName.StartsWith("COM") || CanAdapter.PortOpened || UartAdapter.SelectedPort.IsOpen);
 
@@ -627,48 +627,49 @@ namespace CAN_Tool.ViewModels
 
         private void OnDefaultStyleExecuted(object parameter)
         {
-            for (int i = 0; i < 140; i++)
+            foreach (var v in SelectedConnectedDevice.Status)
             {
-                App.Settings.ShowFlag[i] = false;
-                App.Settings.LineStyles[i] = LineStyle.Solid;
-                App.Settings.MarkShapes[i] = MarkerShape.none;
+                v.LineStyle = LineStyle.Solid;
+                v.MarkShape = MarkerShape.none;
+                v.LineWidth = 1;
+                switch (v.Id)
+                {
+                    case 6:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.Orange);
+
+                        break;
+                    case 7:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.OrangeRed); break;
+                    case 15:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.LightBlue); break;
+                    case 16:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.LightBlue);
+                        v.LineStyle = LineStyle.DashDotDot; break;
+                    case 17:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.Green);
+
+                        break;
+                    case 21:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.Red); break;
+                    case 40:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.LightYellow);
+                        v.LineStyle = LineStyle.DashDot;  break;
+                    case 41:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.Yellow); break;
+                    default:
+                        v.Display = false;
+                        break;
+
+                }
             }
-
-            App.Settings.ShowFlag[6] = true;
-            App.Settings.Colors[6] = Colors.OrangeRed;
-            
-
-            App.Settings.ShowFlag[7] = true;
-            App.Settings.Colors[7] = Colors.Orange;
-            
-
-            App.Settings.ShowFlag[15] = true;
-            App.Settings.Colors[15] = Colors.LightBlue;
-            
-
-            App.Settings.ShowFlag[16] = true;
-            App.Settings.Colors[16] = Colors.LightBlue;
-            App.Settings.LineStyles[16] = LineStyle.DashDot;
-
-            App.Settings.ShowFlag[17] = true;
-            App.Settings.Colors[17] = Colors.Green;
-
-            App.Settings.ShowFlag[21] = true;
-            App.Settings.Colors[21] = Colors.Red;
-
-            App.Settings.ShowFlag[40] = true;
-            App.Settings.Colors[40] = Colors.Yellow;
-
-            App.Settings.ShowFlag[41] = true;
-            App.Settings.Colors[41] = Colors.Yellow;
-            App.Settings.LineStyles[41] = LineStyle.Dash;
-
-
-
-
-
-
-
 
         }
 
