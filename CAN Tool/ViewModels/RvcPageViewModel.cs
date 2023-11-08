@@ -27,9 +27,9 @@ namespace CAN_Tool.ViewModels
         public RvcMessage msgToTransmit;
 
 
+    }
 
-
-    public class Timberline20Handler : ViewModel
+    public class Timberline15Handler : ViewModel
     {
             private DispatcherTimer timer;
 
@@ -350,7 +350,7 @@ namespace CAN_Tool.ViewModels
             }
 
 
-            public Timberline20Handler()
+            public Timberline15Handler()
             {
                 hcuVersion = new byte[4];
                 heaterVersion = new byte[4];
@@ -484,8 +484,8 @@ namespace CAN_Tool.ViewModels
 
             public string PanelVersionString { get => $"{panelVersion[0]:D03}.{panelVersion[1]:D03}.{panelVersion[2]:D03}.{panelVersion[3]:D03}"; }
         }
-    }
-    public class Timberline15Handler : ViewModel
+    
+    public class Timberline20Handler : ViewModel
     {
         private DispatcherTimer timer;
 
@@ -508,13 +508,7 @@ namespace CAN_Tool.ViewModels
 
                     break;
 
-                case 0x1FE99: //Water heater status 2
-                    if (D[0] != 1) return;
-                    if (D[2] != 0xFF)
-                        WaterEnabled = (D[2] >> 6) == 0;
-
-                    break;
-
+                    /*
                 case 0x1FE97://Pump status
                     if (D[0] != 1) return;
                     if ((D[1]&0xF) != 0xF)
@@ -527,6 +521,7 @@ namespace CAN_Tool.ViewModels
                         }
                         
                     break;
+                    */
                 case 0x1FFE4://Furnace status
                     if (D[0] != 1) return;
                     if ((D[1] & 3) != 3)
@@ -569,7 +564,6 @@ namespace CAN_Tool.ViewModels
                     switch (D[0])
                     {
                         case 0x84:
-                            if ((D[1] & 3) != 3) SolenoidStatus = (D[1] & 3) != 0;
                             if (D[2] != 0xFF || D[3] != 0xFF) TankTemperature = (D[2] + D[3] * 256) / 32 - 273;
                             if (D[4] != 0xFF || D[5] != 0xFF) HeaterTemperature = (D[4] + D[5] * 256) / 32 - 273;
                             if (D[6] != 0xFF) ZoneManualFanSpeed = (byte)(D[6]/2);
@@ -620,15 +614,7 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void ToggleWater()
-        {
-            RvcMessage msg = new() { Dgn = 0x1EF65 };
-            msg.Data[0] = 0x83;
-            msg.Data[1] = (byte)(0b11111100 + (!WaterEnabled ? 1 : 0));
-
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
-        }
-
+        /*
         public void TogglePump()
         {
             
@@ -642,7 +628,7 @@ namespace CAN_Tool.ViewModels
                 NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
 
         }
-
+        */
         public void ToggleZone()
         {
             RvcMessage msg = new() { Dgn = 0x1FEF9 };
@@ -806,7 +792,7 @@ namespace CAN_Tool.ViewModels
         }
 
 
-        public Timberline15Handler()
+        public Timberline20Handler()
         {
             hcuVersion = new byte[4];
             heaterVersion = new byte[4];
@@ -977,6 +963,7 @@ namespace CAN_Tool.ViewModels
     internal class RvcPageViewModel : ViewModel
     {
 
+        public Timberline20Handler Timberline20 { get; }
         public Timberline15Handler Timberline15 { get; }
         private MainWindowViewModel vm;
         public MainWindowViewModel VM => vm;
@@ -1013,8 +1000,8 @@ namespace CAN_Tool.ViewModels
 
             spamTask = Task.Run(SpamFunction);
 
-            Timberline15 = new();
-            Timberline15.NeedToTransmit += SendMessage;
+            Timberline20 = new();
+            Timberline20.NeedToTransmit += SendMessage;
 
         }
 
