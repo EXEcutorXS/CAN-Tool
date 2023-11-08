@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace CAN_Tool.Infrastructure.Commands.Base
 {
-    internal abstract class Command : ICommand
+    public abstract class Command : ICommand
     {
         event EventHandler ICommand.CanExecuteChanged
         {

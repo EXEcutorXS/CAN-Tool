@@ -3,7 +3,7 @@ using System;
 
 namespace CAN_Tool.Infrastructure.Commands
 {
-    internal class LambdaCommand : Command
+    public class LambdaCommand : Command
     {
         private readonly Action<object> _Execute;
         private readonly Func<object, bool> _CanExecute;
@@ -11,6 +11,8 @@ namespace CAN_Tool.Infrastructure.Commands
         {
             _Execute = Execute ?? throw new ArgumentException("Execute method can't be null!");
             if (CanExecute != null) _CanExecute = CanExecute;
+            else
+                CanExecute = (x)=> true;
         }
 
 

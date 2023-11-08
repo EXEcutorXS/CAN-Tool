@@ -16,7 +16,7 @@ using CAN_Tool.Libs;
 using CAN_Tool;
 using ScottPlot;
 using static CAN_Tool.Libs.Helper;
-
+using CAN_Tool.Infrastructure.Commands;
 
 namespace OmniProtocol
 {
@@ -160,13 +160,14 @@ namespace OmniProtocol
         }
         private string recourceId;
 
-        public string Name { internal set=> recourceId = value; get => GetString(recourceId); }
+        public string Name { internal set => recourceId = value; get => GetString(recourceId); }
 
         private readonly List<OmniPgnParameter> _Parameters = new();
         public List<OmniPgnParameter> Parameters => _Parameters;
         public override string ToString() => Name;
 
     }
+
 
     public class ZoneHandler : ViewModel
     {
@@ -214,6 +215,8 @@ namespace OmniProtocol
         public bool GotChange = false;
 
     }
+
+
     public class TimberlineHandler : ViewModel
     {
         private void ZoneChanged(ZoneHandler newSelectedZone)
@@ -272,8 +275,8 @@ namespace OmniProtocol
 
         private byte[] data = new byte[8];
 
-        [AffectsTo(nameof(DataAsText),nameof(DataAsULong),nameof(VerboseInfo))]
-        public byte[] Data { set => Set(ref data,value); get => data; }
+        [AffectsTo(nameof(DataAsText), nameof(DataAsULong), nameof(VerboseInfo))]
+        public byte[] Data { set => Set(ref data, value); get => data; }
 
         public OmniMessage()
         {
@@ -317,20 +320,21 @@ namespace OmniProtocol
                 Data.CopyTo(bytes, 0);
                 Array.Reverse(bytes);
                 return BitConverter.ToUInt64(bytes, 0);
-                
+
             }
             set
             {
                 byte[] tempArr = BitConverter.GetBytes(value);
                 Array.Reverse(tempArr);
-                tempArr.CopyTo(Data,0);
+                tempArr.CopyTo(Data, 0);
                 OnPropertyChanged(nameof(Data));
                 OnPropertyChanged(nameof(DataAsText));
                 OnPropertyChanged(nameof(VerboseInfo));
             }
         }
 
-        public string DataAsText {
+        public string DataAsText
+        {
             get
             {
                 StringBuilder sb = new("");
@@ -384,7 +388,7 @@ namespace OmniProtocol
                 if (value > 7)
                     throw new ArgumentException("ReceiverAddress can't be over 7");
                 Set(ref receiverAddress, value);
-                    }
+            }
         }
 
         private int transmitterType;
@@ -397,7 +401,7 @@ namespace OmniProtocol
             {
                 if (value > 127)
                     throw new ArgumentException("TransmitterType can't be over 127");
-               Set(ref transmitterType, value);
+                Set(ref transmitterType, value);
             }
         }
 
@@ -530,7 +534,7 @@ namespace OmniProtocol
             retString.Append(GetString(pgn.name) + ";;");
             if (pgn.multipack)
                 retString.Append($"Мультипакет №{Data[0]};");
-            if (PGN == 1 && Omni.commands.ContainsKey(Data[1] + Data[0]*256))
+            if (PGN == 1 && Omni.commands.ContainsKey(Data[1] + Data[0] * 256))
             {
                 OmniCommand cmd = Omni.commands[Data[1] + Data[0] * 256];
                 retString.Append(GetString(cmd.Name) + ";");
@@ -685,7 +689,7 @@ namespace OmniProtocol
             markShape = App.Settings.MarkShapes[Id];
 
         }
-        
+
         public int Id { get; set; }
 
         private long rawVal;
@@ -1359,7 +1363,7 @@ namespace OmniProtocol
         {
             Log.Insert(0, (MainParameters)Parameters.Clone());
 
-            if (!isLogWriting) 
+            if (!isLogWriting)
                 return;
 
             if (LogCurrentPos < LogData[0].Length)
@@ -1375,7 +1379,7 @@ namespace OmniProtocol
                 LogDataOverrun?.Invoke(this, null);
             }
 
-            
+
         }
 
         public void LogInit(int length = 86400)
@@ -1507,7 +1511,7 @@ namespace OmniProtocol
 
 
 
-        
+
 
         public OmniTask CurrentTask
         {
@@ -1544,11 +1548,11 @@ namespace OmniProtocol
                 senderDevice = new ConnectedDevice(id);
                 ConnectedDevices.Add(senderDevice);
                 NewDeviceAquired?.Invoke(this, null);
-                if (senderDevice.ID.Type!=123)        //Requesting basic data, but not for bootloaders
+                if (senderDevice.ID.Type != 123)        //Requesting basic data, but not for bootloaders
                     Task.Run(() => RequestBasicData(id));
             }
 
-            
+
             if (!PGNs.ContainsKey(m.PGN))
             {
                 Debug.WriteLine($"{m.PGN} {GetString("t_not supported")}");
@@ -1603,7 +1607,7 @@ namespace OmniProtocol
                     if (sv.Id == 40)
                         senderDevice.Parameters.LiquidTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                     if (sv.Id == 41)
-                        senderDevice.Parameters.OverheatTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b,sv.AssignedParameter.UnitT);
+                        senderDevice.Parameters.OverheatTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                 }
             }
 
@@ -1857,13 +1861,13 @@ namespace OmniProtocol
         }
 
         public void ProcessUartMessage(byte[] buf)
-        { 
-        
+        {
+
         }
 
         public void ProcessMessage(UInt16 pgn, byte[] data)
         {
-        
+
         }
         public async void ReadBlackBoxData(DeviceId id)
         {
@@ -1962,7 +1966,7 @@ namespace OmniProtocol
             ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
             UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
-            
+
             OmniMessage msg = new OmniMessage
             {
                 PGN = 8,
@@ -2229,7 +2233,7 @@ namespace OmniProtocol
         {
             if ((bool)canAdapter?.PortOpened)
                 canAdapter.Transmit(m.ToCanMessage());
-            if (uartAdapter.SelectedPort!=null && uartAdapter.SelectedPort.IsOpen)
+            if (uartAdapter.SelectedPort != null && uartAdapter.SelectedPort.IsOpen)
                 uartAdapter.Transmit(m);
         }
 
@@ -2265,7 +2269,7 @@ namespace OmniProtocol
 
         public static Dictionary<int, Device> Devices;
 
-        public Omni(CanAdapter canAdapter,UartAdapter uartAdapter)
+        public Omni(CanAdapter canAdapter, UartAdapter uartAdapter)
         {
             if (canAdapter == null) throw new ArgumentNullException("Can Adapter reference can't be null");
             if (uartAdapter == null) throw new ArgumentNullException("Uart Adapter reference can't be null");
