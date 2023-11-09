@@ -345,6 +345,10 @@
 <v:String x:Key="par_554">ZONE 3 TEMP CORRECTION (+25)</v:String>
 <v:String x:Key="par_555">ZONE 4 TEMP CORRECTION (+25)</v:String>
 <v:String x:Key="par_556">ZONE 5 TEMP CORRECTION (+25)</v:String>
+<v:String x:Key="par_557">PAR_FLOOR_PUMP</v:String>
+<v:String x:Key="par_558">PAR_FLOOR_TEMP_SENSOR</v:String>
+<v:String x:Key="par_559">PAR_ENGINE_PREHEAT_PUMP</v:String>
+<v:String x:Key="par_560">PAR_ENGINE_PREHEAT_TEMP_SENSOR</v:String>
 
 
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>

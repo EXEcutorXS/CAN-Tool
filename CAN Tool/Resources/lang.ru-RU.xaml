@@ -345,6 +345,10 @@
 <v:String x:Key="par_554">Коррекция температура зоны 3 (+25)</v:String>
 <v:String x:Key="par_555">Коррекция температура зоны 4 (+25)</v:String>
 <v:String x:Key="par_556">Коррекция температура зоны 5 (+25)</v:String>
+<v:String x:Key="par_557">Помпа тёплого пола(номер)</v:String>
+<v:String x:Key="par_558">Датчик пемпературы тёплого пола</v:String>
+<v:String x:Key="par_559">Помпа предпускогого подогрева</v:String>
+<v:String x:Key="par_560">Датчик температуры предпускового подогрева</v:String>
 
 
 <v:String x:Key="par_600">номер устройства на шине CAN RV-C</v:String>

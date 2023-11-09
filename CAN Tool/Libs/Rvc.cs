@@ -32,6 +32,9 @@ namespace RVC
         hertz,
         watts,
         natural,
+        seconds,
+        minutes,
+        hours,
         custom
     };
 

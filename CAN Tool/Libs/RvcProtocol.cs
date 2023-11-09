@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OmniProtocol;
+using System.Collections.Generic;
 
 
 namespace RVC
@@ -627,6 +628,61 @@ namespace RVC
 
             DGNs.Add(newDgn.Dgn, newDgn);
 
+            newDgn = new DGN() { Dgn = 0x1FEFB, Name = "FLOOR_HEAT_COMMAND" };
+            newDgn.Parameters.Add(new()
+            {
+                Name = "Operating mode",
+                Size = 2,
+                frstByte = 1,
+                Meanings = mnsMkr("Automatic","Manual")
+            });
+
+            newDgn.Parameters.Add(new()
+            {
+                Name = "Operating status",
+                Size = 2,
+                frstByte = 1,
+                frstBit = 2,
+                Meanings = defMeaningsOnOff
+            });
+
+            newDgn.Parameters.Add(new()
+            {
+                Name = "Heat element status",
+                Size = 2,
+                frstByte = 1,
+                frstBit = 4,
+                Meanings = defMeaningsOnOff
+            });
+
+            newDgn.Parameters.Add(new()
+            {
+                Name = "Schedule mode",
+                Size = 2,
+                frstByte = 1,
+                frstBit = 6,
+                Meanings = defMeaningsOnOff
+            });
+
+            newDgn.Parameters.Add(new()
+            {
+                Name = "Setpoint",
+                Size = 16,
+                frstByte = 2,
+                Type = paramTyp.temperature
+            });
+
+            newDgn.Parameters.Add(new()
+            {
+                Name = "Dead band",
+                Size = 8,
+                frstByte = 4,
+                coefficient = 0.1,
+                Unit = "°C"
+            }); ;
+
+            DGNs.Add(newDgn.Dgn, newDgn);
+
             newDgn = new DGN() { Dgn = 0x1FE99, Name = "WATERHEATER_STATUS_2" };
 
             newDgn.Parameters.Add(new()
@@ -734,6 +790,43 @@ namespace RVC
 
             newDgn.Parameters.Add(new() { multipackNum = 0x8A, Name = "System limitation", frstByte = 1, Size = 16, Unit = "min" });
             newDgn.Parameters.Add(new() { multipackNum = 0x8A, Name = "Water limitation", frstByte = 3, Size = 8, Unit = "min" });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0xA0, Name = "Tank Temperature", frstByte = 1, Size = 8, Type = paramTyp.temperature});
+            newDgn.Parameters.Add(new() { multipackNum = 0xA0, Name = "Heater Temperature", frstByte = 2, Size = 8, Type = paramTyp.temperature });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA0, Name = "Zone 1 fan manual percent", frstByte = 3, Size = 8, Type = paramTyp.percent });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA0, Name = "Zone 2 fan manual percent", frstByte = 4, Size = 8, Type = paramTyp.percent });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA0, Name = "Zone 3 fan manual percent", frstByte = 5, Size = 8, Type = paramTyp.percent });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA0, Name = "Zone 4 fan manual percent", frstByte = 6, Size = 8, Type = paramTyp.percent });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA0, Name = "Zone 5 fan manual percent", frstByte = 7, Size = 8, Type = paramTyp.percent });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0xA1, Name = "System timer", frstByte = 1, Size = 24, Type = paramTyp.seconds });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0xA2, Name = "Loop 1 pump timer", frstByte = 1, Size = 16, Type = paramTyp.seconds });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA2, Name = "Loop 2 pump timer", frstByte = 3, Size = 16, Type = paramTyp.seconds });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA2, Name = "Heater pump timer", frstByte = 5, Size = 16, Type = paramTyp.seconds });
+            
+            newDgn.Parameters.Add(new() { multipackNum = 0xA3, Name = "AUX pump 1 timer", frstByte = 1, Size = 16, Type = paramTyp.seconds });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA3, Name = "AUX pump 2 timer", frstByte = 1, Size = 16, Type = paramTyp.seconds });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA3, Name = "AUX pump 3 timer", frstByte = 1, Size = 16, Type = paramTyp.seconds });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater total minutes", frstByte = 1, Size = 24, Type = paramTyp.minutes });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 1", frstByte = 4, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 2", frstByte = 4, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 3", frstByte = 4, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 4", frstByte = 4, Size = 8, Type = paramTyp.natural });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0xA5, Name = "Panel version byte 1", frstByte = 4, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA5, Name = "Panel version byte 2", frstByte = 5, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA5, Name = "Panel version byte 3", frstByte = 6, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA5, Name = "Panel version byte 4", frstByte = 7, Size = 8, Type = paramTyp.natural });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0xA6, Name = "HCU version byte 1", frstByte = 4, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA6, Name = "HCU version byte 2", frstByte = 5, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA6, Name = "HCU version byte 3", frstByte = 6, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA6, Name = "HCU version byte 4", frstByte = 7, Size = 8, Type = paramTyp.natural });
+
+            newDgn.Parameters.Add(new() { multipackNum = 0xA7, Name = "System time limit", frstByte = 1, Size = 1, Type = paramTyp.hours });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA7, Name = "Pump overridelimit", frstByte = 1, Size = 1, Type = paramTyp.minutes });
 
 
 
