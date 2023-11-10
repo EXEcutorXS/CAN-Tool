@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Interop;
 using System.Windows.Threading;
 
 namespace CAN_Tool.ViewModels
@@ -14,12 +15,28 @@ namespace CAN_Tool.ViewModels
 
     public class ZoneHandler : ViewModel
     {
+        public event EventHandler NeedToTransmit;
+
+
+        /*
         public ZoneHandler(Action<ZoneHandler> NotifierAction)
         {
             selectedZoneChanged = NotifierAction;
         }
-        private Action<ZoneHandler> selectedZoneChanged;
 
+        private Action<ZoneHandler> selectedZoneChanged;
+        */
+
+        public ZoneHandler(int zoneNumber, Timberline20Handler parent)
+        {
+            this.zoneNumber = zoneNumber;
+            this.parent = parent;
+        }
+        private readonly int zoneNumber;
+
+        private Timberline20Handler parent;
+
+        public int ZoneNumber => zoneNumber;
         private int tempSetpointDay = 22;
         public int TempSetpointDay { set => Set(ref tempSetpointDay, value); get => tempSetpointDay; }
 
@@ -38,9 +55,6 @@ namespace CAN_Tool.ViewModels
         private zoneState_t state = zoneState_t.Off;
         public zoneState_t State { set => Set(ref state, value); get => state; }
 
-        private bool selected = false;
-        public bool Selected { set { Set(ref selected, value); if (value) selectedZoneChanged(this); } get => selected; }
-
         private bool manualMode = false;
         public bool ManualMode { set => Set(ref manualMode, value); get => manualMode; }
 
@@ -49,6 +63,37 @@ namespace CAN_Tool.ViewModels
 
         private int currentPwm = 50;
         public int CurrentPwm { set => Set(ref currentPwm, value); get => currentPwm; }
+
+        private bool broadcastTemperature;
+        public bool BroadcastTemperature { set => Set(ref broadcastTemperature, value); get => broadcastTemperature; }
+
+        private int rvcTemperature = 30;
+        public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
+
+        public void ToggleState()
+        {
+            parent.ToggleZoneState(ZoneNumber);
+        }
+
+        public void SetDaySetpoint(int value)
+        {
+            parent.SetDaySetpoint(ZoneNumber ,value);
+        }
+
+        public void SetNightSetpoint(int value)
+        {
+            parent.SetNightSetpoint(ZoneNumber, value);
+        }
+
+        public void ToggleFanManual()
+        {
+            parent.ToggleFanManualMode(ZoneNumber);
+        }
+
+        public void SetFanManualSpeed(byte value)
+        {
+            parent.SetFanManualSpeed(ZoneNumber, value);
+        }
     }
 
 
@@ -75,26 +120,36 @@ namespace CAN_Tool.ViewModels
 
                     break;
 
-                /*
-            case 0x1FE97://Pump status
-                if (D[0] != 1) return;
-                if ((D[1]&0xF) != 0xF)
-                    switch (D[1]&0xf)
-                    {
-                        case 0: WaterPumpStatus=pumpStatus_t.off; WaterPumpOverride = false; break;
-                        case 1: WaterPumpStatus = pumpStatus_t.on; WaterPumpOverride = false; break;
-                        case 5: WaterPumpStatus = pumpStatus_t.overriden; WaterPumpOverride = true; break;
-                        default: throw new ArgumentException("Wrong pump status");
-                    }
 
-                break;
-                */
+                case 0x1FE97://Pump status
+                    pumpStatus_t newStatus = pumpStatus_t.off;
+                    bool overriden = false;
+                    if (D[0] > 8) return;
+                    if ((D[1] & 0xF) != 0xF)
+                        switch (D[1] & 0xf)
+                        {
+                            case 0: newStatus = pumpStatus_t.off; break;
+                            case 1: newStatus = pumpStatus_t.on; break;
+                            case 5: newStatus = pumpStatus_t.overriden; overriden = true; break;
+                            default: throw new ArgumentException("Wrong pump status");
+                        }
+                    switch (D[0])
+                    {
+                        case 1: Pump1Override = overriden; WaterPump1Status = newStatus; break;
+                        case 2: Pump2Override = overriden; WaterPump2Status = newStatus; break;
+                        case 5: HeaterPumpOverride = overriden; HeaterPumpStatus = newStatus; break;
+                        case 6: WaterPumpAux1Override = overriden; WaterPumpAux1Status = newStatus; break;
+                        case 7: WaterPumpAux2Override = overriden; WaterPumpAux2Status = newStatus; break;
+                        case 8: WaterPumpAux3Override = overriden; WaterPumpAux3Status = newStatus; break;
+                    }
+                    break;
+
                 case 0x1FFE4://Furnace status
-                    if (D[0] != 1) return;
+                    if (D[0] > 5) return;
                     if ((D[1] & 3) != 3)
-                        ZoneManualFanMode = (D[1] & 3) != 0;
+                        Zones[D[0] - 1].ManualMode = (D[1] & 3) != 0;
                     if (D[2] != 0xFF)
-                        ZoneFanMeasuredSpeed = D[2] / 2;
+                        Zones[D[0] - 1].ManualPercent = D[2] / 2;
                     break;
                 case 0x1FFE2://Thermostat status 1
                     if (D[0] > 5) return;
@@ -105,7 +160,7 @@ namespace CAN_Tool.ViewModels
                         if ((D[1] & 0xF) == 4) Zones[D[0] - 1].State = zoneState_t.Fan;
                     }
 
-                    if (D[3] != 0xFF || D[4] != 0xFF) CurrentSetpoint = (D[3] + D[4] * 256) / 32 - 273;
+                    if (D[3] != 0xFF || D[4] != 0xFF) Zones[D[0] - 1].TempSetpointCurrent = (D[3] + D[4] * 256) / 32 - 273;
                     break;
 
                 case 0x1FEF7://Thermostat schedule 1
@@ -136,30 +191,52 @@ namespace CAN_Tool.ViewModels
                 case 0x1EF65: //Proprietary dgn
                     switch (D[0])
                     {
-                        case 0x84:
-                            if (D[2] != 0xFF || D[3] != 0xFF) TankTemperature = (D[2] + D[3] * 256) / 32 - 273;
-                            if (D[4] != 0xFF || D[5] != 0xFF) HeaterTemperature = (D[4] + D[5] * 256) / 32 - 273;
-                            if (D[6] != 0xFF) ZoneManualFanSpeed = (byte)(D[6] / 2);
+                        case 0xA0:
+                            if (D[1] != 0xFF) TankTemperature = D[1] - 40;
+                            if (D[2] != 0xFF) HeaterTemperature = D[2] - 40;
+                            if (D[3] != 0xFF) Zones[0].ManualPercent = (byte)(D[3] / 2);
+                            if (D[4] != 0xFF) Zones[1].ManualPercent = (byte)(D[4] / 2);
+                            if (D[5] != 0xFF) Zones[2].ManualPercent = (byte)(D[5] / 2);
+                            if (D[6] != 0xFF) Zones[3].ManualPercent = (byte)(D[6] / 2);
+                            if (D[7] != 0xFF) Zones[4].ManualPercent = (byte)(D[7] / 2);
                             break;
-                        case 0x85: //Estimated time
+                        case 0xA1: //Estimated time
                             if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) SystemEstimatedTime = D[1] + D[2] * 256 + D[3] * 65536;
-                            if (D[4] != 0xFF || D[5] != 0xFF) WaterEstimatedTime = D[4] + D[5] * 256;
-                            if (D[6] != 0xFF || D[7] != 0xFF) PumpEstimatedTime = D[6] + D[7] * 256;
                             break;
-                        case 0x86: // Heater info
+                        case 0xA2: //Pump timers #1
+                            if (D[1] != 0xFF || D[2] != 0xFF) Pump1EstimatedTime = D[1] + D[2] * 256;
+                            if (D[3] != 0xFF || D[4] != 0xFF) Pump2EstimatedTime = D[3] + D[4] * 256;
+                            if (D[5] != 0xFF || D[6] != 0xFF) HeaterPumpEstimatedTime = D[5] + D[6] * 256;
+                            break;
+                        case 0xA3: //Pump timers #2
+                            if (D[1] != 0xFF || D[2] != 0xFF) AuxPump1EstimatedTime = D[1] + D[2] * 256;
+                            if (D[3] != 0xFF || D[4] != 0xFF) AuxPump2EstimatedTime = D[3] + D[4] * 256;
+                            if (D[5] != 0xFF || D[6] != 0xFF) AuxPump3EstimatedTime = D[5] + D[6] * 256;
+                            break;
+                        case 0xA4: // Heater info
                             if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) HeaterTotalMinutes = D[1] + D[2] * 256 + D[3] * 65536;
                             HeaterVersion = new byte[] { D[4], D[5], D[6], D[7] };
                             break;
-                        case 0x87: //Panel Info
-                            if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) PanelMinutesSinceStart = D[1] + D[2] * 256 + D[3] * 65536;
+                        case 0xA5: //Panel Info
                             PanelVersion = new byte[] { D[4], D[5], D[6], D[7] };
                             break;
-                        case 0x88: //HCU info
+                        case 0xA6: //HCU info
                             HcuVersion = new byte[] { D[4], D[5], D[6], D[7] };
                             break;
-                        case 0x8A: //Timers config status
-                            if (D[1] != 0xFF || D[2] != 0xFF) SystemDuration = D[1] + D[2] * 256;
-                            if (D[3] != 0xFF) WaterDuration = D[3];
+                        case 0xA7: //Timers config command
+                            if (D[1] != 0xFF || D[2] != 0xFF)
+                            {
+                                if (D[1] < 1) SystemDuration = 1;
+                                else if (D[1] > 100) SystemDuration = 100; //Unlimited
+                                else SystemDuration = D[1];
+                            }
+                            if (D[2] != 0xFF)
+                            {
+                                if (D[2] < 2) PumpDuration = 2;
+                                else if (D[2] > 60) SystemDuration = 60; //Unlimited
+                                else SystemDuration = D[2];
+
+                            }
                             break;
                     }
 
@@ -187,61 +264,134 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        /*
-        public void TogglePump()
+
+        public void ToggleHeaterPump()
         {
-            
-                RvcMessage msg = new() { Dgn = 0x1FE96 };
-                msg.Data[0] = 1;
-                if (WaterPumpStatus!=pumpStatus_t.overriden)
-                    msg.Data[1] = 0b11110101;
-                else
-                    msg.Data[1] = 0b11110000;
 
-                NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            RvcMessage msg = new() { Dgn = 0x1FE96 };
+            msg.Data[0] = 5;
+            if (HeaterPumpOverride)
+                msg.Data[1] = 0b11110000;
+            else
+                msg.Data[1] = 0b11110101;
 
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
-        */
-        public void ToggleZone()
+
+        public void ToggleHeaterPumpOverride()
+        {
+
+            RvcMessage msg = new() { Dgn = 0x1FE96 };
+            msg.Data[0] = 5;
+            if (HeaterPumpOverride)
+                msg.Data[1] = 0b11110000;
+            else
+                msg.Data[1] = 0b11110101;
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void TogglePump1Override()
+        {
+
+            RvcMessage msg = new() { Dgn = 0x1FE96 };
+            msg.Data[0] = 1;
+            if (HeaterPumpOverride)
+                msg.Data[1] = 0b11110000;
+            else
+                msg.Data[1] = 0b11110101;
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void TogglePump2Override()
+        {
+
+            RvcMessage msg = new() { Dgn = 0x1FE96 };
+            msg.Data[0] = 2;
+            if (HeaterPumpOverride)
+                msg.Data[1] = 0b11110000;
+            else
+                msg.Data[1] = 0b11110101;
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+        public void ToggleAuxPump1Override()
+        {
+
+            RvcMessage msg = new() { Dgn = 0x1FE96 };
+            msg.Data[0] = 6;
+            if (HeaterPumpOverride)
+                msg.Data[1] = 0b11110000;
+            else
+                msg.Data[1] = 0b11110101;
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void ToggleAuxPump2Override()
+        {
+
+            RvcMessage msg = new() { Dgn = 0x1FE96 };
+            msg.Data[0] = 7;
+            if (HeaterPumpOverride)
+                msg.Data[1] = 0b11110000;
+            else
+                msg.Data[1] = 0b11110101;
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void ToggleAuxPump3Override()
+        {
+
+            RvcMessage msg = new() { Dgn = 0x1FE96 };
+            msg.Data[0] = 8;
+            if (HeaterPumpOverride)
+                msg.Data[1] = 0b11110000;
+            else
+                msg.Data[1] = 0b11110101;
+
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void ToggleZoneState(int zone)
         {
             RvcMessage msg = new() { Dgn = 0x1FEF9 };
-            msg.Data[0] = 1;
-            msg.Data[1] = (byte)(0xF0 + (!ZoneEnabled ? 2 : 0));
+            msg.Data[0] = (byte)(1 + zone);
+            switch (Zones[zone].State)
+            {
+                case zoneState_t.Off: msg.Data[1] = 0b11110010; break;
+                case zoneState_t.Heat: msg.Data[1] = 0b11110100; break;
+                case zoneState_t.Fan: msg.Data[1] = 0b11110000; break;
+            }
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void ToggleFanManualMode()
+        public void ToggleFanManualMode(int zone)
         {
             RvcMessage msg = new() { Dgn = 0x1FFE3 };
-            msg.Data[0] = 1;
-            msg.Data[1] = (byte)(0b11111100 + (!ZoneManualFanMode ? 1 : 0));
+            msg.Data[0] = (byte)(1 + zone);
+            msg.Data[1] = (byte)(0b11111100 + (!Zones[zone].ManualMode ? 1 : 0));
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void ToggleScheduleMode()
-        {
-            RvcMessage msg = new() { Dgn = 0x1FEF9 };
-            msg.Data[0] = 1;
-            msg.Data[1] = (byte)(0b00111111 + ((!ScheduleMode ? 1 : 0) << 6));
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
-        }
-
-        public void SetFanManualSpeed(byte speed)
+        public void SetFanManualSpeed(byte zone, byte speed)
         {
             RvcMessage msg = new() { Dgn = 0x1FFE3 };
-            msg.Data[0] = 1;
+            msg.Data[0] = (byte)(1 + zone);
             msg.Data[2] = (byte)(speed * 2);
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void SetDaySetpoint(int temp)
+        public void SetDaySetpoint(int zone, int temp)
         {
             RvcMessage msg = new() { Dgn = 0x1FEF5 };
-            msg.Data[0] = 1;
+            msg.Data[0] = (byte)(1 + zone);
             msg.Data[1] = 1;
             ushort tmp = (ushort)((temp + 273) * 32);
             msg.Data[4] = (byte)(tmp & 0xFF);
@@ -251,10 +401,10 @@ namespace CAN_Tool.ViewModels
 
         }
 
-        public void SetNightSetpoint(int temp)
+        public void SetNightSetpoint(int zone, int temp)
         {
             RvcMessage msg = new() { Dgn = 0x1FEF5 };
-            msg.Data[0] = 1;
+            msg.Data[0] = (byte)(1 + zone);
             msg.Data[1] = 0;
             ushort tmp = (ushort)((temp + 273) * 32);
             msg.Data[4] = (byte)(tmp & 0xFF);
@@ -289,35 +439,34 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void SetSystemDuration(int minutes)
+        public void SetSystemDuration(int hours)
         {
-            if (minutes < 60) minutes = 60;
-            if (minutes > 7200) minutes = 7200;
+            if (hours < 1) hours = 1;
+            if (hours > 100) hours = 100;
 
             RvcMessage msg = new();
             msg.Dgn = 0x1EF65;
             msg.Priority = 6;
-            msg.Data[0] = 0x89;
-            msg.Data[1] = (byte)(minutes & 0xff);
-            msg.Data[2] = (byte)(minutes >> 8 & 0xff);
+            msg.Data[0] = 0xA7;
+            msg.Data[1] = (byte)hours;
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void SetWaterDuration(int minutes)
+        public void SetPumpOverrideDuration(int minutes)
         {
-            if (minutes < 30) minutes = 30;
+            if (minutes < 2) minutes = 2;
             if (minutes > 60) minutes = 60;
 
             RvcMessage msg = new();
             msg.Dgn = 0x1EF65;
             msg.Priority = 6;
-            msg.Data[0] = 0x89;
-            msg.Data[3] = (byte)(minutes & 0xff);
-
+            msg.Data[0] = 0xA7;
+            msg.Data[2] = (byte)minutes;
 
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
+
 
         public void SetDayStart(int hours, int minutes)
         {
@@ -351,12 +500,12 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void OverrideTempSensor(int temperature)
+        public void OverrideTempSensor(int zone, int temperature)
         {
             RvcMessage msg = new();
             msg.Dgn = 0x1FF9C;
             msg.Priority = 6;
-            msg.Data[0] = 1;
+            msg.Data[0] = (byte)(1 + zone);
             ushort tmp = (ushort)((temperature + 273) * 32);
             msg.Data[1] = (byte)tmp;
             msg.Data[2] = (byte)(tmp >> 8);
@@ -372,15 +521,24 @@ namespace CAN_Tool.ViewModels
             panelVersion = new byte[4];
 
             timer = new();
-            timer.Interval = new TimeSpan(0, 0, 5);
+            timer.Interval = new TimeSpan(0, 0, 1);
             timer.Start();
             timer.Tick += TimerCallback;
+
+            Zones.Add(new(0, this));
+            Zones.Add(new(1, this));
+            Zones.Add(new(2, this));
+            Zones.Add(new(3, this));
+            Zones.Add(new(4, this));
+
         }
 
         void TimerCallback(object sender, EventArgs e)
         {
-            if (BroadcastTemperature)
-                OverrideTempSensor(RvcTemperature);
+            if (Zones[zoneToOverride].BroadcastTemperature)
+                OverrideTempSensor(zoneToOverride, Zones[zoneToOverride].RvcTemperature);
+            zoneToOverride++;
+            if (zoneToOverride > 4) zoneToOverride = 0;
         }
 
         private int tankTemperature;
@@ -394,6 +552,9 @@ namespace CAN_Tool.ViewModels
 
         private int outsideTemperature;
         public int OutsideTemperature { set => Set(ref outsideTemperature, value); get => outsideTemperature; }
+
+        private int liquidLevel;
+        public int LiquidLEvel { set => Set(ref liquidLevel, value); get => liquidLevel; }
 
         private pumpStatus_t heaterPumpStatus;
         public pumpStatus_t HeaterPumpStatus { set => Set(ref heaterPumpStatus, value); get => heaterPumpStatus; }
@@ -416,11 +577,11 @@ namespace CAN_Tool.ViewModels
         private bool heaterPumpOverride;
         public bool HeaterPumpOverride { set => Set(ref heaterPumpOverride, value); get => heaterPumpOverride; }
 
-        private bool waterPump1Override;
-        public bool WaterPump1Override { set => Set(ref waterPump1Override, value); get => waterPump1Override; }
+        private bool pump1Override;
+        public bool Pump1Override { set => Set(ref pump1Override, value); get => pump1Override; }
 
-        private bool waterPump2Override;
-        public bool WaterPump2Override { set => Set(ref waterPump2Override, value); get => waterPump2Override; }
+        private bool pump2Override;
+        public bool Pump2Override { set => Set(ref pump2Override, value); get => pump2Override; }
 
         private bool waterPumpAux1Override;
         public bool WaterPumpAux1Override { set => Set(ref waterPumpAux1Override, value); get => waterPumpAux1Override; }
@@ -446,26 +607,8 @@ namespace CAN_Tool.ViewModels
         private bool domesticWater;
         public bool DomesticWater { set => Set(ref domesticWater, value); get => domesticWater; }
 
-        private BindingList<ZoneHandler> zones;
+        private BindingList<ZoneHandler> zones = new();
         public BindingList<ZoneHandler> Zones => zones;
-
-        private int setpointDay;
-        public int SetpointDay { set => Set(ref setpointDay, value); get => setpointDay; }
-
-        private int setpointNight;
-        public int SetpointNight { set => Set(ref setpointNight, value); get => setpointNight; }
-
-        private int currentSetpoint;
-        public int CurrentSetpoint { set => Set(ref currentSetpoint, value); get => currentSetpoint; }
-
-        private byte zoneManualFanSpeed;
-        public byte ZoneManualFanSpeed { set => Set(ref zoneManualFanSpeed, value); get => zoneManualFanSpeed; }
-
-        private bool zoneManualFanMode;
-        public bool ZoneManualFanMode { set => Set(ref zoneManualFanMode, value); get => zoneManualFanMode; }
-
-        private int zoneFanMeasuredSpeed;
-        public int ZoneFanMeasuredSpeed { set => Set(ref zoneFanMeasuredSpeed, value); get => zoneFanMeasuredSpeed; }
 
         private int systemLimitationTime;
         public int SystemLimitationTime { set => Set(ref systemLimitationTime, value); get => systemLimitationTime; }
@@ -476,20 +619,23 @@ namespace CAN_Tool.ViewModels
         private int systemEstimatedTime;
         public int SystemEstimatedTime { set => Set(ref systemEstimatedTime, value); get => systemEstimatedTime; }
 
-        private int pumpEstimatedTime;
-        public int PumpEstimatedTime { set => Set(ref pumpEstimatedTime, value); get => pumpEstimatedTime; }
+        private int heaterPumpEstimatedTime;
+        public int HeaterPumpEstimatedTime { set => Set(ref heaterPumpEstimatedTime, value); get => heaterPumpEstimatedTime; }
 
-        private int waterEstimatedTime;
-        public int WaterEstimatedTime { set => Set(ref waterEstimatedTime, value); get => waterEstimatedTime; }
+        private int pump1EstimatedTime;
+        public int Pump1EstimatedTime { set => Set(ref pump1EstimatedTime, value); get => pump1EstimatedTime; }
 
-        private int panelTimeSinceStart;
-        public int PanelMinutesSinceStart { set => Set(ref panelTimeSinceStart, value); get => panelTimeSinceStart; }
+        private int pump2EstimatedTime;
+        public int Pump2EstimatedTime { set => Set(ref pump2EstimatedTime, value); get => pump2EstimatedTime; }
 
-        private bool panelSensorOn;
-        public bool PanelSensorOn { set => Set(ref panelSensorOn, value); get => panelSensorOn; }
+        private int auxPump1EstimatedTime;
+        public int AuxPump1EstimatedTime { set => Set(ref auxPump1EstimatedTime, value); get => auxPump1EstimatedTime; }
 
-        private int zoneTemperature;
-        public int ZoneTemperature { set => Set(ref zoneTemperature, value); get => zoneTemperature; }
+        private int auxPump2EstimatedTime;
+        public int AuxPump2EstimatedTime { set => Set(ref auxPump2EstimatedTime, value); get => auxPump2EstimatedTime; }
+
+        private int auxPump3EstimatedTime;
+        public int AuxPump3EstimatedTime { set => Set(ref auxPump3EstimatedTime, value); get => auxPump3EstimatedTime; }
 
         private int heaterTotalMinutes;
         public int HeaterTotalMinutes { set => Set(ref heaterTotalMinutes, value); get => heaterTotalMinutes; }
@@ -500,14 +646,9 @@ namespace CAN_Tool.ViewModels
         private int systemDuration;
         public int SystemDuration { set => Set(ref systemDuration, value); get => systemDuration; }
 
-        private bool broadcastTemperature;
-        public bool BroadcastTemperature { set => Set(ref broadcastTemperature, value); get => broadcastTemperature; }
+        private int pumpDuration;
+        public int PumpDuration { set => Set(ref pumpDuration, value); get => pumpDuration; }
 
-        private bool scheduleMode;
-        public bool ScheduleMode { set => Set(ref scheduleMode, value); get => scheduleMode; }
-
-        private int rvcTemperature = 30;
-        public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
 
         private DateTime? dayStart;
         public DateTime? DayStart { set => Set(ref dayStart, value); get => dayStart; }
@@ -533,6 +674,8 @@ namespace CAN_Tool.ViewModels
         public byte[] PanelVersion { set => Set(ref panelVersion, value); get => panelVersion; }
 
         public string PanelVersionString { get => $"{panelVersion[0]:D03}.{panelVersion[1]:D03}.{panelVersion[2]:D03}.{panelVersion[3]:D03}"; }
+
+        private int zoneToOverride = 0;
 
     }
 

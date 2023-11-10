@@ -26,7 +26,6 @@ namespace CAN_Tool.ViewModels
     {
         public RvcMessage msgToTransmit;
 
-
     }
 
     public class Timberline15Handler : ViewModel

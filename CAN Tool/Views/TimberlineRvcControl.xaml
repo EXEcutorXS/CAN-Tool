@@ -1,14 +1,24 @@
-﻿<UserControl x:Class="CAN_Tool.Views.TimberlineRvcControl"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
-             xmlns:local="clr-namespace:CAN_Tool.Views"
-             mc:Ignorable="d" 
-             DataContext=""
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        
+﻿<UserControl x:Class="CAN_Tool.Views.TimberlineRvcControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:local="clr-namespace:CAN_Tool.Views" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <vm:Timberline20Handler />
+    </UserControl.DataContext>
+    <Grid Background="LightGray">
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+                <CheckBox>Heater</CheckBox>
+                <CheckBox>Element</CheckBox>
+                <CheckBox>Floor</CheckBox>
+                <CheckBox>Engine</CheckBox>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>OutdoorTemp:</TextBlock>
+                    <TextBlock Text="{Binding OutsideTemperature}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                            <TextBlock>Liquid level:</TextBlock>
+                            <TextBlock Text="{Binding }" />
+                    </StackPanel>
+            </StackPanel>
+        </DockPanel>
+
     </Grid>
 </UserControl>
