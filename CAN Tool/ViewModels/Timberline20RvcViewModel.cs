@@ -26,7 +26,10 @@ namespace CAN_Tool.ViewModels
 
         private Action<ZoneHandler> selectedZoneChanged;
         */
-
+        public ZoneHandler():this(0,null)
+        { 
+            
+        }
         public ZoneHandler(int zoneNumber, Timberline20Handler parent)
         {
             this.zoneNumber = zoneNumber;
@@ -92,7 +95,7 @@ namespace CAN_Tool.ViewModels
 
         public void SetFanManualSpeed(byte value)
         {
-            parent.SetFanManualSpeed(ZoneNumber, value);
+            parent.SetFanManualSpeed((byte)ZoneNumber, value);
         }
     }
 
@@ -138,9 +141,9 @@ namespace CAN_Tool.ViewModels
                         case 1: Pump1Override = overriden; WaterPump1Status = newStatus; break;
                         case 2: Pump2Override = overriden; WaterPump2Status = newStatus; break;
                         case 5: HeaterPumpOverride = overriden; HeaterPumpStatus = newStatus; break;
-                        case 6: WaterPumpAux1Override = overriden; WaterPumpAux1Status = newStatus; break;
-                        case 7: WaterPumpAux2Override = overriden; WaterPumpAux2Status = newStatus; break;
-                        case 8: WaterPumpAux3Override = overriden; WaterPumpAux3Status = newStatus; break;
+                        case 6: WaterPumpAux1Override = overriden; auxPumpStatus[0] = newStatus; break;
+                        case 7: WaterPumpAux2Override = overriden; auxPumpStatus[1] = newStatus; break;
+                        case 8: WaterPumpAux3Override = overriden; auxPumpStatus[2] = newStatus; break;
                     }
                     break;
 
@@ -209,9 +212,9 @@ namespace CAN_Tool.ViewModels
                             if (D[5] != 0xFF || D[6] != 0xFF) HeaterPumpEstimatedTime = D[5] + D[6] * 256;
                             break;
                         case 0xA3: //Pump timers #2
-                            if (D[1] != 0xFF || D[2] != 0xFF) AuxPump1EstimatedTime = D[1] + D[2] * 256;
-                            if (D[3] != 0xFF || D[4] != 0xFF) AuxPump2EstimatedTime = D[3] + D[4] * 256;
-                            if (D[5] != 0xFF || D[6] != 0xFF) AuxPump3EstimatedTime = D[5] + D[6] * 256;
+                            if (D[1] != 0xFF || D[2] != 0xFF) auxPumpEstimatedTime[0] = D[1] + D[2] * 256;
+                            if (D[3] != 0xFF || D[4] != 0xFF) auxPumpEstimatedTime[1] = D[3] + D[4] * 256;
+                            if (D[5] != 0xFF || D[6] != 0xFF) auxPumpEstimatedTime[2] = D[5] + D[6] * 256;
                             break;
                         case 0xA4: // Heater info
                             if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) HeaterTotalMinutes = D[1] + D[2] * 256 + D[3] * 65536;
@@ -531,6 +534,22 @@ namespace CAN_Tool.ViewModels
             Zones.Add(new(3, this));
             Zones.Add(new(4, this));
 
+            AuxTemp.Add(new());
+            AuxTemp.Add(new());
+            AuxTemp.Add(new());
+            AuxTemp.Add(new());
+
+            auxPumpOverride.AddNew();
+            auxPumpOverride.AddNew();
+            auxPumpOverride.AddNew();
+
+            AuxPumpEstimatedTime.AddNew();
+            AuxPumpEstimatedTime.AddNew();
+            AuxPumpEstimatedTime.AddNew();
+
+            AuxPumpStatus.AddNew();
+            AuxPumpStatus.AddNew();
+            AuxPumpStatus.AddNew();
         }
 
         void TimerCallback(object sender, EventArgs e)
@@ -565,14 +584,8 @@ namespace CAN_Tool.ViewModels
         private pumpStatus_t waterPump2Status;
         public pumpStatus_t WaterPump2Status { set => Set(ref waterPump2Status, value); get => waterPump2Status; }
 
-        private pumpStatus_t waterPumpAux1Status;
-        public pumpStatus_t WaterPumpAux1Status { set => Set(ref waterPumpAux1Status, value); get => waterPumpAux1Status; }
-
-        private pumpStatus_t waterPumpAux2Status;
-        public pumpStatus_t WaterPumpAux2Status { set => Set(ref waterPumpAux2Status, value); get => waterPumpAux2Status; }
-
-        private pumpStatus_t waterPumpAux3Status;
-        public pumpStatus_t WaterPumpAux3Status { set => Set(ref waterPumpAux3Status, value); get => waterPumpAux3Status; }
+        private BindingList<pumpStatus_t> auxPumpStatus = new();
+        public BindingList<pumpStatus_t> AuxPumpStatus => auxPumpStatus;
 
         private bool heaterPumpOverride;
         public bool HeaterPumpOverride { set => Set(ref heaterPumpOverride, value); get => heaterPumpOverride; }
@@ -610,11 +623,14 @@ namespace CAN_Tool.ViewModels
         private BindingList<ZoneHandler> zones = new();
         public BindingList<ZoneHandler> Zones => zones;
 
-        private int systemLimitationTime;
-        public int SystemLimitationTime { set => Set(ref systemLimitationTime, value); get => systemLimitationTime; }
+        BindingList<float> auxTemp = new();
+        public BindingList<float> AuxTemp => auxTemp;
 
-        private int waterLimitationTime;
-        public int WaterLimitationTime { set => Set(ref waterLimitationTime, value); get => waterLimitationTime; }
+        BindingList<bool> auxPumpOverride = new();
+        public BindingList<bool> AuxPumpOverride => auxPumpOverride;
+
+        BindingList<int> auxPumpEstimatedTime = new();
+        public BindingList<int> AuxPumpEstimatedTime => auxPumpEstimatedTime;
 
         private int systemEstimatedTime;
         public int SystemEstimatedTime { set => Set(ref systemEstimatedTime, value); get => systemEstimatedTime; }
@@ -628,15 +644,6 @@ namespace CAN_Tool.ViewModels
         private int pump2EstimatedTime;
         public int Pump2EstimatedTime { set => Set(ref pump2EstimatedTime, value); get => pump2EstimatedTime; }
 
-        private int auxPump1EstimatedTime;
-        public int AuxPump1EstimatedTime { set => Set(ref auxPump1EstimatedTime, value); get => auxPump1EstimatedTime; }
-
-        private int auxPump2EstimatedTime;
-        public int AuxPump2EstimatedTime { set => Set(ref auxPump2EstimatedTime, value); get => auxPump2EstimatedTime; }
-
-        private int auxPump3EstimatedTime;
-        public int AuxPump3EstimatedTime { set => Set(ref auxPump3EstimatedTime, value); get => auxPump3EstimatedTime; }
-
         private int heaterTotalMinutes;
         public int HeaterTotalMinutes { set => Set(ref heaterTotalMinutes, value); get => heaterTotalMinutes; }
 
@@ -644,7 +651,18 @@ namespace CAN_Tool.ViewModels
         public int WaterDuration { set => Set(ref waterDuration, value); get => waterDuration; }
 
         private int systemDuration;
+        [AffectsTo(nameof(SystemDurationString))]
         public int SystemDuration { set => Set(ref systemDuration, value); get => systemDuration; }
+
+        public string SystemDurationString { get
+            {
+                if (SystemDuration < 24)
+                    return $"{systemDuration} H";
+                else if (SystemDuration < 100)
+                    return $"{systemDuration / 24} D";
+                else return "Unlimited";
+            }
+        }
 
         private int pumpDuration;
         public int PumpDuration { set => Set(ref pumpDuration, value); get => pumpDuration; }
