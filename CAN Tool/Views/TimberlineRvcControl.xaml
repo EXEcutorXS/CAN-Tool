@@ -1,29 +1,39 @@
-﻿<UserControl x:Class="CAN_Tool.Views.TimberlineRvcControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:local="clr-namespace:CAN_Tool.Views" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontSize="15">
+﻿<UserControl x:Class="CAN_Tool.Views.TimberlineRvcControl"
+             
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
+             xmlns:controls="clr-namespace:CAN_Tool.Controls"
+             xmlns:local="clr-namespace:CAN_Tool.Views" 
+             xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
+             xmlns:fa="http://schemas.fontawesome.com/icons/"
+             
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontSize="15">
     <UserControl.DataContext>
         <vm:Timberline20Handler />
     </UserControl.DataContext>
+    <UserControl.Resources>
+        <c:BoolToOpacity x:Key="BoolToOpacity" />
+    </UserControl.Resources>
     <Grid>
         
         <DockPanel>
-            <StackPanel>
-                <local:ZoneControl Width="300" Height="100"></local:ZoneControl>
-                <local:ZoneControl Width="300" Height="100"></local:ZoneControl>
-                <local:ZoneControl Width="300" Height="100"></local:ZoneControl>
-                <local:ZoneControl Width="300" Height="100"></local:ZoneControl>
-                <local:ZoneControl Width="300" Height="100"></local:ZoneControl>
-            </StackPanel>
-            <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="120" HorizontalAlignment="Left">
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding HeaterEnabled,Mode=OneWay}" HorizontalAlignment="Center">Heater</CheckBox>
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding ElementEnabled,Mode=OneWay}" HorizontalAlignment="Center">Element</CheckBox>
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding UnderfloorHeatingEnabled,Mode=OneWay}" HorizontalAlignment="Center">Floor</CheckBox>
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding EnginePreheatEnabled,Mode=OneWay}" HorizontalAlignment="Center">Engine</CheckBox>
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding HeaterPumpOverride,Mode=OneWay}" HorizontalAlignment="Center">Heater Pump</CheckBox>
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding Pump1Override,Mode=OneWay}" HorizontalAlignment="Center">Pump 1</CheckBox>
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding Pump2Override,Mode=OneWay}" HorizontalAlignment="Center">Pump 2</CheckBox>
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding AuxPumpOverride[0],Mode=OneWay}" HorizontalAlignment="Center">AUX pump 1</CheckBox>
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding AuxPumpOverride[1],Mode=OneWay}" HorizontalAlignment="Center">AXU pump 2</CheckBox>
-                <CheckBox Style="{DynamicResource MaterialDesignFilterChipAccentCheckBox}" IsChecked="{Binding AuxPumpOverride[2],Mode=OneWay}" HorizontalAlignment="Center">AUX pump3</CheckBox>
-                <Button Margin="5">Sync time</Button>
+
+            <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="120" HorizontalAlignment="Left" Margin="2">
+                
+                <Button  Margin="3" Opacity="{Binding HeaterEnabled,Converter={StaticResource BoolToOpacity}}"  Click="ToggleHeaterClick">Heater</Button>
+                <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}">Element</Button>
+                <Button Margin="3" Opacity="{Binding UnderfloorHeatingEnabled,Converter={StaticResource BoolToOpacity}}" >Floor</Button>
+                <Button Margin="3" Opacity="{Binding EnginePreheatEnabled,Converter={StaticResource BoolToOpacity}}">Engine</Button>
+                <Button Margin="3" Opacity="{Binding HeaterPumpOverride,Converter={StaticResource BoolToOpacity}}">Heater Pump</Button>
+                <Button Margin="3" Opacity="{Binding Pump1Override,Converter={StaticResource BoolToOpacity}}">Pump 1</Button>
+                <Button Margin="3" Opacity="{Binding Pump2Override,Converter={StaticResource BoolToOpacity}}">Pump 2</Button>
+                <Button Margin="3" Opacity="{Binding AuxPumpOverride[0],Converter={StaticResource BoolToOpacity}}">AUX pump 1</Button>
+                <Button Margin="3" Opacity="{Binding AuxPumpOverride[1],Converter={StaticResource BoolToOpacity}}" >AXU pump 2</Button>
+                <Button Margin="3" Opacity="{Binding AuxPumpOverride[2],Converter={StaticResource BoolToOpacity}}" >AUX pump3</Button>
+                <Button Margin="3">Sync time</Button>
 
             </StackPanel>
             <StackPanel DockPanel.Dock="Left">
@@ -49,6 +59,23 @@
                     <Slider Width="200"></Slider>
                     <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" Text="{Binding PumpDuration,StringFormat={}{0}M}"></TextBlock>
                 </StackPanel>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Left">
+                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
+                <local:ZoneControl Margin="2" Width="300" Height="150" ></local:ZoneControl>
+                </Border>
+                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
+                    <local:ZoneControl Margin="2" Width="300" Height="150"></local:ZoneControl>
+                </Border>
+                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
+                    <local:ZoneControl Margin="2" Width="300" Height="150"></local:ZoneControl>
+                </Border>
+                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
+                    <local:ZoneControl Margin="2" Width="300" Height="150"></local:ZoneControl>
+                </Border>
+                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
+                    <local:ZoneControl Margin="2" Width="300" Height="150"></local:ZoneControl>
+                </Border>
             </StackPanel>
         </DockPanel>
 

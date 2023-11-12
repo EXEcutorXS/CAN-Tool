@@ -5,8 +5,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CAN_Tool" xmlns:rvc="clr-namespace:RVC"
-        xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
+        xmlns:vm="clr-namespace:CAN_Tool.ViewModels" 
         xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators"
+        xmlns:views="clr-namespace:CAN_Tool.Views"
         xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
         mc:Ignorable="d" 
         xmlns:col="clr-namespace:System.Collections;assembly=mscorlib" 
@@ -1108,161 +1109,8 @@
                 </DockPanel>
 
             </TabItem>
-            <TabItem Header="Timberline 2.0">
-                <DockPanel>
-                    <StackPanel DockPanel.Dock="Left" Margin="5">
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline20.HeaterEnabled}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Heater" Margin="5" Click="ToggleHeaterButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline20.ElementEnabled}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Element" Margin="5" Click="ToggleElementButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline20.UnderfloorHeatingEnabled}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Water" Margin="5" Cursor="Hand" Click="ToggleUnderfloorButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneEnabled}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Zone Heating" Margin="5" Cursor="Hand" Click="ToggleZoneButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterPumpOverride}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Pump override" Margin="5" Cursor="Hand" Click="TogglePumpButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneManualFanMode}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Fan manual" Margin="5" Cursor="Hand" Click="ToggleFanManualModeButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ScheduleMode}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Schedule mode" Margin="5" Cursor="Hand" Click="ToggleScheduleModeButtonPressed" />
-                        </StackPanel>
-
-                        <Button Margin="5" Content="Sync time" Click="SetTimeButtonPressed"></Button>
-                        <Button Margin="5" Content="Clear errors" Click="ClearErrorsButtonPressed"></Button>
-                    </StackPanel>
-                    <StackPanel DockPanel.Dock="Left" Margin="5" Orientation="Vertical" Width="550">
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Day setpoint,C°"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointDay,Mode=OneWay}" ValueChanged="DaySetPointValueChanged"></ScrollBar>
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointDay}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Night setpoint,C°"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointNight,Mode=OneWay}" ValueChanged="NightSetPointValueChanged" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointNight}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Fan manual speed,%"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="100" Value="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" ValueChanged="ManualFanSpeedValueChanged" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="RVC-Temperature,C°"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="40" Value="{Binding Timberline15.RvcTemperature}" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.RvcTemperature,Mode=OneWay}" HorizontalAlignment="Right" />
-                            <CheckBox DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" HorizontalAlignment="Right" IsChecked="{Binding Timberline15.BroadcastTemperature}" />
-
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Day Start"></TextBlock>
-                            <materialDesign:TimePicker SelectedTime="{Binding Timberline15.DayStart}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="DayStartChanged" />
-
-                            <materialDesign:TimePicker DockPanel.Dock="Right" SelectedTime="{Binding Timberline15.NightStart}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="NightTimeChanged" />
-                            <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Night Start" HorizontalAlignment="Right" />
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="System Limit, minutes"></TextBlock>
-                            <ScrollBar SmallChange="60" LargeChange="60" DockPanel.Dock="Right" Orientation="Horizontal" Width="300" Margin="5" Minimum="60" Maximum="7200" Value="{Binding Timberline15.SystemDuration,Mode=OneWay}" ValueChanged="SystemDurationValueChanged" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SystemDuration,Mode=OneWay}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Water Limit, minutes"></TextBlock>
-                            <ScrollBar SmallChange="1" LargeChange="5" DockPanel.Dock="Right" Orientation="Horizontal" Width="300" Margin="5" Minimum="30" Maximum="60" Value="{Binding Timberline15.WaterDuration,Mode=OneWay}" ValueChanged="WaterDurationValueChanged" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.WaterDuration,Mode=OneWay}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-
-                    </StackPanel>
-                    <StackPanel Margin="5" Width="300" HorizontalAlignment="Left">
-                        <StackPanel.Resources>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Margin" Value="3" />
-                            </Style>
-                        </StackPanel.Resources>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Tank Temperature: " />
-                            <TextBlock Text="{Binding Timberline15.TankTemperature,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Heatexchanger Temperature: " />
-                            <TextBlock Text="{Binding Timberline15.HeatExchangerTemperature,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Heater Temperature: " />
-                            <TextBlock Text="{Binding Timberline15.HeaterTemperature,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Current setpoint: " />
-                            <TextBlock Text="{Binding Timberline15.CurrentSetpoint,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Day setpoint: " />
-                            <TextBlock Text="{Binding Timberline15.SetpointDay,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Night setpoint: " />
-                            <TextBlock Text="{Binding Timberline15.SetpointNight,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Fan measured speed: " />
-                            <TextBlock Text="{Binding Timberline15.ZoneFanMeasuredSpeed,Mode=OneWay}" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Heater version: " />
-                            <TextBlock Text="{Binding Timberline15.HeaterVersionString,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="HCU version: " />
-                            <TextBlock Text="{Binding Timberline15.HcuVersionString,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Panel version: " />
-                            <TextBlock Text="{Binding Timberline15.PanelVersionString,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Solenoid status: " />
-                            <TextBlock Text="{Binding Timberline15.SolenoidStatus,Mode=OneWay}" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="System timer: " />
-                            <TextBlock Text="{Binding Timberline15.SystemEstimatedTime,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Water timer: " />
-                            <TextBlock Text="{Binding Timberline15.WaterEstimatedTime,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Pump timer: " />
-                            <TextBlock Text="{Binding Timberline15.PumpEstimatedTime,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Pump status: " />
-                            <TextBlock Text="{Binding Timberline15.WaterPumpStatus,Mode=OneWay}" />
-                        </StackPanel>
-
-                    </StackPanel>
-                </DockPanel>
+            <TabItem Header="Timberline 2.0" DataContext="{Binding Timberline20}">
+                <views:TimberlineRvcControl />
             </TabItem>
             <TabItem Header="{DynamicResource b_messages}">
                 <DockPanel>

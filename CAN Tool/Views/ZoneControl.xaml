@@ -1,11 +1,25 @@
-﻿<UserControl x:Class="CAN_Tool.Views.ZoneControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="clr-namespace:CAN_Tool.Views" xmlns:fa="http://schemas.fontawesome.com/icons/" mc:Ignorable="d" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" d:DesignHeight="100" d:DesignWidth="300" Foreground="{DynamicResource MaterialDesignBodyLight}">
+﻿<UserControl x:Class="CAN_Tool.Views.ZoneControl" 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:CAN_Tool.Views" 
+             xmlns:fa="http://schemas.fontawesome.com/icons/"
+             mc:Ignorable="d" xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
+             d:DesignHeight="150"
+             d:DesignWidth="300" 
+             Foreground="{DynamicResource MaterialDesignBodyLight}">
     <UserControl.DataContext>
         <vm:ZoneHandler />
     </UserControl.DataContext>
-    <Grid Background="Gray">
-        <UniformGrid Rows="3" Columns="1">
+    <UserControl.Resources>
+        <c:BoolToOpacity x:Key="BoolToOpacity" />
+    </UserControl.Resources>
+    <Grid>
+        <UniformGrid Rows="4" Columns="1">
             <StackPanel Orientation="Horizontal">
-                <Button Content="{Binding State}" d:Content="HEAT" Margin="2" />
+                <Button Style="{DynamicResource MaterialDesignRaisedSecondaryDarkButton}" Content="{Binding State}" d:Content="HEAT" Margin="3"/>
                 
                 <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding CurrentTemperature,StringFormat={}{0}°}" d:Text="19° → " VerticalAlignment="Center" />
                 <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding TempSetpointCurrent,StringFormat={}{0}°}" d:Text="24°" VerticalAlignment="Center" />
@@ -17,12 +31,17 @@
             <StackPanel Orientation="Horizontal">
                 <fa:SvgAwesome Foreground="{DynamicResource MaterialDesignBody}" VerticalAlignment="Center" Margin="2" Icon="Regular_Sun" Width="30"></fa:SvgAwesome>
                 <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding TempSetpointDay,StringFormat={}{0}°}" VerticalAlignment="Center"></TextBlock>
-                <Slider VerticalAlignment="Center" Margin="3" Width="210"></Slider>
+                <Slider VerticalAlignment="Center" Minimum="10" Maximum="32" SmallChange="1" LargeChange="5" Interval="1" Margin="3" Width="210" Value="{Binding TempSetpointDay,Mode=OneWay}"></Slider>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center" Name="nightPanel">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                 <fa:SvgAwesome Foreground="{DynamicResource MaterialDesignBody}" VerticalAlignment="Center" Margin="2" Icon="Regular_Moon" Width="30"></fa:SvgAwesome>
                 <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding TempSetpointNight,StringFormat={}{0}°}" VerticalAlignment="Center"></TextBlock>
-                <Slider VerticalAlignment="Center" Margin="3" Width="210"></Slider>
+                <Slider VerticalAlignment="Center" Margin="3" Width="210" Minimum="10" Maximum="32" SmallChange="1" LargeChange="5" Interval="1" Value="{Binding TempSetpointNight,Mode=OneWay}"></Slider>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center" Name="nightPanel">
+                <fa:SvgAwesome Foreground="{DynamicResource MaterialDesignBody}" VerticalAlignment="Center" Margin="2" Icon="Solid_TemperatureLow" Width="30" Opacity="{Binding BroadcastTemperature,Converter={StaticResource BoolToOpacity}}"></fa:SvgAwesome>
+                <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding RvcTemperature,StringFormat={}{0}°}" VerticalAlignment="Center"></TextBlock>
+                <Slider VerticalAlignment="Center" Margin="3" Width="210" Minimum="-20" Maximum="40" SmallChange="1" LargeChange="5" Interval="1" Value="{Binding RvcTemperature,Mode=OneWay}"></Slider>
             </StackPanel>
 
         </UniformGrid>

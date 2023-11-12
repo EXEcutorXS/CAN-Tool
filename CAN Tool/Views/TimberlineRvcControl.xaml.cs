@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CAN_Tool.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,19 @@ namespace CAN_Tool.Views
     /// </summary>
     public partial class TimberlineRvcControl : UserControl
     {
+
+        public Timberline20Handler vm;
+
         public TimberlineRvcControl()
         {
             InitializeComponent();
+            vm = (Timberline20Handler)DataContext;
+        }
+
+        private void ToggleHeaterClick(object sender, RoutedEventArgs e)
+        {
+            vm.ToggleHeater();
+            e.Handled = true;
         }
     }
 }

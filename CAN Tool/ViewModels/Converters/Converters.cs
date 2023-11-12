@@ -12,6 +12,7 @@ using System.ComponentModel;
 
 namespace CAN_Tool.ViewModels.Converters
 {
+
     public class DataToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -246,7 +247,7 @@ namespace CAN_Tool.ViewModels.Converters
             if (value != null && (bool)value == true)
                 return 1;
             else
-                return 0.4;
+                return 0.7;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

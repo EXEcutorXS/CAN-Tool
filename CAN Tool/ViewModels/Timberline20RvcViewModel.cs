@@ -17,15 +17,6 @@ namespace CAN_Tool.ViewModels
     {
         public event EventHandler NeedToTransmit;
 
-
-        /*
-        public ZoneHandler(Action<ZoneHandler> NotifierAction)
-        {
-            selectedZoneChanged = NotifierAction;
-        }
-
-        private Action<ZoneHandler> selectedZoneChanged;
-        */
         public ZoneHandler():this(0,null)
         { 
             
@@ -254,7 +245,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             msg.Data[1] = (byte)(0b11110000 + (!HeaterEnabled ? 1 : 0) + ((ElementEnabled ? 1 : 0) << 1));
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
 
         }
 
@@ -264,7 +255,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             msg.Data[1] = (byte)(0b11110000 + (HeaterEnabled ? 1 : 0) + ((!ElementEnabled ? 1 : 0) << 1));
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
 
