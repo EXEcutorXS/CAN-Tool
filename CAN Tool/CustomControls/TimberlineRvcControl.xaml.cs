@@ -27,6 +27,7 @@ namespace CAN_Tool.Views
         public TimberlineRvcControl()
         {
             InitializeComponent();
+
             vm = (Timberline20Handler)DataContext;
         }
 

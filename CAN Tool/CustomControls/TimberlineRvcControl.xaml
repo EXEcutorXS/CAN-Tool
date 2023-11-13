@@ -75,19 +75,19 @@
             </StackPanel>
             <StackPanel DockPanel.Dock="Left">
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                <local:ZoneControl DataContext="{Binding Zones[0]}" Margin="2" Width="300" Height="150" ></local:ZoneControl>
+                    <local:ZoneControl DataContext="{Binding Zones[0]}" ZoneNumber="0"  Margin="2" Width="300" Height="150" ></local:ZoneControl>
                 </Border>
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl DataContext="{Binding Zones[1]}" Margin="2" Width="300" Height="150"></local:ZoneControl>
+                    <local:ZoneControl DataContext="{Binding Zones[1]}" ZoneNumber="1" Margin="2" Width="300" Height="150"></local:ZoneControl>
                 </Border>
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl DataContext="{Binding Zones[2]}" Margin="2" Width="300" Height="150"></local:ZoneControl>
+                    <local:ZoneControl DataContext="{Binding Zones[2]}" ZoneNumber="2" Margin="2" Width="300" Height="150"></local:ZoneControl>
                 </Border>
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl DataContext="{Binding Zones[3]}" Margin="2" Width="300" Height="150"></local:ZoneControl>
+                    <local:ZoneControl DataContext="{Binding Zones[3]}" ZoneNumber="3" Margin="2" Width="300" Height="150"></local:ZoneControl>
                 </Border>
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl DataContext="{Binding Zones[4]}" Margin="2" Width="300" Height="150"></local:ZoneControl>
+                    <local:ZoneControl DataContext="{Binding Zones[4]}" ZoneNumber="4" Margin="2" Width="300" Height="150"></local:ZoneControl>
                 </Border>
             </StackPanel>
         </DockPanel>

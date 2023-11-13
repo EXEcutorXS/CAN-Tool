@@ -1109,8 +1109,8 @@
                 </DockPanel>
 
             </TabItem>
-            <TabItem Header="Timberline 2.0" DataContext="{Binding Timberline20}">
-                <views:TimberlineRvcControl />
+            <TabItem Header="Timberline 2.0">
+                <views:TimberlineRvcControl DataContext="{Binding Timberline20}" />
             </TabItem>
             <TabItem Header="{DynamicResource b_messages}">
                 <DockPanel>

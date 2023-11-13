@@ -1,9 +1,12 @@
 ﻿using CAN_Tool.ViewModels.Base;
 using RVC;
+using ScottPlot.Drawing.Colormaps;
+using ScottPlot.MarkerShapes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Interop;
@@ -17,18 +20,18 @@ namespace CAN_Tool.ViewModels
     {
         public event EventHandler NeedToTransmit;
 
-        public ZoneHandler():this(0,null)
-        { 
+
+        public ZoneHandler()
+        {
             
         }
-        public ZoneHandler(int zoneNumber, Timberline20Handler parent)
+
+        public ZoneHandler(int zoneNumber)
         {
             this.zoneNumber = zoneNumber;
-            this.parent = parent;
         }
-        private readonly int zoneNumber;
 
-        private Timberline20Handler parent;
+        private readonly int zoneNumber;
 
         public int ZoneNumber => zoneNumber;
         private int tempSetpointDay = 22;
@@ -64,29 +67,60 @@ namespace CAN_Tool.ViewModels
         private int rvcTemperature = 30;
         public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
 
-        public void ToggleState()
+        public void ToggleState(int zone)
         {
-            parent.ToggleZoneState(ZoneNumber);
+            RvcMessage msg = new() { Dgn = 0x1FEF9 };
+            msg.Data[0] = (byte)(1 + zone);
+            switch (State)
+            {
+                case zoneState_t.Off: msg.Data[1] = 0b11110010; break;
+                case zoneState_t.Heat: msg.Data[1] = 0b11110100; break;
+                case zoneState_t.Fan: msg.Data[1] = 0b11110000; break;
+            }
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void SetDaySetpoint(int value)
+        public void SetDaySetpoint(int zone, int value)
         {
-            parent.SetDaySetpoint(ZoneNumber ,value);
+            RvcMessage msg = new() { Dgn = 0x1FEF5 };
+            msg.Data[0] = (byte)(1 + zone);
+            msg.Data[1] = 1;
+            ushort tmp = (ushort)((value + 273) * 32);
+            msg.Data[4] = (byte)(tmp & 0xFF);
+            msg.Data[5] = (byte)(tmp >> 8 & 0xFF);
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-        public void SetNightSetpoint(int value)
+        public void SetNightSetpoint(int zone, int value)
         {
-            parent.SetNightSetpoint(ZoneNumber, value);
+            RvcMessage msg = new() { Dgn = 0x1FEF5 };
+            msg.Data[0] = (byte)(1 + zone);
+            msg.Data[1] = 0;
+            ushort tmp = (ushort)((value + 273) * 32);
+            msg.Data[4] = (byte)(tmp & 0xFF);
+            msg.Data[5] = (byte)(tmp >> 8 & 0xFF);
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
         public void ToggleFanManual()
         {
-            parent.ToggleFanManualMode(ZoneNumber);
+            RvcMessage msg = new() { Dgn = 0x1FFE3 };
+            msg.Data[0] = (byte)(1 + ZoneNumber);
+            msg.Data[1] = (byte)(0b11111100 + (ManualMode ? 1 : 0));
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
         public void SetFanManualSpeed(byte value)
         {
-            parent.SetFanManualSpeed((byte)ZoneNumber, value);
+            RvcMessage msg = new() { Dgn = 0x1FFE3 };
+            msg.Data[0] = (byte)(1 + ZoneNumber);
+            msg.Data[2] = (byte)(value * 2);
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
     }
 
@@ -96,6 +130,42 @@ namespace CAN_Tool.ViewModels
         private DispatcherTimer timer;
 
         public event EventHandler NeedToTransmit;
+
+
+        public Timberline20Handler()
+        {
+            hcuVersion = new byte[4];
+            heaterVersion = new byte[4];
+            panelVersion = new byte[4];
+
+            timer = new();
+            timer.Interval = new TimeSpan(0, 0, 1);
+            timer.Start();
+            timer.Tick += TimerCallback;
+
+            Zones.Add(new(0));
+            Zones.Add(new(1));
+            Zones.Add(new(2));
+            Zones.Add(new(3));
+            Zones.Add(new(4));
+
+            AuxTemp.Add(new());
+            AuxTemp.Add(new());
+            AuxTemp.Add(new());
+            AuxTemp.Add(new());
+
+            auxPumpOverride.AddNew();
+            auxPumpOverride.AddNew();
+            auxPumpOverride.AddNew();
+
+            AuxPumpEstimatedTime.AddNew();
+            AuxPumpEstimatedTime.AddNew();
+            AuxPumpEstimatedTime.AddNew();
+
+            AuxPumpStatus.AddNew();
+            AuxPumpStatus.AddNew();
+            AuxPumpStatus.AddNew();
+        }
 
         public void ProcessMesage(RvcMessage msg)
         {
@@ -479,7 +549,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[2] = (byte)hours;
             msg.Data[3] = (byte)minutes;
 
-            NeedToTransmit.?Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
         public void OverrideTempSensor(int zone, int temperature)
@@ -492,44 +562,9 @@ namespace CAN_Tool.ViewModels
             msg.Data[1] = (byte)tmp;
             msg.Data[2] = (byte)(tmp >> 8);
 
-            NeedToTransmit.?Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
-
-        public Timberline20Handler()
-        {
-            hcuVersion = new byte[4];
-            heaterVersion = new byte[4];
-            panelVersion = new byte[4];
-
-            timer = new();
-            timer.Interval = new TimeSpan(0, 0, 1);
-            timer.Start();
-            timer.Tick += TimerCallback;
-
-            Zones.Add(new(0, this));
-            Zones.Add(new(1, this));
-            Zones.Add(new(2, this));
-            Zones.Add(new(3, this));
-            Zones.Add(new(4, this));
-
-            AuxTemp.Add(new());
-            AuxTemp.Add(new());
-            AuxTemp.Add(new());
-            AuxTemp.Add(new());
-
-            auxPumpOverride.AddNew();
-            auxPumpOverride.AddNew();
-            auxPumpOverride.AddNew();
-
-            AuxPumpEstimatedTime.AddNew();
-            AuxPumpEstimatedTime.AddNew();
-            AuxPumpEstimatedTime.AddNew();
-
-            AuxPumpStatus.AddNew();
-            AuxPumpStatus.AddNew();
-            AuxPumpStatus.AddNew();
-        }
 
         void TimerCallback(object sender, EventArgs e)
         {
