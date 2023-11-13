@@ -483,6 +483,7 @@ namespace CAN_Tool.ViewModels
 
             public string PanelVersionString { get => $"{panelVersion[0]:D03}.{panelVersion[1]:D03}.{panelVersion[2]:D03}.{panelVersion[3]:D03}"; }
         }
+    
     internal class RvcPageViewModel : ViewModel
     {
 
@@ -522,6 +523,9 @@ namespace CAN_Tool.ViewModels
             RefreshTimer.Start();
 
             spamTask = Task.Run(SpamFunction);
+
+            Timberline15 = new();
+            Timberline15.NeedToTransmit += SendMessage;
 
             Timberline20 = new();
             Timberline20.NeedToTransmit += SendMessage;

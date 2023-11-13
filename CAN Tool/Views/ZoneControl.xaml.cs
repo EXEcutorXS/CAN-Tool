@@ -39,5 +39,10 @@ namespace CAN_Tool.Views
         {
 
         }
+
+        private void Slider_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+
+        }
     }
 }

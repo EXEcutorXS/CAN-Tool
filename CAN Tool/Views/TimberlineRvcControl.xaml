@@ -10,12 +10,13 @@
              xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
              xmlns:fa="http://schemas.fontawesome.com/icons/"
              
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontSize="15">
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="820" d:DesignWidth="900" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontSize="15">
     <UserControl.DataContext>
         <vm:Timberline20Handler />
     </UserControl.DataContext>
     <UserControl.Resources>
         <c:BoolToOpacity x:Key="BoolToOpacity" />
+        <c:FarenheitConverter x:Key="ToFarenheit" />
     </UserControl.Resources>
     <Grid>
         
@@ -24,39 +25,51 @@
             <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="130" HorizontalAlignment="Left" Margin="2">
                 
                 <Button  Margin="3" Opacity="{Binding HeaterEnabled,Converter={StaticResource BoolToOpacity}}"  Click="ToggleHeaterClick">Heater</Button>
-                <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}">Element</Button>
-                <Button Margin="3" Opacity="{Binding UnderfloorHeatingEnabled,Converter={StaticResource BoolToOpacity}}" >Floor</Button>
+                <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}" Click="ElementToggleButtonClick">Element</Button>
+                <Button Margin="3" Opacity="{Binding UnderfloorHeatingEnabled,Converter={StaticResource BoolToOpacity}}" Click="FloorButtonClick">Floor</Button>
                 <Button Margin="3" Opacity="{Binding EnginePreheatEnabled,Converter={StaticResource BoolToOpacity}}">Engine</Button>
-                <Button Margin="3" Opacity="{Binding HeaterPumpOverride,Converter={StaticResource BoolToOpacity}}">Heater Pump</Button>
-                <Button Margin="3" Opacity="{Binding Pump1Override,Converter={StaticResource BoolToOpacity}}">Pump 1</Button>
-                <Button Margin="3" Opacity="{Binding Pump2Override,Converter={StaticResource BoolToOpacity}}">Pump 2</Button>
-                <Button Margin="3" Opacity="{Binding AuxPumpOverride[0],Converter={StaticResource BoolToOpacity}}">AUX pump 1</Button>
-                <Button Margin="3" Opacity="{Binding AuxPumpOverride[1],Converter={StaticResource BoolToOpacity}}" >AXU pump 2</Button>
-                <Button Margin="3" Opacity="{Binding AuxPumpOverride[2],Converter={StaticResource BoolToOpacity}}" >AUX pump3</Button>
-                <Button Margin="3">Sync time</Button>
+                <Button Margin="3" Opacity="{Binding HeaterPumpOverride,Converter={StaticResource BoolToOpacity}}" Click="HeaterPumpButtonClick">Heater Pump</Button>
+                <Button Margin="3" Opacity="{Binding Pump1Override,Converter={StaticResource BoolToOpacity}}" Click="Pump1ButtonClick">Pump 1</Button>
+                <Button Margin="3" Opacity="{Binding Pump2Override,Converter={StaticResource BoolToOpacity}}" Click="Pump2ButtonClick">Pump 2</Button>
+                <Button Margin="3" Opacity="{Binding AuxPumpOverride[0],Converter={StaticResource BoolToOpacity}}" Click="AuxPump1ButtonClick">AUX pump 1</Button>
+                <Button Margin="3" Opacity="{Binding AuxPumpOverride[1],Converter={StaticResource BoolToOpacity}}" Click="AuxPump2ButtonClick">AUX pump 2</Button>
+                <Button Margin="3" Opacity="{Binding AuxPumpOverride[2],Converter={StaticResource BoolToOpacity}}" Click="AuxPump3ButtonClick">AUX pump3</Button>
+                <Button Margin="3" Click="Button_Click">Sync time</Button>
 
             </StackPanel>
             <StackPanel DockPanel.Dock="Left">
-               <TextBlock Text="{Binding OutsideTemperature,StringFormat={}Outside temp: {0}}" />
-               <TextBlock Text="{Binding LiquidLEvel,StringFormat={}Liquid level: {0}}" />
-                <TextBlock Text="{Binding temp,StringFormat={}Aux temp: {0:F1}}" />
+               <TextBlock Text="{Binding OutsideTemperature,StringFormat={}Outside temp: {0}°,Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding TankTemperature,StringFormat={}Tank temp: {0}°,Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding HeatExchangerTemperature,StringFormat={}Heat exchanger: {0}°,Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding LiquidLEvel,StringFormat={}Liquid level: {0}}" />
+                <TextBlock Text="{Binding DomesticWater,StringFormat={}Flow sensor: {0}}" />
+                <TextBlock Text="{Binding AuxTemp[0],StringFormat={}Aux temp 1: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding AuxTemp[1],StringFormat={}Aux temp 2: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding AuxTemp[2],StringFormat={}Aux temp 3: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding AuxTemp[3],StringFormat={}Aux temp 4: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding HeaterPumpStatus,StringFormat={}Heater pump: {0}}" />
+                <TextBlock Text="{Binding WaterPump1Status,StringFormat={}Pump1: {0}}" />
+                <TextBlock Text="{Binding WaterPump2Status,StringFormat={}Pump2: {0}}" />
+                <TextBlock Text="{Binding AuxPumpStatus[0],StringFormat={}AUX pump1 status: {0}}" />
+                <TextBlock Text="{Binding AuxPumpStatus[1],StringFormat={}AUX pump2 status: {0}}" />
+                <TextBlock Text="{Binding AuxPumpStatus[2],StringFormat={}AUX pump3 status: {0}}" />
 
                 <StackPanel Orientation="Horizontal" Margin="5">
                     <TextBlock Width="90"> Day start:</TextBlock>
-                <materialDesign:TimePicker SelectedTime="{Binding DayStart}" Is24Hours="True" MinWidth="50" />
+                <materialDesign:TimePicker SelectedTime="{Binding DayStart,Mode=OneWay}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="DayStartTimeChanged"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
                     <TextBlock Width="90"> Night start:</TextBlock>
-                    <materialDesign:TimePicker SelectedTime="{Binding NightStart}" Is24Hours="True" MinWidth="50"/>
+                    <materialDesign:TimePicker SelectedTime="{Binding NightStart,Mode=OneWay}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="NightStartTimeChanged"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
                     <TextBlock Width="90">System Limit</TextBlock>
-                    <Slider Width="200"></Slider>
+                    <Slider Minimum="1" Maximum="100" Interval="1" LargeChange="1" SmallChange="1" Width="200" ValueChanged="SystemLimitChanged"></Slider>
                     <TextBlock Text="{Binding SystemDurationString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
                     <TextBlock Width="90">Pump Limit</TextBlock>
-                    <Slider Width="200"></Slider>
+                    <Slider Minimum="2" Maximum="60" Interval="1" LargeChange="1" SmallChange="1" Width="200" ValueChanged="PumpDurationChanged"></Slider>
                     <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" Text="{Binding PumpDuration,StringFormat={}{0}M}"></TextBlock>
                 </StackPanel>
             </StackPanel>
