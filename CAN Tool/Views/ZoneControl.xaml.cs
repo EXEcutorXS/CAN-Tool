@@ -24,5 +24,10 @@ namespace CAN_Tool.Views
         {
             InitializeComponent();
         }
+
+        private void Slider_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+
+        }
     }
 }
