@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CAN_Tool.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,23 @@ namespace CAN_Tool.Views
     /// </summary>
     public partial class ZoneControl : UserControl
     {
+        ZoneHandler zoneHandler;
+        
         public ZoneControl()
         {
+            zoneHandler = (DataContext as ZoneHandler);
             InitializeComponent();
+
+        }
+
+        private void ZoneModeButtonClick(object sender, RoutedEventArgs e)
+        {
+            zoneHandler.ToggleState();
+        }
+
+        private void DaySetpointChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
         }
     }
 }

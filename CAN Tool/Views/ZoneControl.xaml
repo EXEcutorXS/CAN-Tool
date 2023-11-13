@@ -19,7 +19,7 @@
     <Grid>
         <UniformGrid Rows="4" Columns="1">
             <StackPanel Orientation="Horizontal">
-                <Button Style="{DynamicResource MaterialDesignRaisedSecondaryDarkButton}" Content="{Binding State}" d:Content="HEAT" Margin="3"/>
+                <Button Style="{DynamicResource MaterialDesignRaisedSecondaryDarkButton}" Content="{Binding State}" d:Content="HEAT" Margin="3" Click="ZoneModeButtonClick"/>
                 
                 <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding CurrentTemperature,StringFormat={}{0}°}" d:Text="19° → " VerticalAlignment="Center" />
                 <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding TempSetpointCurrent,StringFormat={}{0}°}" d:Text="24°" VerticalAlignment="Center" />
@@ -31,7 +31,7 @@
             <StackPanel Orientation="Horizontal">
                 <fa:SvgAwesome Foreground="{DynamicResource MaterialDesignBody}" VerticalAlignment="Center" Margin="2" Icon="Regular_Sun" Width="30"></fa:SvgAwesome>
                 <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding TempSetpointDay,StringFormat={}{0}°}" VerticalAlignment="Center"></TextBlock>
-                <Slider VerticalAlignment="Center" Minimum="10" Maximum="32" SmallChange="1" LargeChange="5" Interval="1" Margin="3" Width="210" Value="{Binding TempSetpointDay,Mode=OneWay}"></Slider>
+                <Slider VerticalAlignment="Center" Minimum="10" Maximum="32" SmallChange="1" LargeChange="5" Interval="1" Margin="3" Width="210" Value="{Binding TempSetpointDay,Mode=OneWay}" ValueChanged="DaySetpointChanged"></Slider>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                 <fa:SvgAwesome Foreground="{DynamicResource MaterialDesignBody}" VerticalAlignment="Center" Margin="2" Icon="Regular_Moon" Width="30"></fa:SvgAwesome>

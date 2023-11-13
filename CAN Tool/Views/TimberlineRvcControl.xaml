@@ -21,7 +21,7 @@
         
         <DockPanel>
 
-            <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="120" HorizontalAlignment="Left" Margin="2">
+            <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="130" HorizontalAlignment="Left" Margin="2">
                 
                 <Button  Margin="3" Opacity="{Binding HeaterEnabled,Converter={StaticResource BoolToOpacity}}"  Click="ToggleHeaterClick">Heater</Button>
                 <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}">Element</Button>
@@ -62,19 +62,19 @@
             </StackPanel>
             <StackPanel DockPanel.Dock="Left">
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                <local:ZoneControl Margin="2" Width="300" Height="150" ></local:ZoneControl>
+                <local:ZoneControl DataContext="{Binding Zones[0]}" Margin="2" Width="300" Height="150" ></local:ZoneControl>
                 </Border>
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl Margin="2" Width="300" Height="150"></local:ZoneControl>
+                    <local:ZoneControl DataContext="{Binding Zones[1]}" Margin="2" Width="300" Height="150"></local:ZoneControl>
                 </Border>
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl Margin="2" Width="300" Height="150"></local:ZoneControl>
+                    <local:ZoneControl DataContext="{Binding Zones[2]}" Margin="2" Width="300" Height="150"></local:ZoneControl>
                 </Border>
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl Margin="2" Width="300" Height="150"></local:ZoneControl>
+                    <local:ZoneControl DataContext="{Binding Zones[3]}" Margin="2" Width="300" Height="150"></local:ZoneControl>
                 </Border>
                 <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl Margin="2" Width="300" Height="150"></local:ZoneControl>
+                    <local:ZoneControl DataContext="{Binding Zones[4]}" Margin="2" Width="300" Height="150"></local:ZoneControl>
                 </Border>
             </StackPanel>
         </DockPanel>
