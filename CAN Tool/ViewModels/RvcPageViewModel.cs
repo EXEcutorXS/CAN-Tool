@@ -511,6 +511,8 @@ namespace CAN_Tool.ViewModels
         {
             VM.CanAdapter.Transmit((e as NeedToTransmitEventArgs).msgToTransmit.ToCanMessage());
         }
+        
+        
         public RvcPageViewModel(MainWindowViewModel vm)
         {
             this.vm = vm;

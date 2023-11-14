@@ -18,9 +18,6 @@ namespace CAN_Tool.ViewModels
 
     public class ZoneHandler : ViewModel
     {
-        public event EventHandler NeedToTransmit;
-
-
         public ZoneHandler()
         {
             
@@ -64,64 +61,12 @@ namespace CAN_Tool.ViewModels
         private bool broadcastTemperature;
         public bool BroadcastTemperature { set => Set(ref broadcastTemperature, value); get => broadcastTemperature; }
 
+        private bool selected;
+        public bool Selected { set => Set(ref selected, value); get => selected; }
+
         private int rvcTemperature = 30;
         public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
 
-        public void ToggleState(int zone)
-        {
-            RvcMessage msg = new() { Dgn = 0x1FEF9 };
-            msg.Data[0] = (byte)(1 + zone);
-            switch (State)
-            {
-                case zoneState_t.Off: msg.Data[1] = 0b11110010; break;
-                case zoneState_t.Heat: msg.Data[1] = 0b11110100; break;
-                case zoneState_t.Fan: msg.Data[1] = 0b11110000; break;
-            }
-
-            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
-        }
-
-        public void SetDaySetpoint(int zone, int value)
-        {
-            RvcMessage msg = new() { Dgn = 0x1FEF5 };
-            msg.Data[0] = (byte)(1 + zone);
-            msg.Data[1] = 1;
-            ushort tmp = (ushort)((value + 273) * 32);
-            msg.Data[4] = (byte)(tmp & 0xFF);
-            msg.Data[5] = (byte)(tmp >> 8 & 0xFF);
-
-            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
-        }
-
-        public void SetNightSetpoint(int zone, int value)
-        {
-            RvcMessage msg = new() { Dgn = 0x1FEF5 };
-            msg.Data[0] = (byte)(1 + zone);
-            msg.Data[1] = 0;
-            ushort tmp = (ushort)((value + 273) * 32);
-            msg.Data[4] = (byte)(tmp & 0xFF);
-            msg.Data[5] = (byte)(tmp >> 8 & 0xFF);
-
-            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
-        }
-
-        public void ToggleFanManual()
-        {
-            RvcMessage msg = new() { Dgn = 0x1FFE3 };
-            msg.Data[0] = (byte)(1 + ZoneNumber);
-            msg.Data[1] = (byte)(0b11111100 + (ManualMode ? 1 : 0));
-
-            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
-        }
-
-        public void SetFanManualSpeed(byte value)
-        {
-            RvcMessage msg = new() { Dgn = 0x1FFE3 };
-            msg.Data[0] = (byte)(1 + ZoneNumber);
-            msg.Data[2] = (byte)(value * 2);
-
-            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
-        }
     }
 
 
@@ -130,7 +75,6 @@ namespace CAN_Tool.ViewModels
         private DispatcherTimer timer;
 
         public event EventHandler NeedToTransmit;
-
 
         public Timberline20Handler()
         {
@@ -148,6 +92,8 @@ namespace CAN_Tool.ViewModels
             Zones.Add(new(2));
             Zones.Add(new(3));
             Zones.Add(new(4));
+
+            SelectedZone = Zones[0];
 
             AuxTemp.Add(new());
             AuxTemp.Add(new());
@@ -315,7 +261,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             msg.Data[1] = (byte)(0b11110000 + (!HeaterEnabled ? 1 : 0) + ((ElementEnabled ? 1 : 0) << 1));
 
-            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
 
         }
 
@@ -348,7 +294,7 @@ namespace CAN_Tool.ViewModels
 
             RvcMessage msg = new() { Dgn = 0x1FE96 };
             msg.Data[0] = 1;
-            if (HeaterPumpOverride)
+            if (Pump1Override)
                 msg.Data[1] = 0b11110000;
             else
                 msg.Data[1] = 0b11110101;
@@ -361,7 +307,7 @@ namespace CAN_Tool.ViewModels
 
             RvcMessage msg = new() { Dgn = 0x1FE96 };
             msg.Data[0] = 2;
-            if (HeaterPumpOverride)
+            if (Pump2Override)
                 msg.Data[1] = 0b11110000;
             else
                 msg.Data[1] = 0b11110101;
@@ -373,7 +319,7 @@ namespace CAN_Tool.ViewModels
 
             RvcMessage msg = new() { Dgn = 0x1FE96 };
             msg.Data[0] = 6;
-            if (HeaterPumpOverride)
+            if (WaterPumpAux1Override)
                 msg.Data[1] = 0b11110000;
             else
                 msg.Data[1] = 0b11110101;
@@ -386,7 +332,7 @@ namespace CAN_Tool.ViewModels
 
             RvcMessage msg = new() { Dgn = 0x1FE96 };
             msg.Data[0] = 7;
-            if (HeaterPumpOverride)
+            if (WaterPumpAux2Override)
                 msg.Data[1] = 0b11110000;
             else
                 msg.Data[1] = 0b11110101;
@@ -399,7 +345,7 @@ namespace CAN_Tool.ViewModels
 
             RvcMessage msg = new() { Dgn = 0x1FE96 };
             msg.Data[0] = 8;
-            if (HeaterPumpOverride)
+            if (WaterPumpAux3Override)
                 msg.Data[1] = 0b11110000;
             else
                 msg.Data[1] = 0b11110101;
@@ -417,7 +363,7 @@ namespace CAN_Tool.ViewModels
                 case zoneState_t.Heat: msg.Data[1] = 0b11110100; break;
                 case zoneState_t.Fan: msg.Data[1] = 0b11110000; break;
             }
-
+            
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
@@ -574,6 +520,9 @@ namespace CAN_Tool.ViewModels
             if (zoneToOverride > 4) zoneToOverride = 0;
         }
 
+
+ 
+
         private int tankTemperature;
         public int TankTemperature { set => Set(ref tankTemperature, value); get => tankTemperature; }
 
@@ -637,7 +586,15 @@ namespace CAN_Tool.ViewModels
         private BindingList<ZoneHandler> zones = new();
         public BindingList<ZoneHandler> Zones => zones;
 
-        BindingList<float> auxTemp = new();
+        private ZoneHandler selectedZone=null;
+        [AffectsTo(nameof(SelectedZoneNumber))]
+        public ZoneHandler SelectedZone { set => Set(ref selectedZone, value); get => selectedZone; }
+
+        private int selectedZoneNumber;
+        public int SelectedZoneNumber => Zones.IndexOf(SelectedZone);
+
+
+    BindingList<float> auxTemp = new();
         public BindingList<float> AuxTemp => auxTemp;
 
         BindingList<bool> auxPumpOverride = new();

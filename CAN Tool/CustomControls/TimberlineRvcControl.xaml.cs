@@ -22,13 +22,12 @@ namespace CAN_Tool.Views
     public partial class TimberlineRvcControl : UserControl
     {
 
-        public Timberline20Handler vm;
+        public Timberline20Handler vm => (Timberline20Handler)DataContext;
+
 
         public TimberlineRvcControl()
         {
             InitializeComponent();
-
-            vm = (Timberline20Handler)DataContext;
         }
 
         private void ToggleHeaterClick(object sender, RoutedEventArgs e)
@@ -99,6 +98,36 @@ namespace CAN_Tool.Views
         private void NightStartTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
         {
             vm?.SetNightStart(e.NewValue.Value.Hour, e.NewValue.Value.Minute);
+        }
+
+        private void ToggleSelectedZone(object sender, RoutedEventArgs e)
+        {
+            vm?.ToggleZoneState(vm.SelectedZoneNumber);
+        }
+
+        private void RadioChecked(object sender, RoutedEventArgs e)
+        {
+            vm.SelectedZone = vm.Zones.FirstOrDefault(x => x.Selected);
+        }
+
+        private void ToggleFanAuto(object sender, RoutedEventArgs e)
+        {
+            vm?.ToggleFanManualMode(vm.SelectedZoneNumber);
+        }
+
+        private void ManualPercentChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.SetFanManualSpeed((byte)vm.SelectedZoneNumber, (byte)(sender as Slider).Value);
+        }
+
+        private void DaySetpointChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.SetDaySetpoint(vm.SelectedZoneNumber, (int)(sender as Slider).Value);
+        }
+
+        private void NightSetpointChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.SetDaySetpoint(vm.SelectedZoneNumber, (int)(sender as Slider).Value);
         }
     }
 }

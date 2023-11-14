@@ -208,7 +208,15 @@ namespace RVC
                 case paramTyp.natural:
                     retString += rawData.ToString();
                     break;
-
+                case paramTyp.seconds:
+                    retString += rawData.ToString() + " seconds";
+                    break;
+                case paramTyp.minutes:
+                    retString += rawData.ToString() + " minutes";
+                    break;
+                case paramTyp.hours:
+                    retString += rawData.ToString() + " hours";
+                    break;
                 default: throw new ArgumentException("Bad parameter type");
             }
 

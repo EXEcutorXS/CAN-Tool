@@ -19,10 +19,20 @@
         <c:FarenheitConverter x:Key="ToFarenheit" />
     </UserControl.Resources>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="55"></RowDefinition>
+            <RowDefinition Height="55"></RowDefinition>
+            <RowDefinition Height="55"></RowDefinition>
+            <RowDefinition Height="75"></RowDefinition>
+        </Grid.RowDefinitions>
         
-        <DockPanel>
 
-            <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="130" HorizontalAlignment="Left" Margin="2">
+            <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" Width="130" Margin="2">
                 
                 <Button  Margin="3" Opacity="{Binding HeaterEnabled,Converter={StaticResource BoolToOpacity}}"  Click="ToggleHeaterClick">Heater</Button>
                 <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}" Click="ElementToggleButtonClick">Element</Button>
@@ -37,7 +47,7 @@
                 <Button Margin="3" Click="Button_Click">Sync time</Button>
 
             </StackPanel>
-            <StackPanel DockPanel.Dock="Left">
+            <StackPanel Grid.Column="1" Grid.Row="0" Margin="10" >
                <TextBlock Text="{Binding OutsideTemperature,StringFormat={}Outside temp: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding TankTemperature,StringFormat={}Tank temp: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding HeatExchangerTemperature,StringFormat={}Heat exchanger: {0}°,Converter={StaticResource ToFarenheit}}" />
@@ -73,24 +83,51 @@
                     <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" Text="{Binding PumpDuration,StringFormat={}{0}M}"></TextBlock>
                 </StackPanel>
             </StackPanel>
-            <StackPanel DockPanel.Dock="Left">
-                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl DataContext="{Binding Zones[0]}" ZoneNumber="0"  Margin="2" Width="300" Height="150" ></local:ZoneControl>
-                </Border>
-                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl DataContext="{Binding Zones[1]}" ZoneNumber="1" Margin="2" Width="300" Height="150"></local:ZoneControl>
-                </Border>
-                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl DataContext="{Binding Zones[2]}" ZoneNumber="2" Margin="2" Width="300" Height="150"></local:ZoneControl>
-                </Border>
-                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl DataContext="{Binding Zones[3]}" ZoneNumber="3" Margin="2" Width="300" Height="150"></local:ZoneControl>
-                </Border>
-                <Border Width="360" CornerRadius="5" BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" Margin="3">
-                    <local:ZoneControl DataContext="{Binding Zones[4]}" ZoneNumber="4" Margin="2" Width="300" Height="150"></local:ZoneControl>
-                </Border>
-            </StackPanel>
-        </DockPanel>
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" DataContext="{Binding SelectedZone}" Orientation="Horizontal" VerticalAlignment="Top">
+            <TextBlock Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}">Mode:</TextBlock>
+            <Button Margin="6" Content="{Binding State}" Click="ToggleSelectedZone"  />
+            <TextBlock Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}">Fan Manual:</TextBlock>
+            <Button Margin="6" Content="{Binding ManualMode,StringFormat=Manual:{0}}" Click="ToggleFanAuto"  />
+            <Slider VerticalAlignment="Center" Width="200" Minimum="10" Maximum="100"  SmallChange="1" LargeChange="5" ValueChanged="ManualPercentChanged"></Slider>
+            <TextBlock  Text="{Binding ManualPercent,StringFormat={}{0}%}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+        </StackPanel>
+        <StackPanel DataContext="{Binding SelectedZone}" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan = "2" Orientation="Horizontal">
+            <fa:SvgAwesome Icon="Regular_Sun" Foreground="{DynamicResource MaterialDesignBody}" Margin="6"></fa:SvgAwesome>
+            <Slider VerticalAlignment="Center" Width="250" Minimum="10" Maximum="32" SmallChange="1" LargeChange="5" ValueChanged="DaySetpointChanged"></Slider>
+            <TextBlock Text="{Binding TempSetpointDay,StringFormat={}{0}°}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+            <CheckBox Margin="10" Style="{StaticResource MaterialDesignLightCheckBox}" IsChecked="{Binding BroadcastTemperature}">
+                <fa:SvgAwesome Icon="Solid_TemperatureLow" Foreground="{DynamicResource MaterialDesignBody}" Margin="6"></fa:SvgAwesome>
+            </CheckBox>
+            <Slider Margin="10" Minimum="-40" Maximum="60" SmallChange="1" LargeChange="5" Value="{Binding RvcTemperature}" VerticalAlignment="Center"  Width="250"></Slider>
+            <TextBlock Text="{Binding RvcTemperature,StringFormat={}{0}°}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+        </StackPanel>
+        <StackPanel DataContext="{Binding SelectedZone}" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <fa:SvgAwesome Icon="Regular_Moon" Foreground="{DynamicResource MaterialDesignBody}" Margin="10"></fa:SvgAwesome>
+            <Slider VerticalAlignment="Center" Width="250" Minimum="10" Maximum="32" SmallChange="1" LargeChange="5" ValueChanged="NightSetpointChanged"></Slider>
+            <TextBlock Text="{Binding TempSetpointNight,StringFormat={}{0}°}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+        </StackPanel>
+        
+        <ListBox  Grid.Row="4"  Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Zones}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+
+                    <DataTemplate>
+                        <RadioButton Style="{StaticResource MaterialDesignChoiceChipAccentRadioButton}" IsChecked="{Binding Selected}" GroupName="Zones" Height="50" FontSize="30" IsEnabled="{Binding Connected,Mode=OneWay}"  Checked="RadioChecked">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}" />
+                                <fa:ImageAwesome Height="30" Icon="Solid_Fan" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}">
+                                </fa:ImageAwesome>
+                                <ProgressBar Margin="5" Height="10" Orientation="Vertical" Maximum="100" Value="{Binding CurrentPwm}" />
+                                <TextBlock VerticalAlignment="Center" Text="{Binding CurrentPwm,Mode=OneWay,StringFormat={}{0:d2}%}" />
+                            </StackPanel>
+                        </RadioButton>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
     </Grid>
 </UserControl>

@@ -806,14 +806,14 @@ namespace RVC
             newDgn.Parameters.Add(new() { multipackNum = 0xA2, Name = "Heater pump timer", frstByte = 5, Size = 16, Type = paramTyp.seconds });
             
             newDgn.Parameters.Add(new() { multipackNum = 0xA3, Name = "AUX pump 1 timer", frstByte = 1, Size = 16, Type = paramTyp.seconds });
-            newDgn.Parameters.Add(new() { multipackNum = 0xA3, Name = "AUX pump 2 timer", frstByte = 1, Size = 16, Type = paramTyp.seconds });
-            newDgn.Parameters.Add(new() { multipackNum = 0xA3, Name = "AUX pump 3 timer", frstByte = 1, Size = 16, Type = paramTyp.seconds });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA3, Name = "AUX pump 2 timer", frstByte = 3, Size = 16, Type = paramTyp.seconds });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA3, Name = "AUX pump 3 timer", frstByte = 5, Size = 16, Type = paramTyp.seconds });
 
             newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater total minutes", frstByte = 1, Size = 24, Type = paramTyp.minutes });
             newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 1", frstByte = 4, Size = 8, Type = paramTyp.natural });
-            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 2", frstByte = 4, Size = 8, Type = paramTyp.natural });
-            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 3", frstByte = 4, Size = 8, Type = paramTyp.natural });
-            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 4", frstByte = 4, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 2", frstByte = 5, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 3", frstByte = 6, Size = 8, Type = paramTyp.natural });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA4, Name = "Heater version byte 4", frstByte = 7, Size = 8, Type = paramTyp.natural });
 
             newDgn.Parameters.Add(new() { multipackNum = 0xA5, Name = "Panel version byte 1", frstByte = 4, Size = 8, Type = paramTyp.natural });
             newDgn.Parameters.Add(new() { multipackNum = 0xA5, Name = "Panel version byte 2", frstByte = 5, Size = 8, Type = paramTyp.natural });
@@ -826,7 +826,7 @@ namespace RVC
             newDgn.Parameters.Add(new() { multipackNum = 0xA6, Name = "HCU version byte 4", frstByte = 7, Size = 8, Type = paramTyp.natural });
 
             newDgn.Parameters.Add(new() { multipackNum = 0xA7, Name = "System time limit", frstByte = 1, Size = 1, Type = paramTyp.hours });
-            newDgn.Parameters.Add(new() { multipackNum = 0xA7, Name = "Pump overridelimit", frstByte = 1, Size = 1, Type = paramTyp.minutes });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA7, Name = "Pump overridelimit", frstByte = 2, Size = 1, Type = paramTyp.minutes });
 
 
 
