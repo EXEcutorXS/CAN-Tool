@@ -5,6 +5,7 @@ using ScottPlot.MarkerShapes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -16,11 +17,13 @@ namespace CAN_Tool.ViewModels
 {
     public enum zoneState_t { Off, Heat, Fan }
 
+    public enum heaterIcon { Idle, Blowing, Ignition, Lit }
+
     public class ZoneHandler : ViewModel
     {
         public ZoneHandler()
         {
-            
+
         }
 
         public ZoneHandler(int zoneNumber)
@@ -124,8 +127,6 @@ namespace CAN_Tool.ViewModels
                     {
                         HeaterEnabled = (D[1] & 1) != 0;
                         ElementEnabled = (D[1] & 2) != 0;
-                        if (D[4] != 0xFF && D[5] != 0xFF)
-                            TankTemperature = (D[4] + D[5] * 256) / 32 - 273;
                     }
 
                     break;
@@ -159,7 +160,7 @@ namespace CAN_Tool.ViewModels
                     if ((D[1] & 3) != 3)
                         Zones[D[0] - 1].ManualMode = (D[1] & 3) != 0;
                     if (D[2] != 0xFF)
-                        Zones[D[0] - 1].ManualPercent = D[2] / 2;
+                        Zones[D[0] - 1].CurrentPwm = D[2] / 2;
                     break;
                 case 0x1FFE2://Thermostat status 1
                     if (D[0] > 5) return;
@@ -178,13 +179,13 @@ namespace CAN_Tool.ViewModels
                     if (D[1] == 0)
                     {
                         if (D[2] < 24 && D[3] < 60)
-                            NightStart = new DateTime(1, 1, 1, D[2], D[3], 1);
+                            NightStart = new TimeOnly(D[2], D[3]);
                         if (D[4] != 0xFF || D[5] != 0xFF) Zones[D[0] - 1].TempSetpointNight = (D[4] + D[5] * 256) / 32 - 273;
                     }
                     if (D[1] == 1)
                     {
                         if (D[2] < 24 && D[3] < 60)
-                            DayStart = new DateTime(1, 1, 1, D[2], D[3], 1);
+                            DayStart = new TimeOnly(D[2], D[3]);
                         if (D[4] != 0xFF || D[5] != 0xFF) Zones[D[0] - 1].TempSetpointDay = (D[4] + D[5] * 256) / 32 - 273;
                     }
                     break;
@@ -194,8 +195,12 @@ namespace CAN_Tool.ViewModels
                     if (D[1] != 0xFF || D[2] != 0xFF)
                         if (D[0] < 6)
                             Zones[D[0] - 1].CurrentTemperature = (D[1] + D[2] * 256) / 32 - 273;
-                        else
+                        else if (D[0] == 6)
                             OutsideTemperature = (D[1] + D[2] * 256) / 32 - 273;
+                        else if (D[0] > 6 && D[0] < 11)
+                        {
+                            AuxTemp[D[0] - 7] = (float)((D[1] + D[2] * 256) / 32.0 - 273);
+                        }
                     break;
 
                 case 0x1EF65: //Proprietary dgn
@@ -233,7 +238,7 @@ namespace CAN_Tool.ViewModels
                         case 0xA6: //HCU info
                             HcuVersion = new byte[] { D[4], D[5], D[6], D[7] };
                             break;
-                        case 0xA7: //Timers config command
+                        case 0xA8: //Timers config status
                             if (D[1] != 0xFF || D[2] != 0xFF)
                             {
                                 if (D[1] < 1) SystemDuration = 1;
@@ -245,13 +250,14 @@ namespace CAN_Tool.ViewModels
                                 if (D[2] < 2) PumpDuration = 2;
                                 else if (D[2] > 60) SystemDuration = 60; //Unlimited
                                 else SystemDuration = D[2];
-
                             }
                             break;
+                        case 0xA9:
+                            if ((D[1] & 3) != 3) DomesticWater = (D[1] & 3) != 0;
+                            if ((D[2] != 255)) HeaterIconCode = (heaterIcon)D[1];
+                            break;
                     }
-
                     break;
-
             }
         }
 
@@ -363,7 +369,7 @@ namespace CAN_Tool.ViewModels
                 case zoneState_t.Heat: msg.Data[1] = 0b11110100; break;
                 case zoneState_t.Fan: msg.Data[1] = 0b11110000; break;
             }
-            
+
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
@@ -521,7 +527,7 @@ namespace CAN_Tool.ViewModels
         }
 
 
- 
+
 
         private int tankTemperature;
         public int TankTemperature { set => Set(ref tankTemperature, value); get => tankTemperature; }
@@ -586,7 +592,7 @@ namespace CAN_Tool.ViewModels
         private BindingList<ZoneHandler> zones = new();
         public BindingList<ZoneHandler> Zones => zones;
 
-        private ZoneHandler selectedZone=null;
+        private ZoneHandler selectedZone = null;
         [AffectsTo(nameof(SelectedZoneNumber))]
         public ZoneHandler SelectedZone { set => Set(ref selectedZone, value); get => selectedZone; }
 
@@ -594,7 +600,7 @@ namespace CAN_Tool.ViewModels
         public int SelectedZoneNumber => Zones.IndexOf(SelectedZone);
 
 
-    BindingList<float> auxTemp = new();
+        BindingList<float> auxTemp = new();
         public BindingList<float> AuxTemp => auxTemp;
 
         BindingList<bool> auxPumpOverride = new();
@@ -625,7 +631,9 @@ namespace CAN_Tool.ViewModels
         [AffectsTo(nameof(SystemDurationString))]
         public int SystemDuration { set => Set(ref systemDuration, value); get => systemDuration; }
 
-        public string SystemDurationString { get
+        public string SystemDurationString
+        {
+            get
             {
                 if (SystemDuration < 24)
                     return $"{systemDuration} H";
@@ -639,11 +647,11 @@ namespace CAN_Tool.ViewModels
         public int PumpDuration { set => Set(ref pumpDuration, value); get => pumpDuration; }
 
 
-        private DateTime? dayStart;
-        public DateTime? DayStart { set => Set(ref dayStart, value); get => dayStart; }
+        private TimeOnly? dayStart;
+        public TimeOnly? DayStart { set => Set(ref dayStart, value); get => dayStart; }
 
-        private DateTime? nightStart;
-        public DateTime? NightStart { set => Set(ref nightStart, value); get => nightStart; }
+        private TimeOnly? nightStart;
+        public TimeOnly? NightStart { set => Set(ref nightStart, value); get => nightStart; }
 
 
         private byte[] heaterVersion;
@@ -665,6 +673,10 @@ namespace CAN_Tool.ViewModels
         public string PanelVersionString { get => $"{panelVersion[0]:D03}.{panelVersion[1]:D03}.{panelVersion[2]:D03}.{panelVersion[3]:D03}"; }
 
         private int zoneToOverride = 0;
+
+        heaterIcon heaterIconCode = 0;
+        public heaterIcon HeaterIconCode { set => Set(ref heaterIconCode, value); get => heaterIconCode; }
+
 
     }
 
