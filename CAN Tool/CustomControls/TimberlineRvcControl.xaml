@@ -1,16 +1,4 @@
-﻿<UserControl x:Class="CAN_Tool.Views.TimberlineRvcControl"
-             
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
-             xmlns:controls="clr-namespace:CAN_Tool.Controls"
-             xmlns:local="clr-namespace:CAN_Tool.Views" 
-             xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
-             xmlns:fa="http://schemas.fontawesome.com/icons/"
-             
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="820" d:DesignWidth="900" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontSize="15">
+﻿<UserControl x:Class="CAN_Tool.Views.TimberlineRvcControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:controls="clr-namespace:CAN_Tool.Controls" xmlns:local="clr-namespace:CAN_Tool.Views" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="820" d:DesignWidth="900" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontSize="15">
     <UserControl.DataContext>
         <vm:Timberline20Handler />
     </UserControl.DataContext>
@@ -30,104 +18,123 @@
             <RowDefinition Height="55"></RowDefinition>
             <RowDefinition Height="75"></RowDefinition>
         </Grid.RowDefinitions>
-        
 
-            <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" Width="130" Margin="2">
-                
-                <Button  Margin="3" Opacity="{Binding HeaterEnabled,Converter={StaticResource BoolToOpacity}}"  Click="ToggleHeaterClick">Heater</Button>
-                <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}" Click="ElementToggleButtonClick">Element</Button>
-                <Button Margin="3" Opacity="{Binding UnderfloorHeatingEnabled,Converter={StaticResource BoolToOpacity}}" Click="FloorButtonClick">Floor</Button>
-                <Button Margin="3" Opacity="{Binding EnginePreheatEnabled,Converter={StaticResource BoolToOpacity}}">Engine</Button>
-                <Button Margin="3" Opacity="{Binding HeaterPumpOverride,Converter={StaticResource BoolToOpacity}}" Click="HeaterPumpButtonClick">Heater Pump</Button>
-                <Button Margin="3" Opacity="{Binding Pump1Override,Converter={StaticResource BoolToOpacity}}" Click="Pump1ButtonClick">Pump 1</Button>
-                <Button Margin="3" Opacity="{Binding Pump2Override,Converter={StaticResource BoolToOpacity}}" Click="Pump2ButtonClick">Pump 2</Button>
-                <Button Margin="3" Opacity="{Binding AuxPumpOverride[0],Converter={StaticResource BoolToOpacity}}" Click="AuxPump1ButtonClick">AUX pump 1</Button>
-                <Button Margin="3" Opacity="{Binding AuxPumpOverride[1],Converter={StaticResource BoolToOpacity}}" Click="AuxPump2ButtonClick">AUX pump 2</Button>
-                <Button Margin="3" Opacity="{Binding AuxPumpOverride[2],Converter={StaticResource BoolToOpacity}}" Click="AuxPump3ButtonClick">AUX pump3</Button>
-                <Button Margin="3" Click="Button_Click">Sync time</Button>
+        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" Width="130" Margin="2">
 
-            </StackPanel>
-            <StackPanel Grid.Column="1" Grid.Row="0" Margin="10" >
-               <TextBlock Text="{Binding OutsideTemperature,StringFormat={}Outside temp: {0}°,Converter={StaticResource ToFarenheit}}" />
+            <Button Margin="3" Opacity="{Binding HeaterEnabled,Converter={StaticResource BoolToOpacity}}" Click="ToggleHeaterClick">Heater</Button>
+            <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}" Click="ElementToggleButtonClick">Element</Button>
+            <Button Margin="3" Opacity="{Binding UnderfloorHeatingEnabled,Converter={StaticResource BoolToOpacity}}" Click="FloorButtonClick">Floor</Button>
+            <Button Margin="3" Opacity="{Binding EnginePreheatEnabled,Converter={StaticResource BoolToOpacity}}" Click="Button_Click_1">Engine</Button>
+            <Button Margin="3" Opacity="{Binding HeaterPumpOverride,Converter={StaticResource BoolToOpacity}}" Click="HeaterPumpButtonClick">Heater Pump</Button>
+            <Button Margin="3" Opacity="{Binding Pump1Override,Converter={StaticResource BoolToOpacity}}" Click="Pump1ButtonClick">Pump 1</Button>
+            <Button Margin="3" Opacity="{Binding Pump2Override,Converter={StaticResource BoolToOpacity}}" Click="Pump2ButtonClick">Pump 2</Button>
+            <Button Margin="3" Opacity="{Binding AuxPumpOverride[0].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump1ButtonClick">AUX pump 1</Button>
+            <Button Margin="3" Opacity="{Binding AuxPumpOverride[1].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump2ButtonClick">AUX pump 2</Button>
+            <Button Margin="3" Opacity="{Binding AuxPumpOverride[2].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump3ButtonClick">AUX pump 3</Button>
+            <Button Margin="3" Click="Button_Click">Sync time</Button>
+
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" Margin="10">
+            <StackPanel>
+                <TextBlock Text="{Binding OutsideTemperature,StringFormat={}Outside temp: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding TankTemperature,StringFormat={}Tank temp: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding HeatExchangerTemperature,StringFormat={}Heat exchanger: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding LiquidLEvel,StringFormat={}Liquid level: {0}}" />
                 <TextBlock Text="{Binding DomesticWater,StringFormat={}Flow sensor: {0}}" />
-                <TextBlock Text="{Binding AuxTemp[0],StringFormat={}Aux temp 1: {0:F1},Converter={StaticResource ToFarenheit}}" />
-                <TextBlock Text="{Binding AuxTemp[1],StringFormat={}Aux temp 2: {0:F1},Converter={StaticResource ToFarenheit}}" />
-                <TextBlock Text="{Binding AuxTemp[2],StringFormat={}Aux temp 3: {0:F1},Converter={StaticResource ToFarenheit}}" />
-                <TextBlock Text="{Binding AuxTemp[3],StringFormat={}Aux temp 4: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding AuxPumpStatus[0].Value,StringFormat={}Aux pump status 1: {0}}" />
+                <TextBlock Text="{Binding AuxPumpStatus[1].Value,StringFormat={}Aux pump status 2: {0}}" />
+                <TextBlock Text="{Binding AuxPumpStatus[2].Value,StringFormat={}Aux pump status 3: {0}}" />
+                <TextBlock Text="{Binding AuxTemp[0].Value,StringFormat={}Aux temp 1: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding AuxTemp[1].Value,StringFormat={}Aux temp 2: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding AuxTemp[2].Value,StringFormat={}Aux temp 3: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding AuxTemp[3].Value,StringFormat={}Aux temp 4: {0:F1},Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding HeaterPumpStatus,StringFormat={}Heater pump: {0}}" />
                 <TextBlock Text="{Binding WaterPump1Status,StringFormat={}Pump1: {0}}" />
                 <TextBlock Text="{Binding WaterPump2Status,StringFormat={}Pump2: {0}}" />
-                <TextBlock Text="{Binding AuxPumpStatus[0],StringFormat={}AUX pump1 status: {0}}" />
-                <TextBlock Text="{Binding AuxPumpStatus[1],StringFormat={}AUX pump2 status: {0}}" />
-                <TextBlock Text="{Binding AuxPumpStatus[2],StringFormat={}AUX pump3 status: {0}}" />
+                <TextBlock Text="{Binding UnderfloorCurrentTemp,StringFormat={}Underfloor temp: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding UnderfloorSetpoint,StringFormat={}Underfloor temp: {0},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding UnderfloorHysteresis,StringFormat={}Underfloor Hysteresis: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding UnderfloorPumpState,StringFormat={}Underfloor pump state: {0}}" />
+                <TextBlock Text="{Binding EnginePreheatSetpoint,StringFormat={}Engine setpoint: {0},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding SystemEstimatedTime,StringFormat={}System off in: {0} s}" />
 
-                <StackPanel Orientation="Horizontal" Margin="5">
+            </StackPanel>
+            <StackPanel>
+                <StackPanel Margin="5" Orientation="Horizontal">
                     <TextBlock Width="90"> Day start:</TextBlock>
-                <materialDesign:TimePicker SelectedTime="{Binding DayStart,Mode=OneWay}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="DayStartTimeChanged"/>
+                    <materialDesign:TimePicker SelectedTime="{Binding DayStart,Mode=OneWay}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="DayStartTimeChanged" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
                     <TextBlock Width="90"> Night start:</TextBlock>
-                    <materialDesign:TimePicker SelectedTime="{Binding NightStart,Mode=OneWay}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="NightStartTimeChanged"/>
+                    <materialDesign:TimePicker SelectedTime="{Binding NightStart,Mode=OneWay}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="NightStartTimeChanged" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Width="90">System Limit</TextBlock>
-                    <Slider Minimum="1" Maximum="100" Interval="1" LargeChange="1" SmallChange="1" Width="200" ValueChanged="SystemLimitChanged"></Slider>
-                    <TextBlock Text="{Binding SystemDurationString}"></TextBlock>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="90">System Limit</TextBlock>
+                    <Slider Margin="5" VerticalAlignment="Center" Minimum="1" Maximum="100" Interval="1" LargeChange="1" SmallChange="1" Width="200" ValueChanged="SystemLimitChanged"></Slider>
+                    <TextBlock Margin="5" VerticalAlignment="Center"  Text="{Binding SystemDurationString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Width="90">Pump Limit</TextBlock>
-                    <Slider Minimum="2" Maximum="60" Interval="1" LargeChange="1" SmallChange="1" Width="200" ValueChanged="PumpDurationChanged"></Slider>
-                    <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" Text="{Binding PumpDuration,StringFormat={}{0}M}"></TextBlock>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="90">Pump Limit</TextBlock>
+                    <Slider Margin="5" VerticalAlignment="Center" Minimum="2" Maximum="60" Interval="1" LargeChange="1" SmallChange="1" Width="200" ValueChanged="PumpDurationChanged"></Slider>
+                    <TextBlock Margin="5" VerticalAlignment="Center"  Text="{Binding PumpDuration,StringFormat={}{0} M}"></TextBlock>
+                </StackPanel>
+                <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="90">Engine setpt</TextBlock>
+                    <Slider Margin="5" VerticalAlignment="Center" Minimum="0" Maximum="80" Interval="1" LargeChange="10" SmallChange="1" Width="200" ValueChanged="EngineSetpointChanged"></Slider>
+                    <TextBlock Margin="5" VerticalAlignment="Center"  Text="{Binding EnginePreheatSetpoint,StringFormat={}{0} °,Converter={StaticResource ToFarenheit}}"></TextBlock>
+                </StackPanel>
+                <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="90">Engine time</TextBlock>
+                    <Slider Margin="5" VerticalAlignment="Center" Minimum="10" Maximum="1450" Interval="1" LargeChange="10" SmallChange="1" Width="200" ValueChanged="EngineDurationChanged"></Slider>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding EngineDurationString}"></TextBlock>
                 </StackPanel>
             </StackPanel>
+        </StackPanel>
         <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" DataContext="{Binding SelectedZone}" Orientation="Horizontal" VerticalAlignment="Top">
             <TextBlock Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}">Mode:</TextBlock>
-            <Button Margin="6" Content="{Binding State}" Click="ToggleSelectedZone"  />
+            <Button Margin="6" Content="{Binding State}" Click="ToggleSelectedZone" />
             <TextBlock Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}">Fan Manual:</TextBlock>
-            <Button Margin="6" Content="{Binding ManualMode,StringFormat=Manual:{0}}" Click="ToggleFanAuto"  />
-            <Slider VerticalAlignment="Center" Width="200" Minimum="10" Maximum="100"  SmallChange="1" LargeChange="5" ValueChanged="ManualPercentChanged"></Slider>
-            <TextBlock  Text="{Binding ManualPercent,StringFormat={}{0}%}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+            <Button Margin="6" Content="{Binding ManualMode,StringFormat=Manual:{0}}" Click="ToggleFanAuto" />
+            <Slider VerticalAlignment="Center" Width="200" Minimum="10" Maximum="100" SmallChange="1" LargeChange="5" ValueChanged="ManualPercentChanged"></Slider>
+            <TextBlock Text="{Binding ManualPercent,StringFormat={}{0}%}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
         </StackPanel>
-        <StackPanel DataContext="{Binding SelectedZone}" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan = "2" Orientation="Horizontal">
+        <StackPanel DataContext="{Binding SelectedZone}" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
             <fa:SvgAwesome Icon="Regular_Sun" Foreground="{DynamicResource MaterialDesignBody}" Margin="6"></fa:SvgAwesome>
             <Slider VerticalAlignment="Center" Width="250" Minimum="10" Maximum="32" SmallChange="1" LargeChange="5" ValueChanged="DaySetpointChanged"></Slider>
-            <TextBlock Text="{Binding TempSetpointDay,StringFormat={}{0}°}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+            <TextBlock Text="{Binding TempSetpointDay,StringFormat={}{0}°,Mode=OneWay}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
             <CheckBox Margin="10" Style="{StaticResource MaterialDesignLightCheckBox}" IsChecked="{Binding BroadcastTemperature}">
                 <fa:SvgAwesome Icon="Solid_TemperatureLow" Foreground="{DynamicResource MaterialDesignBody}" Margin="6"></fa:SvgAwesome>
             </CheckBox>
-            <Slider Margin="10" Minimum="-40" Maximum="60" SmallChange="1" LargeChange="5" Value="{Binding RvcTemperature}" VerticalAlignment="Center"  Width="250"></Slider>
+            <Slider Margin="10" Minimum="-40" Maximum="60" SmallChange="1" LargeChange="5" Value="{Binding RvcTemperature}" VerticalAlignment="Center" Width="250"></Slider>
             <TextBlock Text="{Binding RvcTemperature,StringFormat={}{0}°}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
         </StackPanel>
         <StackPanel DataContext="{Binding SelectedZone}" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal">
             <fa:SvgAwesome Icon="Regular_Moon" Foreground="{DynamicResource MaterialDesignBody}" Margin="10"></fa:SvgAwesome>
             <Slider VerticalAlignment="Center" Width="250" Minimum="10" Maximum="32" SmallChange="1" LargeChange="5" ValueChanged="NightSetpointChanged"></Slider>
-            <TextBlock Text="{Binding TempSetpointNight,StringFormat={}{0}°}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+            <TextBlock Text="{Binding TempSetpointNight,StringFormat={}{0}°,Mode=OneWay}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
         </StackPanel>
-        
-        <ListBox  Grid.Row="4"  Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Zones}">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemTemplate>
 
-                    <DataTemplate>
-                        <RadioButton Style="{StaticResource MaterialDesignChoiceChipAccentRadioButton}" IsChecked="{Binding Selected}" GroupName="Zones" Height="50" FontSize="30" IsEnabled="{Binding Connected,Mode=OneWay}"  Checked="RadioChecked">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock VerticalAlignment="Center" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}" />
-                                <fa:ImageAwesome Height="30" Icon="Solid_Fan" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}">
-                                </fa:ImageAwesome>
-                                <ProgressBar Margin="5" Height="10" Orientation="Vertical" Maximum="100" Value="{Binding CurrentPwm}" />
-                                <TextBlock VerticalAlignment="Center" Text="{Binding CurrentPwm,Mode=OneWay,StringFormat={}{0:d2}%}" />
-                            </StackPanel>
-                        </RadioButton>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+        <ListBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Zones}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+
+                <DataTemplate>
+                    <RadioButton Style="{StaticResource MaterialDesignChoiceChipAccentRadioButton}" IsChecked="{Binding Selected}" GroupName="Zones" Height="50" FontSize="30" IsEnabled="{Binding Connected,Mode=OneWay}" Checked="RadioChecked">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}" />
+                            <fa:ImageAwesome Height="30" Icon="Solid_Fan" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}">
+                            </fa:ImageAwesome>
+                            <ProgressBar Margin="5" Height="10" Orientation="Vertical" Maximum="100" Value="{Binding CurrentPwm}" />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding CurrentPwm,Mode=OneWay,StringFormat={}{0:d2}%}" />
+                        </StackPanel>
+                    </RadioButton>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
     </Grid>
 </UserControl>

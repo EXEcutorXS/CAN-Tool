@@ -14,6 +14,32 @@ namespace CAN_Tool.Libs
 
     }
 
+    public class Trackable<T> : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private T _Value;
+        public T Value
+        {
+            get { return _Value; }
+            set { _Value = value; OnPropertyChanged("Value"); }
+        }
+
+        void OnPropertyChanged(string propertyName)
+        {
+            var handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+    }
+
     public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>, IComparable
     {
         /// <summary>

@@ -574,7 +574,7 @@ namespace CAN_Tool.ViewModels
             {
                 var rvcm = new RvcMessage(m);
                 MessageList.TryToAdd(rvcm);
-                Timberline15.ProcessMesage(rvcm);
+                //Timberline15.ProcessMesage(rvcm);
                 Timberline20.ProcessMesage(rvcm);
             }
         }

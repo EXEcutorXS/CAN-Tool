@@ -1,4 +1,5 @@
-﻿using CAN_Tool.ViewModels.Base;
+﻿using CAN_Tool.Libs;
+using CAN_Tool.ViewModels.Base;
 using RVC;
 using ScottPlot.Drawing.Colormaps;
 using ScottPlot.MarkerShapes;
@@ -11,6 +12,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Interop;
+using System.Windows.Markup;
 using System.Windows.Threading;
 
 namespace CAN_Tool.ViewModels
@@ -131,6 +133,15 @@ namespace CAN_Tool.ViewModels
 
                     break;
 
+                case 0x1FE99://Water heater status 2
+                    if (D[0] != 1) return;
+                    if ((D[2]&0xF) != 0xF)
+                        EnginePreheatEnabled = (D[2] & 0xF) != 0;
+                    if (((D[2]>>4) & 3) != 3)
+                        LiquidLevelWarning = (((D[2] >> 4) & 3) != 0);
+                    if (((D[2]>>6) & 3) != 3)
+                        HotWaterPriority = (((D[2] >> 6) & 3) != 0);
+                    break;
 
                 case 0x1FE97://Pump status
                     pumpStatus_t newStatus = pumpStatus_t.off;
@@ -149,9 +160,9 @@ namespace CAN_Tool.ViewModels
                         case 1: Pump1Override = overriden; WaterPump1Status = newStatus; break;
                         case 2: Pump2Override = overriden; WaterPump2Status = newStatus; break;
                         case 5: HeaterPumpOverride = overriden; HeaterPumpStatus = newStatus; break;
-                        case 6: WaterPumpAux1Override = overriden; auxPumpStatus[0] = newStatus; break;
-                        case 7: WaterPumpAux2Override = overriden; auxPumpStatus[1] = newStatus; break;
-                        case 8: WaterPumpAux3Override = overriden; auxPumpStatus[2] = newStatus; break;
+                        case 6: AuxPumpOverride[0].Value = overriden; auxPumpStatus[0].Value = newStatus; break;
+                        case 7: AuxPumpOverride[1].Value = overriden; auxPumpStatus[1].Value = newStatus; break;
+                        case 8: AuxPumpOverride[2].Value = overriden; auxPumpStatus[2].Value = newStatus; break;
                     }
                     break;
 
@@ -179,30 +190,45 @@ namespace CAN_Tool.ViewModels
                     if (D[1] == 0)
                     {
                         if (D[2] < 24 && D[3] < 60)
-                            NightStart = new TimeOnly(D[2], D[3]);
+                            NightStart = new DateTime(1,1,1,D[2], D[3],0);
                         if (D[4] != 0xFF || D[5] != 0xFF) Zones[D[0] - 1].TempSetpointNight = (D[4] + D[5] * 256) / 32 - 273;
                     }
                     if (D[1] == 1)
                     {
                         if (D[2] < 24 && D[3] < 60)
-                            DayStart = new TimeOnly(D[2], D[3]);
+                            DayStart = new DateTime(1,1,1,D[2], D[3],0);
                         if (D[4] != 0xFF || D[5] != 0xFF) Zones[D[0] - 1].TempSetpointDay = (D[4] + D[5] * 256) / 32 - 273;
                     }
                     break;
 
                 case 0x1FF9C://Ambient temperature
-                    if (D[0] > 6) return;
+                    if (D[0] > 10) return;
                     if (D[1] != 0xFF || D[2] != 0xFF)
                         if (D[0] < 6)
                             Zones[D[0] - 1].CurrentTemperature = (D[1] + D[2] * 256) / 32 - 273;
                         else if (D[0] == 6)
                             OutsideTemperature = (D[1] + D[2] * 256) / 32 - 273;
                         else if (D[0] > 6 && D[0] < 11)
-                        {
-                            AuxTemp[D[0] - 7] = (float)((D[1] + D[2] * 256) / 32.0 - 273);
-                        }
+                            AuxTemp[D[0] - 7].Value = (float)((D[1] + D[2] * 256) / 32.0 - 273);
                     break;
+                case 0x1FEFC: //Underfloor heating
+                    if (D[0] > 1) return;
+                    if (((D[1]>>2) & 3) != 3)
+                        UnderfloorHeatingEnabled = ((D[1] >> 2) & 3) != 0;
+                    if (((D[1] >> 4) & 3) != 3)
+                        UnderfloorPumpState = ((D[1] >> 4) & 3) != 0;
+                    if (D[2] != 255 || D[3] != 255)
+                        UnderfloorCurrentTemp = (D[2] + D[3] * 256) / 32 - 273;
+                    if (D[4] != 255 || D[5] != 255)
+                        UnderfloorSetpoint = (D[4] + D[5] * 256) / 32 - 273;
+                    if (D[6] != 255)
+                    {
+                        UnderfloorHysteresis = (float)(D[6] / 10.0);
+                        if (UnderfloorHysteresis < 2) UnderfloorHysteresis = 2;
+                        if (UnderfloorHysteresis > 10) UnderfloorHysteresis = 10;
+                    }
 
+                    break;
                 case 0x1EF65: //Proprietary dgn
                     switch (D[0])
                     {
@@ -224,9 +250,9 @@ namespace CAN_Tool.ViewModels
                             if (D[5] != 0xFF || D[6] != 0xFF) HeaterPumpEstimatedTime = D[5] + D[6] * 256;
                             break;
                         case 0xA3: //Pump timers #2
-                            if (D[1] != 0xFF || D[2] != 0xFF) auxPumpEstimatedTime[0] = D[1] + D[2] * 256;
-                            if (D[3] != 0xFF || D[4] != 0xFF) auxPumpEstimatedTime[1] = D[3] + D[4] * 256;
-                            if (D[5] != 0xFF || D[6] != 0xFF) auxPumpEstimatedTime[2] = D[5] + D[6] * 256;
+                            if (D[1] != 0xFF || D[2] != 0xFF) auxPumpEstimatedTime[0].Value = D[1] + D[2] * 256;
+                            if (D[3] != 0xFF || D[4] != 0xFF) auxPumpEstimatedTime[1].Value = D[3] + D[4] * 256;
+                            if (D[5] != 0xFF || D[6] != 0xFF) auxPumpEstimatedTime[2].Value = D[5] + D[6] * 256;
                             break;
                         case 0xA4: // Heater info
                             if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) HeaterTotalMinutes = D[1] + D[2] * 256 + D[3] * 65536;
@@ -239,17 +265,17 @@ namespace CAN_Tool.ViewModels
                             HcuVersion = new byte[] { D[4], D[5], D[6], D[7] };
                             break;
                         case 0xA8: //Timers config status
-                            if (D[1] != 0xFF || D[2] != 0xFF)
+                            if (D[1] != 0xFF)
                             {
                                 if (D[1] < 1) SystemDuration = 1;
-                                else if (D[1] > 100) SystemDuration = 100; //Unlimited
-                                else SystemDuration = D[1];
+                                if (D[1] > 100) SystemDuration = 100; //Unlimited
+                                SystemDuration = D[1];
                             }
                             if (D[2] != 0xFF)
                             {
                                 if (D[2] < 2) PumpDuration = 2;
-                                else if (D[2] > 60) SystemDuration = 60;
-                                else SystemDuration = D[2];
+                                if (D[2] > 60) SystemDuration = 60;
+                                PumpDuration = D[2];
                             }
                             if (D[3] != 0xFF)
                             {
@@ -296,7 +322,50 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
+        public void ToggleUnderfloorHeating()
+        {
+            RvcMessage msg = new() { Dgn = 0x1FEFB };
+            msg.Data[0] = 1;
+            msg.Data[1] = (byte)(0b11110011 + ((UnderfloorHeatingEnabled ? 0 : 1) <<2));
 
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void SetUnderfloorSetpoint(float setpoint)
+        {
+            if (setpoint > 40) setpoint = 40;
+            if (setpoint < 10) setpoint = 10;
+
+            RvcMessage msg = new() { Dgn = 0x1FEFB };
+            UInt16 temp = (ushort)((setpoint + 273) * 32);
+            msg.Data[0] = 1;
+            msg.Data[2] = (byte)(temp&0xFF);
+            msg.Data[3] = (byte)((temp>>8) & 0xFF);
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void SetUnderfloorHysteresis(float hysteresis)
+        {
+            if (hysteresis < 2) hysteresis = 2;
+            if (hysteresis > 10) hysteresis = 10;
+
+            RvcMessage msg = new() { Dgn = 0x1FEFB };
+            byte temp = (byte)(hysteresis*10);
+            msg.Data[0] = 1;
+            msg.Data[4] = (byte)((temp >> 8) & 0xFF);
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+        public void ToggleEnginePreheat()
+        {
+            RvcMessage msg = new() { Dgn = 0x1FE98 };
+            msg.Data[0] = 1;
+            msg.Data[1] = (byte)(0b11110000 + (EnginePreheatEnabled ? 0 : 1));
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
 
         public void ToggleHeaterPumpOverride()
         {
@@ -341,7 +410,7 @@ namespace CAN_Tool.ViewModels
 
             RvcMessage msg = new() { Dgn = 0x1FE96 };
             msg.Data[0] = 6;
-            if (WaterPumpAux1Override)
+            if (AuxPumpOverride[0].Value)
                 msg.Data[1] = 0b11110000;
             else
                 msg.Data[1] = 0b11110101;
@@ -354,7 +423,7 @@ namespace CAN_Tool.ViewModels
 
             RvcMessage msg = new() { Dgn = 0x1FE96 };
             msg.Data[0] = 7;
-            if (WaterPumpAux2Override)
+            if (AuxPumpOverride[1].Value)
                 msg.Data[1] = 0b11110000;
             else
                 msg.Data[1] = 0b11110101;
@@ -367,7 +436,7 @@ namespace CAN_Tool.ViewModels
 
             RvcMessage msg = new() { Dgn = 0x1FE96 };
             msg.Data[0] = 8;
-            if (WaterPumpAux3Override)
+            if (AuxPumpOverride[2].Value)
                 msg.Data[1] = 0b11110000;
             else
                 msg.Data[1] = 0b11110101;
@@ -473,6 +542,37 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
 
+
+        public void SetEngineSetpoint(int deg)
+        {
+            if (deg < 0) deg = 1;
+            if (deg > 80) deg = 80;
+
+            RvcMessage msg = new();
+            msg.Dgn = 0x1EF65;
+            msg.Priority = 6;
+            msg.Data[0] = 0xA7;
+            msg.Data[3] = (byte)(deg+40);
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
+
+        public void SetEngineDuration(int minutes)
+        {
+            if (minutes < 10) minutes = 10;
+            if (minutes > 1450) minutes = 1450;
+
+            RvcMessage msg = new();
+            msg.Dgn = 0x1EF65;
+            msg.Priority = 6;
+            msg.Data[0] = 0xA7;
+            msg.Data[4] = (byte)minutes;
+            msg.Data[5] = (byte)(minutes>>8);
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
+
         public void SetPumpOverrideDuration(int minutes)
         {
             if (minutes < 2) minutes = 2;
@@ -569,8 +669,8 @@ namespace CAN_Tool.ViewModels
         private pumpStatus_t waterPump2Status;
         public pumpStatus_t WaterPump2Status { set => Set(ref waterPump2Status, value); get => waterPump2Status; }
 
-        private BindingList<pumpStatus_t> auxPumpStatus = new();
-        public BindingList<pumpStatus_t> AuxPumpStatus => auxPumpStatus;
+        private BindingList<Trackable<pumpStatus_t>> auxPumpStatus = new();
+        public BindingList<Trackable<pumpStatus_t>> AuxPumpStatus => auxPumpStatus;
 
         private bool heaterPumpOverride;
         public bool HeaterPumpOverride { set => Set(ref heaterPumpOverride, value); get => heaterPumpOverride; }
@@ -580,15 +680,6 @@ namespace CAN_Tool.ViewModels
 
         private bool pump2Override;
         public bool Pump2Override { set => Set(ref pump2Override, value); get => pump2Override; }
-
-        private bool waterPumpAux1Override;
-        public bool WaterPumpAux1Override { set => Set(ref waterPumpAux1Override, value); get => waterPumpAux1Override; }
-
-        private bool waterPumpAux2Override;
-        public bool WaterPumpAux2Override { set => Set(ref waterPumpAux2Override, value); get => waterPumpAux2Override; }
-
-        private bool waterPumpAux3Override;
-        public bool WaterPumpAux3Override { set => Set(ref waterPumpAux3Override, value); get => waterPumpAux3Override; }
 
         private bool heaterEnabled;
         public bool HeaterEnabled { set => Set(ref heaterEnabled, value); get => heaterEnabled; }
@@ -612,18 +703,17 @@ namespace CAN_Tool.ViewModels
         [AffectsTo(nameof(SelectedZoneNumber))]
         public ZoneHandler SelectedZone { set => Set(ref selectedZone, value); get => selectedZone; }
 
-        private int selectedZoneNumber;
         public int SelectedZoneNumber => Zones.IndexOf(SelectedZone);
 
 
-        BindingList<float> auxTemp = new();
-        public BindingList<float> AuxTemp => auxTemp;
+        BindingList<Trackable<float>> auxTemp = new();
+        public BindingList<Trackable<float>> AuxTemp => auxTemp;
 
-        BindingList<bool> auxPumpOverride = new();
-        public BindingList<bool> AuxPumpOverride => auxPumpOverride;
+        BindingList<Trackable<bool>> auxPumpOverride = new();
+        public BindingList<Trackable<bool>> AuxPumpOverride => auxPumpOverride;
 
-        BindingList<int> auxPumpEstimatedTime = new();
-        public BindingList<int> AuxPumpEstimatedTime => auxPumpEstimatedTime;
+        BindingList<Trackable<int>> auxPumpEstimatedTime = new();
+        public BindingList<Trackable<int>> AuxPumpEstimatedTime => auxPumpEstimatedTime;
 
         private int systemEstimatedTime;
         public int SystemEstimatedTime { set => Set(ref systemEstimatedTime, value); get => systemEstimatedTime; }
@@ -651,16 +741,35 @@ namespace CAN_Tool.ViewModels
         public int EnginePreheatSetpoint { set => Set(ref enginePreheatSetpoint, value); get => enginePreheatSetpoint; }
 
         private int enginePreheatDuration;
+        [AffectsTo(nameof(EngineDurationString))]
         public int EnginePreheatDuration { set => Set(ref enginePreheatDuration, value); get => enginePreheatDuration; }
+
+        public string EngineDurationString { get { if (enginePreheatDuration <= 1440) return $"{enginePreheatDuration} M"; else return "Unlimited"; } }
+
+        private float underfloorCurrentTemp;
+        public float UnderfloorCurrentTemp { set => Set(ref underfloorCurrentTemp, value); get => underfloorCurrentTemp; }
+
+        private int underfloorSetpoint;
+        public int UnderfloorSetpoint { set => Set(ref underfloorSetpoint, value); get => underfloorSetpoint; }
+
+        private float underfloorHysteresis;
+        public float UnderfloorHysteresis { set => Set(ref underfloorHysteresis, value); get => underfloorHysteresis; }
+
+        private bool underfloorPumpState;
+        public bool UnderfloorPumpState { set => Set(ref underfloorPumpState, value); get => underfloorPumpState; }
+
+        private bool liquidLevelWarning;
+        public bool LiquidLevelWarning { set => Set(ref liquidLevelWarning, value); get => liquidLevelWarning; }
+
+        private bool hotWaterPriority;
+        public bool HotWaterPriority { set => Set(ref hotWaterPriority, value); get => hotWaterPriority; }
 
         public string SystemDurationString
         {
             get
             {
-                if (SystemDuration < 24)
+                if (SystemDuration < 100)
                     return $"{systemDuration} H";
-                else if (SystemDuration < 100)
-                    return $"{systemDuration / 24} D";
                 else return "Unlimited";
             }
         }
@@ -669,11 +778,11 @@ namespace CAN_Tool.ViewModels
         public int PumpDuration { set => Set(ref pumpDuration, value); get => pumpDuration; }
 
 
-        private TimeOnly? dayStart;
-        public TimeOnly? DayStart { set => Set(ref dayStart, value); get => dayStart; }
+        private DateTime? dayStart;
+        public DateTime? DayStart { set => Set(ref dayStart, value); get => dayStart; }
 
-        private TimeOnly? nightStart;
-        public TimeOnly? NightStart { set => Set(ref nightStart, value); get => nightStart; }
+        private DateTime? nightStart;
+        public DateTime? NightStart { set => Set(ref nightStart, value); get => nightStart; }
 
 
         private byte[] heaterVersion;

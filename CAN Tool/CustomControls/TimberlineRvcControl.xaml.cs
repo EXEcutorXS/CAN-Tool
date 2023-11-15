@@ -42,7 +42,7 @@ namespace CAN_Tool.Views
 
         private void FloorButtonClick(object sender, RoutedEventArgs e)
         {
-            
+            vm?.ToggleUnderfloorHeating();
         }
 
         private void HeaterPumpButtonClick(object sender, RoutedEventArgs e)
@@ -127,7 +127,32 @@ namespace CAN_Tool.Views
 
         private void NightSetpointChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            vm?.SetNightSetpoint(vm.SelectedZoneNumber, (int)(sender as Slider).Value);
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            vm?.ToggleEnginePreheat();
+        }
+
+        private void NightSetpointChanged(object sender, MouseButtonEventArgs e)
+        {
+            vm?.SetNightSetpoint(vm.SelectedZoneNumber, (int)(sender as Slider).Value);
+        }
+
+        private void DaySetpointChanged(object sender, MouseButtonEventArgs e)
+        {
             vm?.SetDaySetpoint(vm.SelectedZoneNumber, (int)(sender as Slider).Value);
+        }
+
+        private void EngineDurationChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.SetEngineDuration((int)(sender as Slider).Value);
+        }
+
+        private void EngineSetpointChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.SetEngineSetpoint((int)(sender as Slider).Value);
         }
     }
 }
