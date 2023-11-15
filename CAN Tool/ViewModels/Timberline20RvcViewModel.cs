@@ -248,13 +248,29 @@ namespace CAN_Tool.ViewModels
                             if (D[2] != 0xFF)
                             {
                                 if (D[2] < 2) PumpDuration = 2;
-                                else if (D[2] > 60) SystemDuration = 60; //Unlimited
+                                else if (D[2] > 60) SystemDuration = 60;
                                 else SystemDuration = D[2];
+                            }
+                            if (D[3] != 0xFF)
+                            {
+                                EnginePreheatSetpoint = D[3] - 40;
+                                if (EnginePreheatSetpoint < 0)
+                                    EnginePreheatSetpoint = 0;
+                                if (EnginePreheatSetpoint > 80)
+                                    EnginePreheatSetpoint = 80;
+                            }
+                            
+                            if (D[4] != 0xFF || D[5] != 255)
+                            {
+                                EnginePreheatDuration = D[4] + D[5] * 256;
+                                if (EnginePreheatDuration < 10) EnginePreheatDuration = 10;
+                                if (EnginePreheatDuration > 1450) EnginePreheatDuration = 1450;
                             }
                             break;
                         case 0xA9:
                             if ((D[1] & 3) != 3) DomesticWater = (D[1] & 3) != 0;
                             if ((D[2] != 255)) HeaterIconCode = (heaterIcon)D[1];
+                            if (D[3] != 255) LiquidLEvel = D[3];
                             break;
                     }
                     break;
@@ -630,6 +646,12 @@ namespace CAN_Tool.ViewModels
         private int systemDuration;
         [AffectsTo(nameof(SystemDurationString))]
         public int SystemDuration { set => Set(ref systemDuration, value); get => systemDuration; }
+
+        private int enginePreheatSetpoint;
+        public int EnginePreheatSetpoint { set => Set(ref enginePreheatSetpoint, value); get => enginePreheatSetpoint; }
+
+        private int enginePreheatDuration;
+        public int EnginePreheatDuration { set => Set(ref enginePreheatDuration, value); get => enginePreheatDuration; }
 
         public string SystemDurationString
         {

@@ -827,7 +827,19 @@ namespace RVC
 
             newDgn.Parameters.Add(new() { multipackNum = 0xA7, Name = "System time limit", frstByte = 1, Size = 1, Type = paramTyp.hours });
             newDgn.Parameters.Add(new() { multipackNum = 0xA7, Name = "Pump overridelimit", frstByte = 2, Size = 1, Type = paramTyp.minutes });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA7, Name = "Engine preheat setpoint", frstByte = 3, Size = 1, Type = paramTyp.temperature });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA7, Name = "Engine preheat duration", frstByte = 4, Size = 16, Type = paramTyp.minutes });
 
+            newDgn.Parameters.Add(new() { multipackNum = 0xA8, Name = "System time limit", frstByte = 1, Size = 1, Type = paramTyp.hours });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA8, Name = "Pump overridelimit", frstByte = 2, Size = 1, Type = paramTyp.minutes });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA8, Name = "Engine preheat setpoint", frstByte = 3, Size = 1, Type = paramTyp.temperature });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA8, Name = "Engine preheat duration", frstByte = 4, Size = 16, Type = paramTyp.minutes });
+
+
+            newDgn.Parameters.Add(new() { multipackNum = 0xA9, Name = "Domestic Water", frstByte = 1, Size = 2, Type = paramTyp.boolean });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA9, Name = "Element status", frstByte = 1, Size = 2, Type = paramTyp.boolean });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA9, Name = "Heater Icon", frstByte = 2, Size = 8, Meanings = mnsMkr("Idle","Blowing","Ignition","Lit") });
+            newDgn.Parameters.Add(new() { multipackNum = 0xA9, Name = "Liquid level", frstByte = 3, Size = 8, Type = paramTyp.natural });
 
 
             DGNs.Add(newDgn.Dgn, newDgn);
