@@ -90,15 +90,6 @@ namespace CAN_Tool.Views
             vm?.SetPumpOverrideDuration((int)(sender as Slider).Value);
         }
 
-        private void DayStartTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
-        {
-            vm?.SetDayStart(e.NewValue.Value.Hour, e.NewValue.Value.Minute);
-        }
-
-        private void NightStartTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
-        {
-            vm?.SetNightStart(e.NewValue.Value.Hour, e.NewValue.Value.Minute);
-        }
 
         private void ToggleSelectedZone(object sender, RoutedEventArgs e)
         {
@@ -153,6 +144,32 @@ namespace CAN_Tool.Views
         private void EngineSetpointChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             vm?.SetEngineSetpoint((int)(sender as Slider).Value);
+        }
+
+        private void FloorSetpointChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.SetUnderfloorSetpoint((int)(sender as Slider).Value);
+        }
+
+        private void FloorHysteresisCHanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.SetUnderfloorHysteresis((float)(sender as Slider).Value);
+        }
+
+        private void DayStartChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            int hours = (int)(sender as Slider).Value/60;
+            int minutes  = (int)(sender as Slider).Value%60;
+
+            vm?.SetDayStart(hours, minutes);
+        }
+
+        private void NightStartChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            int hours = (int)(sender as Slider).Value / 60;
+            int minutes = (int)(sender as Slider).Value % 60;
+
+            vm?.SetNightStart(hours, minutes);
         }
     }
 }

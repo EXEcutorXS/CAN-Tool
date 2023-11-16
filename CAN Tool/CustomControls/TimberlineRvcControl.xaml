@@ -52,21 +52,24 @@
                 <TextBlock Text="{Binding WaterPump1Status,StringFormat={}Pump1: {0}}" />
                 <TextBlock Text="{Binding WaterPump2Status,StringFormat={}Pump2: {0}}" />
                 <TextBlock Text="{Binding UnderfloorCurrentTemp,StringFormat={}Underfloor temp: {0:F1},Converter={StaticResource ToFarenheit}}" />
-                <TextBlock Text="{Binding UnderfloorSetpoint,StringFormat={}Underfloor temp: {0},Converter={StaticResource ToFarenheit}}" />
-                <TextBlock Text="{Binding UnderfloorHysteresis,StringFormat={}Underfloor Hysteresis: {0:F1},Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding UnderfloorPumpState,StringFormat={}Underfloor pump state: {0}}" />
-                <TextBlock Text="{Binding EnginePreheatSetpoint,StringFormat={}Engine setpoint: {0},Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding SystemEstimatedTime,StringFormat={}System off in: {0} s}" />
-
+                <TextBlock Text="{Binding EnginePreheatEstiamtedTime,StringFormat={}Engine preheat off in: {0} s}" />
+                <TextBlock Text="{Binding HcuVersionString,StringFormat={}HCU:{0}}"></TextBlock>
+                <TextBlock Text="{Binding PanelVersionString,StringFormat={}Panel:{0}}"></TextBlock>
+                <TextBlock Text="{Binding HeaterVersionString,StringFormat={}Heater:{0}}"></TextBlock>
+                
             </StackPanel>
             <StackPanel>
                 <StackPanel Margin="5" Orientation="Horizontal">
-                    <TextBlock Width="90"> Day start:</TextBlock>
-                    <materialDesign:TimePicker SelectedTime="{Binding DayStart,Mode=OneWay}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="DayStartTimeChanged" />
+                    <TextBlock Width="100" VerticalAlignment="Center"> Day start:</TextBlock>
+                    <Slider Margin="5" VerticalAlignment="Center" Minimum="1" Maximum="1430" Interval="200" LargeChange="10" SmallChange="10" Width="200" ValueChanged="DayStartChanged"></Slider>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding DayStartString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Width="90"> Night start:</TextBlock>
-                    <materialDesign:TimePicker SelectedTime="{Binding NightStart,Mode=OneWay}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="NightStartTimeChanged" />
+                    <TextBlock Width="100" VerticalAlignment="Center"> Night start:</TextBlock>
+                    <Slider Margin="5" VerticalAlignment="Center" Minimum="1" Maximum="1430" Interval="100" LargeChange="10" SmallChange="10" Width="200" ValueChanged="NightStartChanged"></Slider>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding NightStartString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
                     <TextBlock Margin="5" VerticalAlignment="Center" Width="90">System Limit</TextBlock>
@@ -87,6 +90,16 @@
                     <TextBlock Margin="5" VerticalAlignment="Center" Width="90">Engine time</TextBlock>
                     <Slider Margin="5" VerticalAlignment="Center" Minimum="10" Maximum="1450" Interval="1" LargeChange="10" SmallChange="1" Width="200" ValueChanged="EngineDurationChanged"></Slider>
                     <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding EngineDurationString}"></TextBlock>
+                </StackPanel>
+                <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="90">Floor setpt</TextBlock>
+                    <Slider Margin="5" VerticalAlignment="Center" Minimum="3" Maximum="50" Interval="1" LargeChange="10" SmallChange="1" Width="200" ValueChanged="FloorSetpointChanged"></Slider>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding UnderfloorSetpoint,StringFormat={}{0}°}"></TextBlock>
+                </StackPanel>
+                <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="90">Floor hyst</TextBlock>
+                    <Slider Margin="5" VerticalAlignment="Center" Minimum="2" Maximum="10" LargeChange="2" SmallChange="1" Width="200" ValueChanged="FloorHysteresisCHanged"></Slider>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding UnderfloorHysteresis,StringFormat={}{0}°}"></TextBlock>
                 </StackPanel>
             </StackPanel>
         </StackPanel>

@@ -190,13 +190,13 @@ namespace CAN_Tool.ViewModels
                     if (D[1] == 0)
                     {
                         if (D[2] < 24 && D[3] < 60)
-                            NightStart = new DateTime(1,1,1,D[2], D[3],0);
+                            NightStartMinutes = D[2] * 60 + D[3];
                         if (D[4] != 0xFF || D[5] != 0xFF) Zones[D[0] - 1].TempSetpointNight = (D[4] + D[5] * 256) / 32 - 273;
                     }
                     if (D[1] == 1)
                     {
                         if (D[2] < 24 && D[3] < 60)
-                            DayStart = new DateTime(1,1,1,D[2], D[3],0);
+                            DayStartMinutes = D[2] * 60 + D[3];
                         if (D[4] != 0xFF || D[5] != 0xFF) Zones[D[0] - 1].TempSetpointDay = (D[4] + D[5] * 256) / 32 - 273;
                     }
                     break;
@@ -223,7 +223,7 @@ namespace CAN_Tool.ViewModels
                         UnderfloorSetpoint = (D[4] + D[5] * 256) / 32 - 273;
                     if (D[6] != 255)
                     {
-                        UnderfloorHysteresis = (float)(D[6] / 10.0);
+                        UnderfloorHysteresis = (D[6] / 10);
                         if (UnderfloorHysteresis < 2) UnderfloorHysteresis = 2;
                         if (UnderfloorHysteresis > 10) UnderfloorHysteresis = 10;
                     }
@@ -297,6 +297,7 @@ namespace CAN_Tool.ViewModels
                             if ((D[1] & 3) != 3) DomesticWater = (D[1] & 3) != 0;
                             if ((D[2] != 255)) HeaterIconCode = (heaterIcon)D[1];
                             if (D[3] != 255) LiquidLEvel = D[3];
+                            if (D[4] + D[5]*0x100 + D[6]*0x10000 != 0xFFFFFF) EnginePreheatEstiamtedTime = D[4] + D[5] * 0x100 + D[6] * 0x10000;
                             break;
                     }
                     break;
@@ -333,8 +334,8 @@ namespace CAN_Tool.ViewModels
 
         public void SetUnderfloorSetpoint(float setpoint)
         {
-            if (setpoint > 40) setpoint = 40;
-            if (setpoint < 10) setpoint = 10;
+            if (setpoint > 50) setpoint = 50;
+            if (setpoint < 3) setpoint = 3;
 
             RvcMessage msg = new() { Dgn = 0x1FEFB };
             UInt16 temp = (ushort)((setpoint + 273) * 32);
@@ -353,7 +354,7 @@ namespace CAN_Tool.ViewModels
             RvcMessage msg = new() { Dgn = 0x1FEFB };
             byte temp = (byte)(hysteresis*10);
             msg.Data[0] = 1;
-            msg.Data[4] = (byte)((temp >> 8) & 0xFF);
+            msg.Data[4] = temp;
 
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
@@ -752,8 +753,8 @@ namespace CAN_Tool.ViewModels
         private int underfloorSetpoint;
         public int UnderfloorSetpoint { set => Set(ref underfloorSetpoint, value); get => underfloorSetpoint; }
 
-        private float underfloorHysteresis;
-        public float UnderfloorHysteresis { set => Set(ref underfloorHysteresis, value); get => underfloorHysteresis; }
+        private int underfloorHysteresis;
+        public int UnderfloorHysteresis { set => Set(ref underfloorHysteresis, value); get => underfloorHysteresis; }
 
         private bool underfloorPumpState;
         public bool UnderfloorPumpState { set => Set(ref underfloorPumpState, value); get => underfloorPumpState; }
@@ -777,13 +778,19 @@ namespace CAN_Tool.ViewModels
         private int pumpDuration;
         public int PumpDuration { set => Set(ref pumpDuration, value); get => pumpDuration; }
 
+        private int enginePreheatEstiamtedTime;
+        public int EnginePreheatEstiamtedTime { set => Set(ref enginePreheatEstiamtedTime, value); get => enginePreheatEstiamtedTime; }
 
-        private DateTime? dayStart;
-        public DateTime? DayStart { set => Set(ref dayStart, value); get => dayStart; }
+        private int dayStartMinutes;
+        [AffectsTo(nameof(DayStartString))]
+        public int DayStartMinutes { set => Set(ref dayStartMinutes, value); get => dayStartMinutes; }
 
-        private DateTime? nightStart;
-        public DateTime? NightStart { set => Set(ref nightStart, value); get => nightStart; }
+        private int nightStartMinutes;
+        [AffectsTo(nameof(NightStartString))]
+        public int NightStartMinutes { set => Set(ref nightStartMinutes, value); get => nightStartMinutes; }
 
+        public string DayStartString => $"{DayStartMinutes / 60:D2}:{DayStartMinutes % 60:D2}";
+        public string NightStartString => $"{NightStartMinutes / 60:D2}:{NightStartMinutes % 60:D2}";
 
         private byte[] heaterVersion;
         [AffectsTo(nameof(HeaterVersionString))]
@@ -800,6 +807,8 @@ namespace CAN_Tool.ViewModels
         private byte[] panelVersion;
         [AffectsTo(nameof(PanelVersionString))]
         public byte[] PanelVersion { set => Set(ref panelVersion, value); get => panelVersion; }
+
+        
 
         public string PanelVersionString { get => $"{panelVersion[0]:D03}.{panelVersion[1]:D03}.{panelVersion[2]:D03}.{panelVersion[3]:D03}"; }
 

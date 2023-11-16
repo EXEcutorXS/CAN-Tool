@@ -9,6 +9,7 @@ using System.Windows.Media;
 using RVC;
 using System.Linq;
 using System.ComponentModel;
+using System.CodeDom;
 
 namespace CAN_Tool.ViewModels.Converters
 {
@@ -262,7 +263,10 @@ namespace CAN_Tool.ViewModels.Converters
         {
             if (value != null)
                 if (App.Settings.UseImperial)
-                    return (int)value * 1.8 + 32;
+                    if (value.GetType() == typeof(float))
+                        return (float)value * 1.8 + 32;
+                    else
+                        return (int)value * 1.8 + 32;
                 else
                     return value;
             else
