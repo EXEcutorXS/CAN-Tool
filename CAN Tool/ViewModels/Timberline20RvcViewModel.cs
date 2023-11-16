@@ -21,6 +21,8 @@ namespace CAN_Tool.ViewModels
 
     public enum heaterIcon { Idle, Blowing, Ignition, Lit }
 
+    public enum zoneType { Disconnected, Furnace, Defrosting, Radiator }
+
     public class ZoneHandler : ViewModel
     {
         public ZoneHandler()
@@ -48,8 +50,8 @@ namespace CAN_Tool.ViewModels
         private int currentTemperature = 0;
         public int CurrentTemperature { set => Set(ref currentTemperature, value); get => currentTemperature; }
 
-        private bool connected = false;
-        public bool Connected { set => Set(ref connected, value); get => connected; }
+        private zoneType connected = zoneType.Disconnected;
+        public zoneType Connected { set => Set(ref connected, value); get => connected; }
 
         private zoneState_t state = zoneState_t.Off;
         public zoneState_t State { set => Set(ref state, value); get => state; }
@@ -298,6 +300,13 @@ namespace CAN_Tool.ViewModels
                             if ((D[2] != 255)) HeaterIconCode = (heaterIcon)D[1];
                             if (D[3] != 255) LiquidLEvel = D[3];
                             if (D[4] + D[5]*0x100 + D[6]*0x10000 != 0xFFFFFF) EnginePreheatEstiamtedTime = D[4] + D[5] * 0x100 + D[6] * 0x10000;
+                            break;
+                        case 0xAA:
+                            if (D[1] < 4) Zones[0].Connected = (zoneType)D[1];
+                            if (D[2] < 4) Zones[1].Connected = (zoneType)D[2];
+                            if (D[3] < 4) Zones[2].Connected = (zoneType)D[3];
+                            if (D[4] < 4) Zones[3].Connected = (zoneType)D[4];
+                            if (D[5] < 4) Zones[4].Connected = (zoneType)D[5];
                             break;
                     }
                     break;
@@ -701,11 +710,10 @@ namespace CAN_Tool.ViewModels
         public BindingList<ZoneHandler> Zones => zones;
 
         private ZoneHandler selectedZone = null;
-        [AffectsTo(nameof(SelectedZoneNumber))]
         public ZoneHandler SelectedZone { set => Set(ref selectedZone, value); get => selectedZone; }
 
-        public int SelectedZoneNumber => Zones.IndexOf(SelectedZone);
-
+        private int selectedZoneNumber;
+        public int SelectedZoneNumber { set => Set(ref selectedZoneNumber, value); get => selectedZoneNumber; }
 
         BindingList<Trackable<float>> auxTemp = new();
         public BindingList<Trackable<float>> AuxTemp => auxTemp;

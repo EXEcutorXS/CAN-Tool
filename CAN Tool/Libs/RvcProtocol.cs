@@ -840,6 +840,12 @@ namespace RVC
             newDgn.Parameters.Add(new() { multipackNum = 0xA9, Name = "Element status", frstByte = 1, Size = 2, Type = paramTyp.boolean });
             newDgn.Parameters.Add(new() { multipackNum = 0xA9, Name = "Heater Icon", frstByte = 2, Size = 8, Meanings = mnsMkr("Idle","Blowing","Ignition","Lit") });
             newDgn.Parameters.Add(new() { multipackNum = 0xA9, Name = "Liquid level", frstByte = 3, Size = 8, Type = paramTyp.natural });
+            
+            newDgn.Parameters.Add(new() { multipackNum = 0xAA, Name = "Zone 1 Type", frstByte = 1, Size = 8, Meanings = mnsMkr("Disconnected","Furnace","Freeze protection","Radiator") });
+            newDgn.Parameters.Add(new() { multipackNum = 0xAA, Name = "Zone 2 Type", frstByte = 2, Size = 8, Meanings = mnsMkr("Disconnected", "Furnace", "Freeze protection", "Radiator") });
+            newDgn.Parameters.Add(new() { multipackNum = 0xAA, Name = "Zone 3 Type", frstByte = 3, Size = 8, Meanings = mnsMkr("Disconnected", "Furnace", "Freeze protection", "Radiator") });
+            newDgn.Parameters.Add(new() { multipackNum = 0xAA, Name = "Zone 4 Type", frstByte = 4, Size = 8, Meanings = mnsMkr("Disconnected", "Furnace", "Freeze protection", "Radiator") });
+            newDgn.Parameters.Add(new() { multipackNum = 0xAA, Name = "Zone 5 Type", frstByte = 5, Size = 8, Meanings = mnsMkr("Disconnected", "Furnace", "Freeze protection", "Radiator") });
 
 
             DGNs.Add(newDgn.Dgn, newDgn);

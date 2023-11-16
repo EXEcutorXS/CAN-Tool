@@ -98,7 +98,8 @@ namespace CAN_Tool.Views
 
         private void RadioChecked(object sender, RoutedEventArgs e)
         {
-            vm.SelectedZone = vm.Zones.FirstOrDefault(x => x.Selected);
+            vm.SelectedZone = (ZoneHandler)DataContext;
+            vm.SelectedZoneNumber = ((ZoneHandler)DataContext).ZoneNumber;
         }
 
         private void ToggleFanAuto(object sender, RoutedEventArgs e)
@@ -170,6 +171,13 @@ namespace CAN_Tool.Views
             int minutes = (int)(sender as Slider).Value % 60;
 
             vm?.SetNightStart(hours, minutes);
+        }
+
+
+        private void SelectedZoneChanged(object sender, SelectionChangedEventArgs e)
+        {
+            vm.SelectedZoneNumber = (sender as ListBox).SelectedIndex;
+            vm.SelectedZone = vm.Zones[vm.SelectedZoneNumber];
         }
     }
 }

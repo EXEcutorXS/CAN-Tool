@@ -126,28 +126,26 @@
             <Slider VerticalAlignment="Center" Width="250" Minimum="10" Maximum="32" SmallChange="1" LargeChange="5" ValueChanged="NightSetpointChanged"></Slider>
             <TextBlock Text="{Binding TempSetpointNight,StringFormat={}{0}°,Mode=OneWay}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
         </StackPanel>
-
-        <ListBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Zones}">
+        <ListBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Zones}" SelectionChanged="SelectedZoneChanged">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListBox.ItemTemplate>
-
                 <DataTemplate>
-                    <RadioButton Style="{StaticResource MaterialDesignChoiceChipAccentRadioButton}" IsChecked="{Binding Selected}" GroupName="Zones" Height="50" FontSize="30" IsEnabled="{Binding Connected,Mode=OneWay}" Checked="RadioChecked">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}" />
+                    <Border BorderBrush="{DynamicResource MaterialDesignBodyLight}"  CornerRadius="5"  Margin="10" Height="50"  d:Visibility="Visible" Visibility="{Binding Connected,Mode=OneWay,Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" Margin="10">
+                            <TextBlock VerticalAlignment="Center" FontSize="30" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}" />
                             <fa:ImageAwesome Height="30" Icon="Solid_Fan" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}">
                             </fa:ImageAwesome>
                             <ProgressBar Margin="5" Height="10" Orientation="Vertical" Maximum="100" Value="{Binding CurrentPwm}" />
-                            <TextBlock VerticalAlignment="Center" Text="{Binding CurrentPwm,Mode=OneWay,StringFormat={}{0:d2}%}" />
+                            <TextBlock VerticalAlignment="Center" FontSize="30" Text="{Binding CurrentPwm,Mode=OneWay,StringFormat={}{0:d2}%}" />
                         </StackPanel>
-                    </RadioButton>
+                    </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
+        
     </Grid>
 </UserControl>
