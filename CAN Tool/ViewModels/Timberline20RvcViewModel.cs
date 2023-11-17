@@ -137,11 +137,11 @@ namespace CAN_Tool.ViewModels
 
                 case 0x1FE99://Water heater status 2
                     if (D[0] != 1) return;
-                    if ((D[2]&0xF) != 0xF)
+                    if ((D[2] & 0xF) != 0xF)
                         EnginePreheatEnabled = (D[2] & 0xF) != 0;
-                    if (((D[2]>>4) & 3) != 3)
+                    if (((D[2] >> 4) & 3) != 3)
                         LiquidLevelWarning = (((D[2] >> 4) & 3) != 0);
-                    if (((D[2]>>6) & 3) != 3)
+                    if (((D[2] >> 6) & 3) != 3)
                         HotWaterPriority = (((D[2] >> 6) & 3) != 0);
                     break;
 
@@ -215,7 +215,7 @@ namespace CAN_Tool.ViewModels
                     break;
                 case 0x1FEFC: //Underfloor heating
                     if (D[0] > 1) return;
-                    if (((D[1]>>2) & 3) != 3)
+                    if (((D[1] >> 2) & 3) != 3)
                         UnderfloorHeatingEnabled = ((D[1] >> 2) & 3) != 0;
                     if (((D[1] >> 4) & 3) != 3)
                         UnderfloorPumpState = ((D[1] >> 4) & 3) != 0;
@@ -287,7 +287,7 @@ namespace CAN_Tool.ViewModels
                                 if (EnginePreheatSetpoint > 80)
                                     EnginePreheatSetpoint = 80;
                             }
-                            
+
                             if (D[4] != 0xFF || D[5] != 255)
                             {
                                 EnginePreheatDuration = D[4] + D[5] * 256;
@@ -299,7 +299,7 @@ namespace CAN_Tool.ViewModels
                             if ((D[1] & 3) != 3) DomesticWater = (D[1] & 3) != 0;
                             if ((D[2] != 255)) HeaterIconCode = (heaterIcon)D[1];
                             if (D[3] != 255) LiquidLEvel = D[3];
-                            if (D[4] + D[5]*0x100 + D[6]*0x10000 != 0xFFFFFF) EnginePreheatEstiamtedTime = D[4] + D[5] * 0x100 + D[6] * 0x10000;
+                            if (D[4] + D[5] * 0x100 + D[6] * 0x10000 != 0xFFFFFF) EnginePreheatEstiamtedTime = D[4] + D[5] * 0x100 + D[6] * 0x10000;
                             break;
                         case 0xAA:
                             if (D[1] < 4) Zones[0].Connected = (zoneType)D[1];
@@ -336,7 +336,7 @@ namespace CAN_Tool.ViewModels
         {
             RvcMessage msg = new() { Dgn = 0x1FEFB };
             msg.Data[0] = 1;
-            msg.Data[1] = (byte)(0b11110011 + ((UnderfloorHeatingEnabled ? 0 : 1) <<2));
+            msg.Data[1] = (byte)(0b11110011 + ((UnderfloorHeatingEnabled ? 0 : 1) << 2));
 
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
@@ -349,8 +349,8 @@ namespace CAN_Tool.ViewModels
             RvcMessage msg = new() { Dgn = 0x1FEFB };
             UInt16 temp = (ushort)((setpoint + 273) * 32);
             msg.Data[0] = 1;
-            msg.Data[2] = (byte)(temp&0xFF);
-            msg.Data[3] = (byte)((temp>>8) & 0xFF);
+            msg.Data[2] = (byte)(temp & 0xFF);
+            msg.Data[3] = (byte)((temp >> 8) & 0xFF);
 
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
@@ -361,7 +361,7 @@ namespace CAN_Tool.ViewModels
             if (hysteresis > 10) hysteresis = 10;
 
             RvcMessage msg = new() { Dgn = 0x1FEFB };
-            byte temp = (byte)(hysteresis*10);
+            byte temp = (byte)(hysteresis * 10);
             msg.Data[0] = 1;
             msg.Data[4] = temp;
 
@@ -458,12 +458,20 @@ namespace CAN_Tool.ViewModels
         {
             RvcMessage msg = new() { Dgn = 0x1FEF9 };
             msg.Data[0] = (byte)(1 + zone);
+
             switch (Zones[zone].State)
             {
                 case zoneState_t.Off: msg.Data[1] = 0b11110010; break;
-                case zoneState_t.Heat: msg.Data[1] = 0b11110100; break;
+                case zoneState_t.Heat:
+                    if (SelectedZone.Connected == zoneType.Furnace)
+                        msg.Data[1] = 0b11110100;
+                    else
+                        msg.Data[1] = 0b11110000;
+                    break;
                 case zoneState_t.Fan: msg.Data[1] = 0b11110000; break;
             }
+
+
 
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
@@ -562,7 +570,7 @@ namespace CAN_Tool.ViewModels
             msg.Dgn = 0x1EF65;
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
-            msg.Data[3] = (byte)(deg+40);
+            msg.Data[3] = (byte)(deg + 40);
 
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
@@ -578,7 +586,7 @@ namespace CAN_Tool.ViewModels
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
             msg.Data[4] = (byte)minutes;
-            msg.Data[5] = (byte)(minutes>>8);
+            msg.Data[5] = (byte)(minutes >> 8);
 
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
@@ -753,7 +761,18 @@ namespace CAN_Tool.ViewModels
         [AffectsTo(nameof(EngineDurationString))]
         public int EnginePreheatDuration { set => Set(ref enginePreheatDuration, value); get => enginePreheatDuration; }
 
-        public string EngineDurationString { get { if (enginePreheatDuration <= 1440) return $"{enginePreheatDuration} M"; else return "Unlimited"; } }
+        public string EngineDurationString
+        {
+            get
+            {
+                if (enginePreheatDuration <= 1440)
+                    if (enginePreheatDuration % 60 == 0)
+                        return $"{enginePreheatDuration / 60} H";
+                    else
+                        return $"{enginePreheatDuration / 60} H {enginePreheatDuration % 60} M";
+                else return "Unlimited";
+            }
+        }
 
         private float underfloorCurrentTemp;
         public float UnderfloorCurrentTemp { set => Set(ref underfloorCurrentTemp, value); get => underfloorCurrentTemp; }
@@ -777,8 +796,13 @@ namespace CAN_Tool.ViewModels
         {
             get
             {
-                if (SystemDuration < 100)
+                if (SystemDuration < 24)
                     return $"{systemDuration} H";
+                else if (SystemDuration < 100)
+                    if (SystemDuration % 24 == 0)
+                        return $"{systemDuration / 24} D";
+                    else
+                        return $"{systemDuration / 24} D {systemDuration % 24} H";
                 else return "Unlimited";
             }
         }
@@ -797,8 +821,37 @@ namespace CAN_Tool.ViewModels
         [AffectsTo(nameof(NightStartString))]
         public int NightStartMinutes { set => Set(ref nightStartMinutes, value); get => nightStartMinutes; }
 
-        public string DayStartString => $"{DayStartMinutes / 60:D2}:{DayStartMinutes % 60:D2}";
-        public string NightStartString => $"{NightStartMinutes / 60:D2}:{NightStartMinutes % 60:D2}";
+        public string DayStartString
+        {
+            get
+            {
+                string ampm = "AM";
+                if (DayStartMinutes >= 720)
+                    ampm = "PM";
+
+                if (App.Settings.UseImperial)
+                    return $"{(DayStartMinutes / 60) % 12:D2}:{DayStartMinutes % 60:D2} {ampm}";
+
+                else
+                    return $"{DayStartMinutes / 60:D2}:{DayStartMinutes % 60:D2}";
+            }
+        }
+
+        public string NightStartString
+        {
+            get
+            {
+                string ampm = "AM";
+                if (DayStartMinutes >= 720)
+                    ampm = "PM";
+
+                if (App.Settings.UseImperial)
+                    return $"{(NightStartMinutes / 60) % 12:D2}:{NightStartMinutes % 60:D2} {ampm}";
+
+                else
+                    return $"{NightStartMinutes / 60:D2}:{NightStartMinutes % 60:D2}";
+            }
+        }
 
         private byte[] heaterVersion;
         [AffectsTo(nameof(HeaterVersionString))]
@@ -816,7 +869,7 @@ namespace CAN_Tool.ViewModels
         [AffectsTo(nameof(PanelVersionString))]
         public byte[] PanelVersion { set => Set(ref panelVersion, value); get => panelVersion; }
 
-        
+
 
         public string PanelVersionString { get => $"{panelVersion[0]:D03}.{panelVersion[1]:D03}.{panelVersion[2]:D03}.{panelVersion[3]:D03}"; }
 

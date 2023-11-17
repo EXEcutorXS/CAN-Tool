@@ -264,9 +264,9 @@ namespace CAN_Tool.ViewModels.Converters
             if (value != null)
                 if (App.Settings.UseImperial)
                     if (value.GetType() == typeof(float))
-                        return (float)value * 1.8 + 32;
+                        return Math.Round((float)value * 1.8 + 32);
                     else
-                        return (int)value * 1.8 + 32;
+                        return (int)Math.Round((int)value * 1.8 + 32);
                 else
                     return value;
             else
@@ -274,11 +274,42 @@ namespace CAN_Tool.ViewModels.Converters
 
         }
 
+
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value != null)
                 if (App.Settings.UseImperial)
                     return ((int)value - 32) / 1.8;
+                else
+                    return value;
+            else
+                return null;
+        }
+    }
+
+    public class FarenheitRelativeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+                if (App.Settings.UseImperial)
+                    if (value.GetType() == typeof(float))
+                        return Math.Round((float)value * 1.8);
+                    else
+                        return (int)Math.Round((int)value * 1.8);
+                else
+                    return value;
+            else
+                return null;
+
+        }
+
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+                if (App.Settings.UseImperial)
+                    return ((int)value) / 1.8;
                 else
                     return value;
             else
@@ -357,6 +388,102 @@ namespace CAN_Tool.ViewModels.Converters
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class ConnectedZoneTypeToVisible : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((zoneType)value != zoneType.Disconnected)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class DefrostingZoneTypeToVisible : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((zoneType)value == zoneType.Defrosting)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class FurnaceZoneTypeToVisible : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((zoneType)value == zoneType.Furnace)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class HeatingZoneTypeToVisible : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((zoneType)value == zoneType.Furnace || (zoneType)value == zoneType.Radiator)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class HeatingZoneTypeToBool : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((zoneType)value == zoneType.Furnace || (zoneType)value == zoneType.Radiator)
+                return true;
+            else
+                return false;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class ConnectedZoneTypeToBool : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((zoneType)value != zoneType.Disconnected)
+                return true;
+            else
+                return false;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

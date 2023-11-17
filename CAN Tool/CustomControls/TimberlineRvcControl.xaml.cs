@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace CAN_Tool.Views
 {
@@ -24,10 +27,39 @@ namespace CAN_Tool.Views
 
         public Timberline20Handler vm => (Timberline20Handler)DataContext;
 
+        DispatcherTimer sliderUpdateTimer = new();
+
 
         public TimberlineRvcControl()
         {
             InitializeComponent();
+            sliderUpdateTimer.Interval = new TimeSpan(20000000);
+            sliderUpdateTimer.Tick += SliderUpdateTimer_Tick;
+            sliderUpdateTimer.Start();
+
+        }
+
+        private void SliderUpdateTimer_Tick(object sender, EventArgs e)
+        {
+
+            if (vm.DayStartMinutes != DayStartSlider.Value)
+                DayStartSlider.Value = vm.DayStartMinutes;
+            if (vm.NightStartMinutes != NightStartSlider.Value)
+                NightStartSlider.Value = vm.NightStartMinutes;
+            if (vm.SystemDuration!= SystemLimitSlider.Value)
+                SystemLimitSlider.Value = vm.SystemDuration;
+            if (vm.PumpDuration != PumpLimitSlider.Value)
+                PumpLimitSlider.Value = vm.PumpDuration;
+            if (EngineSetpointSlider.Value != vm.EnginePreheatSetpoint)
+                EngineSetpointSlider.Value = vm.EnginePreheatSetpoint;
+            if (EngineDurationSlider.Value != vm.EnginePreheatDuration)
+                EngineDurationSlider.Value = vm.EnginePreheatDuration;
+            if (EngineDurationSlider.Value != vm.EnginePreheatDuration)
+                EngineDurationSlider.Value= vm.EnginePreheatDuration;
+            if (FloorSetpointSlider.Value != vm.UnderfloorSetpoint)
+                FloorSetpointSlider.Value = vm.UnderfloorSetpoint;
+            if (FloorHysteresisSlider.Value!=vm.UnderfloorHysteresis)
+                FloorHysteresisSlider.Value = vm.UnderfloorHysteresis;
         }
 
         private void ToggleHeaterClick(object sender, RoutedEventArgs e)
@@ -75,11 +107,6 @@ namespace CAN_Tool.Views
             vm?.ToggleAuxPump3Override();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            vm?.SetTime(DateTime.Now);
-        }
-
         private void SystemLimitChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             vm?.SetSystemDuration((int)(sender as Slider).Value);
@@ -94,12 +121,6 @@ namespace CAN_Tool.Views
         private void ToggleSelectedZone(object sender, RoutedEventArgs e)
         {
             vm?.ToggleZoneState(vm.SelectedZoneNumber);
-        }
-
-        private void RadioChecked(object sender, RoutedEventArgs e)
-        {
-            vm.SelectedZone = (ZoneHandler)DataContext;
-            vm.SelectedZoneNumber = ((ZoneHandler)DataContext).ZoneNumber;
         }
 
         private void ToggleFanAuto(object sender, RoutedEventArgs e)
@@ -178,6 +199,17 @@ namespace CAN_Tool.Views
         {
             vm.SelectedZoneNumber = (sender as ListBox).SelectedIndex;
             vm.SelectedZone = vm.Zones[vm.SelectedZoneNumber];
+
+            NightSetpointSlider.Value = vm.SelectedZone.TempSetpointNight;
+            DaySetpointSlider.Value = vm.SelectedZone.TempSetpointDay;
+            RvcTempSlider.Value = vm.SelectedZone.RvcTemperature;
+            ManualSlider.Value = vm.SelectedZone.ManualPercent;
+
+        }
+
+        private void SyncTimeClick(object sender, RoutedEventArgs e)
+        {
+            vm?.SetTime(DateTime.Now);
         }
     }
 }
