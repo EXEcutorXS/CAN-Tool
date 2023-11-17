@@ -75,8 +75,8 @@ namespace CAN_Tool.ViewModels
                 delta = (int)parameter;
 
             ManualAirBlower += delta;
-            if (ManualAirBlower >= 140)
-                manualAirBlower = 140;
+            if (ManualAirBlower >= 200)
+                manualAirBlower = 200;
 
             updateManualMode();
         }
