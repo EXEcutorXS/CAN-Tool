@@ -241,8 +241,8 @@
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_common}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
-                    <DockPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullableToVisibilityConverter},TargetNullValue=Visible}">
-                        <TextBlock Grid.Row="4" x:Name="StageTextBlock" DockPanel.Dock="Top" HorizontalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}" FontSize="30" Margin="8" TextWrapping="WrapWithOverflow" />
+                    <DockPanel d:Visibility="Visible" Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullableToVisibilityConverter},TargetNullValue=Visible}">
+                        <TextBlock Grid.Row="4" x:Name="StageTextBlock" DockPanel.Dock="Top" HorizontalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" d:Visibility="Visible" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}" FontSize="30" Margin="8" TextWrapping="WrapWithOverflow" />
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                             <StackPanel DockPanel.Dock="Top">
                                 <StackPanel Orientation="Horizontal">
@@ -275,7 +275,7 @@
 
                                 </StackPanel>
                                 <Border BorderThickness="2" BorderBrush="{DynamicResource MaterialDesignDivider}" DockPanel.Dock="Top" HorizontalAlignment="Left" CornerRadius="10" Margin="10">
-                                    <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Left" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
+                                    <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Left" d:Visibility="Visible" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
                                         <Button Margin="8" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
                                             <Button.Content>
                                                 <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
@@ -296,7 +296,7 @@
                                 </Border>
 
                             </StackPanel>
-                            <Grid Margin="10" DockPanel.Dock="Top" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
+                            <Grid Margin="10" DockPanel.Dock="Top" d:Visibility="Visible" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                                     <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
 

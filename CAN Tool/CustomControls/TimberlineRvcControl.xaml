@@ -42,32 +42,53 @@
 
         </WrapPanel>
 
-            <WrapPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="5">
+            <WrapPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="10">
                 <TextBlock Text="{Binding OutsideTemperature,StringFormat={}Outside temp: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding TankTemperature,StringFormat={}Tank temp: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding HeatExchangerTemperature,StringFormat={}Heat exchanger: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding LiquidLEvel,StringFormat={}Liquid level: {0}}" />
                 <TextBlock Text="{Binding DomesticWater,StringFormat={}Flow sensor: {0}}" />
+                <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding HeaterPumpStatus,StringFormat={}Heater pump: {0}}" />
+                    <TextBlock Text="{Binding HeaterPumpEstimatedTime,StringFormat={} ({0})}" Visibility="{Binding HeaterPumpEstimatedTime,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding WaterPump1Status,StringFormat={}Pump1: {0}}" />
+                    <TextBlock Text="{Binding Pump1EstimatedTime,StringFormat={} ({0})}" Visibility="{Binding Pump1EstimatedTime,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding WaterPump2Status,StringFormat={}Pump2: {0}}" />
+                    <TextBlock Text="{Binding Pump2EstimatedTime,StringFormat={} ({0})}" Visibility="{Binding Pump2EstimatedTime,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible"/>
+                </StackPanel>
+                <TextBlock Text="{Binding UnderfloorCurrentTemp,StringFormat={}Underfloor temp: {0:F1},Converter={StaticResource ToFarenheit}}" />
+                <TextBlock Text="{Binding UnderfloorPumpState,StringFormat={}Underfloor pump run: {0}}" />
+                <TextBlock Text="{Binding SystemEstimatedTime,StringFormat={}System off in: {0} s}" Visibility="{Binding SystemEstimatedTime,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible" />
+                <TextBlock Text="{Binding EnginePreheatEstiamtedTime,StringFormat={}Engine preheat off in: {0} s}" Visibility="{Binding EnginePreheatEstiamtedTime,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible"  />
+                <TextBlock Text="{Binding HcuVersionString,StringFormat={}HCU:{0}}"></TextBlock>
+                <TextBlock Text="{Binding PanelVersionString,StringFormat={}Panel:{0}}"></TextBlock>
+                <TextBlock Text="{Binding HeaterIconCode,StringFormat={}Heater Mode: {0}}"></TextBlock>
+                <TextBlock Text="{Binding HeaterVersionString,StringFormat={}Heater:{0}}"></TextBlock>
+                
+            </WrapPanel>
+            <WrapPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="10">
+                <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding AuxPumpStatus[0].Value,StringFormat={}Aux pump status 1: {0}}" />
-                <TextBlock Text="{Binding AuxPumpStatus[1].Value,StringFormat={}Aux pump status 2: {0}}" />
-                <TextBlock Text="{Binding AuxPumpStatus[2].Value,StringFormat={}Aux pump status 3: {0}}" />
+                    <TextBlock Text="{Binding AuxPumpEstimatedTime[0].Value,StringFormat={} ({0})}" Visibility="{Binding AuxPumpEstimatedTime[0].Value,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding AuxPumpStatus[1].Value,StringFormat={}Aux pump status 2: {0}}" />
+                    <TextBlock Text="{Binding AuxPumpEstimatedTime[1].Value,StringFormat={} ({0})}" Visibility="{Binding AuxPumpEstimatedTime[1].Value,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding AuxPumpStatus[2].Value,StringFormat={}Aux pump status 3: {0}}" />
+                    <TextBlock Text="{Binding AuxPumpEstimatedTime[2].Value,StringFormat={} ({0})}" Visibility="{Binding AuxPumpEstimatedTime[2].Value,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible" />
+                </StackPanel>
                 <TextBlock Text="{Binding AuxTemp[0].Value,StringFormat={}Aux temp 1: {0:F1},Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding AuxTemp[1].Value,StringFormat={}Aux temp 2: {0:F1},Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding AuxTemp[2].Value,StringFormat={}Aux temp 3: {0:F1},Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding AuxTemp[3].Value,StringFormat={}Aux temp 4: {0:F1},Converter={StaticResource ToFarenheit}}" />
-                <TextBlock Text="{Binding HeaterPumpStatus,StringFormat={}Heater pump: {0}}" />
-                <TextBlock Text="{Binding WaterPump1Status,StringFormat={}Pump1: {0}}" />
-                <TextBlock Text="{Binding WaterPump2Status,StringFormat={}Pump2: {0}}" />
-                <TextBlock Text="{Binding UnderfloorCurrentTemp,StringFormat={}Underfloor temp: {0:F1},Converter={StaticResource ToFarenheit}}" />
-                <TextBlock Text="{Binding UnderfloorPumpState,StringFormat={}Underfloor pump state: {0}}" />
-                <TextBlock Text="{Binding SystemEstimatedTime,StringFormat={}System off in: {0} s}" />
-                <TextBlock Text="{Binding EnginePreheatEstiamtedTime,StringFormat={}Engine preheat off in: {0} s}" />
-                <TextBlock Text="{Binding HcuVersionString,StringFormat={}HCU:{0}}"></TextBlock>
-                <TextBlock Text="{Binding PanelVersionString,StringFormat={}Panel:{0}}"></TextBlock>
-                <TextBlock Text="{Binding HeaterVersionString,StringFormat={}Heater:{0}}"></TextBlock>
-                
             </WrapPanel>
-            <WrapPanel  Orientation="Vertical" DockPanel.Dock="Left">
+            <WrapPanel  Orientation="Vertical" DockPanel.Dock="Left" Margin="10">
                 <StackPanel Margin="5" Orientation="Horizontal">
                     <TextBlock Margin="5" Width="120" VerticalAlignment="Center"> Day start at:</TextBlock>
                     <Slider x:Name="DayStartSlider" Margin="5" VerticalAlignment="Center" Minimum="1" Maximum="1430" Interval="300" LargeChange="10"  SmallChange="10" Width="200" ValueChanged="DayStartChanged"></Slider>

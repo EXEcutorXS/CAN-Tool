@@ -252,9 +252,9 @@ namespace CAN_Tool.ViewModels
                             if (D[5] != 0xFF || D[6] != 0xFF) HeaterPumpEstimatedTime = D[5] + D[6] * 256;
                             break;
                         case 0xA3: //Pump timers #2
-                            if (D[1] != 0xFF || D[2] != 0xFF) auxPumpEstimatedTime[0].Value = D[1] + D[2] * 256;
-                            if (D[3] != 0xFF || D[4] != 0xFF) auxPumpEstimatedTime[1].Value = D[3] + D[4] * 256;
-                            if (D[5] != 0xFF || D[6] != 0xFF) auxPumpEstimatedTime[2].Value = D[5] + D[6] * 256;
+                            if (D[1] != 0xFF || D[2] != 0xFF) AuxPumpEstimatedTime[0].Value = D[1] + D[2] * 256;
+                            if (D[3] != 0xFF || D[4] != 0xFF) AuxPumpEstimatedTime[1].Value = D[3] + D[4] * 256;
+                            if (D[5] != 0xFF || D[6] != 0xFF) AuxPumpEstimatedTime[2].Value = D[5] + D[6] * 256;
                             break;
                         case 0xA4: // Heater info
                             if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) HeaterTotalMinutes = D[1] + D[2] * 256 + D[3] * 65536;
