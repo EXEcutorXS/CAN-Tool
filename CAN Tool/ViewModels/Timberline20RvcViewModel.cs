@@ -77,13 +77,13 @@ namespace CAN_Tool.ViewModels
     }
 
 
-    public class Timberline20Handler : ViewModel
+    public class Timberline20RvcViewModel : ViewModel
     {
         private DispatcherTimer timer;
 
         public event EventHandler NeedToTransmit;
 
-        public Timberline20Handler()
+        public Timberline20RvcViewModel()
         {
             hcuVersion = new byte[4];
             heaterVersion = new byte[4];
@@ -132,7 +132,6 @@ namespace CAN_Tool.ViewModels
                         HeaterEnabled = (D[1] & 1) != 0;
                         ElementEnabled = (D[1] & 2) != 0;
                     }
-
                     break;
 
                 case 0x1FE99://Water heater status 2
@@ -878,6 +877,8 @@ namespace CAN_Tool.ViewModels
         heaterIcon heaterIconCode = 0;
         public heaterIcon HeaterIconCode { set => Set(ref heaterIconCode, value); get => heaterIconCode; }
 
+        private bool selected;
+        public bool Selected { set => Set(ref selected, value); get => selected; }
 
     }
 

@@ -94,7 +94,15 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((ulong)value).ToString("X");
+            try
+            {
+                return ((ulong)value).ToString("X");
+            }
+            catch
+            {
+                return "0";
+            }
+
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -39,10 +39,7 @@ namespace CAN_Tool.ViewModels
             Vm.ExecuteCommand(67, new byte[] { 1, 0, 0, 0, 0, 0 });
         }
 
-        
 
-
-        
         public ICommand ExitManualModeCommand { get; }
         private void OnExitManualModeCommandExecuted(object parameter)
         {
@@ -81,8 +78,6 @@ namespace CAN_Tool.ViewModels
             updateManualMode();
         }
 
-
-
         public ICommand DecreaseManualAirBlowerCommand { get; }
         private void OnDecreaseManualAirBlowerCommandExecuted(object parameter)
         {
@@ -100,8 +95,6 @@ namespace CAN_Tool.ViewModels
             updateManualMode();
         }
 
-
-
         public ICommand IncreaseManualFuelPumpCommand { get; }
         private void OnIncreaseManualFuelPumpCommandExecuted(object parameter)
         {
@@ -109,9 +102,6 @@ namespace CAN_Tool.ViewModels
             if (ManualFuelPump > 700) ManualFuelPump = 700;
             updateManualMode();
         }
-
-
-
 
 
         public ICommand DecreaseFuelPumpCommand { get; }
@@ -122,7 +112,6 @@ namespace CAN_Tool.ViewModels
             updateManualMode();
         }
 
-
         public ICommand IncreaseGlowPlugCommand { get; }
         private void OnIncreaseGlowPlugCommandExecuted(object parameter)
         {
@@ -130,8 +119,6 @@ namespace CAN_Tool.ViewModels
             if (ManualGlowPlug > 100) ManualGlowPlug = 100;
             updateManualMode();
         }
-
-
         
         public ICommand DecreaseGlowPlugCommand { get; }
         private void OnDecreaseGlowPlugCommandExecuted(object parameter)
@@ -140,7 +127,6 @@ namespace CAN_Tool.ViewModels
             if (ManualGlowPlug < 0) ManualGlowPlug = 0;
             updateManualMode();
         }
-
 
         public ICommand TurnOnWaterPumpCommand { get; }
         private void OnTurnOnWaterPumpCommandExecuted(object parameter)
@@ -155,7 +141,6 @@ namespace CAN_Tool.ViewModels
             manualWaterPump = false;
             updateManualMode();
         }
-
 
         private void updateManualMode()
         {

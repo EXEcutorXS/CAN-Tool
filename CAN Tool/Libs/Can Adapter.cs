@@ -201,6 +201,7 @@ namespace CAN_Adapter
         }
         public void Update(CanMessage m)
         {
+            if (m == null) return;
             Data = m.Data;
             IDE = m.IDE;
             RTR = m.RTR;
