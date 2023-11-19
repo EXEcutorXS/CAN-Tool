@@ -18,9 +18,15 @@ using ScottPlot;
 using static CAN_Tool.Libs.Helper;
 using CAN_Tool.Infrastructure.Commands;
 using CAN_Tool.ViewModels;
+using System.Windows.Input;
 
 namespace OmniProtocol
 {
+    
+    public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency }
+
+    public enum DeviceType {Binar, Planar, HCU, ValveControl, Bootloader, CookingPanel, ExtensionBoard }
+
     public class GotOmniMessageEventArgs : EventArgs
     {
         public OmniMessage receivedMessage;
@@ -33,10 +39,6 @@ namespace OmniProtocol
         public bool multipack;
         public List<OmniPgnParameter> parameters = new();
     }
-
-
-
-    public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency }
 
     public class OmniPgnParameter : ViewModel
     {
@@ -169,7 +171,6 @@ namespace OmniProtocol
 
     }
 
-
     public class ZoneHandler : ViewModel
     {
         public ZoneHandler(Action<ZoneHandler> NotifierAction)
@@ -217,14 +218,13 @@ namespace OmniProtocol
 
     }
 
-
-    public class TimberlineHandler : ViewModel
+    public class Timberline20OmniViewModel : ViewModel
     {
         private void ZoneChanged(ZoneHandler newSelectedZone)
         {
             SelectedZone = newSelectedZone;
         }
-        public TimberlineHandler()
+        public Timberline20OmniViewModel()
         {
             for (int i = 0; i < 5; i++)
             {
@@ -266,6 +266,7 @@ namespace OmniProtocol
 
 
     }
+
     public class OmniMessage : ViewModel, IUpdatable<OmniMessage>, IComparable
     {
 
@@ -582,11 +583,6 @@ namespace OmniProtocol
         }
     }
 
-    public enum DeviceType
-    {
-        Binar, Planar, HCU, ValveControl, Bootloader, CookingPanel, ExtensionBoard
-    }
-
     public class Device
     {
         public int ID;
@@ -603,6 +599,7 @@ namespace OmniProtocol
         }
 
     }
+
     public class ReadedBlackBoxValue : ViewModel, INotifyPropertyChanged, IUpdatable<ReadedBlackBoxValue>, IComparable
     {
         private int id;
@@ -643,6 +640,7 @@ namespace OmniProtocol
         }
 
     }
+
     public class ReadedParameter : ViewModel, INotifyPropertyChanged, IUpdatable<ReadedParameter>, IComparable
     {
 
@@ -680,6 +678,7 @@ namespace OmniProtocol
 
         public string Name => GetString($"par_{id}"); //Omni.configParameters[Id]?.NameRu;
     }
+
     public class StatusVariable : ViewModel, IUpdatable<StatusVariable>, IComparable
     {
         public StatusVariable(int var) : base()
@@ -787,6 +786,7 @@ namespace OmniProtocol
             return Id - (obj as StatusVariable).Id;
         }
     }
+
     public class BBCommonVariable : ViewModel, IUpdatable<BBCommonVariable>, IComparable
     {
         int id;
@@ -823,6 +823,7 @@ namespace OmniProtocol
             return id - (obj as BBCommonVariable).id;
         }
     }
+
     public class BBError : IUpdatable<BBError>, INotifyPropertyChanged, IComparable
     {
         private readonly UpdatableList<BBCommonVariable> variables = new();
@@ -879,6 +880,7 @@ namespace OmniProtocol
             return Id - (obj as BBError).Id;
         }
     }
+
     public class OmniTask : ViewModel
     {
         int percentComplete;
@@ -1161,276 +1163,7 @@ namespace OmniProtocol
         }
     }
 
-    public class ConnectedDevice : ViewModel
-    {
-        public bool WaitForFlag(ref bool flag, int delay)
-        {
-            int wd = 0;
-            while (!flag && wd < delay)
-            {
-                wd++;
-                Thread.Sleep(1);
-            }
-            if (!flag)
-            {
-                flag = false;
-                return false;
-            }
-            else
-            {
-                flag = false;
-                return true;
-            }
-        }
 
-        public ConnectedDevice(DeviceId newId)
-        {
-            LogInit();
-            id = newId;
-            if (Omni.Devices.ContainsKey(ID.Type))
-                deviceReference = Omni.Devices[ID.Type];
-        }
-
-        public MainParameters Parameters { get; set; } = new();
-
-        private DeviceId id;
-
-        public DeviceId ID
-        {
-            get { return id; }
-            set { Set(ref id, value); }
-        }
-
-        private DateOnly prodDate;
-
-        public DateOnly ProductionDate
-        {
-            get => prodDate;
-            set => Set(ref prodDate, value);
-        }
-
-        private byte[] firmware;
-
-        [AffectsTo(nameof(FirmwareAsText))]
-        public byte[] Firmware
-        {
-            get { return firmware; }
-            set { Set(ref firmware, value); }
-        }
-
-        public string FirmwareAsText
-        {
-            get
-            {
-                if (firmware != null)
-                    return $"{firmware[0]}.{firmware[1]}.{firmware[2]}.{firmware[3]}";
-                else
-                    return GetString("t_no_firmware_data");
-            }
-        }
-
-
-        private uint serial1 = 0;
-
-        [AffectsTo(nameof(SerialAsString))]
-        public uint Serial1
-        {
-            get => serial1;
-            set => Set(ref serial1, value);
-        }
-
-        private uint serial2 = 0;
-
-        [AffectsTo(nameof(SerialAsString))]
-        public uint Serial2
-        {
-            get => serial2;
-            set => Set(ref serial2, value);
-        }
-
-        private uint serial3 = 0;
-
-        [AffectsTo(nameof(SerialAsString))]
-        public uint Serial3
-        {
-            get => serial3;
-            set => Set(ref serial3, value);
-        }
-
-        public string SerialAsString => $"{serial1}.{serial2}.{serial3}";
-
-        UpdatableList<StatusVariable> status = new();
-        public UpdatableList<StatusVariable> Status => status;
-
-        private readonly UpdatableList<ReadedParameter> _readedParameters = new();
-        public UpdatableList<ReadedParameter> readedParameters => _readedParameters;
-
-        private UpdatableList<ReadedBlackBoxValue> _bbValues = new();
-        public UpdatableList<ReadedBlackBoxValue> BBValues => _bbValues;
-
-        private UpdatableList<BBError> _BBErrors = new();
-        public UpdatableList<BBError> BBErrors => _BBErrors;
-
-        private readonly BindingList<MainParameters> log = new();
-        public BindingList<MainParameters> Log => log;
-
-        public TimberlineHandler Timber { set; get; } = new();
-
-        private bool manualMode;
-
-        public bool ManualMode
-        {
-            get { return manualMode; }
-            set { Set(ref manualMode, value); }
-        }
-
-        public bool flagEraseDone = false;
-
-        public bool flagSetAdrDone = false;
-
-        public bool flagProgramDone = false;
-
-        public bool flagTransmissionCheck = false;
-
-        public bool flagCrcGetDone = false;
-
-        public bool flagDataGetDone = false;
-
-        public int receivedDataLength = 0;
-
-        public uint receiverDataCrc = 0;
-
-        public bool flagGetParamDone = false;
-
-        public bool flagGetVersionDone = false;
-
-        public bool flagGetBBDone = false;
-
-        public bool waitForBB = false;
-
-        public uint fragmentAdress = 0;
-
-        public int receivedFragmentLength = 0;
-
-        public uint receivedFragmentCrc = 0;
-
-        public string Name => ToString();
-
-        private Device deviceReference;
-
-        public Device DeviceReference => deviceReference;
-
-        public string Img => $"~\\..\\Images\\{id.Type}.jpg";
-
-        public override string ToString()
-        {
-            if (deviceReference != null)
-                return $"{deviceReference.Name}({id.Address})";
-            else
-                return $"Device #<{ID.Type}>({id.Address})";
-
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-            if (obj is not ConnectedDevice) return false;
-            return ID.Equals((obj as ConnectedDevice).ID);
-        }
-
-        public override int GetHashCode()
-        {
-            return ID.GetHashCode();
-        }
-
-        private bool isLogWriting = false;
-
-        public bool IsLogWriting
-        {
-            get { return isLogWriting; }
-            private set { Set(ref isLogWriting, value); }
-        }
-
-        public List<double[]> LogData = new List<double[]>();
-
-        private int logCurrentPos;
-
-        public int LogCurrentPos
-        {
-            get => logCurrentPos;
-            private set => Set(ref logCurrentPos, value);
-        }
-
-
-        public void LogTick()
-        {
-            Log.Insert(0, (MainParameters)Parameters.Clone());
-
-            if (!isLogWriting)
-                return;
-
-            if (LogCurrentPos < LogData[0].Length)
-            {
-                foreach (StatusVariable sv in Status)
-                    LogData[sv.Id][LogCurrentPos] = sv.Value;
-                LogCurrentPos++;
-
-            }
-            else
-            {
-                LogStop();
-                LogDataOverrun?.Invoke(this, null);
-            }
-
-
-        }
-
-        public void LogInit(int length = 86400)
-        {
-            LogCurrentPos = 0;
-            LogData = new List<double[]>();
-            for (int i = 0; i < 150; i++) //Переменных в paramsname.h пока намного меньше, но поставим пока 140
-            {
-                LogData.Add(new double[length]);
-            }
-        }
-
-        private bool[] supportedVariables = new bool[150];
-
-        public bool[] SupportedVariables => supportedVariables;
-
-        public int SupportedVariablesCount
-        {
-            get
-            {
-                int ret = 0;
-                foreach (var s in supportedVariables)
-                    if (s == true) ret++;
-                return ret;
-            }
-        }
-        public void LogStart()
-        {
-            LogInit();
-            IsLogWriting = true;
-        }
-        public void LogClear()
-        {
-            LogInit();
-        }
-
-        public void LogStop()
-        {
-            IsLogWriting = false;
-        }
-
-        public void SaveReport()
-        {
-
-        }
-        public event EventHandler LogDataOverrun;
-
-    }
 
     public class DeviceId : ViewModel
     {
@@ -1477,10 +1210,18 @@ namespace OmniProtocol
         }
     }
 
-
     public partial class Omni : ViewModel
     {
 
+        public Omni(CanAdapter canAdapter, UartAdapter uartAdapter)
+        {
+            if (canAdapter == null) throw new ArgumentNullException("Can Adapter reference can't be null");
+            if (uartAdapter == null) throw new ArgumentNullException("Uart Adapter reference can't be null");
+            this.canAdapter = canAdapter;
+            this.uartAdapter = uartAdapter;
+            SeedStaticData();
+            ConnectedDevices.Add(new DeviceViewModel());
+        }
 
         public event EventHandler NewDeviceAquired;
 
@@ -1497,8 +1238,8 @@ namespace OmniProtocol
 
         public static Dictionary<int, OmniCommand> commands = new();
 
-        private readonly BindingList<ConnectedDevice> connectedDevices = new();
-        public BindingList<ConnectedDevice> ConnectedDevices => connectedDevices;
+        private readonly BindingList<DeviceViewModel> connectedDevices = new();
+        public BindingList<DeviceViewModel> ConnectedDevices => connectedDevices;
 
         private readonly UpdatableList<OmniMessage> messages = new();
         public UpdatableList<OmniMessage> Messages => messages;
@@ -1512,15 +1253,7 @@ namespace OmniProtocol
 
         SynchronizationContext UIContext = SynchronizationContext.Current;
 
-
-
-
-
-        public OmniTask CurrentTask
-        {
-            get => currentTask;
-            set => Set(ref currentTask, value);
-        }
+        public OmniTask CurrentTask {get => currentTask; set => Set(ref currentTask, value);}
 
         private bool CancellationRequested => CurrentTask.CTS.IsCancellationRequested;
 
@@ -1541,14 +1274,13 @@ namespace OmniProtocol
 
         public void ProcessOmniMessage(OmniMessage m)
         {
-
             DeviceId id = m.TransmitterId;
 
-            ConnectedDevice senderDevice = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(m.TransmitterId));
+            DeviceViewModel senderDevice = ConnectedDevices.FirstOrDefault(d => d.ID.Equals(m.TransmitterId));
 
             if (senderDevice == null)
             {
-                senderDevice = new ConnectedDevice(id);
+                senderDevice = new DeviceViewModel(id);
                 ConnectedDevices.Add(senderDevice);
                 NewDeviceAquired?.Invoke(this, null);
                 if (senderDevice.ID.Type != 123)        //Requesting basic data, but not for bootloaders
@@ -1885,7 +1617,7 @@ namespace OmniProtocol
         public async void ReadBlackBoxData(DeviceId id)
         {
             if (!Capture("t_reading_bb_parameters")) return;
-            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(d => d.ID == id);
+            DeviceViewModel currentDevice = ConnectedDevices.FirstOrDefault(d => d.ID == id);
             if (currentDevice == null) return;
             ReadingBBErrorsMode = false;
             OmniMessage msg = new()
@@ -1935,7 +1667,7 @@ namespace OmniProtocol
             Done();
         }
 
-        public async void CheckPump(ConnectedDevice cd)
+        public async void CheckPump(DeviceViewModel cd)
         {
             if (!Capture(GetString("b_1000_ticks"))) return;
             if (cd == null) return;
@@ -1976,7 +1708,7 @@ namespace OmniProtocol
             if (!Capture("t_reading_b_errors")) return;
             ReadingBBErrorsMode = true;
 
-            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
+            DeviceViewModel currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
             UIContext.Send(x => currentDevice.BBErrors.Clear(), null);
 
@@ -2073,7 +1805,7 @@ namespace OmniProtocol
             if (!Capture("t_reading_flash_parameters")) return;
             int cnt = 0;
 
-            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
+            DeviceViewModel currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
             for (int parId = 0; parId < 601; parId++) //Currently we have 600 parameters
             {
@@ -2124,7 +1856,7 @@ namespace OmniProtocol
 
         public async void RequestBasicData(DeviceId id)
         {
-            ConnectedDevice currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
+            DeviceViewModel currentDevice = ConnectedDevices.FirstOrDefault(i => i.ID.Equals(id));
 
             for (int parId = 12; parId < 15; parId++) //ID1 ID2 ID3
             {
@@ -2282,14 +2014,7 @@ namespace OmniProtocol
 
         public static Dictionary<int, Device> Devices;
 
-        public Omni(CanAdapter canAdapter, UartAdapter uartAdapter)
-        {
-            if (canAdapter == null) throw new ArgumentNullException("Can Adapter reference can't be null");
-            if (uartAdapter == null) throw new ArgumentNullException("Uart Adapter reference can't be null");
-            this.canAdapter = canAdapter;
-            this.uartAdapter = uartAdapter;
-            SeedStaticData();
-        }
+        
     }
 
 }

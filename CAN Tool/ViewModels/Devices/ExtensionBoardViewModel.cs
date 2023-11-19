@@ -12,9 +12,9 @@ namespace CAN_Tool.Libs.Devices
 {
     class ExtensionBoardViewModel:ViewModel
     {
-        ConnectedDevice parent;
+        DeviceViewModel parent;
         
-        public ExtensionBoardViewModel(ConnectedDevice parent)
+        public ExtensionBoardViewModel(DeviceViewModel parent)
         {
             this.parent = parent;
 

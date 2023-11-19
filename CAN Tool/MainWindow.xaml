@@ -9,7 +9,8 @@
         xmlns:vm="clr-namespace:CAN_Tool.ViewModels" 
         xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators"
         xmlns:views="clr-namespace:CAN_Tool.Views"
-        xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" 
+        xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
+        xmlns:cc="clr-namespace:CAN_Tool.CustomControls" 
         xmlns:fa="http://schemas.fontawesome.com/icons/"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d" 
@@ -50,22 +51,6 @@
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
-    <Window.Triggers>
-        <EventTrigger RoutedEvent="Loaded">
-            <EventTrigger.Actions>
-                <BeginStoryboard>
-                    <Storyboard TargetProperty="Opacity" TargetName="StageTextBlock">
-                        <DoubleAnimation From="0.3" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:1" />
-                    </Storyboard>
-                </BeginStoryboard>
-                <BeginStoryboard>
-                    <Storyboard TargetProperty="Opacity" TargetName="ErrorButton">
-                        <DoubleAnimation From="0" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:0.5" />
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger.Actions>
-        </EventTrigger>
-    </Window.Triggers>
     <DockPanel>
         <StatusBar x:Name="MyStatusbar" DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
             <StatusBarItem HorizontalAlignment="Left">
@@ -241,164 +226,10 @@
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_common}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
-                    <DockPanel d:Visibility="Visible" Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullableToVisibilityConverter},TargetNullValue=Visible}">
-                        <TextBlock Grid.Row="4" x:Name="StageTextBlock" DockPanel.Dock="Top" HorizontalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.StageString}" d:Visibility="Visible" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}" FontSize="30" Margin="8" TextWrapping="WrapWithOverflow" />
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                            <StackPanel DockPanel.Dock="Top">
-                                <StackPanel Orientation="Horizontal">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                                        <Border Width="150" Height="150" CornerRadius="20" Margin="10" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2">
-                                            <Button x:Name="ErrorButton" Style="{DynamicResource MaterialDesignFloatingActionButton}" Height="100" Width="100" Background="Red" Command="{Binding ClearErrorsCommand}" ToolTip="Press to clean error code" Visibility="{Binding SelectedConnectedDevice.Parameters.Error, Converter={StaticResource IntToVisibileConverter}}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <fa:FontAwesome Icon="Solid_ExclamationTriangle" FontSize="25" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"></fa:FontAwesome>
-                                                    <TextBlock FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding SelectedConnectedDevice.Parameters.Error}" />
-                                                </StackPanel>
-                                            </Button>
-                                            <Border.Background>
-                                                <ImageBrush ImageSource="{Binding SelectedConnectedDevice.Img}" Stretch="Fill" />
-                                            </Border.Background>
-                                        </Border>
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="1*" />
-                                                <RowDefinition Height="1*" />
-                                                <RowDefinition Height="1*" />
-                                                <RowDefinition Height="1*" />
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Grid.Row="0" Text="{Binding SelectedConnectedDevice.FirmwareAsText}" VerticalAlignment="Center" FontSize="25" />
-                                            <TextBlock Grid.Row="1" Text="{Binding SelectedConnectedDevice.ProductionDate}" VerticalAlignment="Center" FontSize="25" />
-                                            <TextBlock Grid.Row="2" Text="{Binding SelectedConnectedDevice.SerialAsString}" VerticalAlignment="Center" FontSize="25" />
-                                            <TextBlock Grid.Row="3" Text="{Binding Path=SelectedConnectedDevice.Parameters.ErrorString}" Foreground="Red" FontSize="25" VerticalAlignment="Center" Visibility="{Binding SelectedConnectedDevice.Parameters.Error, Converter={StaticResource IntToVisibileConverter}}" />
-
-                                        </Grid>
-                                    </StackPanel >
-
-                                </StackPanel>
-                                <Border BorderThickness="2" BorderBrush="{DynamicResource MaterialDesignDivider}" DockPanel.Dock="Top" HorizontalAlignment="Left" CornerRadius="10" Margin="10">
-                                    <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Left" d:Visibility="Visible" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
-                                        <Button Margin="8" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
-                                            <Button.Content>
-                                                <fa:ImageAwesome Icon="Solid_Play" Margin="2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                                            </Button.Content>
-                                        </Button>
-
-                                        <Button Margin="8" ToolTip="Stop Device" Command="{Binding StopHeaterCommand}">
-                                            <Button.Content>
-                                                <fa:ImageAwesome Icon="Solid_Stop" Margin="2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                                            </Button.Content>
-                                        </Button>
-                                        <Button Margin="8" ToolTip="Run just water pump" Command="{Binding StartPumpCommand}" Content="{DynamicResource b_water_pump}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"></Button>
-                                        <Button Margin="8" ToolTip="Run ventilation" Command="{Binding StartVentCommand}" Content="{DynamicResource b_vent}" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForPlanars}}"></Button>
-                                        <Button Content="{DynamicResource b_calibrate}" Margin="10" Command="{Binding CalibrateTermocouplesCommand}" />
-                                        <Button Content="{DynamicResource b_clear_errors}" Margin="10" Command="{Binding ClearErrorsCommand}" />
-
-                                    </StackPanel>
-                                </Border>
-
-                            </StackPanel>
-                            <Grid Margin="10" DockPanel.Dock="Top" d:Visibility="Visible" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
-
-                                        <StackPanel>
-                                            <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}" Text="{DynamicResource b_air_set}" HorizontalAlignment="Center" Margin="4"></TextBlock>
-                                            <Grid>
-                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightGray" Width="40" Height="40" Value="100" Maximum="100" Opacity="0.5">
-                                                    <ProgressBar.LayoutTransform>
-                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
-                                                    </ProgressBar.LayoutTransform>
-                                                </ProgressBar>
-                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightGray" Width="50" Height="50" Value="100" Maximum="100" Opacity="0.5">
-                                                    <ProgressBar.LayoutTransform>
-                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
-                                                    </ProgressBar.LayoutTransform>
-                                                </ProgressBar>
-                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightBlue" Width="50" Height="50" Value="{Binding SelectedConnectedDevice.Parameters.RevSet,TargetNullValue=0}" Maximum="{Binding SelectedConnectedDevice.DeviceReference.MaxBlower}">
-                                                    <ProgressBar.LayoutTransform>
-                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
-                                                    </ProgressBar.LayoutTransform>
-                                                </ProgressBar>
-                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightCyan" Width="40" Height="40" Value="{Binding SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0}" Maximum="{Binding SelectedConnectedDevice.DeviceReference.MaxBlower}">
-                                                    <ProgressBar.LayoutTransform>
-                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
-                                                    </ProgressBar.LayoutTransform>
-                                                </ProgressBar>
-                                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.RevSet,TargetNullValue=0}" Style="{DynamicResource MaterialDesignHeadline4TextBlock}"></TextBlock>
-                                                    <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}">/</TextBlock>
-                                                    <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0}" Style="{DynamicResource MaterialDesignHeadline4TextBlock}"></TextBlock>
-                                                </StackPanel>
-                                            </Grid>
-                                        </StackPanel>
-                                    </Border>
-
-                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
-
-                                        <StackPanel>
-                                            <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}" Text="{DynamicResource b_fuel_pump_set}" HorizontalAlignment="Center" Margin="4"></TextBlock>
-                                            <Grid>
-                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightGray" Width="50" Height="50" Value="100" Maximum="100" Opacity="0.5">
-                                                    <ProgressBar.LayoutTransform>
-                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
-                                                    </ProgressBar.LayoutTransform>
-                                                </ProgressBar>
-                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="Yellow" Width="50" Height="50" Value="{Binding SelectedConnectedDevice.Parameters.FuelPumpMeasured,TargetNullValue=0}" Maximum="{Binding SelectedConnectedDevice.DeviceReference.MaxFuelPump}">
-                                                    <ProgressBar.LayoutTransform>
-                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
-                                                    </ProgressBar.LayoutTransform>
-                                                </ProgressBar>
-                                                <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.FuelPumpMeasured,TargetNullValue=0,StringFormat={}{0:F2}}" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline3TextBlock}"></TextBlock>
-                                            </Grid>
-                                        </StackPanel>
-                                    </Border>
-
-                                    <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
-
-                                        <StackPanel>
-                                            <TextBlock Style="{DynamicResource MaterialDesignHeadline4TextBlock}" Text="{DynamicResource b_glow_plug_set}" HorizontalAlignment="Center" Margin="4"></TextBlock>
-                                            <Grid>
-                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="LightGray" Width="50" Height="50" Value="100" Maximum="100" Opacity="0.5">
-                                                    <ProgressBar.LayoutTransform>
-                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
-                                                    </ProgressBar.LayoutTransform>
-                                                </ProgressBar>
-                                                <ProgressBar Margin="10" Style="{DynamicResource MaterialDesignCircularProgressBar}" Foreground="Crimson" Width="50" Height="50" Value="{Binding SelectedConnectedDevice.Parameters.GlowPlug,TargetNullValue=0}" Maximum="100">
-                                                    <ProgressBar.LayoutTransform>
-                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="4" ScaleY="4" />
-                                                    </ProgressBar.LayoutTransform>
-                                                </ProgressBar>
-                                                <TextBlock Text="{Binding SelectedConnectedDevice.Parameters.GlowPlug,TargetNullValue=0}" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline3TextBlock}"></TextBlock>
-                                            </Grid>
-                                        </StackPanel>
-                                    </Border>
-
-                                </StackPanel>
-
-                            </Grid>
-                        </StackPanel>
-                        <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding SelectedConnectedDevice.Log}" AutoGenerateColumns="False" >
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Path = Mode}" Header="{DynamicResource b_list_mode}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = Stage}" Header="{DynamicResource b_list_stage}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = StageTime}" Header="{DynamicResource b_list_stagetime}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = WorkTime}" Header="{DynamicResource b_list_worktime}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = Voltage,StringFormat={}{0:F1}}" Header="{DynamicResource b_list_voltage}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = RevSet}" Header="{DynamicResource b_list_rev_set}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = RevMeasured}" Header="{DynamicResource b_list_rev_meas}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = FuelPumpMeasured,StringFormat={}{0:F2}}" Header="{DynamicResource b_list_fuel}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = GlowPlug}" Header="{DynamicResource b_list_glowplug}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = FlameSensor}" Header="{DynamicResource b_list_flamesensor}" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path = BodyTemp}" Header="{DynamicResource b_list_bodytemp}" IsReadOnly="True" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForPlanars}}"/>
-                                <DataGridTextColumn Binding="{Binding Path = InletTemp}" Header="{DynamicResource b_list_inlettemp}" IsReadOnly="True" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForPlanars}}"/>
-                                <DataGridTextColumn Binding="{Binding Path = PanelTemp}" Header="{DynamicResource b_list_paneltemp}" IsReadOnly="True" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForPlanars}}"/>
-                                <DataGridTextColumn Binding="{Binding Path = LiquidTemp}" Header="{DynamicResource b_list_liqtemp}" IsReadOnly="True" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"/>
-                                <DataGridTextColumn Binding="{Binding Path = OverheatTemp}" Header="{DynamicResource b_list_overheattemp}" IsReadOnly="True" Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"/>
-                                <DataGridTextColumn Binding="{Binding Path = Error}" Header="{DynamicResource b_list_error}" IsReadOnly="True" />
-
-                            </DataGrid.Columns>
-                        </DataGrid>
+                    <StackPanel>
                         <views:HcuOmniControl Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}"/>
-                    </DockPanel>
+                        <cc:HeaterControl DataContext="{Binding SelectedConnectedDevice}"/>
+                    </StackPanel>
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>

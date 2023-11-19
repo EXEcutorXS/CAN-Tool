@@ -75,8 +75,8 @@ namespace CAN_Tool.ViewModels
 
         public Omni OmniInstance { set; get; }
 
-        ConnectedDevice selectedConnectedDevice;
-        public ConnectedDevice SelectedConnectedDevice
+        DeviceViewModel selectedConnectedDevice;
+        public DeviceViewModel SelectedConnectedDevice
         {
             set => Set(ref selectedConnectedDevice, value);
             get => selectedConnectedDevice;
@@ -352,50 +352,22 @@ namespace CAN_Tool.ViewModels
             }
         }
 
-        public ICommand StartHeaterCommand { get; }
-        private void OnStartHeaterCommandExecuted(object parameter)
+        public void ExecuteCommand(int cmdNum, params byte[] data)
         {
-            ExecuteCommand(1, 0xff, 0xff);
+            OmniMessage msg = new();
+            msg.TransmitterType = 126;
+            msg.TransmitterAddress = 6;
+            msg.ReceiverId = SelectedConnectedDevice.ID;
+            msg.PGN = 1;
+            msg.Data = new byte[8];
+            msg.Data[0] = (byte)(cmdNum >> 8);
+            msg.Data[1] = (byte)(cmdNum & 0xFF);
+            for (int i = 0; i < data.Length; i++)
+                msg.Data[i + 2] = data[i];
+            CanAdapter.Transmit(msg.ToCanMessage());
         }
 
 
-
-        public ICommand StopHeaterCommand { get; }
-        private void OnStopHeaterCommandExecuted(object parameter)
-        {
-            ExecuteCommand(3);
-        }
-
-
-
-        public ICommand StartPumpCommand { get; }
-        private void OnStartPumpCommandExecuted(object parameter)
-        {
-            ExecuteCommand(4, 0, 0);
-        }
-
-        public ICommand ClearErrorsCommand { get; }
-        private void OnClearErrorsCommandExecuted(object parameter)
-        {
-            ExecuteCommand(5);
-        }
-
-
-        public ICommand StartVentCommand { get; }
-        private void OnStartVentCommandExecuted(object parameter)
-        {
-            ExecuteCommand(10);
-        }
-
-
-        public ICommand CalibrateTermocouplesCommand { get; }
-        private void OnCalibrateTermocouplesCommandExecuted(object parameter)
-        {
-            ExecuteCommand(20);
-        }
-
-
-        public bool DeviceConnectedAndNotInManual(object parameter) => CanAdapter.PortOpened && SelectedConnectedDevice != null && !SelectedConnectedDevice.ManualMode;
 
 
         public ICommand LogStartCommand { get; }
@@ -673,20 +645,7 @@ namespace CAN_Tool.ViewModels
 
         }
 
-        public void ExecuteCommand(int cmdNum, params byte[] data)
-        {
-            OmniMessage msg = new();
-            msg.TransmitterType = 126;
-            msg.TransmitterAddress = 6;
-            msg.ReceiverId = selectedConnectedDevice.ID;
-            msg.PGN = 1;
-            msg.Data = new byte[8];
-            msg.Data[0] = (byte)(cmdNum >> 8);
-            msg.Data[1] = (byte)(cmdNum & 0xFF);
-            for (int i = 0; i < data.Length; i++)
-                msg.Data[i + 2] = data[i];
-            OmniInstance.SendMessage(msg);
-        }
+
 
 
 
@@ -712,7 +671,7 @@ namespace CAN_Tool.ViewModels
                         OnChartDrawCommandExecuted(null);
                 }
 
-            foreach (ConnectedDevice d in OmniInstance.ConnectedDevices) //Поддержание связи
+            foreach (DeviceViewModel d in OmniInstance.ConnectedDevices) //Поддержание связи
             {
                 OmniMessage msg = new();
                 msg.TransmitterAddress = 6;
@@ -817,12 +776,7 @@ namespace CAN_Tool.ViewModels
             SetAdapterListedModeCommand = new LambdaCommand(OnSetAdapterListedModeCommandExecuted, CanSetAdapterListedModeCommandExecute);
             SetAdapterSelfReceptionModeCommand = new LambdaCommand(OnSetAdapterSelfReceptionModeCommandExecuted, CanSetAdapterSelfReceptionModeCommandExecute);
             StopCanAdapterCommand = new LambdaCommand(OnStopCanAdapterCommandExecuted, CanStopCanAdapterCommandExecute);
-            StartHeaterCommand = new LambdaCommand(OnStartHeaterCommandExecuted, DeviceConnectedAndNotInManual);
-            StopHeaterCommand = new LambdaCommand(OnStopHeaterCommandExecuted, DeviceConnectedAndNotInManual);
-            StartPumpCommand = new LambdaCommand(OnStartPumpCommandExecuted, DeviceConnectedAndNotInManual);
-            StartVentCommand = new LambdaCommand(OnStartVentCommandExecuted, DeviceConnectedAndNotInManual);
-            ClearErrorsCommand = new LambdaCommand(OnClearErrorsCommandExecuted, deviceSelected);
-            CalibrateTermocouplesCommand = new LambdaCommand(OnCalibrateTermocouplesCommandExecuted, DeviceConnectedAndNotInManual);
+            
             LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
             LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
             ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);

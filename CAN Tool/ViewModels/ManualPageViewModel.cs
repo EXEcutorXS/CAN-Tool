@@ -32,7 +32,7 @@ namespace CAN_Tool.ViewModels
         public bool ManualWaterPump { set => Set(ref manualWaterPump, value); get => manualWaterPump; }
 
 
-        
+
         public ICommand EnterManualModeCommand { get; }
         private void OnEnterManualModeCommandExecuted(object parameter)
         {
@@ -169,7 +169,7 @@ namespace CAN_Tool.ViewModels
         {
             Vm = vm;
 
-            EnterManualModeCommand = new LambdaCommand(OnEnterManualModeCommandExecuted, Vm.DeviceConnectedAndNotInManual);
+            EnterManualModeCommand = new LambdaCommand(OnEnterManualModeCommandExecuted, null);
             ExitManualModeCommand = new LambdaCommand(OnExitManualModeCommandExecuted, Vm.deviceInManualMode);
             IncreaceManualAirBlowerCommand = new LambdaCommand(OnIncreaceManualAirBlowerCommandExecuted, Vm.deviceInManualMode);
             DecreaseManualAirBlowerCommand = new LambdaCommand(OnDecreaseManualAirBlowerCommandExecuted, Vm.deviceInManualMode);

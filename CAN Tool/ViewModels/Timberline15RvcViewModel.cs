@@ -132,7 +132,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             msg.Data[1] = (byte)(0b11110000 + (!HeaterEnabled ? 1 : 0) + ((ElementEnabled ? 1 : 0) << 1));
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
 
         }
 
@@ -142,7 +142,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             msg.Data[1] = (byte)(0b11110000 + (HeaterEnabled ? 1 : 0) + ((!ElementEnabled ? 1 : 0) << 1));
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void ToggleWater()
@@ -151,7 +151,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 0x83;
             msg.Data[1] = (byte)(0b11111100 + (!WaterEnabled ? 1 : 0));
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void TogglePump()
@@ -164,7 +164,7 @@ namespace CAN_Tool.ViewModels
             else
                 msg.Data[1] = 0b11110000;
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
 
         }
 
@@ -174,7 +174,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             msg.Data[1] = (byte)(0xF0 + (!ZoneEnabled ? 2 : 0));
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void ToggleFanManualMode()
@@ -183,7 +183,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             msg.Data[1] = (byte)(0b11111100 + (!ZoneManualFanMode ? 1 : 0));
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void ToggleScheduleMode()
@@ -192,7 +192,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             msg.Data[1] = (byte)(0b00111111 + ((!ScheduleMode ? 1 : 0) << 6));
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void SetFanManualSpeed(byte speed)
@@ -201,7 +201,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 1;
             msg.Data[2] = (byte)(speed * 2);
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void SetDaySetpoint(int temp)
@@ -213,7 +213,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[4] = (byte)(tmp & 0xFF);
             msg.Data[5] = (byte)((tmp >> 8) & 0xFF);
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
 
         }
 
@@ -226,7 +226,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[4] = (byte)(tmp & 0xFF);
             msg.Data[5] = (byte)((tmp >> 8) & 0xFF);
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void SetTime(DateTime dateTime)
@@ -242,7 +242,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[5] = (byte)dateTime.Minute;
             msg.Data[6] = (byte)dateTime.Second;
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void ClearErrors()
@@ -252,7 +252,7 @@ namespace CAN_Tool.ViewModels
             msg.Priority = 6;
             msg.Data[0] = 0x81;
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void SetSystemDuration(int minutes)
@@ -267,7 +267,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[1] = (byte)(minutes & 0xff);
             msg.Data[2] = (byte)((minutes >> 8) & 0xff);
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void SetWaterDuration(int minutes)
@@ -282,7 +282,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[3] = (byte)(minutes & 0xff);
 
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void SetDayStart(int hours, int minutes)
@@ -298,7 +298,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[2] = (byte)hours;
             msg.Data[3] = (byte)minutes;
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void SetNightStart(int hours, int minutes)
@@ -314,7 +314,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[2] = (byte)hours;
             msg.Data[3] = (byte)minutes;
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
         public void OverrideTempSensor(int temperature)
@@ -327,7 +327,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[1] = (byte)tmp;
             msg.Data[2] = (byte)(tmp >> 8);
 
-            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+            NeedToTransmit.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
 

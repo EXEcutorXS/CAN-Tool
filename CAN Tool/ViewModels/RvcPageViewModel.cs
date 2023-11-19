@@ -24,7 +24,7 @@ namespace CAN_Tool.ViewModels
 
     public class NeedToTransmitEventArgs : EventArgs
     {
-        public RvcMessage msgToTransmit;
+        public CanMessage msgToTransmit;
     }
 
     internal class RvcPageViewModel : ViewModel
@@ -73,7 +73,7 @@ namespace CAN_Tool.ViewModels
 
         private void SendMessage(object sender, EventArgs e)
         {
-            VM.CanAdapter.Transmit((e as NeedToTransmitEventArgs).msgToTransmit.ToCanMessage());
+            VM.CanAdapter.Transmit((e as NeedToTransmitEventArgs).msgToTransmit);
         }
 
 
