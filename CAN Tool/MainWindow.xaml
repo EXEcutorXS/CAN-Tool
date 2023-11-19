@@ -8,15 +8,13 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib" 
         xmlns:vm="clr-namespace:CAN_Tool.ViewModels" 
         xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators"
-        xmlns:views="clr-namespace:CAN_Tool.Views"
         xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
         xmlns:cc="clr-namespace:CAN_Tool.CustomControls" 
         xmlns:fa="http://schemas.fontawesome.com/icons/"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d" 
 
-        xmlns:sctplt="clr-namespace:ScottPlot;assembly=ScottPlot" 
-        Title="Adver CAN-Tool" Height="900" Width="1500"
+        xmlns:sctplt="clr-namespace:ScottPlot;assembly=ScottPlot" Title="Advers CAN-Tool" Height="900" Width="1500"
         
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -172,7 +170,7 @@
                 <TextBlock VerticalAlignment="Center" Margin="10" Text="DLC:" FontSize="25" />
                 <TextBox ToolTip="DLC" MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.DLC,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
                 <TextBlock VerticalAlignment="Center" Margin="10" Text="Data:" FontSize="25" />
-                <vm:DataBox ToolTip="Enter data in HEX format" Margin="10" DataContext="{Binding CanPage}"  Text="{Binding  ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" FontFamily="Courier" />
+                <cc:DataBox ToolTip="Enter data in HEX format" Margin="10" DataContext="{Binding CanPage}"  Text="{Binding  ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" FontFamily="Courier" />
                 <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.RTR}" Margin="10" FontSize="20">RTR</CheckBox>
                 <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.IDE}" Margin="10" FontSize="20">IDE</CheckBox>
                 <Button Margin="10" Command="{Binding CanPage.SendCanMessageCommand}">Send</Button>
@@ -227,8 +225,8 @@
                         </StackPanel>
                     </TabItem.Header>
                     <StackPanel>
-                        <views:HcuOmniControl Visibility="{Binding SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}"/>
-                        <cc:HeaterControl DataContext="{Binding SelectedConnectedDevice}"/>
+                        <cc:HcuOmniControl />
+                        <cc:HeaterControl DataContext="{Binding SelectedConnectedDevice}" />
                     </StackPanel>
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -279,7 +277,7 @@
                                         </TextBox.Text>
                                     </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Data:</TextBlock>
-                                    <vm:DataBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource HexToUlongConverter}}" Style="{DynamicResource MaterialDesignTextBox}" />
+                                    <cc:DataBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource HexToUlongConverter}}" Style="{DynamicResource MaterialDesignTextBox}" />
                                     <Button Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}" Cursor="Hand">
                                         <Button.Content>
                                             <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
@@ -813,7 +811,7 @@
 
             </TabItem>
             <TabItem Header="Timberline 2.0" Selector.IsSelected="{Binding Timberline20.Selected}">
-                <views:TimberlineRvcControl DataContext="{Binding Timberline20}" />
+                <cc:TimberlineRvcControl DataContext="{Binding Timberline20}" />
             </TabItem>
             <TabItem Header="{DynamicResource b_messages}">
                 <DockPanel>
@@ -831,7 +829,7 @@
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Priority:</TextBlock>
                         <TextBox Text="{Binding ConstructedMessage.Priority,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}" />
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Data:</TextBlock>
-                        <vm:DataBox  Text="{Binding ConstructedMessage.DataAsULong,Converter={StaticResource HexToUlongConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}"  />
+                        <cc:DataBox  Text="{Binding ConstructedMessage.DataAsULong,Converter={StaticResource HexToUlongConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}"  />
                         <Button Margin="10" Command="{Binding SendRvcMessageCommand}">
                             <Button.Content>
                                 <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />

@@ -8,8 +8,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using RVC;
 using System.Linq;
-using System.ComponentModel;
-using System.CodeDom;
+
 
 namespace CAN_Tool.ViewModels.Converters
 {

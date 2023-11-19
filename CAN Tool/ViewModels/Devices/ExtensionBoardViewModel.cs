@@ -40,8 +40,6 @@ namespace CAN_Tool.Libs.Devices
         private BindingList<float> temperatureData = new BindingList<float>();
         public BindingList<float> TemperatureData => temperatureData;
 
-        public LambdaCommand toggleChannel;
-
         public void onToggleChannelCommandExecute(object parameter)
         {
             int channel = (int)parameter;

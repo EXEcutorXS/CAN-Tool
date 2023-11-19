@@ -7,7 +7,6 @@
              mc:Ignorable="d"
              xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
              xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators"
-             xmlns:views="clr-namespace:CAN_Tool.Views"
              xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
              xmlns:op="clr-namespace:OmniProtocol"
              d:DesignHeight="600"

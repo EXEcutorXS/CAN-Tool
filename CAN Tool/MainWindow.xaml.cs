@@ -17,6 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using static CAN_Tool.Libs.Helper;
+using CAN_Tool.CustomControls;
 using RVC;
 
 namespace CAN_Tool

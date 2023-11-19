@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CAN_Tool.Views
+namespace CAN_Tool.CustomControls
 {
     /// <summary>
     /// Логика взаимодействия для HcuOmniControl.xaml
@@ -28,6 +28,7 @@ namespace CAN_Tool.Views
         enum ZoneState_t {Off,Heat,Fan };
 
         MainWindowViewModel vm => (MainWindowViewModel)DataContext;
+
         public HcuOmniControl()
         {
             InitializeComponent();

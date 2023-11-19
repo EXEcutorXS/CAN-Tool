@@ -11,6 +11,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\**" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Data\**" />
+    <None Remove="Models\**" />
+    <None Remove="Services\**" />
+    <Page Remove="Data\**" />
+    <Page Remove="Models\**" />
+    <Page Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Images\10.jpg" />
     <None Remove="Images\123.jpg" />
     <None Remove="Images\126.jpg" />
@@ -34,12 +49,6 @@
     <PackageReference Include="ScottPlot.WPF" Version="4.1.58" />
     <PackageReference Include="System.IO.Ports" Version="6.0.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\" />
-    <Folder Include="Models\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>
