@@ -225,7 +225,7 @@
                         </StackPanel>
                     </TabItem.Header>
                     <StackPanel>
-                        <cc:HcuOmniControl />
+                        <cc:HcuOmniControl DataContext="{Binding SelectedConnectedDevice}"/>
                         <cc:HeaterControl DataContext="{Binding SelectedConnectedDevice}" />
                     </StackPanel>
                 </TabItem>
@@ -372,7 +372,7 @@
                             <Button Content="{DynamicResource b_save}" Margin="10" Command="{Binding SaveConfigCommand}" />
                             <Button Content="{DynamicResource b_reset}" Margin="10" Command="{Binding ResetConfigCommand}" />
                         </StackPanel>
-                        <DataGrid DockPanel.Dock="Top" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" x:Name="ConfigParameterField" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.readedParameters}">
+                        <DataGrid DockPanel.Dock="Top" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" x:Name="ConfigParameterField" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.ReadedParameters}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path = Id}" Header="ID" IsReadOnly="True">
                                 </DataGridTextColumn>

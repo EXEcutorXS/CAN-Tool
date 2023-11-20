@@ -211,14 +211,14 @@ namespace OmniProtocol
         UpdatableList<StatusVariable> status = new();
         public UpdatableList<StatusVariable> Status => status;
 
-        private readonly UpdatableList<ReadedParameter> _readedParameters = new();
-        public UpdatableList<ReadedParameter> readedParameters => _readedParameters;
+        private readonly UpdatableList<ReadedParameter> readedParameters = new();
+        public UpdatableList<ReadedParameter> ReadedParameters => readedParameters;
 
-        private UpdatableList<ReadedBlackBoxValue> _bbValues = new();
-        public UpdatableList<ReadedBlackBoxValue> BBValues => _bbValues;
+        private UpdatableList<ReadedBlackBoxValue> bbValues = new();
+        public UpdatableList<ReadedBlackBoxValue> BBValues => bbValues;
 
-        private UpdatableList<BBError> _BBErrors = new();
-        public UpdatableList<BBError> BBErrors => _BBErrors;
+        private UpdatableList<BBError> bbErrors = new();
+        public UpdatableList<BBError> BBErrors => bbErrors;
 
         private readonly BindingList<MainParameters> log = new();
         public BindingList<MainParameters> Log => log;

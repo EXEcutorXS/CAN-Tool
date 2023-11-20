@@ -448,7 +448,7 @@ namespace CAN_Tool.ViewModels
             OmniInstance.SaveParameters(selectedConnectedDevice.ID);
         }
         private bool CanSaveConfigCommandExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.readedParameters.Count > 0 && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.ReadedParameters.Count > 0 && SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 

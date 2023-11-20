@@ -1220,7 +1220,6 @@ namespace OmniProtocol
             this.canAdapter = canAdapter;
             this.uartAdapter = uartAdapter;
             SeedStaticData();
-            ConnectedDevices.Add(new DeviceViewModel());
         }
 
         public event EventHandler NewDeviceAquired;
@@ -1372,7 +1371,7 @@ namespace OmniProtocol
                     uint parameterValue = ((uint)m.Data[4] * 0x1000000) + ((uint)m.Data[5] * 0x10000) + ((uint)m.Data[6] * 0x100) + (uint)m.Data[7];
                     if (parameterValue != 0xFFFFFFFF)
                     {
-                        senderDevice.readedParameters.TryToAdd(new() { Id = parameterId, Value = parameterValue });
+                        senderDevice.ReadedParameters.TryToAdd(new() { Id = parameterId, Value = parameterValue });
                         Debug.WriteLine($"{GetString($"par_{parameterId}")}={parameterValue}");
                     }
                     else
@@ -1923,7 +1922,7 @@ namespace OmniProtocol
             if (dev == null) return;
             OmniMessage msg = new OmniMessage();
             List<ReadedParameter> tempCollection = new List<ReadedParameter>();
-            foreach (var p in dev.readedParameters)
+            foreach (var p in dev.ReadedParameters)
                 tempCollection.Add(p);
             int cnt = 0;
             foreach (var p in tempCollection)
