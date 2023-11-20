@@ -407,7 +407,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((zoneType)value != zoneType.Disconnected)
+            if ((zoneType_t)value != zoneType_t.Disconnected)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -423,7 +423,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((zoneType)value == zoneType.Defrosting)
+            if ((zoneType_t)value == zoneType_t.Defrosting)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -439,7 +439,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((zoneType)value == zoneType.Furnace)
+            if ((zoneType_t)value == zoneType_t.Furnace)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -455,7 +455,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((zoneType)value == zoneType.Furnace || (zoneType)value == zoneType.Radiator)
+            if ((zoneType_t)value == zoneType_t.Furnace || (zoneType_t)value == zoneType_t.Radiator)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -471,7 +471,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((zoneType)value == zoneType.Furnace || (zoneType)value == zoneType.Radiator)
+            if ((zoneType_t)value == zoneType_t.Furnace || (zoneType_t)value == zoneType_t.Radiator)
                 return true;
             else
                 return false;
@@ -487,10 +487,26 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((zoneType)value != zoneType.Disconnected)
+            if ((zoneType_t)value != zoneType_t.Disconnected)
                 return true;
             else
                 return false;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class NullToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return Visibility.Collapsed;
+            else
+                return Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -188,14 +188,11 @@ namespace OmniProtocol
         private int currentTemperature = 0;
         public int CurrentTemperature { set => Set(ref currentTemperature, value); get => currentTemperature; }
 
-        private bool connected = false;
-        public bool Connected { set => Set(ref connected, value); get => connected; }
+        private zoneType_t connected = zoneType_t.Disconnected;
+        public  zoneType_t Connected {set => Set(ref connected, value); get => connected; }
 
         private zoneState_t state = zoneState_t.Off;
         public zoneState_t State { set => Set(ref state, value); get => state; }
-
-        private bool selected = false;
-        public bool Selected { set { Set(ref selected, value); if (value) selectedZoneChanged(this); } get => selected; }
 
         private bool manualMode = false;
         public bool ManualMode { set => Set(ref manualMode, value); get => manualMode; }
@@ -232,7 +229,6 @@ namespace OmniProtocol
             }
 
             SelectedZone = zones[0];
-            zones[0].Selected = true;
         }
 
         private int tankTemperature;
@@ -1428,6 +1424,20 @@ namespace OmniProtocol
                     }
                     catch { }
             }
+
+            if (m.PGN == 19) //Версия
+            {
+
+                if (m.Data[0] == 4)
+                {
+                    if (m.Data[1] < 4) senderDevice.Timber.Zones[0].Connected = (zoneType_t)m.Data[1];
+                    if (m.Data[2] < 4) senderDevice.Timber.Zones[1].Connected = (zoneType_t)m.Data[2];
+                    if (m.Data[3] < 4) senderDevice.Timber.Zones[2].Connected = (zoneType_t)m.Data[3];
+                    if (m.Data[4] < 4) senderDevice.Timber.Zones[3].Connected = (zoneType_t)m.Data[4];
+                    if (m.Data[5] < 4) senderDevice.Timber.Zones[4].Connected = (zoneType_t)m.Data[5];
+                }
+            }
+
             if (m.PGN == 21)
             {
                 if (m.Data[2] != 255) senderDevice.Timber.TankTempereature = m.Data[2] - 75;
@@ -1442,46 +1452,33 @@ namespace OmniProtocol
                     if ((m.Data[0] & 3) == 0) senderDevice.Timber.Zones[0].State = zoneState_t.Off;
                     if ((m.Data[0] & 3) == 1) senderDevice.Timber.Zones[0].State = zoneState_t.Heat;
                     if ((m.Data[0] & 3) == 2) senderDevice.Timber.Zones[0].State = zoneState_t.Fan;
-                    senderDevice.Timber.Zones[0].Connected = true;
                 }
-                else
-                    senderDevice.Timber.Zones[0].Connected = false;
+                
                 if (((m.Data[0] >> 2) & 3) != 3)
                 {
                     if (((m.Data[0] >> 2) & 3) == 0) senderDevice.Timber.Zones[1].State = zoneState_t.Off;
                     if (((m.Data[0] >> 2) & 3) == 1) senderDevice.Timber.Zones[1].State = zoneState_t.Heat;
                     if (((m.Data[0] >> 2) & 3) == 2) senderDevice.Timber.Zones[1].State = zoneState_t.Fan;
-                    senderDevice.Timber.Zones[1].Connected = true;
                 }
-                else
-                    senderDevice.Timber.Zones[1].Connected = false;
+                
                 if (((m.Data[0] >> 4) & 3) != 3)
                 {
                     if (((m.Data[0] >> 4) & 3) == 0) senderDevice.Timber.Zones[2].State = zoneState_t.Off;
                     if (((m.Data[0] >> 4) & 3) == 1) senderDevice.Timber.Zones[2].State = zoneState_t.Heat;
                     if (((m.Data[0] >> 4) & 3) == 2) senderDevice.Timber.Zones[2].State = zoneState_t.Fan;
-                    senderDevice.Timber.Zones[2].Connected = true;
                 }
-                else
-                    senderDevice.Timber.Zones[2].Connected = false;
                 if (((m.Data[0] >> 6) & 3) != 3)
                 {
                     if (((m.Data[0] >> 6) & 3) == 0) senderDevice.Timber.Zones[3].State = zoneState_t.Off;
                     if (((m.Data[0] >> 6) & 3) == 1) senderDevice.Timber.Zones[3].State = zoneState_t.Heat;
                     if (((m.Data[0] >> 6) & 3) == 2) senderDevice.Timber.Zones[3].State = zoneState_t.Fan;
-                    senderDevice.Timber.Zones[3].Connected = true;
                 }
-                else
-                    senderDevice.Timber.Zones[3].Connected = false;
                 if ((m.Data[1] & 3) != 3)
                 {
                     if ((m.Data[1] & 3) == 0) senderDevice.Timber.Zones[4].State = zoneState_t.Off;
                     if ((m.Data[1] & 3) == 1) senderDevice.Timber.Zones[4].State = zoneState_t.Heat;
                     if ((m.Data[1] & 3) == 2) senderDevice.Timber.Zones[4].State = zoneState_t.Fan;
-                    senderDevice.Timber.Zones[4].Connected = true;
                 }
-                else
-                    senderDevice.Timber.Zones[4].Connected = false;
 
                 if (m.Data[2] != 255) senderDevice.Timber.Zones[0].CurrentTemperature = m.Data[2] - 75;
                 if (m.Data[3] != 255) senderDevice.Timber.Zones[1].CurrentTemperature = m.Data[3] - 75;

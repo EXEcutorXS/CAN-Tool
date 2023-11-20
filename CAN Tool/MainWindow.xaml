@@ -44,6 +44,7 @@
         <c:RvcToVisibleConverter x:Key="RvcToVisible" />
         <c:HexStringToIntConverter x:Key="HexConverter" />
         <c:HexStringToUlongConverter x:Key="HexToUlongConverter" />
+        <c:NullToVisibleConverter x:Key="NullToVisibleConverter" />
 
     </Window.Resources>
     <Window.DataContext>
@@ -224,8 +225,8 @@
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_common}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
-                    <StackPanel>
-                        <cc:HcuOmniControl DataContext="{Binding SelectedConnectedDevice}"/>
+                    <StackPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullToVisibleConverter}}">
+                        <cc:HcuOmniControl DataContext="{Binding SelectedConnectedDevice}" />
                         <cc:HeaterControl DataContext="{Binding SelectedConnectedDevice}" />
                     </StackPanel>
                 </TabItem>

@@ -25,6 +25,10 @@ namespace OmniProtocol
     public class DeviceViewModel : ViewModel
     {
 
+        public void Transmit(CanMessage msg)
+        {
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
+        }
         public event EventHandler NeedToTransmit;
 
         public bool WaitForFlag(ref bool flag, int delay)

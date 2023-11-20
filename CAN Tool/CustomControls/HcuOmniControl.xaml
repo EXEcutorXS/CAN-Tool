@@ -22,13 +22,13 @@
     <UserControl.DataContext>
         <op:DeviceViewModel />
     </UserControl.DataContext>
-<Grid>
-        <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+<Grid Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHcu},TargetNullValue=Collapsed}" d:Visibility="Visible">
+        <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
-                <CheckBox Margin="10" Style="{StaticResource MaterialDesignActionDarkCheckBox}" IsChecked="{Binding Timber.HeaterEnabled,Mode=OneWay}" IsEnabled="False"></CheckBox>
-                <Button x:Name="HeaterButton" Style="{StaticResource MaterialDesignFlatButton}" FontSize="30" Height="50" Margin="10" Click="HeaterButton_Click">Heater</Button>
-                <CheckBox Margin="10" Style="{StaticResource MaterialDesignActionDarkCheckBox}" IsChecked="{Binding Timber.ElementEbabled,Mode=OneWay}" IsEnabled="False"></CheckBox>
-                <Button x:Name="ElementButton" Style="{StaticResource MaterialDesignFlatButton}" FontSize="30" Height="50" Margin="10" Click="ElementButton_Click">Element</Button>
+
+                <Button x:Name="HeaterButton" Style="{StaticResource MaterialDesignRaisedButton}" FontSize="30" Height="50" Margin="10" Click="HeaterButton_Click" Opacity="{Binding Timber.HeaterEnabled}">Heater</Button>
+
+                <Button x:Name="ElementButton" Style="{StaticResource MaterialDesignRaisedButton}" FontSize="30" Height="50" Margin="10" Click="ElementButton_Click">Element</Button>
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Liquid level: {0:d1},Path=Timber.LiquidLevel}" />
                 <ProgressBar Margin="15" Orientation="Vertical" Maximum="7" Value="{Binding Timber.LiquidLevel}" Height="50" />
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Outside: {0:F1}°,Path=Timber.OutsideTemperature,Converter={StaticResource ToFarenheit}}" />
@@ -39,25 +39,24 @@
                     <StackPanel x:Name="ZoneControlArea" Orientation="Vertical" DataContext="{Binding Timber.SelectedZone}">
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Sun" Foreground="{DynamicResource MaterialDesignBody}" />
-                            <ScrollBar x:Name="DaytimeScroll" Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointDay,Mode=OneWay}" ValueChanged="DayTimeChanged" />
-                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointDay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
+                            <Slider x:Name="DaytimeScroll" Height="40"  Width="400" Margin="10" Minimum="10" Maximum="32" ValueChanged="DayTimeChanged" />
+                            <TextBlock  Margin="3" Style="{StaticResource MaterialDesignHeadline2TextBlock}" d:Text="22°" Text="{Binding TempSetpointDay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
 
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Moon" Foreground="{DynamicResource MaterialDesignBody}" />
-                            <ScrollBar x:Name="NightTimeScroll" Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" Value="{Binding TempSetpointNight,Mode=OneWay}" ValueChanged="NightTimeChanged"></ScrollBar>
-                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding TempSetpointNight,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
+                            <Slider x:Name="NightTimeScroll" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" ValueChanged="NightTimeChanged"></Slider>
+                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" d:Text="20°" Text="{Binding TempSetpointNight,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
 
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" FontSize="30" Margin="10" Click="ToggleZoneModeClick" Content="{Binding State}"></Button>
-                            <CheckBox Style="{StaticResource MaterialDesignActionDarkCheckBox}" Margin="10" IsChecked="{Binding ManualMode,Mode=OneWay}"></CheckBox>
-                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" FontSize="30" Margin="10" Click="ManualButtonClick">Fan Manual</Button>
-                            <ScrollBar x:Name="ManualScroll" Style="{StaticResource MaterialDesignScrollBar}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="100" Value="{Binding ManualPercent,Mode=OneWay}" Visibility="{Binding ManualMode,Converter={StaticResource BoolToVisibileConverter}}" ValueChanged="ManualPercentChanged"></ScrollBar>
-                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding ManualPercent,StringFormat={}{0}%}" Visibility="{Binding ManualMode,Converter={StaticResource BoolToVisibileConverter}}" />
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}" Height="50" FontSize="30" Margin="10" Click="ToggleZoneModeClick" Content="{Binding State}" d:Content="OFF"></Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}" Height="50" FontSize="30" Margin="10" Opacity="{Binding ManualMode ,Converter={StaticResource BoolToOpacity}}" Click="ManualButtonClick">Fan Manual</Button>
+                            <Slider x:Name="ManualScroll" Height="40" Width="400" Margin="10" Minimum="10" Maximum="100" ValueChanged="ManualPercentChanged" IsEnabled="{Binding ManualMode}"></Slider>
+                            <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding ManualPercent,StringFormat={}{0}%}" IsEnabled="{Binding ManualMode}"/>
                         </StackPanel>
                     </StackPanel>
-                    <ListBox ItemsSource="{Binding Timber.Zones}">
+                    <ListBox ItemsSource="{Binding Timber.Zones}" SelectionChanged="ZoneSelected">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
@@ -66,15 +65,17 @@
                         <ListBox.ItemTemplate>
 
                             <DataTemplate>
-                                <RadioButton Style="{StaticResource MaterialDesignChoiceChipAccentRadioButton}" GroupName="Zones" Height="50" FontSize="30" IsChecked="{Binding Selected}" IsEnabled="{Binding Connected,Mode=OneWay}" Visibility="{Binding Connected,Converter={StaticResource BooleanToVisibilityConverter}}" Checked="RadioChecked">
-                                    <StackPanel Orientation="Horizontal">
+                                <Border BorderBrush="{DynamicResource MaterialDesignBodyLight}" BorderThickness="2" CornerRadius="5" Height="50">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Connected}"></TextBlock>
+                                    <StackPanel Orientation="Horizontal" Margin="5">
                                         <TextBlock VerticalAlignment="Center" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}" />
-                                        <fa:ImageAwesome Height="30" Icon="Solid_Fan" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}">
-                                        </fa:ImageAwesome>
                                         <ProgressBar Margin="5" Height="10" Orientation="Vertical" Maximum="100" Value="{Binding CurrentPwm}" />
                                         <TextBlock VerticalAlignment="Center" Text="{Binding CurrentPwm,Mode=OneWay,StringFormat={}{0:d2}%}" />
                                     </StackPanel>
-                                </RadioButton>
+                                    
+                                    </StackPanel>
+                                </Border>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
