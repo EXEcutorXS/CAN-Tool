@@ -86,6 +86,7 @@ t_errors_found	Stored errors found	Ошибок в памяти
 t_no_data	No data	Нет данных
 t_liquid_level	Liquid level	Уровень жидкости
 		
+e_0	No error	Нет ошибки
 e_1	Overheat	Перегрев
 e_2	Overheat	Перегрев
 e_3	Error of the overheat temp. sensor	Ошибка датчика перегрева

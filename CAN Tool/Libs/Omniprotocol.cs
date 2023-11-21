@@ -1285,7 +1285,7 @@ namespace OmniProtocol
 
             if (!PGNs.ContainsKey(m.PGN))
             {
-                Debug.WriteLine($"{m.PGN} {GetString("t_not supported")}");
+                //Debug.WriteLine($"{m.PGN} {GetString("t_not supported")}");
                 return; //Такого PGN нет в библиотеке
             }
 

@@ -1,9 +1,13 @@
-﻿using System;
+﻿using CAN_Tool.CustomControls;
+using CAN_Tool.ViewModels;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+
 
 //TODO: Жёстко рефакторить
 //TODO: Раскидать MainWindowViewModel на файлы по табам
@@ -25,6 +29,7 @@ namespace CAN_Tool
 
 	public partial class App : Application
 	{
+
 		private static List<CultureInfo> m_Languages = new List<CultureInfo>();
 
 		public static Settings Settings { set; get; } = new();
@@ -36,12 +41,18 @@ namespace CAN_Tool
 			}
 		}
 
-		public App()
+        public App()
 		{
 			m_Languages.Clear();
 			m_Languages.Add(new CultureInfo("en-US")); //Нейтральная культура для этого проекта
 			m_Languages.Add(new CultureInfo("ru-RU"));
-		}
+
+			var weakRef = new WeakReference(new HcuOmniControl());
+			GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            Assert.IsFalse(weakRef.IsAlive);
+        }
 
 		public static event EventHandler LanguageChanged;
 

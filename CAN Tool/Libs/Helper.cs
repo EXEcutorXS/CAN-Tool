@@ -82,7 +82,7 @@ namespace CAN_Tool.Libs
     {
         public static string GetString(string key)
         {
-            if (string.IsNullOrEmpty(key)) return "";
+            if (string.IsNullOrEmpty(key) || App.Current==null) return "";
             string ret = (string)App.Current.TryFindResource(key);
             if (ret != null)
                 return ret;

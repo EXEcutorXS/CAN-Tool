@@ -1,30 +1,4 @@
-﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow"
-
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:col="clr-namespace:System.Collections;assembly=mscorlib" 
-        xmlns:sys="clr-namespace:System;assembly=mscorlib" 
-        xmlns:vm="clr-namespace:CAN_Tool.ViewModels" 
-        xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators"
-        xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
-        xmlns:cc="clr-namespace:CAN_Tool.CustomControls" 
-        xmlns:fa="http://schemas.fontawesome.com/icons/"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        mc:Ignorable="d" 
-
-        xmlns:sctplt="clr-namespace:ScottPlot;assembly=ScottPlot" Title="Advers CAN-Tool" Height="900" Width="1500"
-        
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Regular"
-        TextElement.FontSize="13"
-        TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignPaper}" 
-        FontFamily="{DynamicResource MaterialDesignFont}"
-        WindowStyle="ThreeDBorderWindow"
-        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:col="clr-namespace:System.Collections;assembly=mscorlib" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" xmlns:cc="clr-namespace:CAN_Tool.CustomControls" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" xmlns:sctplt="clr-namespace:ScottPlot;assembly=ScottPlot" Title="Advers CAN-Tool" Height="900" Width="1500" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="ThreeDBorderWindow" MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
@@ -73,12 +47,11 @@
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="5">
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="5" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="PortNameList" Margin="5" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
-                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" Margin="5" MinWidth="40" ItemsSource="{Binding PhyProtocols}" SelectedItem="{Binding SelectedProtocol}">
-                        </ComboBox>
-                        
+                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" Margin="5" MinWidth="40" ItemsSource="{Binding PhyProtocols}" SelectedItem="{Binding SelectedProtocol}" />
+
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="ModeSelector" Margin="5" MinWidth="70" ItemsSource="{Binding WorkModes}" SelectedIndex="2" SelectedItem="{Binding Mode}" />
 
-                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}"  Margin="5" Content="{Binding PortButtonString,Mode=OneWay}" Command="{Binding TogglePortCommand}" Cursor="Hand" />
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="5" Content="{Binding PortButtonString,Mode=OneWay}" Command="{Binding TogglePortCommand}" Cursor="Hand" />
 
                         <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
 
@@ -126,11 +99,11 @@
                     <TextBlock VerticalAlignment="Center" Margin="10" Text="{DynamicResource t_delay}" FontSize="25" />
                     <TextBox VerticalAlignment="Center" Margin="10" FontSize="25" MinWidth="40">
                         <TextBox.Text>
-                        <Binding Path="MessageDelay" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <v:RangeRule Min="7" Max="5000" />
-                            </Binding.ValidationRules>
-                        </Binding>
+                            <Binding Path="MessageDelay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <v:RangeRule Min="7" Max="5000" />
+                                </Binding.ValidationRules>
+                            </Binding>
                         </TextBox.Text>
                     </TextBox>
 
@@ -171,7 +144,7 @@
                 <TextBlock VerticalAlignment="Center" Margin="10" Text="DLC:" FontSize="25" />
                 <TextBox ToolTip="DLC" MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.DLC,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
                 <TextBlock VerticalAlignment="Center" Margin="10" Text="Data:" FontSize="25" />
-                <cc:DataBox ToolTip="Enter data in HEX format" Margin="10" DataContext="{Binding CanPage}"  Text="{Binding  ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" FontFamily="Courier" />
+                <cc:DataBox ToolTip="Enter data in HEX format" Margin="10" DataContext="{Binding CanPage}" Text="{Binding  ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" FontFamily="Courier" />
                 <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.RTR}" Margin="10" FontSize="20">RTR</CheckBox>
                 <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.IDE}" Margin="10" FontSize="20">IDE</CheckBox>
                 <Button Margin="10" Command="{Binding CanPage.SendCanMessageCommand}">Send</Button>
@@ -226,8 +199,8 @@
                         </StackPanel>
                     </TabItem.Header>
                     <StackPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullToVisibleConverter}}">
-                        <cc:HcuOmniControl DataContext="{Binding SelectedConnectedDevice}" />
-                        <cc:HeaterControl DataContext="{Binding SelectedConnectedDevice}" />
+                        <cc:HcuOmniControl DataContext="{Binding SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}" />
+                        <cc:HeaterControl DataContext="{Binding SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" />
                     </StackPanel>
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -249,32 +222,32 @@
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Type:</TextBlock>
                                     <TextBox ToolTip="Type" MinWidth="50" Margin="5 10" FontSize="25" TextAlignment="Center" VerticalAlignment="Center">
                                         <TextBox.Text>
-                                        <Binding Path="CustomMessage.ReceiverType" UpdateSourceTrigger="PropertyChanged">
-                                            <Binding.ValidationRules>
-                                                <v:RangeRule Min="0" Max="127" />
-                                            </Binding.ValidationRules>
-                                        </Binding>
+                                            <Binding Path="CustomMessage.ReceiverType" UpdateSourceTrigger="PropertyChanged">
+                                                <Binding.ValidationRules>
+                                                    <v:RangeRule Min="0" Max="127" />
+                                                </Binding.ValidationRules>
+                                            </Binding>
                                         </TextBox.Text>
                                     </TextBox>
 
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Adr:</TextBlock>
                                     <TextBox ToolTip="Adress" MinWidth="40" Margin="5 10" FontSize="25" TextAlignment="Center" VerticalAlignment="Center">
                                         <TextBox.Text>
-                                        <Binding Path="CustomMessage.ReceiverAddress" UpdateSourceTrigger="PropertyChanged" >
-                                            <Binding.ValidationRules>
-                                                <v:RangeRule Min="0" Max="7" />
-                                            </Binding.ValidationRules>
-                                        </Binding>
+                                            <Binding Path="CustomMessage.ReceiverAddress" UpdateSourceTrigger="PropertyChanged">
+                                                <Binding.ValidationRules>
+                                                    <v:RangeRule Min="0" Max="7" />
+                                                </Binding.ValidationRules>
+                                            </Binding>
                                         </TextBox.Text>
                                     </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">PGN:</TextBlock>
                                     <TextBox ToolTip="PGN" MinWidth="40" Margin="5 10" FontSize="25" TextAlignment="Center" VerticalAlignment="Center">
                                         <TextBox.Text>
-                                        <Binding Path="CustomMessage.PGN" UpdateSourceTrigger="PropertyChanged" >
-                                            <Binding.ValidationRules>
-                                                <v:RangeRule Min="0" Max="511" />
-                                            </Binding.ValidationRules>
-                                        </Binding>
+                                            <Binding Path="CustomMessage.PGN" UpdateSourceTrigger="PropertyChanged">
+                                                <Binding.ValidationRules>
+                                                    <v:RangeRule Min="0" Max="511" />
+                                                </Binding.ValidationRules>
+                                            </Binding>
                                         </TextBox.Text>
                                     </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Data:</TextBlock>
@@ -321,7 +294,7 @@
                             <DockPanel DockPanel.Dock="Right">
                                 <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedMessage.VerboseInfo,Mode=OneWay}"></TextBlock>
                                 <Expander x:Name="LogExpander" ExpandDirection="Up" Header="Message Log" DockPanel.Dock="Bottom">
-                                    <TextBox  x:Name="LogField" IsReadOnly="True" VerticalScrollBarVisibility="Visible" />
+                                    <TextBox x:Name="LogField" IsReadOnly="True" VerticalScrollBarVisibility="Visible" />
                                 </Expander>
                             </DockPanel>
                         </DockPanel>
@@ -830,7 +803,7 @@
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Priority:</TextBlock>
                         <TextBox Text="{Binding ConstructedMessage.Priority,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}" />
                         <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Data:</TextBlock>
-                        <cc:DataBox  Text="{Binding ConstructedMessage.DataAsULong,Converter={StaticResource HexToUlongConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}"  />
+                        <cc:DataBox Text="{Binding ConstructedMessage.DataAsULong,Converter={StaticResource HexToUlongConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}" />
                         <Button Margin="10" Command="{Binding SendRvcMessageCommand}">
                             <Button.Content>
                                 <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
@@ -881,7 +854,7 @@
 
                 </DockPanel>
             </TabItem>
-           
+
         </TabControl>
 
     </DockPanel>

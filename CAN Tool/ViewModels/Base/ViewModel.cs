@@ -47,7 +47,7 @@ namespace CAN_Tool.ViewModels.Base
                 //foreach (var property in GetType().GetProperties()) OnPropertyChanged(property.Name);
 
                 OnPropertyChanged(PropertyName);
-                CommandManager.InvalidateRequerySuggested();  //   Фикc необновления статуса кнопок
+                //CommandManager.InvalidateRequerySuggested();  //   Фикc необновления статуса кнопок
 
                 return true;
             }

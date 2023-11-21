@@ -7,6 +7,7 @@ namespace CAN_Tool.Infrastructure.Commands
     {
         private readonly Action<object> _Execute;
         private readonly Func<object, bool> _CanExecute;
+
         public LambdaCommand(Action<object> Execute, Func<object, bool> CanExecute = null)
         {
             _Execute = Execute ?? throw new ArgumentException("Execute method can't be null!");

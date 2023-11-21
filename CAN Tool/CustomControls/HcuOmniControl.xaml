@@ -1,4 +1,15 @@
-﻿<UserControl x:Class="CAN_Tool.CustomControls.HcuOmniControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:op="clr-namespace:OmniProtocol" xmlns:local="clr-namespace:CAN_Tool.CustomControls" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200">
+﻿<UserControl x:Class="CAN_Tool.CustomControls.HcuOmniControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:op="clr-namespace:OmniProtocol"
+             xmlns:local="clr-namespace:CAN_Tool.CustomControls" 
+             xmlns:fa="http://schemas.fontawesome.com/icons/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
+             xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
+             mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200">
     <UserControl.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
@@ -19,16 +30,14 @@
         <c:HexStringToIntConverter x:Key="HexConverter" />
         <c:HexStringToUlongConverter x:Key="HexToUlongConverter" />
     </UserControl.Resources>
-    <UserControl.DataContext>
-        <op:DeviceViewModel />
-    </UserControl.DataContext>
-<Grid Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHcu},TargetNullValue=Collapsed}" d:Visibility="Visible">
+    
+<Grid>
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
 
-                <Button x:Name="HeaterButton" Style="{StaticResource MaterialDesignRaisedButton}" FontSize="30" Height="50" Margin="10" Click="HeaterButton_Click" Opacity="{Binding Timber.HeaterEnabled}">Heater</Button>
+                <Button x:Name="HeaterButton"  FontSize="30" Height="50" Margin="10" Click="HeaterButton_Click" Opacity="{Binding Timber.HeaterEnabled,Converter={StaticResource BoolToOpacity}}">Heater</Button>
 
-                <Button x:Name="ElementButton" Style="{StaticResource MaterialDesignRaisedButton}" FontSize="30" Height="50" Margin="10" Click="ElementButton_Click">Element</Button>
+                <Button x:Name="ElementButton"  FontSize="30" Height="50" Margin="10" Click="ElementButton_Click" Opacity="{Binding Timber.ElementEbabled,Converter={StaticResource BoolToOpacity}}">Element</Button>
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Liquid level: {0:d1},Path=Timber.LiquidLevel}" />
                 <ProgressBar Margin="15" Orientation="Vertical" Maximum="7" Value="{Binding Timber.LiquidLevel}" Height="50" />
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Outside: {0:F1}°,Path=Timber.OutsideTemperature,Converter={StaticResource ToFarenheit}}" />
@@ -50,8 +59,8 @@
 
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <Button Style="{StaticResource MaterialDesignRaisedButton}" Height="50" FontSize="30" Margin="10" Click="ToggleZoneModeClick" Content="{Binding State}" d:Content="OFF"></Button>
-                            <Button Style="{StaticResource MaterialDesignRaisedButton}" Height="50" FontSize="30" Margin="10" Opacity="{Binding ManualMode ,Converter={StaticResource BoolToOpacity}}" Click="ManualButtonClick">Fan Manual</Button>
+                            <Button  Height="50" FontSize="30" Margin="10" Click="ToggleZoneModeClick" Content="{Binding State}" d:Content="OFF"></Button>
+                            <Button  Height="50" FontSize="30" Margin="10" Opacity="{Binding ManualMode ,Converter={StaticResource BoolToOpacity}}" Click="ManualButtonClick">Fan Manual</Button>
                             <Slider x:Name="ManualScroll" Height="40" Width="400" Margin="10" Minimum="10" Maximum="100" ValueChanged="ManualPercentChanged" IsEnabled="{Binding ManualMode}"></Slider>
                             <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" Text="{Binding ManualPercent,StringFormat={}{0}%}" IsEnabled="{Binding ManualMode}"/>
                         </StackPanel>

@@ -192,7 +192,7 @@ namespace CAN_Tool.CustomControls
 
         private void ZoneSelected(object sender, SelectionChangedEventArgs e)
         {
-            int index = (sender as ListView).SelectedIndex;
+            int index = (sender as ListBox).SelectedIndex;
             vm.Timber.SelectedZone = vm.Timber.Zones[index];
         }
     }

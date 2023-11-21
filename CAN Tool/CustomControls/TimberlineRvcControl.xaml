@@ -7,10 +7,9 @@
              xmlns:controls="clr-namespace:CAN_Tool.Controls" 
              xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
              xmlns:local="clr-namespace:CAN_Tool.CustomControls"
-             xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="820" d:DesignWidth="1000" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontSize="15">
-    <UserControl.DataContext>
-        <vm:Timberline20RvcViewModel />
-    </UserControl.DataContext>
+             xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="820" d:DesignWidth="1000" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontSize="15"
+             
+             >
     <UserControl.Resources>
         <c:BoolToOpacity x:Key="BoolToOpacity" />
         <c:FarenheitConverter x:Key="ToFarenheit" />

@@ -111,25 +111,6 @@ namespace OmniProtocol
             ExecuteCommand(20);
         }
 
-        public DeviceViewModel():this(new DeviceId(27,0))
-        {
-            Parameters.GlowPlug = 50;
-            Parameters.Voltage = 13.4;
-            Parameters.FuelPumpMeasured = 2;
-            Parameters.RevMeasured = 51;
-            Parameters.RevSet = 50;
-            Parameters.Stage = 1;
-            Parameters.Mode = 1;
-            serial1 = 122;
-            serial2 = 33;
-            serial3 = 55;
-            Firmware[0] = 27;
-            Firmware[1] = 0;
-            Firmware[2] = 3;
-            Firmware[3] = 3;
-            ProductionDate = new DateOnly(2022, 11, 13);
-        }
-
         public DeviceViewModel(DeviceId newId)
         {
             LogInit();
