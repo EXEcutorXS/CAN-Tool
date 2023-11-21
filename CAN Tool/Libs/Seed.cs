@@ -42,8 +42,8 @@ namespace OmniProtocol
             { 34, new (){ID=34, DevType=DeviceType.Binar, MaxBlower=150}} ,
             { 35, new (){ID=35, DevType=DeviceType.Binar, MaxBlower=150}} ,
             { 37, new (){ID=37, DevType=DeviceType.ExtensionBoard}} ,
-            { 123, new (){ID=123, DevType=DeviceType.Bootloader }} ,
-            { 126, new (){ID=126, DevType=DeviceType.HCU }},
+            { 123, new (){ID=123, DevType=DeviceType.BootLoader }} ,
+            { 126, new (){ID=126, DevType=DeviceType.Hcu }},
             { 255, new (){ID=255}}
         };
             #endregion
@@ -67,7 +67,7 @@ namespace OmniProtocol
             PGNs.Add(16, new() { id = 16, name = "t_adc4-7" });
             PGNs.Add(17, new() { id = 17, name = "t_adc8-11" });
             PGNs.Add(18, new() { id = 18, name = "t_firmware_version" });
-            PGNs.Add(19, new() { id = 19, name = "t_hcu_parameters", multipack = true });
+            PGNs.Add(19, new() { id = 19, name = "t_hcu_parameters", multiPack = true });
             PGNs.Add(20, new() { id = 20, name = "t_failures" });
             PGNs.Add(21, new() { id = 21, name = "t_hcu_status" });
             PGNs.Add(22, new() { id = 22, name = "t_zone_control" });
@@ -77,15 +77,15 @@ namespace OmniProtocol
             PGNs.Add(26, new() { id = 26, name = "t_nighttime_setpoints" });
             PGNs.Add(27, new() { id = 27, name = "t_fan_manual_control" });
             PGNs.Add(28, new() { id = 28, name = "t_total_working_time" });
-            PGNs.Add(29, new() { id = 29, name = "t_Параметры давления", multipack = true });
+            PGNs.Add(29, new() { id = 29, name = "t_Параметры давления", multiPack = true });
             PGNs.Add(30, new() { id = 30, name = "t_remote_wire_engine_air_temp" });
             PGNs.Add(31, new() { id = 31, name = "t_working_time" });
             PGNs.Add(32, new() { id = 32, name = "t_liquid_heater_setup" });
-            PGNs.Add(33, new() { id = 33, name = "t_serial_number", multipack = true });
+            PGNs.Add(33, new() { id = 33, name = "t_serial_number", multiPack = true });
             PGNs.Add(34, new() { id = 34, name = "t_read_flash_by_address_req" });
             PGNs.Add(35, new() { id = 35, name = "t_read_flash_by_address_ans" });
             PGNs.Add(36, new() { id = 36, name = "t_valves_status_probe_valve_failures" });
-            PGNs.Add(37, new() { id = 37, name = "t_air_heater_temperatures", multipack = true });
+            PGNs.Add(37, new() { id = 37, name = "t_air_heater_temperatures", multiPack = true });
             PGNs.Add(38, new() { id = 38, name = "t_panel_temperature" });
             PGNs.Add(39, new() { id = 39, name = "t_drivers_status" });
             PGNs.Add(40, new() { id = 40, name = "t_date_time" });
@@ -95,7 +95,7 @@ namespace OmniProtocol
             PGNs.Add(44, new() { id = 44, name = "t_generic_board_pwm_status" });
             PGNs.Add(45, new() { id = 45, name = "t_generic_board_temp" });
             PGNs.Add(46, new() { id = 46, name = "t_hcu_error_codes" });
-            PGNs.Add(100, new() { id = 100, name = "t_memory_control_old", multipack = true });
+            PGNs.Add(100, new() { id = 100, name = "t_memory_control_old", multiPack = true });
             PGNs.Add(101, new() { id = 101, name = "t_buffer_data_transmitting_old" });
             PGNs.Add(105, new() { id = 105, name = "t_memory_control" });
             PGNs.Add(106, new() { id = 106, name = "t_buffer_data_transmitting" });

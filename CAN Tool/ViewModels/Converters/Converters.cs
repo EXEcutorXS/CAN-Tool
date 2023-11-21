@@ -220,7 +220,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.HCU)
+            if (value != null && (DeviceType)value == DeviceType.Hcu)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;

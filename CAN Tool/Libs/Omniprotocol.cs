@@ -1,42 +1,38 @@
 ﻿using CAN_Adapter;
+using CAN_Tool;
+using CAN_Tool.Libs;
+using CAN_Tool.ViewModels;
 using CAN_Tool.ViewModels.Base;
+using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media;
-using CAN_Tool.Libs;
-using CAN_Tool;
-using ScottPlot;
 using static CAN_Tool.Libs.Helper;
-using CAN_Tool.Infrastructure.Commands;
-using CAN_Tool.ViewModels;
-using System.Windows.Input;
 
 namespace OmniProtocol
 {
-    
+
     public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency }
 
-    public enum DeviceType {Binar, Planar, HCU, ValveControl, Bootloader, CookingPanel, ExtensionBoard }
+    public enum DeviceType {Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard }
 
     public class GotOmniMessageEventArgs : EventArgs
     {
         public OmniMessage receivedMessage;
     }
 
-    public class PGN
+    public class Pgn
     {
         public int id;
         public string name = "";
-        public bool multipack;
+        public bool multiPack;
         public List<OmniPgnParameter> parameters = new();
     }
 
@@ -518,7 +514,7 @@ namespace OmniProtocol
             StringBuilder retString = new StringBuilder();
             if (!Omni.PGNs.ContainsKey(this.PGN))
                 return "PGN not found";
-            PGN pgn = Omni.PGNs[this.PGN];
+            Pgn pgn = Omni.PGNs[this.PGN];
             string sender, receiver;
             if (Omni.Devices.ContainsKey(TransmitterType))
                 sender = Omni.Devices[TransmitterType].Name;
@@ -532,7 +528,7 @@ namespace OmniProtocol
 
 
             retString.Append(GetString(pgn.name) + ";;");
-            if (pgn.multipack)
+            if (pgn.multiPack)
                 retString.Append($"Мультипакет №{Data[0]};");
             if (PGN == 1 && Omni.commands.ContainsKey(Data[1] + Data[0] * 256))
             {
@@ -544,7 +540,7 @@ namespace OmniProtocol
             }
             if (pgn.parameters != null)
                 foreach (OmniPgnParameter p in pgn.parameters)
-                    if (!pgn.multipack || Data[0] == p.PackNumber)
+                    if (!pgn.multiPack || Data[0] == p.PackNumber)
                         retString.Append(PrintParameter(p));
             return retString.ToString();
         }
@@ -568,7 +564,7 @@ namespace OmniProtocol
             if (PGN == 1 || PGN == 2)
                 if (Data[1] != m.Data[1])
                     return false;
-            if (Omni.PGNs[PGN].multipack && Data[0] != m.Data[0]) //Другой номер мультипакета
+            if (Omni.PGNs[PGN].multiPack && Data[0] != m.Data[0]) //Другой номер мультипакета
                 return false;
             return true;
         }
@@ -1216,6 +1212,8 @@ namespace OmniProtocol
             this.canAdapter = canAdapter;
             this.uartAdapter = uartAdapter;
             SeedStaticData();
+            connectedDevices.Add(new DeviceViewModel( new DeviceId(27,0)));
+            connectedDevices.Add(new DeviceViewModel(new DeviceId(126, 1)));
         }
 
         public event EventHandler NewDeviceAquired;
@@ -1229,7 +1227,7 @@ namespace OmniProtocol
 
         public bool UseImperial { set; get; }
 
-        public static Dictionary<int, PGN> PGNs = new();
+        public static Dictionary<int, Pgn> PGNs = new();
 
         public static Dictionary<int, OmniCommand> commands = new();
 
@@ -1294,7 +1292,7 @@ namespace OmniProtocol
             foreach (OmniPgnParameter p in PGNs[m.PGN].parameters)
             {
 
-                if (PGNs[m.PGN].multipack && p.PackNumber != m.Data[0]) continue;
+                if (PGNs[m.PGN].multiPack && p.PackNumber != m.Data[0]) continue;
                 if (p.Var != 0)
                 {
                     StatusVariable sv = new StatusVariable(p.Var);

@@ -65,7 +65,7 @@ namespace CAN_Tool.ViewModels
         private string portButtonString = "Open";
         public string PortButtonString { set => Set(ref portButtonString, value); get => portButtonString; }
 
-        CanAdapter canAdapter;
+        readonly CanAdapter canAdapter;
 
         public CanAdapter CanAdapter { get => canAdapter; }
 
@@ -109,11 +109,11 @@ namespace CAN_Tool.ViewModels
             set => Set(ref portName, value);
         }
 
-        private BindingList<string> _PortList = new BindingList<string>();
+        private BindingList<string> portList = new ();
         public BindingList<string> PortList
         {
-            get => _PortList;
-            set => Set(ref _PortList, value);
+            get => portList;
+            set => Set(ref portList, value);
         }
 
         private string toggleCanLogButtonName = GetString("b_start_can_log");
