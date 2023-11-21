@@ -183,7 +183,7 @@
             </DataGrid>
         </DockPanel>
         <DockPanel Visibility="{Binding Mode,Converter={StaticResource OmniToVisible}}" DockPanel.Dock="Top">
-            <ListBox DockPanel.Dock="Top" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}">
+            <ListBox x:Name="DeviceSelector" DockPanel.Dock="Top" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />

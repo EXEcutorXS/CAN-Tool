@@ -29,6 +29,7 @@ namespace OmniProtocol
         {
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg });
         }
+
         public event EventHandler NeedToTransmit;
 
         public bool WaitForFlag(ref bool flag, int delay)

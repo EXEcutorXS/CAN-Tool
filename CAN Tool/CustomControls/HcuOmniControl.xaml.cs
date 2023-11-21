@@ -66,14 +66,6 @@ namespace CAN_Tool.CustomControls
             vm.Timber.SelectedZone = vm.Timber.Zones[4];
         }
 
-        private void RadioChecked(object sender, RoutedEventArgs e)
-        {
-            DaytimeScroll.Value = vm.Timber.SelectedZone.TempSetpointDay;
-            NightTimeScroll.Value = vm.Timber.SelectedZone.TempSetpointNight;
-            ManualScroll.Value = vm.Timber.SelectedZone.ManualPercent;
-
-        }
-
 
         private void HeaterButton_Click(object sender, RoutedEventArgs e)
         {

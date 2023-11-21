@@ -11,8 +11,7 @@
              xmlns:op="clr-namespace:OmniProtocol"
              d:DesignHeight="600"
              d:DesignWidth="1200"
-             xmlns:fa="http://schemas.fontawesome.com/icons/"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+             xmlns:fa="http://schemas.fontawesome.com/icons/"  >
              
     <UserControl.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />

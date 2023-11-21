@@ -46,12 +46,13 @@ namespace CAN_Tool
 			m_Languages.Clear();
 			m_Languages.Add(new CultureInfo("en-US")); //Нейтральная культура для этого проекта
 			m_Languages.Add(new CultureInfo("ru-RU"));
-
-			var weakRef = new WeakReference(new HcuOmniControl());
+			
+			var weakRef = new WeakReference(new Timberline20RvcViewModel());
 			GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
             Assert.IsFalse(weakRef.IsAlive);
+			
         }
 
 		public static event EventHandler LanguageChanged;
