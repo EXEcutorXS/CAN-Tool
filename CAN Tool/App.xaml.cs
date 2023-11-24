@@ -30,27 +30,19 @@ namespace CAN_Tool
 	public partial class App : Application
 	{
 
-		private static List<CultureInfo> m_Languages = new List<CultureInfo>();
-
-		public static Settings Settings { set; get; } = new();
-		public static List<CultureInfo> Languages
-		{
-			get
-			{
-				return m_Languages;
-			}
-		}
-
         public App()
-		{
-			m_Languages.Clear();
-			m_Languages.Add(new CultureInfo("en-US")); //Нейтральная культура для этого проекта
-			m_Languages.Add(new CultureInfo("ru-RU"));
-		
-			
+        {
+            m_Languages.Clear();
+            m_Languages.Add(new CultureInfo("en-US")); //Нейтральная культура для этого проекта
+            m_Languages.Add(new CultureInfo("ru-RU"));
         }
 
-		public static event EventHandler LanguageChanged;
+        private static List<CultureInfo> m_Languages = new List<CultureInfo>();
+
+		public static Settings Settings { set; get; } = new();
+		public static List<CultureInfo> Languages => m_Languages;
+
+        public static event EventHandler LanguageChanged;
 
 		public static CultureInfo Language
 		{

@@ -21,7 +21,7 @@ using System.Runtime.CompilerServices;
 namespace CAN_Tool.ViewModels
 {
 
-    internal class CanPageViewModel : ViewModel
+    public class CanPageViewModel : ViewModel
     {
         private MainWindowViewModel vm;
         public MainWindowViewModel VM => vm;

@@ -1202,8 +1202,9 @@ namespace OmniProtocol
         }
     }
 
-    public partial class Omni : ViewModel
+    public  partial class Omni : ViewModel
     {
+        private static bool initialized = false;
 
         public Omni(CanAdapter canAdapter, UartAdapter uartAdapter)
         {
@@ -1214,6 +1215,7 @@ namespace OmniProtocol
             SeedStaticData();
             connectedDevices.Add(new DeviceViewModel( new DeviceId(27,0)));
             connectedDevices.Add(new DeviceViewModel(new DeviceId(126, 1)));
+            initialized = true;
         }
 
         public event EventHandler NewDeviceAquired;

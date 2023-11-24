@@ -104,10 +104,9 @@ namespace CAN_Tool
         }
         public MainWindow()
         {
+            vm = new();
+            DataContext = vm;
             InitializeComponent();
-
-
-            vm = (MainWindowViewModel)DataContext;
 
             App.LanguageChanged += LanguageChanged;
 

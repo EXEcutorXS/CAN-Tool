@@ -14,7 +14,7 @@ using System.Windows.Input;
 namespace CAN_Tool.ViewModels
 {
 
-    internal class ManualPageViewModel : ViewModel
+    public class ManualPageViewModel : ViewModel
     {
         public MainWindowViewModel Vm { set; get; }
 

@@ -11,7 +11,8 @@
              xmlns:op="clr-namespace:OmniProtocol"
              d:DesignHeight="600"
              d:DesignWidth="1200"
-             xmlns:fa="http://schemas.fontawesome.com/icons/"  >
+             xmlns:fa="http://schemas.fontawesome.com/icons/"  
+             d:DataContext="{d:DesignInstance Type=op:DeviceViewModel}">
              
     <UserControl.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
@@ -149,7 +150,7 @@
                                         <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="3.3" ScaleY="3.3" />
                                     </ProgressBar.LayoutTransform>
                                 </ProgressBar>
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
                             <TextBlock  Text="{DynamicResource b_fuel_pump_set}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" />
                             <TextBlock Text="{Binding Parameters.FuelPumpMeasured,TargetNullValue=0,StringFormat={}{0:F2}}" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline4TextBlock}"></TextBlock>
                         </StackPanel>

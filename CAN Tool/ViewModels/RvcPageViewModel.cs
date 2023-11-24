@@ -27,7 +27,7 @@ namespace CAN_Tool.ViewModels
         public CanMessage msgToTransmit;
     }
 
-    internal class RvcPageViewModel : ViewModel
+    public class RvcPageViewModel : ViewModel
     {
 
         public Timberline20RvcViewModel Timberline20 { get; }

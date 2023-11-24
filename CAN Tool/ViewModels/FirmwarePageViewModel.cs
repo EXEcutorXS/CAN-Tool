@@ -23,7 +23,7 @@ namespace CAN_Tool.ViewModels
         public byte[] Data;
     }
 
-    internal class FirmwarePageViewModel : ViewModel
+    public class FirmwarePageViewModel : ViewModel
     {
         private int fragmentSize = 512;
 

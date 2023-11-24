@@ -33,7 +33,7 @@ namespace CAN_Tool.ViewModels
     public enum WorkMode_t { Omni, Rvc, RegularCan }
     public enum PhyProt_t { CAN, UART }
 
-    internal class MainWindowViewModel : ViewModel
+    public class MainWindowViewModel : ViewModel
     {
         private SynchronizationContext UIContext = SynchronizationContext.Current;
 
