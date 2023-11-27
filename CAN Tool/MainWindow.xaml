@@ -343,7 +343,7 @@
                             <Button Content="{DynamicResource b_save}" Margin="10" Command="{Binding SaveConfigCommand}" />
                             <Button Content="{DynamicResource b_reset}" Margin="10" Command="{Binding ResetConfigCommand}" />
                         </StackPanel>
-                        <DataGrid DockPanel.Dock="Top" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" x:Name="ConfigParameterField" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.ReadedParameters}">
+                        <DataGrid DockPanel.Dock="Top" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" x:Name="ConfigParameterField" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding SelectedConnectedDevice.ReadParameters}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path = Id}" Header="ID" IsReadOnly="True">
                                 </DataGridTextColumn>
@@ -480,7 +480,7 @@
                                 <Button Content="{DynamicResource b_clear_bb_errors}" Margin="10" Command="{Binding EraseBlackBoxErrorsCommand}"></Button>
                                 <Button Content="{DynamicResource b_save_report}" Margin="10" Command="{Binding SaveReportCommand}"></Button>
                             </StackPanel>
-                            <DataGrid ItemsSource="{Binding SelectedConnectedDevice.BBValues,Mode=OneWay}" AutoGenerateColumns="False" Margin="10" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
+                            <DataGrid ItemsSource="{Binding SelectedConnectedDevice.BbValues,Mode=OneWay}" AutoGenerateColumns="False" Margin="10" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="ID" Binding="{Binding Path=Id,Mode=OneWay}"></DataGridTextColumn>
                                     <DataGridTextColumn Header="{DynamicResource t_value}" Binding="{Binding Path=Value,Mode=OneWay}"></DataGridTextColumn>
@@ -489,7 +489,7 @@
                             </DataGrid>
                         </DockPanel>
                         <DockPanel Grid.Column="1">
-                            <ComboBox Style="{DynamicResource MaterialDesignOutlinedComboBox}" DockPanel.Dock="Top" x:Name="ErrorSelector" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BBErrors, Mode=OneWay}"></ComboBox>
+                            <ComboBox Style="{DynamicResource MaterialDesignOutlinedComboBox}" DockPanel.Dock="Top" x:Name="ErrorSelector" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding SelectedConnectedDevice.BbErrors, Mode=OneWay}"></ComboBox>
                             <DataGrid ItemsSource="{Binding ElementName=ErrorSelector, Path=SelectedItem.Variables,Mode=OneWay}" AutoGenerateColumns="False" Margin="10" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>

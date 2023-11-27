@@ -5,26 +5,24 @@ namespace CAN_Tool.Infrastructure.Commands
 {
     public class LambdaCommand : Command
     {
-        private readonly Action<object> _Execute;
-        private readonly Func<object, bool> _CanExecute;
+        private readonly Action<object> execute;
+        private readonly Func<object, bool> canExecute;
 
-        public LambdaCommand(Action<object> Execute, Func<object, bool> CanExecute = null)
+        public LambdaCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {
-            _Execute = Execute ?? throw new ArgumentException("Execute method can't be null!");
-            if (CanExecute != null) _CanExecute = CanExecute;
-            else
-                CanExecute = (x)=> true;
+            this.execute = execute ?? throw new ArgumentException("Execute method can't be null!");
+            if (canExecute != null) this.canExecute = canExecute;
         }
 
 
         public override bool CanExecute(object parameter)
         {
-            return _CanExecute?.Invoke(parameter) ?? true;
+            return canExecute?.Invoke(parameter) ?? true;
         }
 
         public override void Execute(object parameter)
         {
-            _Execute(parameter);
+            execute(parameter);
         }
     }
 }

@@ -55,7 +55,7 @@
             <RowDefinition Height="55"/>
             <RowDefinition Height="200" />
             <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
+            <RowDefinition Name="LastRow" Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
@@ -184,7 +184,7 @@
 
 
 
-        <DataGrid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="3" ItemsSource="{Binding Log}" AutoGenerateColumns="False">
+        <DataGrid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="3" ItemsSource="{Binding Log}" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" >
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path = Mode}" Header="{DynamicResource b_list_mode}" IsReadOnly="True" />
                 <DataGridTextColumn Binding="{Binding Path = Stage}" Header="{DynamicResource b_list_stage}" IsReadOnly="True" />

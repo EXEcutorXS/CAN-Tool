@@ -55,7 +55,7 @@ namespace CAN_Tool.ViewModels
 
             OmniMessage msg = new();
             msg.PGN = 1;
-            msg.ReceiverId = Vm.SelectedConnectedDevice.ID;
+            msg.ReceiverId = Vm.SelectedConnectedDevice.Id;
             msg.Data[0] = 0;
             msg.Data[1] = 22;
             msg.Data[2] = 0;
@@ -119,7 +119,7 @@ namespace CAN_Tool.ViewModels
         {
             OmniMessage msg = new();
             msg.PGN = 6;
-            msg.ReceiverId = Vm.SelectedConnectedDevice.ID;
+            msg.ReceiverId = Vm.SelectedConnectedDevice.Id;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
@@ -194,10 +194,10 @@ namespace CAN_Tool.ViewModels
             };
             msg.Data[0] = 2;
             
-            for (int к = 0; к <= 100; к++)
+            for (int i = 0; i < 6; i++)
             {
                 Vm.SelectedConnectedDevice.flagTransmissionCheck = false;
-                if (к == 5)
+                if (i == 5)
                 {
                     Vm.OmniInstance.CurrentTask.onFail("Can't check transmission result");
                     return false;
@@ -241,7 +241,7 @@ namespace CAN_Tool.ViewModels
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
                 if (WaitForFlag(ref Vm.SelectedConnectedDevice.flagSetAdrDone, 300))
                 {
-                    if (Vm.SelectedConnectedDevice.fragmentAdress == f.StartAdress)
+                    if (Vm.SelectedConnectedDevice.fragmentAddress == f.StartAdress)
                         break;
                 }
             }
@@ -498,7 +498,7 @@ namespace CAN_Tool.ViewModels
 
         private bool CanUpdateFirmwareCommandExecute(object parameter)
         {
-            return (Vm.SelectedConnectedDevice != null && Vm.SelectedConnectedDevice.ID.Type == 123 && fragments.Count > 0);
+            return (Vm.SelectedConnectedDevice != null && Vm.SelectedConnectedDevice.Id.Type == 123 && fragments.Count > 0);
         }
 
         public FirmwarePageViewModel(MainWindowViewModel vm)

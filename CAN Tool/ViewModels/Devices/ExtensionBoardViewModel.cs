@@ -46,7 +46,7 @@ namespace CAN_Tool.Libs.Devices
             if (channel > 3) return;
             OmniMessage msg = new();
             msg.PGN = 43;
-            msg.ReceiverId = parent.ID;
+            msg.ReceiverId = parent.Id;
                 
                     if (PwmChannels[channel] > 0)
                     {

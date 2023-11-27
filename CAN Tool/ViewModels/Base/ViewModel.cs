@@ -10,14 +10,18 @@ namespace CAN_Tool.ViewModels.Base
     [AttributeUsage(AttributeTargets.Property)]
     public class AffectsToAttribute : Attribute
     {
-        string[] props;
-
-        public string[] Props => props;
+        public string[] Props { get; }
 
         public AffectsToAttribute(params string[] propName)
         {
-            props = propName;
+            Props = propName;
         }
+    }
+
+    [AttributeUsage(AttributeTargets.Property)]
+    public class RefreshCommands : Attribute
+    {
+
     }
 
     public abstract class ViewModel : INotifyPropertyChanged, IDisposable
@@ -25,48 +29,44 @@ namespace CAN_Tool.ViewModels.Base
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string PropertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected virtual bool Set<T>(ref T field, T value, [CallerMemberName] string PropertyName = null)
+        protected virtual bool Set<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
         {
-            if (!Equals(field, value))
+            if (Equals(field, value)) return false;
+            field = value;
+            if (propertyName != null)
             {
-                field = value;
-                var attr = GetType().GetProperty(PropertyName)?.GetCustomAttribute(typeof(AffectsToAttribute));
+                var attr = GetType().GetProperty(propertyName)?.GetCustomAttribute(typeof(AffectsToAttribute));
                 if (attr != null)
                 {
-                    AffectsToAttribute at = (AffectsToAttribute)attr;
+                    var at = (AffectsToAttribute)attr;
                     foreach (var p in at.Props)
                         OnPropertyChanged(p);
                 }
-
-                //2 Вариант
-                //foreach (var property in GetType().GetProperties()) OnPropertyChanged(property.Name);
-
-                OnPropertyChanged(PropertyName);
-                //CommandManager.InvalidateRequerySuggested();  //   Фикc необновления статуса кнопок
-
-                return true;
             }
-            else
-                return false;
+
+            OnPropertyChanged(propertyName);
+
+            if (propertyName != null && GetType().GetProperty(propertyName)?.GetCustomAttributes(typeof(RefreshCommands)) != null)
+                CommandManager.InvalidateRequerySuggested();  //   Фикc необновления статуса кнопок
+
+            return true;
         }
 
-        private bool _Disposed;
+        private bool disposed;
 
         public void Dispose()
         {
             Dispose(true);
         }
-        protected virtual void Dispose(bool Disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            if (!Disposing || _Disposed) return;
-            _Disposed = true;
-            //Освобождение занятых ресурсов
-            return;
+            if (!disposing || disposed) return;
+            disposed = true;
         }
 
     }

@@ -243,7 +243,7 @@ namespace CAN_Tool
             vm.CustomMessage.PGN = 1;
             vm.CustomMessage.Data[1] = (byte)cmd.Id;
             if (vm.SelectedConnectedDevice != null)
-                vm.CustomMessage.ReceiverId = vm.SelectedConnectedDevice.ID;
+                vm.CustomMessage.ReceiverId = vm.SelectedConnectedDevice.Id;
 
             int counter = 0;
             foreach (OmniPgnParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))
