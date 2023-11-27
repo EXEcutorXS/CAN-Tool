@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace CAN_Tool.CustomControls
 {
@@ -25,14 +26,32 @@ namespace CAN_Tool.CustomControls
     public partial class HcuOmniControl : UserControl
     {
 
-        enum ZoneState_t {Off,Heat,Fan };
+        enum ZoneState_t { Off, Heat, Fan };
+
+        DispatcherTimer SliderUpdateTimer = new();
 
         DeviceViewModel vm => (DeviceViewModel)DataContext;
 
         public HcuOmniControl()
         {
             InitializeComponent();
-            
+
+            SliderUpdateTimer.Interval = new TimeSpan(0, 0, 1);
+            SliderUpdateTimer.Start();
+            SliderUpdateTimer.Tick += SliderUpdateTimer_Tick;
+
+
+
+        }
+
+        private void SliderUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            if (vm != null && DaytimeScroll.Value != vm.TimberlineParams.SelectedZone.TempSetpointDay)
+                DaytimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetpointDay);
+            if (vm != null && NightTimeScroll.Value != vm.TimberlineParams.SelectedZone.TempSetpointNight)
+                NightTimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetpointNight);
+            if (vm != null && ManualScroll.Value != vm.TimberlineParams.SelectedZone.ManualPercent)
+                ManualScroll.SilentChange(vm.TimberlineParams.SelectedZone.ManualPercent);
         }
 
         private void Zone1Field_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -94,33 +113,6 @@ namespace CAN_Tool.CustomControls
             vm.Transmit(m.ToCanMessage());
         }
 
-
-        private void DayTimeChanged(object sender, RoutedEventArgs e)
-        {
-            if (vm?.TimberlineParams.SelectedZone != null)
-            {
-                OmniMessage m = new();
-                m.ReceiverId = vm.Id;
-                m.PGN = 25;
-                m.Data[vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone)] = Convert.ToByte((sender as Slider).Value + 75);
-                vm.Transmit(m.ToCanMessage());
-            }
-        }
-
-        private void NightTimeChanged(object sender, RoutedEventArgs e)
-        {
-            if (vm != null)
-            {
-                OmniMessage m = new();
-                m.ReceiverId = vm.Id;
-                m.PGN = 26;
-                m.Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-                m.Data[vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone)] = Convert.ToByte((sender as Slider).Value + 75);
-                vm.Transmit(m.ToCanMessage());
-            }
-        }
-
-
         private void ManualButtonClick(object sender, RoutedEventArgs e)
         {
             if (vm != null)
@@ -153,18 +145,27 @@ namespace CAN_Tool.CustomControls
                 int newState = (int)vm.TimberlineParams.SelectedZone.State + 1;
                 if (newState > 2) newState = 0;
                 byte newStateByte = (byte)(~(3 << (zoneNumber % 4)) | newState << (zoneNumber % 4));
-                m.Data[zoneNumber/4] = newStateByte;
+                m.Data[zoneNumber / 4] = newStateByte;
                 vm.Transmit(m.ToCanMessage());
             }
         }
 
 
-        private void ManualPercentChanged(object sender, RoutedEventArgs e)
-        {
 
-            if (vm != null && Convert.ToByte((sender as Slider).Value) != vm.TimberlineParams.SelectedZone.ManualPercent)
+        private void ZoneSelected(object sender, SelectionChangedEventArgs e)
+        {
+            int index = (sender as ListBox).SelectedIndex;
+            vm.TimberlineParams.SelectedZone = vm.TimberlineParams.Zones[index];
+            DaytimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetpointDay);
+            NightTimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetpointNight);
+            ManualScroll.SilentChange(vm.TimberlineParams.SelectedZone.ManualPercent);
+        }
+
+        private void ManualPercentChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (vm != null && Convert.ToByte((sender as SilentSlider).Value) != vm.TimberlineParams.SelectedZone.ManualPercent)
             {
-                var slider = (Slider)sender;
+                var slider = (SilentSlider)sender;
                 var newvalue = Math.Round(slider.Value, 0);
                 if (newvalue > slider.Maximum)
                     newvalue = slider.Maximum;
@@ -176,16 +177,34 @@ namespace CAN_Tool.CustomControls
                 OmniMessage m = new();
                 m.ReceiverId = vm.Id;
                 m.PGN = 27;
-                m.Data[vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone)] = Convert.ToByte((sender as Slider).Value);
-                Thread.Sleep(80);
+                m.Data[vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone)] = Convert.ToByte((sender as SilentSlider).Value);
                 vm.Transmit(m.ToCanMessage());
             }
         }
 
-        private void ZoneSelected(object sender, SelectionChangedEventArgs e)
+        private void NightTimeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            int index = (sender as ListBox).SelectedIndex;
-            vm.TimberlineParams.SelectedZone = vm.TimberlineParams.Zones[index];
+            if (vm != null)
+            {
+                OmniMessage m = new();
+                m.ReceiverId = vm.Id;
+                m.PGN = 26;
+                m.Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+                m.Data[vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone)] = Convert.ToByte((sender as SilentSlider).Value + 75);
+                vm.Transmit(m.ToCanMessage());
+            }
+        }
+
+        private void DayTimeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (vm?.TimberlineParams.SelectedZone != null)
+            {
+                OmniMessage m = new();
+                m.ReceiverId = vm.Id;
+                m.PGN = 25;
+                m.Data[vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone)] = Convert.ToByte((sender as SilentSlider).Value + 75);
+                vm.Transmit(m.ToCanMessage());
+            }
         }
     }
 

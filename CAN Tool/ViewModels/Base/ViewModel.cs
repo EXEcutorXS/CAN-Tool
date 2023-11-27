@@ -51,7 +51,7 @@ namespace CAN_Tool.ViewModels.Base
 
             OnPropertyChanged(propertyName);
 
-            if (propertyName != null && GetType().GetProperty(propertyName)?.GetCustomAttributes(typeof(RefreshCommands)) != null)
+            //if (propertyName != null && GetType().GetProperty(propertyName)?.GetCustomAttributes(typeof(RefreshCommands)) != null)
                 CommandManager.InvalidateRequerySuggested();  //   Фикc необновления статуса кнопок
 
             return true;

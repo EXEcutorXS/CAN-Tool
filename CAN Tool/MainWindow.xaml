@@ -180,7 +180,7 @@
             </DataGrid>
         </DockPanel>
         <DockPanel Visibility="{Binding Mode,Converter={StaticResource OmniToVisible}}" DockPanel.Dock="Top">
-            <ListBox x:Name="DeviceSelector" DockPanel.Dock="Top" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding SelectedConnectedDevice}">
+            <ListBox x:Name="DeviceSelector" DockPanel.Dock="Top" ItemsSource="{Binding OmniInstance.ConnectedDevices,Mode=OneWay}" SelectedItem="{Binding SelectedConnectedDevice,Mode=OneWayToSource}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
@@ -198,6 +198,7 @@
                     <StackPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullToVisibleConverter}}">
                         <cc:HcuOmniControl DataContext="{Binding SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}" />
                         <cc:HeaterControl DataContext="{Binding SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" />
+ 
                     </StackPanel>
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -248,7 +249,7 @@
                                         </TextBox.Text>
                                     </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Data:</TextBlock>
-                                    <cc:DataBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource HexToUlongConverter}}" Style="{DynamicResource MaterialDesignTextBox}" />
+                                    <cc:DataBox ToolTip="Enter data in HEX format" Width="200" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignTextBox}" />
                                     <Button Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}" Cursor="Hand">
                                         <Button.Content>
                                             <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />

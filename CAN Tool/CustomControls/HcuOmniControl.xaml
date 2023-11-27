@@ -37,20 +37,20 @@
                     <StackPanel x:Name="ZoneControlArea" Orientation="Vertical" DataContext="{Binding TimberlineParams.SelectedZone}">
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Sun" Foreground="{DynamicResource MaterialDesignBody}" />
-                            <Slider x:Name="DaytimeScroll" Height="40" Width="400" Margin="10" Minimum="10" Maximum="32" ValueChanged="DayTimeChanged" />
+                            <local:SilentSlider x:Name="DaytimeScroll" Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" Height="40" Width="400" Margin="10" Minimum="10" Maximum="32" ValueChanged="DayTimeChanged" />
                             <TextBlock Margin="3" Style="{DynamicResource MaterialDesignHeadline2TextBlock}" d:Text="22°" Text="{Binding TempSetpointDay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
 
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Moon" Foreground="{DynamicResource MaterialDesignBody}" />
-                            <Slider x:Name="NightTimeScroll" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" ValueChanged="NightTimeChanged"></Slider>
+                            <local:SilentSlider x:Name="NightTimeScroll" Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" ValueChanged="NightTimeChanged" />
                             <TextBlock Style="{DynamicResource MaterialDesignHeadline2TextBlock}" d:Text="20°" Text="{Binding TempSetpointNight,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
 
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Button Height="50" FontSize="30" Margin="10" Click="ToggleZoneModeClick" Content="{Binding State}" d:Content="OFF"></Button>
                             <Button Height="50" FontSize="30" Margin="10" Opacity="{Binding ManualMode ,Converter={StaticResource BoolToOpacity}}" Click="ManualButtonClick">Fan Manual</Button>
-                            <Slider x:Name="ManualScroll" Height="40" Width="400" Margin="10" Minimum="10" Maximum="100" ValueChanged="ManualPercentChanged" IsEnabled="{Binding ManualMode}"></Slider>
+                            <local:SilentSlider x:Name="ManualScroll" Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" Height="40" Width="400" Margin="10" Minimum="10" Maximum="100" ValueChanged="ManualPercentChanged" IsEnabled="{Binding ManualMode}" />
                             <TextBlock Style="{DynamicResource MaterialDesignHeadline2TextBlock}" Text="{Binding ManualPercent,StringFormat={}{0}%}" IsEnabled="{Binding ManualMode}" />
                         </StackPanel>
                     </StackPanel>

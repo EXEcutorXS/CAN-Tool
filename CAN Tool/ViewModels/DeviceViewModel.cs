@@ -18,7 +18,27 @@ namespace OmniProtocol
     public class DeviceViewModel : ViewModel
     {
 
+        public DeviceViewModel(DeviceId newId)
+        {
+            LogInit();
+            Id = newId;
+            StartHeaterCommand = new LambdaCommand(x => ExecuteCommand(1, 0xff, 0xff), NotInManual);
+            StopHeaterCommand = new LambdaCommand(x => ExecuteCommand(3), NotInManual);
+            StartPumpCommand = new LambdaCommand(x => ExecuteCommand(4, 0, 0), NotInManual);
+            StartVentCommand = new LambdaCommand(x => ExecuteCommand(10), NotInManual);
+            ClearErrorsCommand = new LambdaCommand(x => ExecuteCommand(5), NotInManual);
+            CalibrateTermocouplesCommand = new LambdaCommand(x => ExecuteCommand(20), NotInManual);
+            if (Omni.Devices.TryGetValue(Id.Type, out var device))
+                DeviceReference = device;
+        }
+
         public void Transmit(CanMessage msg)
+        {
+            if (Application.Current.MainWindow != null)
+                ((MainWindowViewModel)Application.Current.MainWindow.DataContext).CanAdapter.Transmit(msg);
+        }
+
+        public static void TransmitStatic(CanMessage msg)
         {
             if (Application.Current.MainWindow != null)
                 ((MainWindowViewModel)Application.Current.MainWindow.DataContext).CanAdapter.Transmit(msg);
@@ -44,7 +64,7 @@ namespace OmniProtocol
             }
         }
 
-        public bool NotInManual(object parameter) => ManualMode;
+        public bool NotInManual(object parameter) => !ManualMode;
 
         public void ExecuteCommand(int cmdNum, params byte[] data)
         {
@@ -61,61 +81,32 @@ namespace OmniProtocol
             Transmit(msg.ToCanMessage());
         }
 
-        public ICommand StartHeaterCommand { get; }
-        private void OnStartHeaterCommandExecuted(object parameter)
+        public static void ExecuteCommandOnDevice(Tuple<DeviceId, int, byte[]> arg)
         {
-            ExecuteCommand(1, 0xff, 0xff);
+            OmniMessage msg = new();
+            msg.TransmitterType = 126;
+            msg.TransmitterAddress = 6;
+            msg.ReceiverId = arg.Item1;
+            msg.PGN = 1;
+            msg.Data = new byte[8];
+            msg.Data[0] = (byte)(arg.Item2 >> 8);
+            msg.Data[1] = (byte)(arg.Item2 & 0xFF);
+            for (var i = 0; i < arg.Item3.Length; i++)
+                msg.Data[i + 2] = arg.Item3[i];
+            TransmitStatic(msg.ToCanMessage());
         }
 
-
+        public ICommand StartHeaterCommand { get; }
 
         public ICommand StopHeaterCommand { get; }
-        private void OnStopHeaterCommandExecuted(object parameter)
-        {
-            ExecuteCommand(3);
-        }
-
-
 
         public ICommand StartPumpCommand { get; }
-        private void OnStartPumpCommandExecuted(object parameter)
-        {
-            ExecuteCommand(4, 0, 0);
-        }
 
         public ICommand ClearErrorsCommand { get; }
-        private void OnClearErrorsCommandExecuted(object parameter)
-        {
-            ExecuteCommand(5);
-        }
-
 
         public ICommand StartVentCommand { get; }
-        private void OnStartVentCommandExecuted(object parameter)
-        {
-            ExecuteCommand(10);
-        }
-
 
         public ICommand CalibrateTermocouplesCommand { get; }
-        private void OnCalibrateTermocouplesCommandExecuted(object parameter)
-        {
-            ExecuteCommand(20);
-        }
-
-        public DeviceViewModel(DeviceId newId)
-        {
-            LogInit();
-            Id = newId;
-            StartHeaterCommand = new LambdaCommand(OnStartHeaterCommandExecuted, NotInManual);
-            StopHeaterCommand = new LambdaCommand(OnStopHeaterCommandExecuted, NotInManual);
-            StartPumpCommand = new LambdaCommand(OnStartPumpCommandExecuted, NotInManual);
-            StartVentCommand = new LambdaCommand(OnStartVentCommandExecuted, NotInManual);
-            ClearErrorsCommand = new LambdaCommand(OnClearErrorsCommandExecuted, null);
-            CalibrateTermocouplesCommand = new LambdaCommand(OnCalibrateTermocouplesCommandExecuted, NotInManual);
-            if (Omni.Devices.TryGetValue(Id.Type, out var device))
-                DeviceReference = device;
-        }
 
         public MainParameters Parameters { get; set; } = new();
 
@@ -224,8 +215,8 @@ namespace OmniProtocol
 
         public void LogTick()
         {
-            Log.Add(((MainParameters)Parameters.Clone()));
-
+            Log.Insert(0,((MainParameters)Parameters.Clone()));
+            if (Log.Count > 10) Log.RemoveAt(10);
             if (!isLogWriting)
                 return;
 

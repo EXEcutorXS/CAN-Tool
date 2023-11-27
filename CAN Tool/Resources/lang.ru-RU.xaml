@@ -86,6 +86,7 @@
 <v:String x:Key="t_no_data">Нет данных</v:String>
 <v:String x:Key="t_liquid_level">Уровень жидкости</v:String>
 
+<v:String x:Key="e_0">Нет ошибки</v:String>
 <v:String x:Key="e_1">Перегрев</v:String>
 <v:String x:Key="e_2">Перегрев</v:String>
 <v:String x:Key="e_3">Ошибка датчика перегрева</v:String>
@@ -662,8 +663,8 @@
 <v:String x:Key="vars_120">Кнопка ТЭНа</v:String>
 
 <v:String x:Key="m_0-1">Ожидание команды</v:String>
-<v:String x:Key="m_0-2">Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)</v:String>
-<v:String x:Key="m_0-3">Сохранение данных о пуске после завершения работы</v:String>
+<v:String x:Key="m_0-3">Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)</v:String>
+<v:String x:Key="m_0-5">Сохранение данных о пуске после завершения работы</v:String>
 
 <v:String x:Key="m_1-0">Стартовая диагностика</v:String>
 <v:String x:Key="m_1-1">Страгивание нагнетателя воздуха</v:String>

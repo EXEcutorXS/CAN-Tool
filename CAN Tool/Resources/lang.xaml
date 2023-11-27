@@ -86,6 +86,7 @@
 <v:String x:Key="t_no_data">No data</v:String>
 <v:String x:Key="t_liquid_level">Liquid level</v:String>
 
+<v:String x:Key="e_0">No error</v:String>
 <v:String x:Key="e_1">Overheat</v:String>
 <v:String x:Key="e_2">Overheat</v:String>
 <v:String x:Key="e_3">Error of the overheat temp. sensor</v:String>
@@ -662,8 +663,8 @@
 <v:String x:Key="vars_120">Element button</v:String>
 
 <v:String x:Key="m_0-1">Waiting for the command</v:String>
-<v:String x:Key="m_0-2">Blowing on power on</v:String>
-<v:String x:Key="m_0-3">Saving data</v:String>
+<v:String x:Key="m_0-3">Blowing on power on</v:String>
+<v:String x:Key="m_0-5">Saving data</v:String>
 
 <v:String x:Key="m_1-0">Initial diagnostics</v:String>
 <v:String x:Key="m_1-1">Fan starting</v:String>
