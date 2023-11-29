@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OmniProtocol;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace CAN_Tool.CustomControls
 {
@@ -20,9 +22,24 @@ namespace CAN_Tool.CustomControls
     /// </summary>
     public partial class HeaterControl : UserControl
     {
+
+        //public DeviceViewModel Vm => (DeviceViewModel)DataContext;
+        //private DispatcherTimer logTimer = new();
+
         public HeaterControl()
         {
             InitializeComponent();
+
+            //logTimer.Interval = new TimeSpan(0, 0, 1);
+            //logTimer.Tick += LogTimer_Tick;
+            //logTimer.Start();
         }
+
+
+        //private void LogTimer_Tick(object sender, EventArgs e)
+        //{
+        //    if (Vm != null)
+        //        LogField.Items.Add(Vm.Status);
+        //}
     }
 }

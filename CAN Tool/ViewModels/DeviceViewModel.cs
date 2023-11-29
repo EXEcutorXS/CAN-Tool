@@ -216,7 +216,7 @@ namespace OmniProtocol
         public void LogTick()
         {
             Log.Insert(0,((MainParameters)Parameters.Clone()));
-            if (Log.Count > 10) Log.RemoveAt(10);
+            //if (Log.Count > 100) Log.RemoveAt(100);
             if (!isLogWriting)
                 return;
 
@@ -230,7 +230,7 @@ namespace OmniProtocol
                 LogStop();
         }
 
-        public void LogInit(int length = 86400)
+        public void LogInit(int length = 14400)
         {
             LogCurrentPos = 0;
             LogData = new List<double[]>();

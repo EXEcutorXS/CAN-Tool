@@ -195,11 +195,10 @@
                             <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_common}"></TextBlock>
                         </StackPanel>
                     </TabItem.Header>
-                    <StackPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullToVisibleConverter}}">
-                        <cc:HcuOmniControl DataContext="{Binding SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}" />
-                        <cc:HeaterControl DataContext="{Binding SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" />
- 
-                    </StackPanel>
+                    <DockPanel Visibility="{Binding SelectedConnectedDevice,Converter={StaticResource NullToVisibleConverter}}">
+                        <cc:HcuOmniControl DockPanel.Dock="Top" DataContext="{Binding SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}" />
+                        <cc:HeaterControl DockPanel.Dock="Top" DataContext="{Binding SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" />
+                    </DockPanel>
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>

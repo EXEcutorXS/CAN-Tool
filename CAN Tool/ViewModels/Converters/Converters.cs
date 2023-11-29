@@ -515,4 +515,22 @@ namespace CAN_Tool.ViewModels.Converters
         }
     }
 
+    public class ManualEnableConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || value.GetType() != typeof(OmniZoneHandler))
+                return false;
+            OmniZoneHandler zone = (OmniZoneHandler)value;
+            if (zone.Connected!=zoneType_t.Furnace)
+                return false;
+            return zone.ManualMode;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
 }

@@ -50,12 +50,12 @@
             </EventTrigger.Actions>
         </EventTrigger>
     </UserControl.Triggers>
-    <Grid>
+    <DockPanel>
+    <Grid Name="DeviceInfoGrid" DockPanel.Dock="Top">
         <Grid.RowDefinitions>
             <RowDefinition Height="55"/>
             <RowDefinition Height="200" />
             <RowDefinition Height="50" />
-            <RowDefinition Name="LastRow" Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
@@ -78,8 +78,8 @@
             <TextBlock Margin="5" Grid.Row="0" Text="{Binding FirmwareAsText}" VerticalAlignment="Center" FontSize="20" />
             <TextBlock Margin="5" Grid.Row="1" Text="{Binding ProductionDate}" VerticalAlignment="Center" FontSize="20" />
             <TextBlock Margin="5" Grid.Row="2" Text="{Binding SerialAsString}" VerticalAlignment="Center" FontSize="20" />
-            
         </StackPanel>
+        
         <Border Grid.Row="2" Grid.ColumnSpan="3" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignDivider}"  CornerRadius="5" Margin="2">
             <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Left">
                 <Button Margin="2" ToolTip="Run Device" Command="{Binding StartHeaterCommand}">
@@ -181,29 +181,31 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
-        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
-            <DataGrid  ItemsSource="{Binding Log}" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHeaters}}" VerticalAlignment="Stretch" Height="Auto">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Path = Mode}" Header="{DynamicResource b_list_mode}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = Stage}" Header="{DynamicResource b_list_stage}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = StageTime}" Header="{DynamicResource b_list_stagetime}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = WorkTime}" Header="{DynamicResource b_list_worktime}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = Voltage,StringFormat={}{0:F1}}" Header="{DynamicResource b_list_voltage}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = RevSet}" Header="{DynamicResource b_list_rev_set}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = RevMeasured}" Header="{DynamicResource b_list_rev_meas}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = FuelPumpMeasured,StringFormat={}{0:F2}}" Header="{DynamicResource b_list_fuel}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = GlowPlug}" Header="{DynamicResource b_list_glowplug}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = FlameSensor}" Header="{DynamicResource b_list_flamesensor}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = BodyTemp}" Header="{DynamicResource b_list_bodytemp}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = InletTemp}" Header="{DynamicResource b_list_inlettemp}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = PanelTemp}" Header="{DynamicResource b_list_paneltemp}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = LiquidTemp}" Header="{DynamicResource b_list_liqtemp}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = OverheatTemp}" Header="{DynamicResource b_list_overheattemp}" IsReadOnly="True" />
-                    <DataGridTextColumn Binding="{Binding Path = Error}" Header="{DynamicResource b_list_error}" IsReadOnly="True" />
-
-                </DataGrid.Columns>
-            </DataGrid>
-        </StackPanel>
-
+        
+           
+        
+    
     </Grid>
+        <DataGrid Name="LogDataGrid" DockPanel.Dock="Top" ItemsSource="{Binding Log}" AutoGenerateColumns="False" IsReadOnly="true" VerticalScrollBarVisibility="Auto" MaxHeight="500">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path = Mode,Mode=OneTime}" Header="{DynamicResource b_list_mode}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = Stage,Mode=OneTime}" Header="{DynamicResource b_list_stage}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = StageTime,Mode=OneTime}" Header="{DynamicResource b_list_stagetime}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = WorkTime,Mode=OneTime}" Header="{DynamicResource b_list_worktime}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = Voltage,Mode=OneTime,StringFormat={}{0:F1}}" Header="{DynamicResource b_list_voltage}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = RevSet,Mode=OneTime}" Header="{DynamicResource b_list_rev_set}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = RevMeasured,Mode=OneTime}" Header="{DynamicResource b_list_rev_meas}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = FuelPumpMeasured,Mode=OneTime,StringFormat={}{0:F2}}" Header="{DynamicResource b_list_fuel}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = GlowPlug,Mode=OneTime}" Header="{DynamicResource b_list_glowplug}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = FlameSensor,Mode=OneTime}" Header="{DynamicResource b_list_flamesensor}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = BodyTemp,Mode=OneTime}" Header="{DynamicResource b_list_bodytemp}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = InletTemp,Mode=OneTime}" Header="{DynamicResource b_list_inlettemp}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = PanelTemp,Mode=OneTime}" Header="{DynamicResource b_list_paneltemp}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = LiquidTemp,Mode=OneTime}" Header="{DynamicResource b_list_liqtemp}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = OverheatTemp,Mode=OneTime}" Header="{DynamicResource b_list_overheattemp}" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path = Error,Mode=OneTime}" Header="{DynamicResource b_list_error}" IsReadOnly="True" />
+
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
 </UserControl>

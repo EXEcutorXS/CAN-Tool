@@ -297,7 +297,7 @@ namespace CAN_Tool.ViewModels
                         case 0xA9:
                             if ((D[1] & 3) != 3) DomesticWater = (D[1] & 3) != 0;
                             if ((D[2] != 255)) HeaterIconCode = (heaterIcon)D[1];
-                            if (D[3] != 255) LiquidLEvel = D[3];
+                            if (D[3] != 255) LiquidLevel = D[3];
                             if (D[4] + D[5] * 0x100 + D[6] * 0x10000 != 0xFFFFFF) EnginePreheatEstiamtedTime = D[4] + D[5] * 0x100 + D[6] * 0x10000;
                             break;
                         case 0xAA:
@@ -675,7 +675,7 @@ namespace CAN_Tool.ViewModels
         public int OutsideTemperature { set => Set(ref outsideTemperature, value); get => outsideTemperature; }
 
         private int liquidLevel;
-        public int LiquidLEvel { set => Set(ref liquidLevel, value); get => liquidLevel; }
+        public int LiquidLevel { set => Set(ref liquidLevel, value); get => liquidLevel; }
 
         private pumpStatus_t heaterPumpStatus;
         public pumpStatus_t HeaterPumpStatus { set => Set(ref heaterPumpStatus, value); get => heaterPumpStatus; }
@@ -797,7 +797,7 @@ namespace CAN_Tool.ViewModels
             {
                 if (SystemDuration < 24)
                     return $"{systemDuration} H";
-                else if (SystemDuration < 100)
+                else if (SystemDuration < 97)
                     if (SystemDuration % 24 == 0)
                         return $"{systemDuration / 24} D";
                     else

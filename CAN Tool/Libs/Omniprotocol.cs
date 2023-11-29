@@ -167,13 +167,13 @@ namespace OmniProtocol
 
     }
 
-    public class ZoneHandler : ViewModel
+    public class OmniZoneHandler : ViewModel
     {
-        public ZoneHandler(Action<ZoneHandler> NotifierAction)
+        public OmniZoneHandler(Action<OmniZoneHandler> NotifierAction)
         {
             selectedZoneChanged = NotifierAction;
         }
-        private Action<ZoneHandler> selectedZoneChanged;
+        private Action<OmniZoneHandler> selectedZoneChanged;
 
         private int tempSetpointDay = 22;
         public int TempSetpointDay { set => Set(ref tempSetpointDay, value); get => tempSetpointDay; }
@@ -185,13 +185,14 @@ namespace OmniProtocol
         public int CurrentTemperature { set => Set(ref currentTemperature, value); get => currentTemperature; }
 
         private zoneType_t connected = zoneType_t.Disconnected;
+        [AffectsTo(nameof(ManualMode))]
         public  zoneType_t Connected {set => Set(ref connected, value); get => connected; }
 
         private zoneState_t state = zoneState_t.Off;
         public zoneState_t State { set => Set(ref state, value); get => state; }
 
         private bool manualMode = false;
-        public bool ManualMode { set => Set(ref manualMode, value); get => manualMode; }
+        public bool ManualMode { set => Set(ref manualMode, value); get => manualMode && Connected==zoneType_t.Furnace; }
 
         private int manualPercent = 40;
         public int ManualPercent { set => Set(ref manualPercent, value); get => manualPercent; }
@@ -213,7 +214,7 @@ namespace OmniProtocol
 
     public class Timberline20OmniViewModel : ViewModel
     {
-        private void ZoneChanged(ZoneHandler newSelectedZone)
+        private void ZoneChanged(OmniZoneHandler newSelectedZone)
         {
             SelectedZone = newSelectedZone;
         }
@@ -221,7 +222,7 @@ namespace OmniProtocol
         {
             for (int i = 0; i < 5; i++)
             {
-                Zones.Add(new ZoneHandler(ZoneChanged));
+                Zones.Add(new OmniZoneHandler(ZoneChanged));
             }
 
             SelectedZone = zones[0];
@@ -249,12 +250,12 @@ namespace OmniProtocol
 
         public DateTime Time { set => Set(ref time, value); get => time; }
 
-        public BindingList<ZoneHandler> Zones => zones;
+        public BindingList<OmniZoneHandler> Zones => zones;
 
-        private BindingList<ZoneHandler> zones = new();
+        private BindingList<OmniZoneHandler> zones = new();
 
-        private ZoneHandler selectedZone;
-        public ZoneHandler SelectedZone { set => Set(ref selectedZone, value); get => selectedZone; }
+        private OmniZoneHandler selectedZone;
+        public OmniZoneHandler SelectedZone { set => Set(ref selectedZone, value); get => selectedZone; }
 
 
     }

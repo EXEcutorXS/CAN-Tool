@@ -54,7 +54,7 @@
                 <TextBlock Text="{Binding OutsideTemperature,StringFormat={}Outside temp: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding TankTemperature,StringFormat={}Tank temp: {0}°,Converter={StaticResource ToFarenheit}}" />
                 <TextBlock Text="{Binding HeatExchangerTemperature,StringFormat={}Heat exchanger: {0}°,Converter={StaticResource ToFarenheit}}" />
-                <TextBlock Text="{Binding LiquidLEvel,StringFormat={}Liquid level: {0}}" />
+                <TextBlock Text="{Binding LiquidLevel,StringFormat={}Liquid level: {0}}" />
                 <TextBlock Text="{Binding DomesticWater,StringFormat={}Flow sensor: {0}}" />
                 <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding HeaterPumpStatus,StringFormat={}Heater pump: {0}}" />
@@ -99,12 +99,12 @@
             <WrapPanel  Orientation="Vertical" DockPanel.Dock="Left" Margin="10">
                 <StackPanel Margin="5" Orientation="Horizontal">
                     <TextBlock Margin="5" Width="120" VerticalAlignment="Center"> Day start at:</TextBlock>
-                    <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="DayStartSlider"  Margin="5" VerticalAlignment="Center" Minimum="1" Maximum="1430"  LargeChange="10"  SmallChange="10" Width="200" ValueChanged="DayStartChanged"></local:SilentSlider>
+                    <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="DayStartSlider"  Margin="5" VerticalAlignment="Center" Minimum="0" Maximum="1430"  LargeChange="10"  SmallChange="10" Width="200" ValueChanged="DayStartChanged" TickFrequency="10" IsSnapToTickEnabled="True"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding DayStartString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
                     <TextBlock Margin="5" Width="120" VerticalAlignment="Center"> Night start at:</TextBlock>
-                    <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="NightStartSlider" Margin="5" VerticalAlignment="Center" Minimum="1" Maximum="1430"  LargeChange="10"  SmallChange="10" Width="200" ValueChanged="NightStartChanged"></local:SilentSlider>
+                    <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="NightStartSlider" Margin="5" VerticalAlignment="Center" Minimum="0" Maximum="1430" LargeChange="10" SmallChange="10" Width="200" ValueChanged="NightStartChanged" TickFrequency="10" IsSnapToTickEnabled="True"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding NightStartString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
