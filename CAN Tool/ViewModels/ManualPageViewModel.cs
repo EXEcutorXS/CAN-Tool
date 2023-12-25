@@ -145,11 +145,11 @@ namespace CAN_Tool.ViewModels
         private void updateManualMode()
         {
             OmniMessage msg = new();
-            msg.TransmitterType = 126;
-            msg.TransmitterAddress = 6;
-            msg.ReceiverType = Vm.SelectedConnectedDevice.Id.Type;
-            msg.ReceiverAddress = 7;
-            msg.PGN = 1;
+            msg.TransmitterId.Type = 126;
+            msg.TransmitterId.Address = 6;
+            msg.ReceiverId.Type = Vm.SelectedConnectedDevice.Id.Type;
+            msg.ReceiverId.Address = 7;
+            msg.Pgn = 1;
             msg.Data = new byte[8];
             msg.Data[0] = 0;
             msg.Data[1] = 68;

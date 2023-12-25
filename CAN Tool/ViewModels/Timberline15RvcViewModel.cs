@@ -18,7 +18,7 @@ namespace CAN_Tool.ViewModels
 
         public void ProcessMesage(RvcMessage msg)
         {
-            byte[] D = msg.Data;
+            var D = msg.Data;
             switch (msg.Dgn)
             {
                 case 0x1FFF7://Water heater status
@@ -209,7 +209,7 @@ namespace CAN_Tool.ViewModels
             RvcMessage msg = new() { Dgn = 0x1FEF5 };
             msg.Data[0] = 1;
             msg.Data[1] = 1;
-            UInt16 tmp = (UInt16)((temp + 273) * 32);
+            var tmp = (UInt16)((temp + 273) * 32);
             msg.Data[4] = (byte)(tmp & 0xFF);
             msg.Data[5] = (byte)((tmp >> 8) & 0xFF);
 
@@ -222,7 +222,7 @@ namespace CAN_Tool.ViewModels
             RvcMessage msg = new() { Dgn = 0x1FEF5 };
             msg.Data[0] = 1;
             msg.Data[1] = 0;
-            UInt16 tmp = (UInt16)((temp + 273) * 32);
+            var tmp = (UInt16)((temp + 273) * 32);
             msg.Data[4] = (byte)(tmp & 0xFF);
             msg.Data[5] = (byte)((tmp >> 8) & 0xFF);
 
@@ -323,7 +323,7 @@ namespace CAN_Tool.ViewModels
             msg.Dgn = 0x1FF9C;
             msg.Priority = 6;
             msg.Data[0] = 1;
-            UInt16 tmp = (UInt16)((temperature + 273) * 32);
+            var tmp = (UInt16)((temperature + 273) * 32);
             msg.Data[1] = (byte)tmp;
             msg.Data[2] = (byte)(tmp >> 8);
 

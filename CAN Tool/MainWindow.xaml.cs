@@ -1,5 +1,4 @@
 ﻿using OmniProtocol;
-using CAN_Adapter;
 using CAN_Tool.ViewModels;
 using MaterialDesignThemes.Wpf;
 using ScottPlot.MarkerShapes;
@@ -45,10 +44,10 @@ namespace CAN_Tool
                 LineStyles[i] = ScottPlot.LineStyle.Solid;
             }
         }
-        public bool isDark { get; set; }
+        public bool IsDark { get; set; }
         public bool ExpertModeOn { set; get; }
-        public int themeNumber { get; set; }
-        public int langaugeNumber { get; set; }
+        public int ThemeNumber { get; set; }
+        public int LangaugeNumber { get; set; }
 
         public Color[] Colors { get; set; }
 
@@ -136,9 +135,9 @@ namespace CAN_Tool
 
             TryToLoadSettings();
 
-            menuLanguage.SelectedIndex = App.Settings.langaugeNumber;
-            menuColor.SelectedIndex = App.Settings.themeNumber;
-            DarkModeCheckBox.IsChecked = App.Settings.isDark;
+            menuLanguage.SelectedIndex = App.Settings.LangaugeNumber;
+            menuColor.SelectedIndex = App.Settings.ThemeNumber;
+            DarkModeCheckBox.IsChecked = App.Settings.IsDark;
             ExpertMode.IsChecked = App.Settings.ExpertModeOn;
             ImperialUnits.IsChecked = App.Settings.UseImperial;
         }
@@ -240,10 +239,13 @@ namespace CAN_Tool
             OmniCommand cmd = ((KeyValuePair<int, OmniCommand>)comboBox.SelectedItem).Value;
             CommandParameterPanel.Children.Clear();
             mainWindowViewModel.CommandParametersArray = new double[cmd.Parameters.Count];
-            vm.CustomMessage.PGN = 1;
+            vm.CustomMessage.Pgn = 1;
             vm.CustomMessage.Data[1] = (byte)cmd.Id;
             if (vm.SelectedConnectedDevice != null)
-                vm.CustomMessage.ReceiverId = vm.SelectedConnectedDevice.Id;
+            {
+                vm.CustomMessage.ReceiverId.Address = vm.SelectedConnectedDevice.Id.Address;
+                vm.CustomMessage.ReceiverId.Type = vm.SelectedConnectedDevice.Id.Type;
+            }
 
             int counter = 0;
             foreach (OmniPgnParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))
@@ -356,7 +358,7 @@ namespace CAN_Tool
 
         private void DarkMode_Checked(object sender, RoutedEventArgs e)
         {
-            App.Settings.isDark = (bool)(sender as CheckBox).IsChecked;
+            App.Settings.IsDark = (bool)(sender as CheckBox).IsChecked;
             var resources = Application.Current.Resources.MergedDictionaries;
 
             var existingResourceDictionary = Application.Current.Resources.MergedDictionaries
@@ -364,7 +366,7 @@ namespace CAN_Tool
                                             rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml");
 
 
-            var source = App.Settings.isDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
+            var source = App.Settings.IsDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
             var newResourceDictionary = new ResourceDictionary() { Source = new Uri(source) };
 
             Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
@@ -415,7 +417,7 @@ namespace CAN_Tool
 
             Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
             Application.Current.Resources.MergedDictionaries.Add(newResourceDictionary);
-            App.Settings.themeNumber = menuColor.SelectedIndex;
+            App.Settings.ThemeNumber = menuColor.SelectedIndex;
         }
 
         private void ExitButtonClick(object sender, RoutedEventArgs e)
@@ -426,7 +428,7 @@ namespace CAN_Tool
 
         private void menuLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            App.Settings.langaugeNumber = menuLanguage.SelectedIndex;
+            App.Settings.LangaugeNumber = menuLanguage.SelectedIndex;
         }
 
         private void CanBitrateField_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -474,14 +476,14 @@ namespace CAN_Tool
         {
             CanMessage m = new();
             Random r = new(DateTime.Now.Millisecond);
-            m.IDE = (r.Next(0, 255)%2)==0;
-            m.RTR = (r.Next(0, 255) % 2) == 0;
-            if (m.IDE)
+            m.Ide = (r.Next(0, 255)%2)==0;
+            m.Rtr = (r.Next(0, 255) % 2) == 0;
+            if (m.Ide)
                 m.Id = r.Next(0, 0x1FFFFFFF);
             else
                 m.Id = r.Next(0, 0x7FF);
-            m.DLC = (byte)r.Next(1, 9);
-            for (int i = 0; i < m.DLC; i++)
+            m.Dlc = (byte)r.Next(1, 9);
+            for (int i = 0; i < m.Dlc; i++)
                 m.Data[i] = (byte)r.Next(0, 256);
 
             vm.CanPage.MessageList.TryToAdd(m);

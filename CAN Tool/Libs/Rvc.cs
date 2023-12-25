@@ -2,20 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization;
-using System.IO;
-using CAN_Adapter;
-using System.Formats.Asn1;
-using System.Text.Json;
-using System.Windows.Controls;
 using CAN_Tool.ViewModels.Base;
-using CAN_Tool.ViewModels;
-using System.ComponentModel;
 using OmniProtocol;
 using CAN_Tool.Libs;
-using System.Threading;
-using System.Windows.Data;
 using static CAN_Tool.Libs.Helper;
 using CAN_Tool;
 
@@ -38,7 +27,7 @@ namespace RVC
         custom
     };
 
-    public class DGN:ViewModel
+    public class DGN
     {
         public int Dgn { set; get; }
         public string Name { set; get; }
@@ -54,7 +43,7 @@ namespace RVC
             HasInstance = true;
             Parameters = new List<Parameter>();
 
-            if (idLen>0)
+            if (idLen > 0)
             {
                 Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = paramTyp.instance, Size = 8, frstByte = 0, Id = true });
                 idLength = idLen;
@@ -63,12 +52,12 @@ namespace RVC
 
         public string Decode(byte[] data)
         {
-            string ret = Name + ": ;";
+            var ret = Name + ": ;";
             if (!MultiPack)
-            foreach (Parameter p in Parameters)
-                ret += p.ToString(data) + "; ";
+                foreach (var p in Parameters)
+                    ret += p.ToString(data) + "; ";
             else
-                foreach (Parameter p in Parameters.Where(p => p.multipackNum == data[0]))
+                foreach (var p in Parameters.Where(p => p.multipackNum == data[0]))
                     ret += p.ToString(data) + "; ";
             return ret;
         }
@@ -98,7 +87,7 @@ namespace RVC
 
         public Parameter()
         {
-         
+
         }
 
 
@@ -115,9 +104,9 @@ namespace RVC
                 case 6: ret = data[startByte] >> startBit & 0b111111; break;
                 case 7: ret = data[startByte] >> startBit & 0b1111111; break;
                 case 8: ret = data[startByte]; break;
-                case 16: ret = BitConverter.ToUInt16(new byte[] { data[startByte ], data[startByte+1] });      break;
-                case 24: ret = data[startByte+2] * 65536 + data[startByte + 1] * 256 + data[startByte];      break;
-                case 32: ret = BitConverter.ToUInt32(new byte[] { data[startByte ], data[startByte + 1], data[startByte + 2], data[startByte + 3] });  break;
+                case 16: ret = BitConverter.ToUInt16(new byte[] { data[startByte], data[startByte + 1] }); break;
+                case 24: ret = data[startByte + 2] * 65536 + data[startByte + 1] * 256 + data[startByte]; break;
+                case 32: ret = BitConverter.ToUInt32(new byte[] { data[startByte], data[startByte + 1], data[startByte + 2], data[startByte + 3] }); break;
                 default: throw new Exception("Bad parameter size");
             }
             return ret;
@@ -125,7 +114,7 @@ namespace RVC
 
         public string ToString(byte[] data)
         {
-            string retString = Name + ": ";
+            var retString = Name + ": ";
 
             uint rawData = 0;
             double tempValue = 0;
@@ -223,7 +212,7 @@ namespace RVC
             return retString;
         }
     }
-    public sealed class RvcMessage :  ViewModel, IComparable, IUpdatable<RvcMessage>
+    public sealed class RvcMessage : ViewModel, IComparable, IUpdatable<RvcMessage>
     {
 
         private byte priority;
@@ -240,7 +229,7 @@ namespace RVC
         public byte SourceAdress { set => Set(ref sourceAdress, value); get => sourceAdress; }
         private byte[] data;
         [AffectsTo(nameof(VerboseInfo), nameof(Instance), nameof(DataAsText))]
-        
+
         public byte Instance => Data[0];
 
         [AffectsTo(nameof(VerboseInfo), nameof(DataAsText), nameof(DataAsULong))]
@@ -255,14 +244,14 @@ namespace RVC
         {
             get
             {
-                byte[] temp = new byte[data.Length];
+                var temp = new byte[data.Length];
                 data.CopyTo(temp, 0);
                 Array.Reverse(temp);
                 return BitConverter.ToUInt64(temp);
             }
             set
             {
-                byte[] temp = BitConverter.GetBytes(value);
+                var temp = BitConverter.GetBytes(value);
                 Array.Reverse(temp);
                 Data = temp;
             }
@@ -274,7 +263,7 @@ namespace RVC
         public string GetDataInTextFormat(string beforeString = "", string afterString = "")
         {
             StringBuilder sb = new("");
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
                 sb.Append($"{beforeString}{Data[i]:X02}{afterString}");
             return sb.ToString();
         }
@@ -300,18 +289,18 @@ namespace RVC
             SourceAdress = 101;
             data = new byte[] { 255, 255, 255, 255, 255, 255, 255, 255 };
             Fresh = true;
-            
+
         }
 
-        public RvcMessage(CanMessage msg):base()
+        public RvcMessage(CanMessage msg) : base()
         {
             if (msg == null)
                 throw new ArgumentNullException("Source CAN Message can't be null");
-            if (msg.DLC != 8)
+            if (msg.Dlc != 8)
                 throw new ArgumentException("DLC of Source Message must be 8");
-            if (msg.IDE == false)
+            if (msg.Ide == false)
                 throw new ArgumentException("RV-C supports only extended CAN frame format (IDE=1)");
-            if (msg.RTR == true)
+            if (msg.Rtr == true)
                 throw new ArgumentException("RV-C do not supports data requests (RTR must be 0)");
             Priority = (byte)((msg.Id >> 26) & 7);
             Dgn = msg.Id >> 8 & 0x1FFFF;
@@ -325,9 +314,9 @@ namespace RVC
         {
             var msg = new CanMessage();
             msg.Id = Priority << 26 | Dgn << 8 | SourceAdress;
-            msg.DLC = 8;
-            msg.IDE = true;
-            msg.RTR = false;
+            msg.Dlc = 8;
+            msg.Ide = true;
+            msg.Rtr = false;
             msg.Data = Data;
             return msg;
         }
@@ -345,13 +334,13 @@ namespace RVC
         public override string ToString()
         {
 
-            string ret = $"{Priority} | {Dgn:X05} {SourceAdress:D3} ||";
+            var ret = $"{Priority} | {Dgn:X05} {SourceAdress:D3} ||";
             foreach (var item in Data)
                 ret += $" {item:X02} ";
             return ret;
         }
 
-        public  string VerboseInfo => PrintParameters().Replace(';', '\n');
+        public string VerboseInfo => PrintParameters().Replace(';', '\n');
 
         public string PrintParameters()
         {
@@ -383,12 +372,12 @@ namespace RVC
             updatetick = DateTime.Now.Ticks;
         }
 
-        public bool IsSimmiliarTo(RvcMessage item)
+        public bool IsSimiliarTo(RvcMessage item)
         {
             if (Dgn != item.Dgn) return false;
             if (!RVC.DGNs.ContainsKey(Dgn)) return true;
-            for(int i = 0; i < RVC.DGNs[Dgn].idLength;i++)
-                if (Data[i]!=item.Data[i]) return false;
+            for (var i = 0; i < RVC.DGNs[Dgn].idLength; i++)
+                if (Data[i] != item.Data[i]) return false;
             return true;
 
         }

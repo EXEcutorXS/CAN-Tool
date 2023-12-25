@@ -1,4 +1,4 @@
-﻿using CAN_Adapter;
+﻿using CAN_Tool;
 using CAN_Tool.Infrastructure.Commands;
 using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
@@ -69,10 +69,11 @@ namespace OmniProtocol
         public void ExecuteCommand(int cmdNum, params byte[] data)
         {
             OmniMessage msg = new();
-            msg.TransmitterType = 126;
-            msg.TransmitterAddress = 6;
-            msg.ReceiverId = Id;
-            msg.PGN = 1;
+            msg.TransmitterId.Type = 126;
+            msg.TransmitterId.Address = 6;
+            msg.ReceiverId.Type = id.Type;
+            msg.ReceiverId.Address = id.Address;
+            msg.Pgn = 1;
             msg.Data = new byte[8];
             msg.Data[0] = (byte)(cmdNum >> 8);
             msg.Data[1] = (byte)(cmdNum & 0xFF);
@@ -84,10 +85,11 @@ namespace OmniProtocol
         public static void ExecuteCommandOnDevice(Tuple<DeviceId, int, byte[]> arg)
         {
             OmniMessage msg = new();
-            msg.TransmitterType = 126;
-            msg.TransmitterAddress = 6;
-            msg.ReceiverId = arg.Item1;
-            msg.PGN = 1;
+            msg.TransmitterId.Type = 126;
+            msg.TransmitterId.Address = 6;
+            msg.ReceiverId.Address = arg.Item1.Address;
+            msg.ReceiverId.Type = arg.Item1.Type;
+            msg.Pgn = 1;
             msg.Data = new byte[8];
             msg.Data[0] = (byte)(arg.Item2 >> 8);
             msg.Data[1] = (byte)(arg.Item2 & 0xFF);
@@ -147,7 +149,7 @@ namespace OmniProtocol
 
         public UpdatableList<ReadedBlackBoxValue> BbValues { get; } = new();
 
-        public UpdatableList<BBError> BbErrors { get; } = new();
+        public BindingList<BbError> BbErrors { get; } = new();
 
         public ObservableCollection<MainParameters> Log { get; } = new();
 
@@ -222,7 +224,7 @@ namespace OmniProtocol
 
             if (LogCurrentPos < LogData[0].Length)
             {
-                foreach (StatusVariable sv in Status)
+                foreach (var sv in Status)
                     LogData[sv.Id][LogCurrentPos] = sv.Value;
                 LogCurrentPos++;
             }

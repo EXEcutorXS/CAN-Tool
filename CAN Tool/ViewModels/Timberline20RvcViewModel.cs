@@ -122,7 +122,7 @@ namespace CAN_Tool.ViewModels
 
         public void ProcessMesage(RvcMessage msg)
         {
-            byte[] D = msg.Data;
+            var D = msg.Data;
             switch (msg.Dgn)
             {
                 case 0x1FFF7://Water heater status
@@ -145,8 +145,8 @@ namespace CAN_Tool.ViewModels
                     break;
 
                 case 0x1FE97://Pump status
-                    pumpStatus_t newStatus = pumpStatus_t.off;
-                    bool overriden = false;
+                    var newStatus = pumpStatus_t.off;
+                    var overriden = false;
                     if (D[0] > 8) return;
                     if ((D[1] & 0xF) != 0xF)
                         switch (D[1] & 0xf)
@@ -346,7 +346,7 @@ namespace CAN_Tool.ViewModels
             if (setpoint < 3) setpoint = 3;
 
             RvcMessage msg = new() { Dgn = 0x1FEFB };
-            UInt16 temp = (ushort)((setpoint + 273) * 32);
+            var temp = (ushort)((setpoint + 273) * 32);
             msg.Data[0] = 1;
             msg.Data[2] = (byte)(temp & 0xFF);
             msg.Data[3] = (byte)((temp >> 8) & 0xFF);
@@ -360,7 +360,7 @@ namespace CAN_Tool.ViewModels
             if (hysteresis > 10) hysteresis = 10;
 
             RvcMessage msg = new() { Dgn = 0x1FEFB };
-            byte temp = (byte)(hysteresis * 10);
+            var temp = (byte)(hysteresis * 10);
             msg.Data[0] = 1;
             msg.Data[4] = temp;
 
@@ -499,7 +499,7 @@ namespace CAN_Tool.ViewModels
             RvcMessage msg = new() { Dgn = 0x1FEF5 };
             msg.Data[0] = (byte)(1 + zone);
             msg.Data[1] = 1;
-            ushort tmp = (ushort)((temp + 273) * 32);
+            var tmp = (ushort)((temp + 273) * 32);
             msg.Data[4] = (byte)(tmp & 0xFF);
             msg.Data[5] = (byte)(tmp >> 8 & 0xFF);
 
@@ -512,7 +512,7 @@ namespace CAN_Tool.ViewModels
             RvcMessage msg = new() { Dgn = 0x1FEF5 };
             msg.Data[0] = (byte)(1 + zone);
             msg.Data[1] = 0;
-            ushort tmp = (ushort)((temp + 273) * 32);
+            var tmp = (ushort)((temp + 273) * 32);
             msg.Data[4] = (byte)(tmp & 0xFF);
             msg.Data[5] = (byte)(tmp >> 8 & 0xFF);
 
@@ -643,7 +643,7 @@ namespace CAN_Tool.ViewModels
             msg.Dgn = 0x1FF9C;
             msg.Priority = 6;
             msg.Data[0] = (byte)(1 + zone);
-            ushort tmp = (ushort)((temperature + 273) * 32);
+            var tmp = (ushort)((temperature + 273) * 32);
             msg.Data[1] = (byte)tmp;
             msg.Data[2] = (byte)(tmp >> 8);
 
@@ -824,7 +824,7 @@ namespace CAN_Tool.ViewModels
         {
             get
             {
-                string ampm = "AM";
+                var ampm = "AM";
                 if (DayStartMinutes >= 720)
                     ampm = "PM";
 
@@ -840,7 +840,7 @@ namespace CAN_Tool.ViewModels
         {
             get
             {
-                string ampm = "AM";
+                var ampm = "AM";
                 if (DayStartMinutes >= 720)
                     ampm = "PM";
 

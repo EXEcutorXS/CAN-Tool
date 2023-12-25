@@ -1,21 +1,9 @@
-﻿using CAN_Tool.ViewModels;
+﻿using CAN_Tool.CustomControls;
 using OmniProtocol;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace CAN_Tool.CustomControls
@@ -26,7 +14,7 @@ namespace CAN_Tool.CustomControls
     public partial class HcuOmniControl : UserControl
     {
 
-        enum ZoneState_t { Off, Heat, Fan };
+        enum ZoneStateT { Off, Heat, Fan };
 
         DispatcherTimer SliderUpdateTimer = new();
 
@@ -46,10 +34,10 @@ namespace CAN_Tool.CustomControls
 
         private void SliderUpdateTimer_Tick(object sender, EventArgs e)
         {
-            if (vm != null && DaytimeScroll.Value != vm.TimberlineParams.SelectedZone.TempSetpointDay)
-                DaytimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetpointDay);
-            if (vm != null && NightTimeScroll.Value != vm.TimberlineParams.SelectedZone.TempSetpointNight)
-                NightTimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetpointNight);
+            if (vm != null && DaytimeScroll.Value != vm.TimberlineParams.SelectedZone.TempSetPointDay)
+                DaytimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetPointDay);
+            if (vm != null && NightTimeScroll.Value != vm.TimberlineParams.SelectedZone.TempSetPointNight)
+                NightTimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetPointNight);
             if (vm != null && ManualScroll.Value != vm.TimberlineParams.SelectedZone.ManualPercent)
                 ManualScroll.SilentChange(vm.TimberlineParams.SelectedZone.ManualPercent);
         }
@@ -89,8 +77,9 @@ namespace CAN_Tool.CustomControls
         private void HeaterButton_Click(object sender, RoutedEventArgs e)
         {
             OmniMessage m = new();
-            m.ReceiverId = vm.Id;
-            m.PGN = 22;
+            m.ReceiverId.Address = vm.Id.Address;
+            m.ReceiverId.Type = vm.Id.Type;
+            m.Pgn = 22;
             m.Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
             if (vm.TimberlineParams.HeaterEnabled)
                 m.Data[7] = 0b11111100;
@@ -103,10 +92,11 @@ namespace CAN_Tool.CustomControls
         private void ElementButton_Click(object sender, RoutedEventArgs e)
         {
             OmniMessage m = new();
-            m.ReceiverId = vm.Id;
-            m.PGN = 22;
+            m.ReceiverId.Type = vm.Id.Type;
+            m.ReceiverId.Address = vm.Id.Address;
+            m.Pgn = 22;
             m.Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-            if (vm.TimberlineParams.ElementEbabled)
+            if (vm.TimberlineParams.ElementEnabled)
                 m.Data[7] = 0b11110011;
             else
                 m.Data[7] = 0b11110111;
@@ -118,10 +108,11 @@ namespace CAN_Tool.CustomControls
             if (vm != null)
             {
                 OmniMessage m = new();
-                m.ReceiverId = vm.Id;
-                m.PGN = 27;
+                m.ReceiverId.Address = vm.Id.Address;
+                m.ReceiverId.Type = vm.Id.Type;
+                m.Pgn = 27;
                 m.Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-                int zoneNumber = vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone);
+                var zoneNumber = vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone);
                 switch (zoneNumber)
                 {
                     case 0: if (!vm.TimberlineParams.Zones[0].ManualMode) m.Data[5] = 0b11111101; else m.Data[5] = 0b11111100; break;
@@ -139,12 +130,13 @@ namespace CAN_Tool.CustomControls
             if (vm != null)
             {
                 OmniMessage m = new();
-                m.ReceiverId = vm.Id;
-                m.PGN = 22;
-                int zoneNumber = vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone);
-                int newState = (int)vm.TimberlineParams.SelectedZone.State + 1;
+                m.ReceiverId.Address = vm.Id.Address;
+                m.ReceiverId.Type = vm.Id.Type;
+                m.Pgn = 22;
+                var zoneNumber = vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone);
+                var newState = (int)vm.TimberlineParams.SelectedZone.State + 1;
                 if (newState > 2) newState = 0;
-                byte newStateByte = (byte)(~(3 << (zoneNumber % 4)) | newState << (zoneNumber % 4));
+                var newStateByte = (byte)(~(3 << (zoneNumber % 4)) | newState << (zoneNumber % 4));
                 m.Data[zoneNumber / 4] = newStateByte;
                 vm.Transmit(m.ToCanMessage());
             }
@@ -154,10 +146,10 @@ namespace CAN_Tool.CustomControls
 
         private void ZoneSelected(object sender, SelectionChangedEventArgs e)
         {
-            int index = (sender as ListBox).SelectedIndex;
+            var index = (sender as ListBox).SelectedIndex;
             vm.TimberlineParams.SelectedZone = vm.TimberlineParams.Zones[index];
-            DaytimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetpointDay);
-            NightTimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetpointNight);
+            DaytimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetPointDay);
+            NightTimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetPointNight);
             ManualScroll.SilentChange(vm.TimberlineParams.SelectedZone.ManualPercent);
         }
 
@@ -175,8 +167,9 @@ namespace CAN_Tool.CustomControls
                 // feel free to add code to test against the min, too.
                 slider.Value = newvalue;
                 OmniMessage m = new();
-                m.ReceiverId = vm.Id;
-                m.PGN = 27;
+                m.ReceiverId.Type = vm.Id.Type;
+                m.ReceiverId.Address = vm.Id.Address;
+                m.Pgn = 27;
                 m.Data[vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone)] = Convert.ToByte((sender as SilentSlider).Value);
                 vm.Transmit(m.ToCanMessage());
             }
@@ -187,8 +180,9 @@ namespace CAN_Tool.CustomControls
             if (vm != null)
             {
                 OmniMessage m = new();
-                m.ReceiverId = vm.Id;
-                m.PGN = 26;
+                m.ReceiverId.Type = vm.Id.Type;
+                m.ReceiverId.Address = vm.Id.Address;
+                m.Pgn = 26;
                 m.Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
                 m.Data[vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone)] = Convert.ToByte((sender as SilentSlider).Value + 75);
                 vm.Transmit(m.ToCanMessage());
@@ -200,8 +194,9 @@ namespace CAN_Tool.CustomControls
             if (vm?.TimberlineParams.SelectedZone != null)
             {
                 OmniMessage m = new();
-                m.ReceiverId = vm.Id;
-                m.PGN = 25;
+                m.ReceiverId.Type = vm.Id.Type;
+                m.ReceiverId.Address = vm.Id.Address;
+                m.Pgn = 25;
                 m.Data[vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone)] = Convert.ToByte((sender as SilentSlider).Value + 75);
                 vm.Transmit(m.ToCanMessage());
             }

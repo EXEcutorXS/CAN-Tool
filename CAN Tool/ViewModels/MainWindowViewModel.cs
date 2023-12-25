@@ -1,5 +1,4 @@
 ﻿using OmniProtocol;
-using CAN_Adapter;
 using CAN_Tool.Infrastructure.Commands;
 using CAN_Tool.ViewModels.Base;
 using ScottPlot;
@@ -82,7 +81,7 @@ namespace CAN_Tool.ViewModels
             get => selectedConnectedDevice;
         }
 
-        public Dictionary<int, OmniCommand> Commands => Omni.commands;
+        public Dictionary<int, OmniCommand> Commands => Omni.Commands;
 
         public WpfPlot myChart;
 
@@ -94,9 +93,9 @@ namespace CAN_Tool.ViewModels
             set => Set(ref selectedMessage, value);
         }
 
-        OmniMessage customMessage = new OmniMessage() { PGN = 0, ReceiverAddress = 0, ReceiverType = 27 };
+        OmniMessage customMessage = new OmniMessage() { Pgn = 0, ReceiverId = new(27, 0), };
 
-        public Dictionary<int, OmniCommand> CommandList { get; } = Omni.commands;
+        public Dictionary<int, OmniCommand> CommandList { get; } = Omni.Commands;
 
         public OmniMessage CustomMessage { get => customMessage; set => customMessage.Update(value); }
 
@@ -149,7 +148,7 @@ namespace CAN_Tool.ViewModels
             {
                 canLogging = true;
                 ToggleCanLogButtonName = GetString("b_stop_can_log");
-                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CAN Log_" + DateTime.Now.ToLongTimeString().Replace(':', '.') + ".txt";
+                var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CAN Log_" + DateTime.Now.ToLongTimeString().Replace(':', '.') + ".txt";
                 canLogStream = File.Create(path);
                 canLogFileName = canLogStream.Name;
             }
@@ -176,7 +175,7 @@ namespace CAN_Tool.ViewModels
             {
                 uartLogging = true;
                 ToggleCanLogButtonName = GetString("b_stop_uart_log");
-                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UAR Log_" + DateTime.Now.ToLongTimeString().Replace(':', '.') + ".txt";
+                var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UAR Log_" + DateTime.Now.ToLongTimeString().Replace(':', '.') + ".txt";
                 uartLogStream = File.Create(path);
                 uartLogFileName = uartLogStream.Name;
             }
@@ -235,7 +234,7 @@ namespace CAN_Tool.ViewModels
                     Thread.Sleep(20);
                     canAdapter.SetBitrate(5); //250kb/sec
                     Thread.Sleep(20);
-                    canAdapter.SetAceptCode(0);
+                    canAdapter.SetAcceptCode(0);
                     Thread.Sleep(20);
                     canAdapter.SetMask(0);
                     Thread.Sleep(20);
@@ -274,17 +273,17 @@ namespace CAN_Tool.ViewModels
 
         private async Task loadLogAsync(string path)
         {
-            string[] lines = File.ReadAllLines(path);
-            foreach (string line in lines)
+            var lines = File.ReadAllLines(path);
+            foreach (var line in lines)
             {
                 var parts = line.Split(' ');
                 CanMessage m = new();
                 m.Id = Convert.ToInt32(parts[0], 16);
-                m.DLC = Convert.ToInt32(parts[1], 16);
-                m.IDE = true;
-                m.RTR = false;
+                m.Dlc = Convert.ToInt32(parts[1], 16);
+                m.Ide = true;
+                m.Rtr = false;
 
-                for (int i = 2; i < parts.Length; i++)
+                for (var i = 2; i < parts.Length; i++)
                     m.Data[i - 2] = Convert.ToByte(parts[i], 16);
 
                 canAdapter.InjectMessage(m);
@@ -299,13 +298,13 @@ namespace CAN_Tool.ViewModels
             dialog.DefaultExt = ".txt"; // Default file extension
             dialog.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
 
-            bool? result = dialog.ShowDialog();
+            var result = dialog.ShowDialog();
 
             // Process open file dialog box results
             if (result == true)
             {
                 // Open document
-                string filename = dialog.FileName;
+                var filename = dialog.FileName;
 
                 await loadLogAsync(filename);
             }
@@ -315,17 +314,17 @@ namespace CAN_Tool.ViewModels
 
         private async Task sendLogAsync(string path)
         {
-            string[] lines = File.ReadAllLines(path);
-            foreach (string line in lines)
+            var lines = File.ReadAllLines(path);
+            foreach (var line in lines)
             {
                 var parts = line.Split(' ');
                 CanMessage m = new();
                 m.Id = Convert.ToInt32(parts[0], 16);
-                m.DLC = Convert.ToInt32(parts[1], 16);
-                m.IDE = true;
-                m.RTR = false;
+                m.Dlc = Convert.ToInt32(parts[1], 16);
+                m.Ide = true;
+                m.Rtr = false;
 
-                for (int i = 2; i < parts.Length; i++)
+                for (var i = 2; i < parts.Length; i++)
                     m.Data[i - 2] = Convert.ToByte(parts[i], 16);
 
                 canAdapter.Transmit(m);
@@ -340,13 +339,13 @@ namespace CAN_Tool.ViewModels
             dialog.DefaultExt = ".txt"; // Default file extension
             dialog.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
 
-            bool? result = dialog.ShowDialog();
+            var result = dialog.ShowDialog();
 
             // Process open file dialog box results
             if (result == true)
             {
                 // Open document
-                string filename = dialog.FileName;
+                var filename = dialog.FileName;
 
                 await sendLogAsync(filename);
             }
@@ -355,14 +354,15 @@ namespace CAN_Tool.ViewModels
         public void ExecuteCommand(int cmdNum, params byte[] data)
         {
             OmniMessage msg = new();
-            msg.TransmitterType = 126;
-            msg.TransmitterAddress = 6;
-            msg.ReceiverId = SelectedConnectedDevice.Id;
-            msg.PGN = 1;
+            msg.TransmitterId.Type = 126;
+            msg.TransmitterId.Address = 6;
+            msg.ReceiverId.Address = SelectedConnectedDevice.Id.Address;
+            msg.ReceiverId.Type = SelectedConnectedDevice.Id.Type;
+            msg.Pgn = 1;
             msg.Data = new byte[8];
             msg.Data[0] = (byte)(cmdNum >> 8);
             msg.Data[1] = (byte)(cmdNum & 0xFF);
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
                 msg.Data[i + 2] = data[i];
             CanAdapter.Transmit(msg.ToCanMessage());
         }
@@ -391,7 +391,7 @@ namespace CAN_Tool.ViewModels
         public ICommand ChartDrawCommand { get; }
         private void OnChartDrawCommandExecuted(object parameter)
         {
-            Plot plt = myChart.Plot;
+            var plt = myChart.Plot;
 
             plt.Clear();
 
@@ -408,7 +408,7 @@ namespace CAN_Tool.ViewModels
                         sig.YAxisIndex = 2;
                     plt.Grid(color: System.Drawing.Color.FromArgb(50, 200, 200, 200));
                     plt.Grid(lineStyle: LineStyle.Dot);
-                    if (App.Settings.isDark)
+                    if (App.Settings.IsDark)
                         plt.Style(dataBackground: System.Drawing.Color.FromArgb(255, 40, 40, 40), figureBackground: System.Drawing.Color.DimGray);
                     else
                         plt.Style(dataBackground: System.Drawing.Color.WhiteSmoke, figureBackground: System.Drawing.Color.White);
@@ -425,7 +425,7 @@ namespace CAN_Tool.ViewModels
         public ICommand CancelOperationCommand { get; }
         private void OnCancelOperationCommandExecuted(object parameter)
         {
-            OmniInstance.CurrentTask.onCancel();
+            OmniInstance.CurrentTask.OnCancel();
         }
         private bool CanCancelOperationCommandExecute(object parameter) => (OmniInstance.CurrentTask.Occupied);
 
@@ -508,9 +508,9 @@ namespace CAN_Tool.ViewModels
         public ICommand SaveReportCommand { get; }
         private void OnSaveReportCommandExecuted(object parameter)
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + selectedConnectedDevice.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
-            DocX doc = DocX.Create(path);
-            Paragraph headParagraph = doc.InsertParagraph();
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + selectedConnectedDevice.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
+            var doc = DocX.Create(path);
+            var headParagraph = doc.InsertParagraph();
             headParagraph.AppendLine(GetString("t_device_report") + ": ").Append(selectedConnectedDevice.Name).Bold();
             headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(selectedConnectedDevice.SerialAsString).Bold();
             headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(selectedConnectedDevice.ProductionDate.ToString()).Bold();
@@ -518,7 +518,7 @@ namespace CAN_Tool.ViewModels
             headParagraph.AppendLine();
             headParagraph.AppendLine(GetString("t_common_black_box_data") + ":").FontSize(18);
             headParagraph.Alignment = Alignment.center;
-            Paragraph dataParagraph = doc.InsertParagraph();
+            var dataParagraph = doc.InsertParagraph();
             foreach (var p in selectedConnectedDevice.BbValues)
             {
                 dataParagraph.Append(GetString($"bb_{p.Id}") + ": ");
@@ -558,7 +558,8 @@ namespace CAN_Tool.ViewModels
         public ICommand SendCustomMessageCommand { get; }
         private void OnSendCustomMessageCommandExecuted(object parameter)
         {
-            CustomMessage.TransmitterId = new DeviceId(126, 6);
+            CustomMessage.TransmitterId.Address = 6;
+            CustomMessage.TransmitterId.Type = 126;
             OmniInstance.SendMessage(CustomMessage);
         }
         private bool CanSendCustomMessageCommandExecute(object parameter)
@@ -572,14 +573,14 @@ namespace CAN_Tool.ViewModels
 
         private void OnSaveLogCommandExecuted(object parameter)
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + SelectedConnectedDevice.Id.Type + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + SelectedConnectedDevice.Id.Type + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
 
-            using (StreamWriter sw = new StreamWriter(path))
+            using (var sw = new StreamWriter(path))
             {
                 foreach (var v in SelectedConnectedDevice.Status)
                     sw.Write(GetString($"vars_{v.Id}") + ";");
                 sw.WriteLine();
-                for (int i = 0; i < SelectedConnectedDevice.LogCurrentPos; i++)
+                for (var i = 0; i < SelectedConnectedDevice.LogCurrentPos; i++)
                 {
                     foreach (var v in SelectedConnectedDevice.Status)
                         sw.Write(SelectedConnectedDevice.LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
@@ -671,13 +672,14 @@ namespace CAN_Tool.ViewModels
                         OnChartDrawCommandExecuted(null);
                 }
 
-            foreach (DeviceViewModel d in OmniInstance.ConnectedDevices) //Поддержание связи
+            foreach (var d in OmniInstance.ConnectedDevices) //Поддержание связи
             {
                 OmniMessage msg = new();
-                msg.TransmitterAddress = 6;
-                msg.TransmitterType = 126;
-                msg.PGN = 0;
-                msg.ReceiverId = d.Id;
+                msg.TransmitterId.Address = 6;
+                msg.TransmitterId.Type = 126;
+                msg.Pgn = 0;
+                msg.ReceiverId.Address = d.Id.Address;
+                msg.ReceiverId.Type = d.Id.Type;
                 OmniInstance.SendMessage(msg);
                 Task.Delay(50);
             }
@@ -759,7 +761,7 @@ namespace CAN_Tool.ViewModels
             refreshTimer.Elapsed += RefreshTimerTick;
             refreshTimer.Start();
 
-            OmniInstance.NewDeviceAquired += NewDeviceHandler;
+            OmniInstance.NewDeviceAcquired += NewDeviceHandler;
 
             TogglePortCommand = new LambdaCommand(OnTogglePortCommandExecuted, CanTogglePortCommandExecute);
             RefreshPortListCommand = new LambdaCommand(OnRefreshPortsCommandExecuted);
@@ -790,8 +792,8 @@ namespace CAN_Tool.ViewModels
             ToggleCanLogCommand = new LambdaCommand(OnToggleCanLogCommandExecuted, CanToggleCanLogCommandExecute);
 
 
-            CustomMessage.TransmitterAddress = 6;
-            CustomMessage.TransmitterType = 126;
+            CustomMessage.TransmitterId.Address = 6;
+            CustomMessage.TransmitterId.Type = 126;
 
             brushes.Add(new SolidColorBrush(Colors.Red));
             brushes.Add(new SolidColorBrush(Colors.DeepPink));

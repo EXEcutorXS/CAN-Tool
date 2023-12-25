@@ -1,14 +1,13 @@
-﻿using CAN_Tool.Infrastructure.Commands;
-using CAN_Tool.ViewModels.Base;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using OmniProtocol;
-using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Windows.Controls;
+using System.Collections.Generic;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
-
 namespace CAN_Tool.ViewModels
 {
 
@@ -18,27 +17,23 @@ namespace CAN_Tool.ViewModels
         {
             Data = new byte[len];
         }
-        public uint StartAdress;
+        public uint StartAddress;
         public int Length;
         public byte[] Data;
     }
 
-    public class FirmwarePageViewModel : ViewModel
+    public partial class FirmwarePageViewModel : ObservableObject
     {
+
+        private List<CodeFragment> fragments = new();
+
+        [ObservableProperty]
         private int fragmentSize = 512;
 
+        [ObservableProperty]
         private string log;
-        public string Log { get => log; private set => Set(ref log, value); }
-        public int FragmentSize
-        {
-            get { return fragmentSize; }
-            set { Set(ref fragmentSize, value); }
-        }
 
         public MainWindowViewModel Vm { set; get; }
-
-        #region SwitchToBootloaderCommand
-        public ICommand SwitchToBootloaderCommand { get; }
 
         private void LogWrite(string str)
         {
@@ -50,156 +45,138 @@ namespace CAN_Tool.ViewModels
             Log += str + Environment.NewLine;
         }
 
-        private void OnSwitchToBootloaderCommandExecuted(Object parameter)
+        [RelayCommand]
+        private void SwitchToBootLoader()
         {
-
             OmniMessage msg = new();
-            msg.PGN = 1;
-            msg.ReceiverId = Vm.SelectedConnectedDevice.Id;
+            msg.Pgn = 1;
+            msg.ReceiverId.Address = Vm.SelectedConnectedDevice.Id.Address;
+            msg.ReceiverId.Type = Vm.SelectedConnectedDevice.Id.Type;
             msg.Data[0] = 0;
             msg.Data[1] = 22;
             msg.Data[2] = 0;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
-        #endregion
 
-        #region SwitchToBootloaderCommand
-        public ICommand RequestBootloaderVersionCommand { get; }
 
-        private void OnRequestBootloaderVersioExecuted(Object parameter)
+
+        [RelayCommand]
+        private void RequestBootLoaderVersion()
         {
-
             OmniMessage msg = new();
-            msg.PGN = 6;
-            msg.ReceiverType = 123;
+            msg.Pgn = 6;
+            msg.ReceiverId.Type = 123;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
-        #endregion
-
-        #region SwitchToMainProgramCommand
-        public ICommand SwitchToMainProgramCommand { get; }
-
-        private void OnSwitchToMainProgramCommandExecuted(Object parameter)
+        [RelayCommand]
+        private void SwitchToMainProgram()
         {
-
             OmniMessage msg = new();
-            msg.PGN = 1;
-            msg.ReceiverType = 123;
+            msg.Pgn = 1;
+            msg.ReceiverId.Type = 123;
             msg.Data[0] = 0;
             msg.Data[1] = 22;
             msg.Data[2] = 1;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
-        #endregion
-
-        #region LoadHexCommand
-        public ICommand LoadHexCommand { get; }
-
-        private List<CodeFragment> fragments = new();
-        private void OnLoadHexCommandExecuted(object parameter)
+        [RelayCommand]
+        private void LoadHex()
         {
-            OpenFileDialog dialog = new OpenFileDialog();
+            OpenFileDialog dialog = new();
             dialog.Filter = "Hex Files|*.hex";
             if (!(bool)dialog.ShowDialog()) return;
-            fragments = parseHexFile(dialog.FileName, fragmentSize);
+            fragments = ParseHexFile(dialog.FileName, FragmentSize);
             LogWriteLine($"Hex is loaded, contains {fragments.Count} fragments.");
         }
 
-        #endregion
-
-        #region GetVersionCommand
-        public ICommand GetVersionCommand { get; }
-
-        private void OnGetVersionCommandExecuted(object parameter)
+        [RelayCommand]
+        private void GetVersion()
         {
             OmniMessage msg = new();
-            msg.PGN = 6;
-            msg.ReceiverId = Vm.SelectedConnectedDevice.Id;
+            msg.Pgn = 6;
+            msg.ReceiverId.Address = Vm.SelectedConnectedDevice.Id.Address;
+            msg.ReceiverId.Type = Vm.SelectedConnectedDevice.Id.Type;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
-        #endregion
-
-        private void eraseFlash()
+        private void EraseFlash()
         {
             OmniMessage msg = new();
-            msg.PGN = 105;
-            msg.ReceiverType = 123;
+            msg.Pgn = 105;
+            msg.ReceiverId.Type = 123;
             msg.Data[0] = 6;
             msg.Data[1] = 255;  //Стереть всю память
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
             Vm.SelectedConnectedDevice.flagEraseDone = false;
         }
 
-        private void startFlashing()
+        private void StartFlashing()
         {
             OmniMessage msg = new();
-            msg.PGN = 105;
-            msg.ReceiverType = 123;
+            msg.Pgn = 105;
+            msg.ReceiverId.Type = 123;
             msg.Data[0] = 4;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
         public bool WaitForFlag(ref bool flag, int delay)
         {
-            int wd = 0;
+            var wd = 0;
             while (!flag && wd < delay)
             {
                 wd++;
                 Thread.Sleep(1);
             }
             if (!flag)
-            {
-                flag = false;
                 return false;
-            }
-            else
-            {
-                flag = false;
-                return true;
-            }
+
+            flag = false;
+            return true;
         }
         private void FlashFragment(CodeFragment f)
         {
-            writeFragmentToRam(f);
-            for (int i = 0; i < 4; i++)
+            WriteFragmentToRam(f);
+            for (var i = 0; i < 4; i++)
             {
                 Vm.SelectedConnectedDevice.flagProgramDone = false;
                 if (i == 3)
                 {
-                    Vm.OmniInstance.CurrentTask.onFail("Can't flash memory");
+                    Vm.OmniInstance.CurrentTask.OnFail("Can't flash memory");
                     return;
                 }
-                startFlashing();
+                StartFlashing();
                 if (WaitForFlag(ref Vm.SelectedConnectedDevice.flagProgramDone, 100))
                     break;
             }
         }
 
-
-
-        private bool checkTransmittedData(int len, uint crc)
+        private bool CheckTransmittedData(int len, uint crc)
         {
             OmniMessage msg = new()
             {
-                PGN = 105,
-                ReceiverType = 123
+                Pgn = 105,
+                ReceiverId = new(123,7),
+                Data =
+                {
+                    [0] = 2
+                }
             };
-            msg.Data[0] = 2;
-            
-            for (int i = 0; i < 6; i++)
+
+
+            for (var i = 0; i < 6; i++)
             {
+                i++;
                 Vm.SelectedConnectedDevice.flagTransmissionCheck = false;
                 if (i == 5)
                 {
-                    Vm.OmniInstance.CurrentTask.onFail("Can't check transmission result");
+                    Vm.OmniInstance.CurrentTask.OnFail("Can't check transmission result");
                     return false;
                 }
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
@@ -209,10 +186,8 @@ namespace CAN_Tool.ViewModels
                 if (crc == Vm.SelectedConnectedDevice.receivedFragmentCrc && len == Vm.SelectedConnectedDevice.receivedFragmentLength)
                     return true;
                 else
-                {
                     LogWriteLine("###Transmission failed!");
-                    return false;
-                }
+
             }
             return false;
         }
@@ -222,49 +197,50 @@ namespace CAN_Tool.ViewModels
 
             OmniMessage msg = new()
             {
-                PGN = 105,
-                ReceiverType = 123
+                Pgn = 105,
+                ReceiverId = new(123, 7),
+                Data =
+                {
+                    [0] = 0,
+                    [1] = (byte)(f.StartAddress >> 24),
+                    [2] = (byte)(f.StartAddress >> 16),
+                    [3] = (byte)(f.StartAddress >> 8),
+                    [4] = (byte)(f.StartAddress >> 0)
+                }
             };
-            msg.Data[0] = 0;
-            msg.Data[1] = (byte)(f.StartAdress >> 24);
-            msg.Data[2] = (byte)(f.StartAdress >> 16);
-            msg.Data[3] = (byte)(f.StartAdress >> 8);
-            msg.Data[4] = (byte)(f.StartAdress >> 0);
             for (var i = 0; i < 4; i++)
             {
                 Vm.SelectedConnectedDevice.flagSetAdrDone = false;
                 if (i == 3)
                 {
-                    Vm.OmniInstance.CurrentTask.onFail("Can't set address");
+                    Vm.OmniInstance.CurrentTask.OnFail("Can't set address");
                     return;
                 }
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
-                if (WaitForFlag(ref Vm.SelectedConnectedDevice.flagSetAdrDone, 300))
-                {
-                    if (Vm.SelectedConnectedDevice.fragmentAddress == f.StartAdress)
-                        break;
-                }
+                if (!WaitForFlag(ref Vm.SelectedConnectedDevice.flagSetAdrDone, 300)) continue;
+                if (Vm.SelectedConnectedDevice.fragmentAddress == f.StartAddress)
+                    break;
             }
         }
-        private void writeFragmentToRam(CodeFragment f)
+        private void WriteFragmentToRam(CodeFragment f)
         {
             OmniMessage msg = new()
             {
-                PGN = 106,
-                ReceiverType = 123
+                Pgn = 106,
+                ReceiverId = new(123, 7),
             };
 
-            LogWrite($"Fragment {f.StartAdress:X08}...");
-            for (int k = 0; k < 16; k++)
+            LogWrite($"Fragment {f.StartAddress:X08}...");
+            for (var k = 0; k < 16; k++)
             {
                 SetFragmentAdr(f);
 
-                if (Vm.OmniInstance.CurrentTask.CTS.IsCancellationRequested)
+                if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested)
                     return;
 
-                if (k == 15) { Vm.OmniInstance.CurrentTask.onFail("Can't transmit data pack"); return; }
-                if (k>0)
-                LogWriteLine($"Try: {k+1}");
+                if (k == 15) { Vm.OmniInstance.CurrentTask.OnFail("Can't transmit data pack"); return; }
+                if (k > 0)
+                    LogWriteLine($"Try: {k + 1}");
                 uint crc = 0;
                 var len = 0;
                 Vm.SelectedConnectedDevice.receivedFragmentCrc = 0;
@@ -290,35 +266,35 @@ namespace CAN_Tool.ViewModels
                     Vm.CanAdapter.Transmit(msg.ToCanMessage());
 
                 }
-                if (checkTransmittedData(len, crc)) break;
+                if (CheckTransmittedData(len, crc)) break;
             }
         }
 
-        private void updateFirmware(List<CodeFragment> fragments)
+        private void UpdateFirmware(List<CodeFragment> fragmentsArg)
         {
             LogWriteLine("Starting Firmware updating procedure");
             Vm.OmniInstance.CurrentTask.Capture("Memory Erasing");
             LogWriteLine("Starting flash erasing");
-            for (int i = 0; i < 4; i++)
+            for (var i = 0; i < 4; i++)
             {
-                if (i == 3) { Vm.OmniInstance.CurrentTask.onFail("Can't erase memory"); return; }
-                eraseFlash();
+                if (i == 3) { Vm.OmniInstance.CurrentTask.OnFail("Can't erase memory"); return; }
+                EraseFlash();
                 if (WaitForFlag(ref Vm.SelectedConnectedDevice.flagEraseDone, 5000)) break;
             }
 
-            Vm.OmniInstance.CurrentTask.onDone();
+            Vm.OmniInstance.CurrentTask.OnDone();
 
             Vm.OmniInstance.CurrentTask.Capture("Programming...");
 
-            int cnt = 0;
-            foreach (var f in fragments)
+            var cnt = 0;
+            foreach (var f in fragmentsArg)
             {
                 FlashFragment(f);
-                Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
-                if (Vm.OmniInstance.CurrentTask.CTS.IsCancellationRequested) return;
+                Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragmentsArg.Count;
+                if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested) return;
             }
             LogWriteLine("Firmware updating success");
-            Vm.OmniInstance.CurrentTask.onDone();
+            Vm.OmniInstance.CurrentTask.OnDone();
 
         }
         #region oldVersionBootloader
@@ -338,8 +314,8 @@ namespace CAN_Tool.ViewModels
         {
             LogWriteLine($"Setting adress to 0X{adress:X}");
             AC2PMessage msg = new();
-            msg.PGN = 100;
-            msg.ReceiverType = 123;
+            msg.Pgn = 100;
+            msg.ReceiverId.Type = 123;
             msg.Data[0] = 5;
             msg.Data[1] = 0xFF;
             msg.Data[2] = (byte)((adress >> 24) & 0xFF);
@@ -360,11 +336,11 @@ namespace CAN_Tool.ViewModels
         {
             AC2PMessage msg = new()
             {
-                PGN = 100,
-                TransmitterAddress = 6,
-                TransmitterType = 126,
-                ReceiverAddress = 0,
-                ReceiverType = 123
+                Pgn = 100,
+                TransmitterId.Address = 6,
+                TransmitterId.Type = 126,
+                ReceiverId.Address = 0,
+                ReceiverId.Type = 123
             };
             msg.Data[0] = 1;
 
@@ -376,11 +352,11 @@ namespace CAN_Tool.ViewModels
             int len = 0;
             AC2PMessage msg = new()
             {
-                PGN = 101,
-                TransmitterAddress = 6,
-                TransmitterType = 126,
-                ReceiverAddress = 0,
-                ReceiverType = 123
+                Pgn = 101,
+                TransmitterId.Address = 6,
+                TransmitterId.Type = 126,
+                ReceiverId.Address = 0,
+                ReceiverId.Type = 123
             };
 
             LogWriteLine($"Starting {f.StartAdress:X} fragment transmission");
@@ -437,80 +413,93 @@ namespace CAN_Tool.ViewModels
         */
         #endregion
 
-        public ICommand UpdateFirmwareCommand { get; }
-
-        private List<CodeFragment> parseHexFile(string path, int maxFragment)
+        private void AddFragment(CodeFragment fragment)
+        {
+            fragments.Add(fragment);
+            LogWriteLine($"Fragment added, {fragment.Length} bytes");
+        }
+        private List<CodeFragment> ParseHexFile(string path, int maxFragmentSize)
         {
             fragments.Clear();
-            CodeFragment current = new(maxFragment);
+            CodeFragment currentFragment = new(maxFragmentSize);
             uint pageAddress = 0;
 
-            if (path != null && path.Length > 0)
-                using (StreamReader sr = new (path))
+            if (path is not { Length: > 0 }) return null;
+            uint lastLineAddress = 0;
+            using StreamReader sr = new(path);
+            while (!sr.EndOfStream)
+            {
+                OmniMessage msg = new();
+                var line = sr.ReadLine()?[1..];
+                var bytes = new byte[60];
+                for (var i = 0; i < line?.Length / 2; i++)
+                    bytes[i] = Convert.ToByte(line.Substring(i * 2, 2), 16);
+                int recordLen = bytes[0];
+
+                var lastLineSize = recordLen;
+                switch (bytes[3])
                 {
-                    while (!sr.EndOfStream)
-                    {
-                        OmniMessage msg = new();
-                        string line = sr.ReadLine().Substring(1);
-                        byte[] bytes = new byte[25];
-                        for (int i = 0; i < line.Length / 2; i++)
-                            bytes[i] = Convert.ToByte(line.Substring(i * 2, 2), 16);
-                        int recordLen = bytes[0];
-                        switch (bytes[3])
+                    case 0:
+                        var localAddress = (uint)(bytes[1] * 256 + bytes[2]);
+                        if ((pageAddress + localAddress != lastLineAddress + lastLineSize) && (lastLineAddress != 0)) //Current line is not just after previous, fragment must be divided
                         {
-                            case 0:
-                                var localAddress = (uint)(bytes[1] * 256 + bytes[2]);
-                                if (current.StartAdress == 0) current.StartAdress = pageAddress + localAddress;
-                                for (var i = 0; i < recordLen; i++)
-                                {
-                                    current.Data[current.Length++] = bytes[i + 4];
-                                    if (current.Length == maxFragment)
-                                    {
-                                        fragments.Add(current);
-                                        current = new(maxFragment);
-                                    }
-                                }
-                                break;
-                            case 4:
-                                if (current.Length != 0)
-                                {
-                                    fragments.Add(current);
-                                    current = new(maxFragment);
-                                }
-                                pageAddress = (uint)(bytes[4] * 256 + bytes[5]) << 16;
-                                break;
-                            case 1:
-                                if (current.Length > 0)
-                                    fragments.Add(current);
-                                return fragments;
-
+                            AddFragment(currentFragment);
+                            currentFragment = new CodeFragment(maxFragmentSize);
+                            LogWriteLine($"Line is not after previous. Current:0x{(pageAddress + localAddress):X08},prev:0x{lastLineAddress:X08} + {lastLineSize} bytes");
                         }
-                    }
-                    return fragments;
+                        if (currentFragment.StartAddress == 0) //First line in data fragment, saving address
+                        {
+                            currentFragment.StartAddress = pageAddress + localAddress;
+                            LogWriteLine($"New Fragment Start:0x{(pageAddress + localAddress):X08}");
+                        }
+
+                        var gotNotReserveData = false;
+
+                        for (var i = 0; i < recordLen; i++)
+                        {
+                            if (bytes[i + 4] == 0xff) continue;
+                            gotNotReserveData = true;
+                            break;
+                        }
+
+                        if (gotNotReserveData)
+                            for (var i = 0; i < recordLen; i++)
+                            {
+                                currentFragment.Data[currentFragment.Length++] = bytes[i + 4];
+                                if (currentFragment.Length != maxFragmentSize) continue;
+                                AddFragment(currentFragment);
+                                currentFragment = new CodeFragment(maxFragmentSize);
+                            }
+                        lastLineAddress = currentFragment.StartAddress;
+                        break;
+                    case 4:
+                        if (currentFragment.Length != 0)
+                        {
+                            AddFragment(currentFragment);
+                            currentFragment = new CodeFragment(maxFragmentSize);
+                        }
+                        pageAddress = (uint)(bytes[4] * 256 + bytes[5]) << 16;
+                        LogWriteLine($"Base address:0x{pageAddress:X08}");
+                        break;
+                    case 1:
+                        if (currentFragment.Length > 0)
+                            AddFragment(currentFragment);
+                        return fragments;
+
                 }
-            return null;
+            }
+            return fragments;
         }
 
-        private void OnUpdateFirmwareCommandExecuted(object parameter)
+        [RelayCommand]
+        private void UpdateFirmware()
         {
-            Task.Run(() => updateFirmware(fragments));
-        }
-
-        private bool CanUpdateFirmwareCommandExecute(object parameter)
-        {
-            return (Vm.SelectedConnectedDevice != null && Vm.SelectedConnectedDevice.Id.Type == 123 && fragments.Count > 0);
+            Task.Run(() => UpdateFirmware(fragments));
         }
 
         public FirmwarePageViewModel(MainWindowViewModel vm)
         {
             Vm = vm;
-
-            UpdateFirmwareCommand = new LambdaCommand(OnUpdateFirmwareCommandExecuted, CanUpdateFirmwareCommandExecute);
-            LoadHexCommand = new LambdaCommand(OnLoadHexCommandExecuted, null);
-            SwitchToBootloaderCommand = new LambdaCommand(OnSwitchToBootloaderCommandExecuted, Vm.deviceSelected);
-            SwitchToMainProgramCommand = new LambdaCommand(OnSwitchToMainProgramCommandExecuted, Vm.deviceSelected);
-            RequestBootloaderVersionCommand = new LambdaCommand(OnRequestBootloaderVersioExecuted, Vm.portOpened);
-            GetVersionCommand = new LambdaCommand(OnGetVersionCommandExecuted, Vm.deviceSelected);
         }
     }
 }

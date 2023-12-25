@@ -7,7 +7,6 @@ using OmniProtocol;
 using System.IO.Ports;
 using Microsoft.VisualBasic;
 using System.Windows.Media.Animation;
-using CAN_Adapter;
 
 namespace CAN_Tool.Libs
 {
@@ -54,8 +53,8 @@ namespace CAN_Tool.Libs
             List<byte> txBuffer = new();
             txBuffer.Add(0xCC);
             txBuffer.Add(0xAA);
-            AddByteToTxBuffer((byte)(m.PGN >> 8));
-            AddByteToTxBuffer((byte)(m.PGN & 0xFF));
+            AddByteToTxBuffer((byte)(m.Pgn >> 8));
+            AddByteToTxBuffer((byte)(m.Pgn & 0xFF));
             foreach (byte b in m.Data)
                 AddByteToTxBuffer(b);
             UInt16 crc = calcCrc(txBuffer.ToArray(),10);
@@ -105,9 +104,10 @@ namespace CAN_Tool.Libs
             if (!CheckCrc()) { rxBuffer.Clear(); return; } //wrong CRC - clearing buffer and leaving
 
             OmniMessage msg = new OmniMessage();
-            msg.TransmitterId = ConnectedDevice;
+            msg.TransmitterId.Address = ConnectedDevice.Address;
+            msg.TransmitterId.Type = ConnectedDevice.Type;
             msg.ReceiverId = new DeviceId(126, 6);
-            msg.PGN = rxBuffer[0] * 256 + rxBuffer[1];
+            msg.Pgn = rxBuffer[0] * 256 + rxBuffer[1];
 
             rxBuffer.Skip(2).ToArray().CopyTo(msg.Data, 8);
             GotNewMessage?.Invoke(this, new GotOmniMessageEventArgs() { receivedMessage = msg });

@@ -1,60 +1,48 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿using CAN_Tool;
 using OmniProtocol;
-using System.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 
 namespace CAN_Tool.Libs
 {
-    public interface IUpdatable<T>
+    public interface IUpdatable<in T>
     {
         public void Update(T item);
-
-        public bool IsSimmiliarTo(T item);
-
+        public bool IsSimiliarTo(T item);
     }
 
     public class Trackable<T> : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private T _Value;
+        private T value;
         public T Value
         {
-            get { return _Value; }
-            set { _Value = value; OnPropertyChanged("Value"); }
+            get => value;
+            set { this.value = value; OnPropertyChanged("Value"); }
         }
 
-        void OnPropertyChanged(string propertyName)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
             var handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+        public override string ToString() => Value.ToString();
     }
 
     public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>, IComparable
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="unit">Element to add</param>
-        /// <returns>true - element was added, false - updated</returns>
         public bool TryToAdd(T item)
         {
-            var found = Items.FirstOrDefault(i => i.IsSimmiliarTo(item));
+            var found = Items.FirstOrDefault(i => i.IsSimiliarTo(item));
             if (found == null)
             {
                 if (Count > 0)
                 {
-                    for (int i = 0; i < Count; i++)
+                    for (var i = 0; i < Count; i++)
                     {
                         if (item.CompareTo(Items[i]) <= 0)
                         {
@@ -82,31 +70,29 @@ namespace CAN_Tool.Libs
     {
         public static string GetString(string key)
         {
-            if (string.IsNullOrEmpty(key) || App.Current==null) return "";
-            string ret = (string)App.Current.TryFindResource(key);
+            if (string.IsNullOrEmpty(key) || Application.Current == null) return "";
+            var ret = (string)Application.Current.TryFindResource(key);
             if (ret != null)
                 return ret;
             else
-                return key.Replace('_',' ');
+                return key.Replace('_', ' ');
         }
 
         public static bool GotResource(string key)
         {
-            if (App.Current.TryFindResource(key) != null)
-                return true;
-            else
-                return false;
+            return Application.Current.TryFindResource(key) != null;
         }
 
         public static double ImperialConverter(double val, UnitType type)
         {
-            if (App.Settings.UseImperial)
-                switch (type)
-                {
-                    case UnitType.Temp: return val * 1.8 + 32;
-                    case UnitType.Pressure: return val * 0.14503773773;
-                    case UnitType.Flow: return val /= 4.5461;
-                }
+            if (!App.Settings.UseImperial) return val;
+            if (type == UnitType.Temp)
+                return val * 1.8 + 32;
+            if (type == UnitType.Pressure)
+                return val * 0.14503773773;
+            if (type == UnitType.Flow)
+                return val / 4.5461;
+
             return val;
         }
     }

@@ -12,7 +12,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.ComponentModel;
 using RVC;
-using CAN_Adapter;
 using CAN_Tool.Libs;
 using System.Windows.Threading;
 using System.Windows.Interop;
@@ -86,7 +85,7 @@ namespace CAN_Tool.ViewModels
                 {
                     if (RandomDgn)
                     {
-                        CanMessage msg = new RvcMessage() { Dgn = new Random((int)DateTime.Now.Ticks).Next(0, 0x1FFFF) }.ToCanMessage();
+                        var msg = new RvcMessage() { Dgn = new Random((int)DateTime.Now.Ticks).Next(0, 0x1FFFF) }.ToCanMessage();
                         vm.CanAdapter.Transmit(msg);
                     }
                     else
@@ -126,8 +125,8 @@ namespace CAN_Tool.ViewModels
 
         private void OnSaveRvcLogCommandExecuted(object parameter)
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\RVC_Log.txt";
-            string log = "";
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\RVC_Log.txt";
+            var log = "";
             foreach (var m in MessageList)
                 log += m.ToString() + '|' + m.PrintParameters() + '\n';
             File.WriteAllText(path, log);
@@ -145,7 +144,7 @@ namespace CAN_Tool.ViewModels
 
         private void OnSendRvcMessageCommandExecuted(object parameter)
         {
-            CanMessage msg = ConstructedMessage.ToCanMessage();
+            var msg = ConstructedMessage.ToCanMessage();
             vm.CanAdapter.Transmit(msg);
         }
 

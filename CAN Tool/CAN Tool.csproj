@@ -43,6 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="DocX" Version="2.5.0" />
     <PackageReference Include="FontAwesome5" Version="2.1.11" />
     <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.2.20220510" />
