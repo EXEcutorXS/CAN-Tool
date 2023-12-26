@@ -74,11 +74,11 @@ namespace CAN_Tool.ViewModels
 
         private void SpamTimerTick(object sender, EventArgs e)
         {
-            if (autoSendCounter > SendInterval)
+            if (autoSendCounter > SendInterval/20)
             {
                 autoSendCounter = 0;
-
-                vm.CanAdapter.Transmit(ConstructedMessage);
+                if (AutoSend)
+                    vm.CanAdapter.Transmit(ConstructedMessage);
             }
             else
                 autoSendCounter += 20;

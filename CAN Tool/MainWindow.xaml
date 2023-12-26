@@ -172,9 +172,9 @@
                 </DataGrid.RowStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding IdAsText,Mode=OneWay}"></DataGridTextColumn>
-                    <DataGridCheckBoxColumn Header="IDE" Binding="{Binding IDE,Mode=OneWay}"></DataGridCheckBoxColumn>
-                    <DataGridCheckBoxColumn Header="RTR" Binding="{Binding RTR,Mode=OneWay}"></DataGridCheckBoxColumn>
-                    <DataGridTextColumn Header="DLC" Binding="{Binding DLC,Mode=OneWay}"></DataGridTextColumn>
+                    <DataGridCheckBoxColumn Header="IDE" Binding="{Binding Ide,Mode=OneWay}"></DataGridCheckBoxColumn>
+                    <DataGridCheckBoxColumn Header="RTR" Binding="{Binding Rtr,Mode=OneWay}"></DataGridCheckBoxColumn>
+                    <DataGridTextColumn Header="DLC" Binding="{Binding Dlc,Mode=OneWay}"></DataGridTextColumn>
                     <DataGridTextColumn Header="Data" Binding="{Binding DataAsText,Mode=OneWay}"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
