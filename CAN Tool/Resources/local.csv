@@ -797,7 +797,7 @@ t_receiver_command_ack	Received command ack	Подтверждение на пр
 t_spn_request	SPN request	Запрос параметра или набора данных по определенному номеру (SPN)
 t_spn_answer	SPN answer	Ответ на запрос параметра или набора данных по определенному номеру (SPN)
 t_parameter_write	Parameter or data write	Запись параметра или набора данных устройства
-t_pgn_request	PGN request	Запрос параметров по PGN
+t_pgn_request	Pgn request	Запрос параметров по Pgn
 t_flash_conf_read_write	Read/Write configuration in flash	Запись/чтение параметров работы (конигурация) в/из flash-памяти
 t_black_box_operation	Black box operations	Работа с ЧЯ
 t_stage_mode_failures	Stage,Mode Fail Codes and warnings	Стадия, режим, код неисправности, код предупреждения
@@ -824,7 +824,7 @@ t_remote_wire_engine_air_temp	Status of alarm wire,engine,ambient temperature	С
 t_working_time	Working time	Время работы
 t_liquid_heater_setup	Liquid heater setup	Параметры работы жидкостного подогревателя
 t_read_flash_by_address_req	Read flash by address request	Считать данные из flash по адресу
-t_read_flash_by_address_ans	Read flash by adress answer	Передача данных на запрос по PGN 34
+t_read_flash_by_address_ans	Read flash by adress answer	Передача данных на запрос по Pgn 34
 t_valves _status_probe_valve_failures	Valves status, probe status, valves failures	Передача состояния клапанов, зонда, кода неисправности клапанов
 t_air_heater_temperatures	Air heater temperatures	Температуры воздушных отопителей (мультипакет)
 t_panel_temperature	Panel temperature sensor data	Температура датчика в пульте
@@ -834,27 +834,27 @@ t_buffer_data_transmitting_old	Memory buffer transmitting (obsolete)	Запол�
 t_memory_control	Memory control	Управления памятью (Мультипакет)
 t_buffer_data_transmitting	Memory buffer transmitting	Заполнение буферного массива для последующей записи во флэш
 		
-t_whos_here	Who is here?	Кто здесь?
-t_start_device	Device start	пуск устройства
-t_stop_device	Device stop	остановка устройства
-t_start_pump	Start only pump	пуск только помпы
-t_reset_failures	Clear failure codes	сброс неисправностей
-t_liquid_heater_set_parameters	Liquid heater set parameters	задать параметры работы жидкостного подогревателя
-t_request_deltas	Request power mode transition steps	запрос температурных переходов по режимам жидкостного подогревателя
-t_valves_control	Valves control	задать состояние клапанов устройства ”Блок управления клапанами”
-t_air_heater_set_parameters	Air heater set parameters	задать параметры работы воздушного отопителя
-t_start_vent	Ventilation start	запуск в режиме вентиляции (для воздушных отопителей)
-t_calibration	Thermocouples calibration start	калибровка термопар
-t_set_pwm_freq	Set air blower PWM frequency 	задать параметры частоты ШИМ нагнетателя воздуха
-t_reset_cpu	Reset MCU	Перезагрузка контроллера
-t_failures_mask	Mask failure codes	биты реакции на неисправности
-t_temperature_set	Temperature set	установить значение температуры
-t_do_not_clear_codes	Don't clear error codes	Не сбрасывать неисправности
-t_clear_error_codes	Clear error codes	сброс неисправностей
-t_manual_test_mode_enter	Manual or test mode enter/exit	вход/выход в стадию M (ручное управление) или T (тестирование блока управления)
-t_manual_control	Manual device control	задание параметров устройств в стадии M (ручное управление)
-t_control_executive_devices	Executive devices control	управление устройствами
-t_executive_devices_onoff	Executive devices on/off	Включение/Выключение устройств
+c_0	Who is here?	Кто здесь?
+c_1	Device start	пуск устройства
+c_3	Device stop	остановка устройства
+c_4	Start only pump	пуск только помпы
+c_5	Clear failure codes	сброс неисправностей
+c_6	Liquid heater set parameters	задать параметры работы жидкостного подогревателя
+c_7	Request power mode transition steps	запрос температурных переходов по режимам жидкостного подогревателя
+c_8	Valves control	задать состояние клапанов устройства ”Блок управления клапанами”
+c_9	Air heater set parameters	задать параметры работы воздушного отопителя
+c_10	Ventilation start	запуск в режиме вентиляции (для воздушных отопителей)
+c_20	Thermocouples calibration start	калибровка термопар
+c_21	Set air blower PWM frequency 	задать параметры частоты ШИМ нагнетателя воздуха
+c_22	Reset MCU	Перезагрузка контроллера
+c_45	Mask failure codes	биты реакции на неисправности
+c_65	Temperature set	установить значение температуры
+c_66	Clear error codes	сброс неисправностей
+c_67	Manual or test mode enter/exit	вход/выход в стадию M (ручное управление) или T (тестирование блока управления)
+c_68	Manual device control	задание параметров устройств в стадии M (ручное управление)
+c_69	Executive devices control	управление устройствами
+c_70	Executive devices on/off	Включение/Выключение устройств
+		
 t_device	Device	Устройство
 t_12 volts	12 Volts	12 вольт
 t_24 volts	24 Volts	24 вольта

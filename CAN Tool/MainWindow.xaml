@@ -274,7 +274,7 @@
                                     </Style>
                                 </DataGrid.RowStyle>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding Path = PGN}" Header="PGN" IsReadOnly="True">
+                                    <DataGridTextColumn Binding="{Binding Path = Pgn}" Header="PGN" IsReadOnly="True">
                                     </DataGridTextColumn>
                                     <DataGridTextColumn Binding="{Binding Path = TransmitterId.Type}" Header="FROM" IsReadOnly="True">
                                     </DataGridTextColumn>

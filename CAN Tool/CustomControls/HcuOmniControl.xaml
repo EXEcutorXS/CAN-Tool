@@ -33,7 +33,7 @@
 
                 <Button x:Name="HeaterButton" FontSize="30" Height="50" Margin="10" Click="HeaterButton_Click" Opacity="{Binding  TimberlineParams.HeaterEnabled,Converter={StaticResource BoolToOpacity}}">Heater</Button>
 
-                <Button x:Name="ElementButton" FontSize="30" Height="50" Margin="10" Click="ElementButton_Click" Opacity="{Binding TimberlineParams.ElementEbabled,Converter={StaticResource BoolToOpacity}}">Element</Button>
+                <Button x:Name="ElementButton" FontSize="30" Height="50" Margin="10" Click="ElementButton_Click" Opacity="{Binding TimberlineParams.ElementEnabled,Converter={StaticResource BoolToOpacity}}">Element</Button>
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Liquid level: {0:d1},Path=TimberlineParams.LiquidLevel}" />
                 <ProgressBar Margin="15" Orientation="Vertical" Maximum="7" Value="{Binding TimberlineParams.LiquidLevel}" Height="50" />
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Outside: {0:F1}°,Path=TimberlineParams.OutsideTemperature,Converter={StaticResource ToFarenheit}}" />
@@ -45,13 +45,13 @@
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Sun" Foreground="{DynamicResource MaterialDesignBody}" />
                             <local:SilentSlider x:Name="DaytimeScroll" Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" Height="40" Width="400" Margin="10" Minimum="10" Maximum="32" ValueChanged="DayTimeChanged" IsEnabled="{Binding Connected,Converter={StaticResource HetingZoneToBool}}" />
-                            <TextBlock Margin="3" Style="{DynamicResource MaterialDesignHeadline2TextBlock}" d:Text="22°" Text="{Binding TempSetpointDay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
+                            <TextBlock Margin="3" Style="{DynamicResource MaterialDesignHeadline2TextBlock}" d:Text="22°" Text="{Binding TempSetPointDay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
 
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Width="40" Margin="10" Icon="Solid_Moon" Foreground="{DynamicResource MaterialDesignBody}" />
                             <local:SilentSlider x:Name="NightTimeScroll" Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" Height="40" HorizontalAlignment="Left" Orientation="Horizontal" Width="400" Margin="10" Minimum="10" Maximum="32" ValueChanged="NightTimeChanged" IsEnabled="{Binding Connected,Converter={StaticResource HetingZoneToBool}}"/>
-                            <TextBlock Style="{DynamicResource MaterialDesignHeadline2TextBlock}" d:Text="20°" Text="{Binding TempSetpointNight,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
+                            <TextBlock Style="{DynamicResource MaterialDesignHeadline2TextBlock}" d:Text="20°" Text="{Binding TempSetPointNight,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
 
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
