@@ -16,6 +16,8 @@ using System.Threading;
 using System.Windows.Media;
 using static CAN_Tool.Libs.Helper;
 using static Omni;
+using System.Windows;
+using CommunityToolkit.Mvvm.Input;
 
 
 namespace OmniProtocol
@@ -37,6 +39,15 @@ namespace OmniProtocol
         public bool multiPack;
         public List<OmniPgnParameter> parameters = new();
     }
+
+    public class ConfigPreset:ObservableObject
+    {
+        public string VendorName;
+        public string ModelName;
+        public BindingList<Tuple<int,uint>> ParamList = new ();
+        
+    }
+   
 
     public class OmniPgnParameter
     {
@@ -101,7 +112,7 @@ namespace OmniProtocol
                         if (App.Settings.UseImperial)
                             return "PSI";
                         else
-                            return GetString("u_kPa");
+                            return GetString("u_kpa");
                     default: return "";
                 }
             }
@@ -153,11 +164,6 @@ namespace OmniProtocol
 
     public partial class OmniZoneHandler : ObservableObject
     {
-        public OmniZoneHandler(Action<OmniZoneHandler> notifierAction)
-        {
-            selectedZoneChanged = notifierAction;
-        }
-        private Action<OmniZoneHandler> selectedZoneChanged;
 
         [ObservableProperty] private int tempSetPointDay = 22;
 
@@ -188,12 +194,12 @@ namespace OmniProtocol
 
     public partial class Timberline20OmniViewModel : ObservableObject
     {
-        private void ZoneChanged(OmniZoneHandler newSelectedZone) => SelectedZone = newSelectedZone;
+        //private void ZoneChanged(OmniZoneHandler newSelectedZone) => SelectedZone = newSelectedZone;
 
         public Timberline20OmniViewModel()
         {
             for (var i = 0; i < 5; i++)
-                Zones.Add(new OmniZoneHandler(ZoneChanged));
+                Zones.Add(new OmniZoneHandler());
 
             SelectedZone = zones[0];
         }
@@ -736,6 +742,7 @@ public partial class Omni : ObservableObject
 {
     public static void SeedStaticData()
     {
+
         #region Device names init
         Devices = new Dictionary<int, Device>() {
             { 0, new (){Id=0, } } ,
@@ -1208,6 +1215,12 @@ public partial class Omni : ObservableObject
         this.canAdapter = canAdapter;
         this.uartAdapter = uartAdapter;
         SeedStaticData();
+
+        AllPresets.Add(new() { VendorName = "Vinnebago", ModelName = "Avenger", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 22), new Tuple<int, uint>(3, 33) } });
+        AllPresets.Add(new() { VendorName = "Vinnebago", ModelName = "Revel", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 23), new Tuple<int, uint>(3, 34) } });
+        AllPresets.Add(new() { VendorName = "Vinnebago", ModelName = "Stream", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 24), new Tuple<int, uint>(3, 35) } });
+        AllPresets.Add(new() { VendorName = "AirStream", ModelName = "Polano", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 25), new Tuple<int, uint>(3, 36) } });
+        AllPresets.Add(new() { VendorName = "AirStream", ModelName = "Vector", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 26), new Tuple<int, uint>(3, 37) } });
     }
 
     public event EventHandler NewDeviceAcquired;
@@ -1227,12 +1240,39 @@ public partial class Omni : ObservableObject
 
     public BindingList<DeviceViewModel> ConnectedDevices { get; } = new();
 
+    [ObservableProperty] private DeviceViewModel selectedConnectedDevice;
+
     public UpdatableList<OmniMessage> Messages { get; } = new();
 
     private readonly CanAdapter canAdapter;
     private readonly UartAdapter uartAdapter;
 
     [ObservableProperty] private bool readingBbErrorsMode = false;
+    [ObservableProperty] public static BindingList<ConfigPreset> allPresets = new();
+    [NotifyPropertyChangedFor(nameof(AvailableModels))]
+    [ObservableProperty] private string selectedVendor;
+    [ObservableProperty] private string selectedModel;
+
+    [RelayCommand]
+    void LoadPreset()
+    { 
+        
+    }
+
+    public BindingList<string> AvailableModels  { get {
+            var initialCollection = AllPresets;
+    var distincted = initialCollection.Where(p => p.VendorName==SelectedVendor).ToList();
+    var ret = new BindingList<string>(distincted.Select(p => p.ModelName).ToList());
+            return ret;
+        } }
+
+    public BindingList<string> AvailableVendors { get {
+            var initialCollection = AllPresets;
+            var distincted = initialCollection.DistinctBy(p => p.VendorName).ToList();
+            var ret = new BindingList<string>(distincted.Select(p => p.VendorName).ToList());
+            return ret;
+        } }
+    
 
     private readonly SynchronizationContext uiContext = SynchronizationContext.Current;
 

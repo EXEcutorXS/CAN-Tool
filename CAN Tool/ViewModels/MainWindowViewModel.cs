@@ -74,12 +74,7 @@ namespace CAN_Tool.ViewModels
 
         public Omni OmniInstance { set; get; }
 
-        DeviceViewModel selectedConnectedDevice;
-        public DeviceViewModel SelectedConnectedDevice
-        {
-            set => Set(ref selectedConnectedDevice, value);
-            get => selectedConnectedDevice;
-        }
+        public DeviceViewModel SelectedConnectedDevice => OmniInstance.SelectedConnectedDevice;
 
         public Dictionary<int, OmniCommand> Commands => Omni.Commands;
 
@@ -435,7 +430,7 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadConfigCommand { get; }
         private void OnReadConfigCommandExecuted(object parameter)
         {
-            OmniInstance.ReadAllParameters(selectedConnectedDevice.Id);
+            OmniInstance.ReadAllParameters(SelectedConnectedDevice.Id);
         }
         private bool CanReadConfigCommandExecute(object parameter) =>
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
@@ -445,7 +440,7 @@ namespace CAN_Tool.ViewModels
         public ICommand SaveConfigCommand { get; }
         private void OnSaveConfigCommandExecuted(object parameter)
         {
-            OmniInstance.SaveParameters(selectedConnectedDevice.Id);
+            OmniInstance.SaveParameters(SelectedConnectedDevice.Id);
         }
         private bool CanSaveConfigCommandExecute(object parameter) =>
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.ReadParameters.Count > 0 && SelectedConnectedDevice.Parameters.Stage == 0);
@@ -455,7 +450,7 @@ namespace CAN_Tool.ViewModels
         public ICommand ResetConfigCommand { get; }
         private void OnResetConfigCommandExecuted(object parameter)
         {
-            OmniInstance.ResetParameters(selectedConnectedDevice.Id);
+            OmniInstance.ResetParameters(SelectedConnectedDevice.Id);
         }
         private bool CanResetConfigCommandExecute(object parameter) =>
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
@@ -468,7 +463,7 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadBlackBoxDataCommand { get; }
         private void OnReadBlackBoxDataCommandExecuted(object parameter)
         {
-            OmniInstance.ReadBlackBoxData(selectedConnectedDevice.Id);
+            OmniInstance.ReadBlackBoxData(SelectedConnectedDevice.Id);
         }
         private bool CanReadBlackBoxDataExecute(object parameter) =>
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
@@ -478,7 +473,7 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadBlackBoxErrorsCommand { get; }
         private void OnReadBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Task.Run(() => OmniInstance.ReadErrorsBlackBox(selectedConnectedDevice.Id));
+            Task.Run(() => OmniInstance.ReadErrorsBlackBox(SelectedConnectedDevice.Id));
         }
         private bool CanReadBlackBoxErrorsExecute(object parameter) =>
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
@@ -488,7 +483,7 @@ namespace CAN_Tool.ViewModels
         public ICommand EraseBlackBoxErrorsCommand { get; }
         private void OnEraseBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Task.Run(() => OmniInstance.EraseErrorsBlackBox(selectedConnectedDevice.Id));
+            Task.Run(() => OmniInstance.EraseErrorsBlackBox(SelectedConnectedDevice.Id));
         }
         private bool CanEraseBlackBoxErrorsExecute(object parameter) =>
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
@@ -498,7 +493,7 @@ namespace CAN_Tool.ViewModels
         public ICommand EraseBlackBoxDataCommand { get; }
         private void OnEraseBlackBoxDataCommandExecuted(object parameter)
         {
-            Task.Run(() => OmniInstance.EraseCommonBlackBox(selectedConnectedDevice.Id));
+            Task.Run(() => OmniInstance.EraseCommonBlackBox(SelectedConnectedDevice.Id));
         }
         private bool CanEraseBlackBoxDataExecute(object parameter) =>
             (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
@@ -508,18 +503,18 @@ namespace CAN_Tool.ViewModels
         public ICommand SaveReportCommand { get; }
         private void OnSaveReportCommandExecuted(object parameter)
         {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + selectedConnectedDevice.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + SelectedConnectedDevice.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
             var doc = DocX.Create(path);
             var headParagraph = doc.InsertParagraph();
-            headParagraph.AppendLine(GetString("t_device_report") + ": ").Append(selectedConnectedDevice.Name).Bold();
-            headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(selectedConnectedDevice.SerialAsString).Bold();
-            headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(selectedConnectedDevice.ProductionDate.ToString()).Bold();
+            headParagraph.AppendLine(GetString("t_device_report") + ": ").Append(SelectedConnectedDevice.Name).Bold();
+            headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(SelectedConnectedDevice.SerialAsString).Bold();
+            headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(SelectedConnectedDevice.ProductionDate.ToString()).Bold();
             headParagraph.AppendLine(GetString("t_formed") + ": ").Append(DateTime.Now.ToLocalTime().ToString()).Bold();
             headParagraph.AppendLine();
             headParagraph.AppendLine(GetString("t_common_black_box_data") + ":").FontSize(18);
             headParagraph.Alignment = Alignment.center;
             var dataParagraph = doc.InsertParagraph();
-            foreach (var p in selectedConnectedDevice.BbValues)
+            foreach (var p in SelectedConnectedDevice.BbValues)
             {
                 dataParagraph.Append(GetString($"bb_{p.Id}") + ": ");
                 dataParagraph.Append(p.Value.ToString()).Bold();
@@ -528,15 +523,15 @@ namespace CAN_Tool.ViewModels
             dataParagraph.AppendLine();
 
 
-            if (selectedConnectedDevice.BbErrors.Count > 0)
+            if (SelectedConnectedDevice.BbErrors.Count > 0)
             {
                 var errorHeader = doc.InsertParagraph();
-                errorHeader.AppendLine($"{GetString("t_errors_found") + ": "} {selectedConnectedDevice.BbErrors.Count}").FontSize(17);
+                errorHeader.AppendLine($"{GetString("t_errors_found") + ": "} {SelectedConnectedDevice.BbErrors.Count}").FontSize(17);
                 errorHeader.AppendLine();
                 errorHeader.Alignment = Alignment.center;
                 var errorParagraph = doc.InsertParagraph();
 
-                foreach (var e in selectedConnectedDevice.BbErrors)
+                foreach (var e in SelectedConnectedDevice.BbErrors)
                 {
 
                     errorParagraph.AppendLine(e.Name).Bold();
@@ -551,7 +546,7 @@ namespace CAN_Tool.ViewModels
 
         }
         private bool CanSaveReportCommandExecute(object parameter) =>
-        (selectedConnectedDevice != null && (SelectedConnectedDevice.BbErrors.Count > 0 || SelectedConnectedDevice.BbValues.Count > 0));
+        (SelectedConnectedDevice != null && (SelectedConnectedDevice.BbErrors.Count > 0 || SelectedConnectedDevice.BbValues.Count > 0));
 
 
 
@@ -688,7 +683,7 @@ namespace CAN_Tool.ViewModels
 
         public void NewDeviceHandler(object sender, EventArgs e)
         {
-            SelectedConnectedDevice = OmniInstance.ConnectedDevices[^1];
+            
         }
 
 

@@ -788,6 +788,7 @@
 <v:String x:Key="d_123">Программный загрузчик</v:String>
 <v:String x:Key="d_124">Мобильное приложение</v:String>
 <v:String x:Key="d_126">Устройство управления</v:String>
+
 <v:String x:Key="u_voltage">В</v:String>
 <v:String x:Key="u_pressure">кПа</v:String>
 
@@ -950,6 +951,8 @@
 <v:String x:Key="u_kpa">кПа</v:String>
 <v:String x:Key="u_rps">Об/с</v:String>
 
+<v:String x:Key="b_load_preset">Загрузить</v:String>
+<v:String x:Key="b_save_current_config">Сохранить настройки</v:String>
 <v:String x:Key="t_in_progress">в процессе</v:String>
 <v:String x:Key="t_done_in">выполнено за</v:String>
 <v:String x:Key="t_canelled">отменено</v:String>

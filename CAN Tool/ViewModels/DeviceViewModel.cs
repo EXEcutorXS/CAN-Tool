@@ -218,7 +218,7 @@ namespace OmniProtocol
         public void LogTick()
         {
             Log.Insert(0,((MainParameters)Parameters.Clone()));
-            //if (Log.Count > 100) Log.RemoveAt(100);
+            if (Log.Count > 120) Log.RemoveAt(120);
             if (!isLogWriting)
                 return;
 

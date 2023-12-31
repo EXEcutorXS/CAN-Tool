@@ -18,6 +18,8 @@ using System.Windows.Controls.Primitives;
 using static CAN_Tool.Libs.Helper;
 using CAN_Tool.CustomControls;
 using RVC;
+using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CAN_Tool
 {
@@ -26,7 +28,7 @@ namespace CAN_Tool
     /// </summary>
 
 
-    public class Settings
+    public partial class Settings:ObservableObject
     {
         public Settings()
         {
@@ -57,6 +59,8 @@ namespace CAN_Tool
         public ScottPlot.MarkerShape[] MarkShapes { set; get; }
 
         public bool UseImperial { set; get; }
+
+        
 
     }
 
@@ -91,9 +95,12 @@ namespace CAN_Tool
         {
             try
             {
-                using (FileStream fs = new FileStream("settings.json", FileMode.OpenOrCreate))
+                
+               using (FileStream fs = new FileStream("settings.json", FileMode.OpenOrCreate))
                 {
                     App.Settings = JsonSerializer.Deserialize<Settings>(fs);
+
+
                 }
             }
             catch
@@ -153,6 +160,8 @@ namespace CAN_Tool
                 }
             }, null);
         }
+        
+        
         private void LanguageChanged(Object sender, EventArgs e)
         {
             CultureInfo currLang = App.Language;
@@ -165,7 +174,7 @@ namespace CAN_Tool
 
 
         }
-
+        
         private void ChangeLanguageClick(Object sender, EventArgs e)
         {
             ComboBoxItem ci = sender as ComboBoxItem;
@@ -179,6 +188,7 @@ namespace CAN_Tool
             }
 
         }
+        
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
@@ -251,12 +261,12 @@ namespace CAN_Tool
             foreach (OmniPgnParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))
             {
                 StackPanel panel = new();
-                panel.Orientation = System.Windows.Controls.Orientation.Horizontal;
+                panel.Orientation = Orientation.Horizontal;
                 Label label = new();
                 label.Content = GetString(p.Name);
                 label.Name = $"label_{counter}";
                 label.Margin = new Thickness(10);
-                label.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+                label.VerticalAlignment = VerticalAlignment.Center;
                 panel.Children.Add(label);
                 if (p.Meanings != null && p.Meanings.Count > 0)
                 {
@@ -267,7 +277,7 @@ namespace CAN_Tool
                     cb.Name = $"field_{counter}";
                     cb.SelectedIndex = (int)p.DefaultValue;
                     cb.Margin = new Thickness(10);
-                    cb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+                    cb.VerticalAlignment = VerticalAlignment.Center;
                     panel.Children.Add(cb);
                 }
                 else
@@ -277,7 +287,7 @@ namespace CAN_Tool
                     tb.Text = p.DefaultValue.ToString();
                     tb.TextChanged += UpdateCommand;
                     tb.Margin = new Thickness(10);
-                    tb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+                    tb.VerticalAlignment = VerticalAlignment.Center;
                     tb.Style = (Style)App.Current.TryFindResource("MaterialDesignOutlinedTextBox");
                     panel.Children.Add(tb);
                 }
@@ -587,11 +597,7 @@ namespace CAN_Tool
             vm?.RvcPage.Timberline15.ClearErrors();
         }
 
-        private void ToggleUnderfloorButtonPressed(object sender, RoutedEventArgs e)
-        {
 
-        }
-       
     }
 
 

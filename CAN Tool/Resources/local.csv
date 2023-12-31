@@ -788,6 +788,7 @@ d_37	Extension board	Плата расширения
 d_123	Bootloader	Программный загрузчик
 d_124	Mobile App	Мобильное приложение
 d_126	Control device	Устройство управления
+		
 u_voltage	V	В
 u_pressure	kPa	кПа
 		
@@ -950,6 +951,8 @@ u_hz	Hz	Гц
 u_kpa	kPa	кПа
 u_rps	RPS	Об/с
 		
+b_load_preset	Load preset	Загрузить
+b_save_current_config	Save current	Сохранить настройки
 t_in_progress	in progress	в процессе
 t_done_in	done in	выполнено за
 t_canelled	cancelled	отменено

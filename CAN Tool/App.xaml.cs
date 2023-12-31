@@ -18,6 +18,8 @@ namespace CAN_Tool
             m_Languages.Clear();
             m_Languages.Add(new CultureInfo("en-US")); //Нейтральная культура для этого проекта
             m_Languages.Add(new CultureInfo("ru-RU"));
+
+            
         }
 
         private static List<CultureInfo> m_Languages = new List<CultureInfo>();
