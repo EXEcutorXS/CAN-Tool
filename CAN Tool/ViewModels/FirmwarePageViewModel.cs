@@ -452,7 +452,7 @@ namespace CAN_Tool.ViewModels
                             currentFragment.StartAddress = pageAddress + localAddress;
                             LogWriteLine($"New Fragment Start:0x{(pageAddress + localAddress):X08}");
                         }
-
+                        lastLineAddress = pageAddress + localAddress;
                         var gotNotReserveData = false;
 
                         for (var i = 0; i < recordLen; i++)
@@ -470,7 +470,7 @@ namespace CAN_Tool.ViewModels
                                 AddFragment(currentFragment);
                                 currentFragment = new CodeFragment(maxFragmentSize);
                             }
-                        lastLineAddress = currentFragment.StartAddress;
+                        
                         break;
                     case 4:
                         if (currentFragment.Length != 0)
