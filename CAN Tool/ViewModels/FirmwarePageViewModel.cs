@@ -162,7 +162,7 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new()
             {
                 Pgn = 105,
-                ReceiverId = new(123,7),
+                ReceiverId = new(123,0),
                 Data =
                 {
                     [0] = 2
@@ -198,7 +198,7 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new()
             {
                 Pgn = 105,
-                ReceiverId = new(123, 7),
+                ReceiverId = new(123, 0),
                 Data =
                 {
                     [0] = 0,
@@ -227,7 +227,7 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new()
             {
                 Pgn = 106,
-                ReceiverId = new(123, 7),
+                ReceiverId = new(123, 0),
             };
 
             LogWrite($"Fragment {f.StartAddress:X08}...");
