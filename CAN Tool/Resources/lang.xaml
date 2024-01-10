@@ -338,8 +338,8 @@
 <v:String x:Key="par_548">ENGINE_PREHEAT_SETPOINT_CELSIUS</v:String>
 
 
-<v:String x:Key="par_550">DEFROSTING_ENABLING_SETPOINT_CELSIUS</v:String>
-<v:String x:Key="par_551">DEFROSTING_DISABLING_SETPOINT_CELSIUS</v:String>
+<v:String x:Key="par_550">DEFROSTING_SETPOINT</v:String>
+<v:String x:Key="par_551">DEFROSTING_HYSTERESIS</v:String>
 
 <v:String x:Key="par_552">ZONE 1 TEMP CORRECTION (+25)</v:String>
 <v:String x:Key="par_553">ZONE 2 TEMP CORRECTION (+25)</v:String>
@@ -951,6 +951,7 @@
 <v:String x:Key="u_kpa">kPa</v:String>
 <v:String x:Key="u_rps">RPS</v:String>
 
+<v:String x:Key="b_delete_preset">Delete preset</v:String>
 <v:String x:Key="b_load_preset">Load preset</v:String>
 <v:String x:Key="b_save_current_config">Save current</v:String>
 <v:String x:Key="t_in_progress">in progress</v:String>

@@ -338,8 +338,8 @@
 <v:String x:Key="par_548">Желаемая температура двигателя после подогрева</v:String>
 
 
-<v:String x:Key="par_550">Температура включения разморозки</v:String>
-<v:String x:Key="par_551">Температура выключения разморозки</v:String>
+<v:String x:Key="par_550">Уставка для зон разморозки</v:String>
+<v:String x:Key="par_551">Гистерезис работы зон разморозки</v:String>
 
 <v:String x:Key="par_552">Коррекция температура зоны 1 (+25)</v:String>
 <v:String x:Key="par_553">Коррекция температура зоны 2 (+25)</v:String>
@@ -951,6 +951,7 @@
 <v:String x:Key="u_kpa">кПа</v:String>
 <v:String x:Key="u_rps">Об/с</v:String>
 
+<v:String x:Key="b_delete_preset">Удалить</v:String>
 <v:String x:Key="b_load_preset">Загрузить</v:String>
 <v:String x:Key="b_save_current_config">Сохранить настройки</v:String>
 <v:String x:Key="t_in_progress">в процессе</v:String>

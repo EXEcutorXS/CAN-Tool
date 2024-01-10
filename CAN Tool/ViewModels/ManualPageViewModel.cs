@@ -53,12 +53,12 @@ namespace CAN_Tool.ViewModels
         public ICommand PumpCheckCommand { get; }
         private void OnPumpCheckCommandExecuted(object parameter)
         {
-            Task.Run(() => Vm.OmniInstance.CheckPump(Vm.SelectedConnectedDevice));
+            Task.Run(() => Vm.OmniInstance.CheckPump(Vm.OmniInstance.SelectedConnectedDevice));
         }
 
         private bool CanPumpCheckCommandExecute(object parameter)
         {
-            return (Vm.deviceSelected(null) && Vm.SelectedConnectedDevice.ManualMode && !Vm.OmniInstance.CurrentTask.Occupied);
+            return (Vm.deviceSelected(null) && Vm.OmniInstance.SelectedConnectedDevice.ManualMode && !Vm.OmniInstance.CurrentTask.Occupied);
         }
         
         public ICommand IncreaceManualAirBlowerCommand { get; }
@@ -147,7 +147,7 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new();
             msg.TransmitterId.Type = 126;
             msg.TransmitterId.Address = 6;
-            msg.ReceiverId.Type = Vm.SelectedConnectedDevice.Id.Type;
+            msg.ReceiverId.Type = Vm.OmniInstance.SelectedConnectedDevice.Id.Type;
             msg.ReceiverId.Address = 7;
             msg.Pgn = 1;
             msg.Data = new byte[8];

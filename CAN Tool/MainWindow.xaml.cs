@@ -73,9 +73,9 @@ namespace CAN_Tool
 
         private void SaveSettings()
         {
-            if (vm.SelectedConnectedDevice != null)
+            if (vm.OmniInstance.SelectedConnectedDevice != null)
 
-                foreach (var b in vm.SelectedConnectedDevice.Status)
+                foreach (var b in vm.OmniInstance.SelectedConnectedDevice.Status)
                 {
                     App.Settings.Colors[b.Id] = (b.ChartBrush as SolidColorBrush).Color;
                     App.Settings.ShowFlag[b.Id] = (b.Display);
@@ -251,10 +251,10 @@ namespace CAN_Tool
             mainWindowViewModel.CommandParametersArray = new double[cmd.Parameters.Count];
             vm.CustomMessage.Pgn = 1;
             vm.CustomMessage.Data[1] = (byte)cmd.Id;
-            if (vm.SelectedConnectedDevice != null)
+            if (vm.OmniInstance.SelectedConnectedDevice != null)
             {
-                vm.CustomMessage.ReceiverId.Address = vm.SelectedConnectedDevice.Id.Address;
-                vm.CustomMessage.ReceiverId.Type = vm.SelectedConnectedDevice.Id.Type;
+                vm.CustomMessage.ReceiverId.Address = vm.OmniInstance.SelectedConnectedDevice.Id.Address;
+                vm.CustomMessage.ReceiverId.Type = vm.OmniInstance.SelectedConnectedDevice.Id.Type;
             }
 
             int counter = 0;

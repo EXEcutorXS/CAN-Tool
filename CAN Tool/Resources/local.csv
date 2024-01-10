@@ -338,8 +338,8 @@ par_547	ENGINE_PREHEAT_MODULE_CONNECTED	Признак наличия функц
 par_548	ENGINE_PREHEAT_SETPOINT_CELSIUS	Желаемая температура двигателя после подогрева
 		
 		
-par_550	DEFROSTING_ENABLING_SETPOINT_CELSIUS	Температура включения разморозки
-par_551	DEFROSTING_DISABLING_SETPOINT_CELSIUS	Температура выключения разморозки
+par_550	DEFROSTING_SETPOINT	Уставка для зон разморозки
+par_551	DEFROSTING_HYSTERESIS	Гистерезис работы зон разморозки
 		
 par_552	ZONE 1 TEMP CORRECTION (+25)	Коррекция температура зоны 1 (+25)
 par_553	ZONE 2 TEMP CORRECTION (+25)	Коррекция температура зоны 2 (+25)
@@ -951,6 +951,7 @@ u_hz	Hz	Гц
 u_kpa	kPa	кПа
 u_rps	RPS	Об/с
 		
+b_delete_preset	Delete preset	Удалить
 b_load_preset	Load preset	Загрузить
 b_save_current_config	Save current	Сохранить настройки
 t_in_progress	in progress	в процессе

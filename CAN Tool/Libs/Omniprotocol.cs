@@ -18,6 +18,11 @@ using static CAN_Tool.Libs.Helper;
 using static Omni;
 using System.Windows;
 using CommunityToolkit.Mvvm.Input;
+using System.IO;
+using Newtonsoft;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Collections.Specialized;
 
 
 namespace OmniProtocol
@@ -40,14 +45,14 @@ namespace OmniProtocol
         public List<OmniPgnParameter> parameters = new();
     }
 
-    public class ConfigPreset:ObservableObject
+    public class ConfigPreset : ObservableObject
     {
         public string VendorName;
         public string ModelName;
-        public BindingList<Tuple<int,uint>> ParamList = new ();
-        
+        public BindingList<Tuple<int, uint>> ParamList = new();
+
     }
-   
+
 
     public class OmniPgnParameter
     {
@@ -229,7 +234,7 @@ namespace OmniProtocol
         {
             Fresh = true;
             updateTick = DateTime.Now.Ticks;
-            TransmitterId = new(126,6);
+            TransmitterId = new(126, 6);
             ReceiverId = new(0, 0);
             Data = new byte[8];
             for (var i = 0; i < 8; i++)
@@ -1216,11 +1221,24 @@ public partial class Omni : ObservableObject
         this.uartAdapter = uartAdapter;
         SeedStaticData();
 
-        AllPresets.Add(new() { VendorName = "Vinnebago", ModelName = "Avenger", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 22), new Tuple<int, uint>(3, 33) } });
-        AllPresets.Add(new() { VendorName = "Vinnebago", ModelName = "Revel", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 23), new Tuple<int, uint>(3, 34) } });
-        AllPresets.Add(new() { VendorName = "Vinnebago", ModelName = "Stream", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 24), new Tuple<int, uint>(3, 35) } });
-        AllPresets.Add(new() { VendorName = "AirStream", ModelName = "Polano", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 25), new Tuple<int, uint>(3, 36) } });
-        AllPresets.Add(new() { VendorName = "AirStream", ModelName = "Vector", ParamList = new() { new Tuple<int, uint>(1, 1), new Tuple<int, uint>(2, 26), new Tuple<int, uint>(3, 37) } });
+        try
+        {
+            var str = File.ReadAllText("presets.json");
+            JArray serialised = (JArray)JsonConvert.DeserializeObject(str);
+            AllPresets = serialised.ToObject<BindingList<ConfigPreset>>();
+        }
+        catch
+        {
+            MessageBox.Show("Can't load preset list, empty list initiated");
+        }
+
+        allPresets.ListChanged += PresetCollectionChanged;
+    }
+
+    private void PresetCollectionChanged(object sender, ListChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(AvailableModels));
+        OnPropertyChanged(nameof(AvailableVendors));
     }
 
     public event EventHandler NewDeviceAcquired;
@@ -1248,6 +1266,7 @@ public partial class Omni : ObservableObject
     private readonly UartAdapter uartAdapter;
 
     [ObservableProperty] private bool readingBbErrorsMode = false;
+    [NotifyPropertyChangedFor(nameof(AvailableModels), nameof(AvailableVendors))]
     [ObservableProperty] public static BindingList<ConfigPreset> allPresets = new();
     [NotifyPropertyChangedFor(nameof(AvailableModels))]
     [ObservableProperty] private string selectedVendor;
@@ -1255,24 +1274,103 @@ public partial class Omni : ObservableObject
 
     [RelayCommand]
     void LoadPreset()
-    { 
-        
+    {
+        SelectedConnectedDevice.ReadParameters.Clear();
+        var Preset = AllPresets.FirstOrDefault(p => p.VendorName == SelectedVendor && p.ModelName == SelectedModel);
+        if (Preset == null)
+        {
+            MessageBox.Show($"Can't find preset for {SelectedVendor}-{SelectedModel}");
+            return;
+        }
+        foreach (var parameter in Preset.ParamList)
+        {
+            SelectedConnectedDevice.ReadParameters.TryToAdd(new ReadedParameter() { Id = parameter.Item1, Value = parameter.Item2 });
+        }
     }
 
-    public BindingList<string> AvailableModels  { get {
-            var initialCollection = AllPresets;
-    var distincted = initialCollection.Where(p => p.VendorName==SelectedVendor).ToList();
-    var ret = new BindingList<string>(distincted.Select(p => p.ModelName).ToList());
-            return ret;
-        } }
+    [RelayCommand]
+    void SavePreset()
+    {
+        if (SelectedModel.Length < 3 || SelectedModel.Length < 3)
+        {
+            MessageBox.Show("Model and vendor names must contain at least 3 characters");
+            return;
+        }
+        var Preset = AllPresets.FirstOrDefault(p => p.VendorName == SelectedVendor && p.ModelName == SelectedModel);
+        if (Preset != null)
+        {
+            MessageBox.Show($"Preset for \"{SelectedVendor} - {SelectedModel}\" already exists, delete it first");
+            return;
+        }
+        ConfigPreset newPreset = new ConfigPreset() { ModelName = SelectedModel, VendorName = SelectedVendor };
+        foreach (var parameter in SelectedConnectedDevice.ReadParameters)
+        {
+            if (parameter.Id < 12 || parameter.Id > 14) //Excluding serial number
+                newPreset.ParamList.Add(new Tuple<int, uint>(parameter.Id, parameter.Value));
+        }
+        AllPresets.Add(newPreset);
+        if (File.Exists("presets.json"))
+            File.Delete("presets.json");
+        string serialized = JsonConvert.SerializeObject(AllPresets);
 
-    public BindingList<string> AvailableVendors { get {
+        StreamWriter sw = new("presets.json", false);
+        sw.Write(serialized);
+        sw.Flush();
+        sw.Dispose();
+
+    }
+
+    [RelayCommand]
+    void DeletePreset()
+    {
+        if (AllPresets.Remove(AllPresets.FirstOrDefault(p => p.ModelName == SelectedModel && p.VendorName == SelectedVendor)))
+        {
+            try
+            {
+                if (File.Exists("presets.json"))
+                    File.Delete("presets.json");
+                string serialized = JsonConvert.SerializeObject(AllPresets);
+
+                StreamWriter sw = new("presets.json", false);
+                sw.Write(serialized);
+                sw.Flush();
+                sw.Dispose();
+                MessageBox.Show($"Preset for {SelectedVendor}-{SelectedModel} successfully removed");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        else
+        {
+            MessageBox.Show($"Preset for {SelectedVendor}-{SelectedModel} not found");
+        }
+
+    }
+
+    public BindingList<string> AvailableModels
+    {
+        get
+        {
+            var initialCollection = AllPresets;
+            var distincted = initialCollection.Where(p => p.VendorName == SelectedVendor).ToList();
+            var ret = new BindingList<string>(distincted.Select(p => p.ModelName).ToList());
+            return ret;
+        }
+    }
+
+    public BindingList<string> AvailableVendors
+    {
+        get
+        {
             var initialCollection = AllPresets;
             var distincted = initialCollection.DistinctBy(p => p.VendorName).ToList();
             var ret = new BindingList<string>(distincted.Select(p => p.VendorName).ToList());
             return ret;
-        } }
-    
+        }
+    }
+
 
     private readonly SynchronizationContext uiContext = SynchronizationContext.Current;
 
@@ -1671,8 +1769,8 @@ public partial class Omni : ObservableObject
         OmniMessage msg = new()
         {
             Pgn = 8,
-            TransmitterId = new(126,6),
-            ReceiverId= new(id.Type,id.Address),
+            TransmitterId = new(126, 6),
+            ReceiverId = new(id.Type, id.Address),
             Data =
             {
                 [0] = 6, //Read Single Param
@@ -1723,7 +1821,7 @@ public partial class Omni : ObservableObject
 
         OmniMessage msg = new()
         {
-            TransmitterId = new(126,6),
+            TransmitterId = new(126, 6),
             ReceiverId = new(cd.Id.Type, cd.Id.Address),
             Pgn = 1,
             Data = new byte[8]
@@ -1770,7 +1868,7 @@ public partial class Omni : ObservableObject
         var msg = new OmniMessage
         {
             Pgn = 8,
-            ReceiverId = new (id.Type,id.Address),
+            ReceiverId = new(id.Type, id.Address),
             Data =
             {
                 [0] = 0x13, //Read Errors

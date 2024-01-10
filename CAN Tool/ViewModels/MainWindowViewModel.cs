@@ -26,99 +26,59 @@ using Microsoft.Win32;
 using System.Windows;
 using System.Text;
 using ScottPlot.MarkerShapes;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CAN_Tool.ViewModels
 {
     public enum WorkMode_t { Omni, Rvc, RegularCan }
     public enum PhyProt_t { CAN, UART }
 
-    public class MainWindowViewModel : ViewModel
+    public partial class MainWindowViewModel : ObservableObject
     {
         private SynchronizationContext UIContext = SynchronizationContext.Current;
 
         public WorkMode_t[] WorkModes => new WorkMode_t[] { WorkMode_t.Omni, WorkMode_t.Rvc, WorkMode_t.RegularCan };
-
-        private WorkMode_t mode;
-        public WorkMode_t Mode { set => Set(ref mode, value); get => mode; }
-
         public PhyProt_t[] PhyProtocols => new PhyProt_t[2] { PhyProt_t.CAN, PhyProt_t.UART };
 
-        private PhyProt_t selectedProtocol;
-        public PhyProt_t SelectedProtocol { set => Set(ref selectedProtocol, value); get => selectedProtocol; }
-
-
-        private readonly List<SolidColorBrush> brushes = new();
-
-        public List<SolidColorBrush> Brushes => brushes;
+        [ObservableProperty] private List<SolidColorBrush> brushes = new();
+        [ObservableProperty] private WorkMode_t mode;
+        [ObservableProperty] private PhyProt_t selectedProtocol;
+        [ObservableProperty] public bool autoRedraw = true;
 
         public FirmwarePageViewModel FirmwarePage { set; get; }
         public ManualPageViewModel ManualPage { set; get; }
         public RvcPageViewModel RvcPage { set; get; }
         public CanPageViewModel CanPage { set; get; }
 
-        public bool AutoRedraw { set; get; } = true;
 
-        private bool canAdapterSettings = false;
-        public bool CanAdapterSettings { set => Set(ref canAdapterSettings, value); get => canAdapterSettings; }
-
-        private string portButtonString = "Open";
-        public string PortButtonString { set => Set(ref portButtonString, value); get => portButtonString; }
-
-        readonly CanAdapter canAdapter;
-
-        public CanAdapter CanAdapter { get => canAdapter; }
-
-        UartAdapter uartAdapter;
-
-        public UartAdapter UartAdapter { get => uartAdapter; }
-
-        public Omni OmniInstance { set; get; }
-
-        public DeviceViewModel SelectedConnectedDevice => OmniInstance.SelectedConnectedDevice;
+        [ObservableProperty] private bool canAdapterSettings = false;
+        [ObservableProperty] private string portButtonString = "Open";
+        [ObservableProperty] private CanAdapter canAdapter;
+        [ObservableProperty] UartAdapter uartAdapter;
+        [ObservableProperty] public Omni omniInstance;
 
         public Dictionary<int, OmniCommand> Commands => Omni.Commands;
 
         public WpfPlot myChart;
 
-        private OmniMessage selectedMessage;
-
-        public OmniMessage SelectedMessage
-        {
-            get => selectedMessage;
-            set => Set(ref selectedMessage, value);
-        }
-
-        OmniMessage customMessage = new OmniMessage() { Pgn = 0, ReceiverId = new(27, 0), };
+        [ObservableProperty]      private OmniMessage selectedMessage;
+        [ObservableProperty] OmniMessage customMessage = new OmniMessage() { Pgn = 0, ReceiverId = new(27, 0), };
 
         public Dictionary<int, OmniCommand> CommandList { get; } = Omni.Commands;
 
-        public OmniMessage CustomMessage { get => customMessage; set => customMessage.Update(value); }
-
         public double[] CommandParametersArray;
+        [ObservableProperty]    private string portName = "";
+        
 
-        private string portName = "";
-        public string PortName
-        {
-            get => portName;
-            set => Set(ref portName, value);
-        }
-
-        private BindingList<string> portList = new ();
-        public BindingList<string> PortList
-        {
-            get => portList;
-            set => Set(ref portList, value);
-        }
-
-        private string toggleCanLogButtonName = GetString("b_start_can_log");
-        public string ToggleCanLogButtonName { get => toggleCanLogButtonName; set => Set(ref toggleCanLogButtonName, value); }
+        [ObservableProperty] private BindingList<string> portList = new();
+        [ObservableProperty] private string toggleCanLogButtonName = GetString("b_start_can_log");
 
         private bool canLogging = false;
 
         private string canLogFileName = "";
 
-        private string toggleUartLogButtonName = GetString("b_start_uart_log");
-        public string ToggleUartLogButtonName { get => toggleUartLogButtonName; set => Set(ref toggleUartLogButtonName, value); }
+        [ObservableProperty] private string toggleUartLogButtonName = GetString("b_start_uart_log");
+        
 
         private bool uartLogging = false;
 
@@ -178,8 +138,7 @@ namespace CAN_Tool.ViewModels
 
         private bool CanToggleUartLogCommandExecute(object Parameter) => UartAdapter.SelectedPort.IsOpen;
 
-        int messageDelay = 100;
-        public int MessageDelay { get => messageDelay; set => Set(ref messageDelay, value); }
+        [ObservableProperty] int messageDelay = 100;
 
         public ICommand SetAdapterNormalModeCommand { get; }
 
@@ -227,11 +186,11 @@ namespace CAN_Tool.ViewModels
                     CanAdapter.PortOpen();
                     PortButtonString = GetString("b_close");
                     Thread.Sleep(20);
-                    canAdapter.SetBitrate(5); //250kb/sec
+                    CanAdapter.SetBitrate(5); //250kb/sec
                     Thread.Sleep(20);
-                    canAdapter.SetAcceptCode(0);
+                    CanAdapter.SetAcceptCode(0);
                     Thread.Sleep(20);
-                    canAdapter.SetMask(0);
+                    CanAdapter.SetMask(0);
                     Thread.Sleep(20);
                     CanAdapter.StartNormal();
                     Thread.Sleep(20);
@@ -281,7 +240,7 @@ namespace CAN_Tool.ViewModels
                 for (var i = 2; i < parts.Length; i++)
                     m.Data[i - 2] = Convert.ToByte(parts[i], 16);
 
-                canAdapter.InjectMessage(m);
+                CanAdapter.InjectMessage(m);
                 await Task.Delay(MessageDelay);
 
             }
@@ -322,7 +281,7 @@ namespace CAN_Tool.ViewModels
                 for (var i = 2; i < parts.Length; i++)
                     m.Data[i - 2] = Convert.ToByte(parts[i], 16);
 
-                canAdapter.Transmit(m);
+                CanAdapter.Transmit(m);
                 await Task.Delay(MessageDelay);
 
             }
@@ -351,8 +310,8 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new();
             msg.TransmitterId.Type = 126;
             msg.TransmitterId.Address = 6;
-            msg.ReceiverId.Address = SelectedConnectedDevice.Id.Address;
-            msg.ReceiverId.Type = SelectedConnectedDevice.Id.Type;
+            msg.ReceiverId.Address = OmniInstance.SelectedConnectedDevice.Id.Address;
+            msg.ReceiverId.Type = OmniInstance.SelectedConnectedDevice.Id.Type;
             msg.Pgn = 1;
             msg.Data = new byte[8];
             msg.Data[0] = (byte)(cmdNum >> 8);
@@ -368,18 +327,18 @@ namespace CAN_Tool.ViewModels
         public ICommand LogStartCommand { get; }
         private void OnLogStartCommandExecuted(object parameter)
         {
-            SelectedConnectedDevice.LogStart();
+            OmniInstance.SelectedConnectedDevice.LogStart();
         }
-        private bool CanLogStartCommandExecute(object parameter) => (SelectedConnectedDevice != null && CanAdapter.PortOpened);
+        private bool CanLogStartCommandExecute(object parameter) => (OmniInstance.SelectedConnectedDevice != null && CanAdapter.PortOpened);
 
 
 
         public ICommand LogStopCommand { get; }
         private void OnLogStopCommandExecuted(object parameter)
         {
-            SelectedConnectedDevice.LogStop();
+            OmniInstance.SelectedConnectedDevice.LogStop();
         }
-        private bool CanLogStopCommandExecute(object parameter) => (SelectedConnectedDevice != null && CanAdapter.PortOpened && SelectedConnectedDevice.IsLogWriting);
+        private bool CanLogStopCommandExecute(object parameter) => (OmniInstance.SelectedConnectedDevice != null && CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice.IsLogWriting);
 
 
 
@@ -390,10 +349,10 @@ namespace CAN_Tool.ViewModels
 
             plt.Clear();
 
-            foreach (var v in SelectedConnectedDevice.Status)
+            foreach (var v in OmniInstance.SelectedConnectedDevice.Status)
                 if (v.Display)
                 {
-                    var sig = plt.AddSignalConst(SelectedConnectedDevice.LogData[v.Id].Take(SelectedConnectedDevice.LogCurrentPos).ToArray(), color: v.Color, label: v.Name);
+                    var sig = plt.AddSignalConst(OmniInstance.SelectedConnectedDevice.LogData[v.Id].Take(OmniInstance.SelectedConnectedDevice.LogCurrentPos).ToArray(), color: v.Color, label: v.Name);
                     sig.UseParallel = false;
                     sig.LineWidth = v.LineWidth;
                     sig.LineStyle = v.LineStyle;
@@ -414,7 +373,7 @@ namespace CAN_Tool.ViewModels
             myChart.Refresh();
 
         }
-        private bool CanChartDrawCommandExecute(object parameter) => (SelectedConnectedDevice != null && SelectedConnectedDevice.LogCurrentPos > 0);
+        private bool CanChartDrawCommandExecute(object parameter) => (OmniInstance.SelectedConnectedDevice != null && OmniInstance.SelectedConnectedDevice.LogCurrentPos > 0);
 
 
         public ICommand CancelOperationCommand { get; }
@@ -430,30 +389,30 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadConfigCommand { get; }
         private void OnReadConfigCommandExecuted(object parameter)
         {
-            OmniInstance.ReadAllParameters(SelectedConnectedDevice.Id);
+            OmniInstance.ReadAllParameters(OmniInstance.SelectedConnectedDevice.Id);
         }
         private bool CanReadConfigCommandExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
         public ICommand SaveConfigCommand { get; }
         private void OnSaveConfigCommandExecuted(object parameter)
         {
-            OmniInstance.SaveParameters(SelectedConnectedDevice.Id);
+            OmniInstance.SaveParameters(OmniInstance.SelectedConnectedDevice.Id);
         }
         private bool CanSaveConfigCommandExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.ReadParameters.Count > 0 && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.ReadParameters.Count > 0 && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
         public ICommand ResetConfigCommand { get; }
         private void OnResetConfigCommandExecuted(object parameter)
         {
-            OmniInstance.ResetParameters(SelectedConnectedDevice.Id);
+            OmniInstance.ResetParameters(OmniInstance.SelectedConnectedDevice.Id);
         }
         private bool CanResetConfigCommandExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
@@ -463,58 +422,58 @@ namespace CAN_Tool.ViewModels
         public ICommand ReadBlackBoxDataCommand { get; }
         private void OnReadBlackBoxDataCommandExecuted(object parameter)
         {
-            OmniInstance.ReadBlackBoxData(SelectedConnectedDevice.Id);
+            OmniInstance.ReadBlackBoxData(OmniInstance.SelectedConnectedDevice.Id);
         }
         private bool CanReadBlackBoxDataExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
         public ICommand ReadBlackBoxErrorsCommand { get; }
         private void OnReadBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Task.Run(() => OmniInstance.ReadErrorsBlackBox(SelectedConnectedDevice.Id));
+            Task.Run(() => OmniInstance.ReadErrorsBlackBox(OmniInstance.SelectedConnectedDevice.Id));
         }
         private bool CanReadBlackBoxErrorsExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
         public ICommand EraseBlackBoxErrorsCommand { get; }
         private void OnEraseBlackBoxErrorsCommandExecuted(object parameter)
         {
-            Task.Run(() => OmniInstance.EraseErrorsBlackBox(SelectedConnectedDevice.Id));
+            Task.Run(() => OmniInstance.EraseErrorsBlackBox(OmniInstance.SelectedConnectedDevice.Id));
         }
         private bool CanEraseBlackBoxErrorsExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
         public ICommand EraseBlackBoxDataCommand { get; }
         private void OnEraseBlackBoxDataCommandExecuted(object parameter)
         {
-            Task.Run(() => OmniInstance.EraseCommonBlackBox(SelectedConnectedDevice.Id));
+            Task.Run(() => OmniInstance.EraseCommonBlackBox(OmniInstance.SelectedConnectedDevice.Id));
         }
         private bool CanEraseBlackBoxDataExecute(object parameter) =>
-            (CanAdapter.PortOpened && SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && SelectedConnectedDevice.Parameters.Stage == 0);
+            (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
         public ICommand SaveReportCommand { get; }
         private void OnSaveReportCommandExecuted(object parameter)
         {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + SelectedConnectedDevice.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + OmniInstance.SelectedConnectedDevice.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
             var doc = DocX.Create(path);
             var headParagraph = doc.InsertParagraph();
-            headParagraph.AppendLine(GetString("t_device_report") + ": ").Append(SelectedConnectedDevice.Name).Bold();
-            headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(SelectedConnectedDevice.SerialAsString).Bold();
-            headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(SelectedConnectedDevice.ProductionDate.ToString()).Bold();
+            headParagraph.AppendLine(GetString("t_device_report") + ": ").Append(OmniInstance.SelectedConnectedDevice.Name).Bold();
+            headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(OmniInstance.SelectedConnectedDevice.SerialAsString).Bold();
+            headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(OmniInstance.SelectedConnectedDevice.ProductionDate.ToString()).Bold();
             headParagraph.AppendLine(GetString("t_formed") + ": ").Append(DateTime.Now.ToLocalTime().ToString()).Bold();
             headParagraph.AppendLine();
             headParagraph.AppendLine(GetString("t_common_black_box_data") + ":").FontSize(18);
             headParagraph.Alignment = Alignment.center;
             var dataParagraph = doc.InsertParagraph();
-            foreach (var p in SelectedConnectedDevice.BbValues)
+            foreach (var p in OmniInstance.SelectedConnectedDevice.BbValues)
             {
                 dataParagraph.Append(GetString($"bb_{p.Id}") + ": ");
                 dataParagraph.Append(p.Value.ToString()).Bold();
@@ -523,15 +482,15 @@ namespace CAN_Tool.ViewModels
             dataParagraph.AppendLine();
 
 
-            if (SelectedConnectedDevice.BbErrors.Count > 0)
+            if (OmniInstance.SelectedConnectedDevice.BbErrors.Count > 0)
             {
                 var errorHeader = doc.InsertParagraph();
-                errorHeader.AppendLine($"{GetString("t_errors_found") + ": "} {SelectedConnectedDevice.BbErrors.Count}").FontSize(17);
+                errorHeader.AppendLine($"{GetString("t_errors_found") + ": "} {OmniInstance.SelectedConnectedDevice.BbErrors.Count}").FontSize(17);
                 errorHeader.AppendLine();
                 errorHeader.Alignment = Alignment.center;
                 var errorParagraph = doc.InsertParagraph();
 
-                foreach (var e in SelectedConnectedDevice.BbErrors)
+                foreach (var e in OmniInstance.SelectedConnectedDevice.BbErrors)
                 {
 
                     errorParagraph.AppendLine(e.Name).Bold();
@@ -546,7 +505,7 @@ namespace CAN_Tool.ViewModels
 
         }
         private bool CanSaveReportCommandExecute(object parameter) =>
-        (SelectedConnectedDevice != null && (SelectedConnectedDevice.BbErrors.Count > 0 || SelectedConnectedDevice.BbValues.Count > 0));
+        (OmniInstance.SelectedConnectedDevice != null && (OmniInstance.SelectedConnectedDevice.BbErrors.Count > 0 || OmniInstance.SelectedConnectedDevice.BbValues.Count > 0));
 
 
 
@@ -568,17 +527,17 @@ namespace CAN_Tool.ViewModels
 
         private void OnSaveLogCommandExecuted(object parameter)
         {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + SelectedConnectedDevice.Id.Type + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + OmniInstance.SelectedConnectedDevice.Id.Type + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
 
             using (var sw = new StreamWriter(path))
             {
-                foreach (var v in SelectedConnectedDevice.Status)
+                foreach (var v in OmniInstance.SelectedConnectedDevice.Status)
                     sw.Write(GetString($"vars_{v.Id}") + ";");
                 sw.WriteLine();
-                for (var i = 0; i < SelectedConnectedDevice.LogCurrentPos; i++)
+                for (var i = 0; i < OmniInstance.SelectedConnectedDevice.LogCurrentPos; i++)
                 {
-                    foreach (var v in SelectedConnectedDevice.Status)
-                        sw.Write(SelectedConnectedDevice.LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
+                    foreach (var v in OmniInstance.SelectedConnectedDevice.Status)
+                        sw.Write(OmniInstance.SelectedConnectedDevice.LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
                     sw.WriteLine();
                 }
                 sw.Flush();
@@ -588,14 +547,14 @@ namespace CAN_Tool.ViewModels
 
         private bool CanSaveLogCommandExecuted(object parameter)
         {
-            return SelectedConnectedDevice != null && SelectedConnectedDevice.LogCurrentPos > 0;
+            return OmniInstance.SelectedConnectedDevice != null && OmniInstance.SelectedConnectedDevice.LogCurrentPos > 0;
         }
 
         public ICommand DefaultStyleCommand { get; }
 
         private void OnDefaultStyleExecuted(object parameter)
         {
-            foreach (var v in SelectedConnectedDevice.Status)
+            foreach (var v in OmniInstance.SelectedConnectedDevice.Status)
             {
                 v.LineStyle = LineStyle.Solid;
                 v.MarkShape = MarkerShape.none;
@@ -628,7 +587,7 @@ namespace CAN_Tool.ViewModels
                     case 40:
                         v.Display = true;
                         v.ChartBrush = new SolidColorBrush(Colors.LightYellow);
-                        v.LineStyle = LineStyle.DashDot;  break;
+                        v.LineStyle = LineStyle.DashDot; break;
                     case 41:
                         v.Display = true;
                         v.ChartBrush = new SolidColorBrush(Colors.Yellow); break;
@@ -661,7 +620,7 @@ namespace CAN_Tool.ViewModels
             if (AutoRedraw)                                 //Перерисовка графиков
                 if (CanChartDrawCommandExecute(null))
                 {
-                    if (SelectedConnectedDevice.LogCurrentPos < 600)
+                    if (OmniInstance.SelectedConnectedDevice.LogCurrentPos < 600)
                         OnChartDrawCommandExecuted(null);
                     else if (DateTime.Now.Second % 10 == 0)
                         OnChartDrawCommandExecuted(null);
@@ -683,7 +642,7 @@ namespace CAN_Tool.ViewModels
 
         public void NewDeviceHandler(object sender, EventArgs e)
         {
-            
+            OmniInstance.SelectedConnectedDevice = OmniInstance.ConnectedDevices[^1];
         }
 
 
@@ -693,17 +652,17 @@ namespace CAN_Tool.ViewModels
         }
         public bool deviceSelected(object parameter)
         {
-            return CanAdapter.PortOpened && SelectedConnectedDevice != null;
+            return CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null;
         }
 
         public bool deviceInManualMode(object parameter)
         {
-            return (CanAdapter.PortOpened && SelectedConnectedDevice != null && SelectedConnectedDevice.ManualMode);
+            return (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && OmniInstance.SelectedConnectedDevice.ManualMode);
         }
 
         public void NewMessgeReceived(object sender, EventArgs e)
         {
-            switch (selectedProtocol)
+            switch (SelectedProtocol)
             {
                 case PhyProt_t.CAN:
                     switch (Mode)
@@ -773,7 +732,7 @@ namespace CAN_Tool.ViewModels
             SetAdapterListedModeCommand = new LambdaCommand(OnSetAdapterListedModeCommandExecuted, CanSetAdapterListedModeCommandExecute);
             SetAdapterSelfReceptionModeCommand = new LambdaCommand(OnSetAdapterSelfReceptionModeCommandExecuted, CanSetAdapterSelfReceptionModeCommandExecute);
             StopCanAdapterCommand = new LambdaCommand(OnStopCanAdapterCommandExecuted, CanStopCanAdapterCommandExecute);
-            
+
             LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
             LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
             ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);

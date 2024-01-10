@@ -50,8 +50,8 @@ namespace CAN_Tool.ViewModels
         {
             OmniMessage msg = new();
             msg.Pgn = 1;
-            msg.ReceiverId.Address = Vm.SelectedConnectedDevice.Id.Address;
-            msg.ReceiverId.Type = Vm.SelectedConnectedDevice.Id.Type;
+            msg.ReceiverId.Address = Vm.OmniInstance.SelectedConnectedDevice.Id.Address;
+            msg.ReceiverId.Type = Vm.OmniInstance.SelectedConnectedDevice.Id.Type;
             msg.Data[0] = 0;
             msg.Data[1] = 22;
             msg.Data[2] = 0;
@@ -99,8 +99,8 @@ namespace CAN_Tool.ViewModels
         {
             OmniMessage msg = new();
             msg.Pgn = 6;
-            msg.ReceiverId.Address = Vm.SelectedConnectedDevice.Id.Address;
-            msg.ReceiverId.Type = Vm.SelectedConnectedDevice.Id.Type;
+            msg.ReceiverId.Address = Vm.OmniInstance.SelectedConnectedDevice.Id.Address;
+            msg.ReceiverId.Type = Vm.OmniInstance.SelectedConnectedDevice.Id.Type;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
@@ -114,7 +114,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 6;
             msg.Data[1] = 255;  //Стереть всю память
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
-            Vm.SelectedConnectedDevice.flagEraseDone = false;
+            Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone = false;
         }
 
         private void StartFlashing()
@@ -145,14 +145,14 @@ namespace CAN_Tool.ViewModels
             WriteFragmentToRam(f);
             for (var i = 0; i < 4; i++)
             {
-                Vm.SelectedConnectedDevice.flagProgramDone = false;
+                Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone = false;
                 if (i == 3)
                 {
                     Vm.OmniInstance.CurrentTask.OnFail("Can't flash memory");
                     return;
                 }
                 StartFlashing();
-                if (WaitForFlag(ref Vm.SelectedConnectedDevice.flagProgramDone, 100))
+                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone, 100))
                     break;
             }
         }
@@ -173,17 +173,17 @@ namespace CAN_Tool.ViewModels
             for (var i = 0; i < 6; i++)
             {
                 i++;
-                Vm.SelectedConnectedDevice.flagTransmissionCheck = false;
+                Vm.OmniInstance.SelectedConnectedDevice.flagTransmissionCheck = false;
                 if (i == 5)
                 {
                     Vm.OmniInstance.CurrentTask.OnFail("Can't check transmission result");
                     return false;
                 }
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
-                WaitForFlag(ref Vm.SelectedConnectedDevice.flagTransmissionCheck, 100);
+                WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagTransmissionCheck, 100);
 
-                LogWriteLine($"Len:{Vm.SelectedConnectedDevice.receivedFragmentLength},CRC:0x{Vm.SelectedConnectedDevice.receivedFragmentCrc:X08}");
-                if (crc == Vm.SelectedConnectedDevice.receivedFragmentCrc && len == Vm.SelectedConnectedDevice.receivedFragmentLength)
+                LogWriteLine($"Len:{Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentLength},CRC:0x{Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc:X08}");
+                if (crc == Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc && len == Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentLength)
                     return true;
                 else
                     LogWriteLine("###Transmission failed!");
@@ -210,15 +210,15 @@ namespace CAN_Tool.ViewModels
             };
             for (var i = 0; i < 4; i++)
             {
-                Vm.SelectedConnectedDevice.flagSetAdrDone = false;
+                Vm.OmniInstance.SelectedConnectedDevice.flagSetAdrDone = false;
                 if (i == 3)
                 {
                     Vm.OmniInstance.CurrentTask.OnFail("Can't set address");
                     return;
                 }
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
-                if (!WaitForFlag(ref Vm.SelectedConnectedDevice.flagSetAdrDone, 300)) continue;
-                if (Vm.SelectedConnectedDevice.fragmentAddress == f.StartAddress)
+                if (!WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagSetAdrDone, 300)) continue;
+                if (Vm.OmniInstance.SelectedConnectedDevice.fragmentAddress == f.StartAddress)
                     break;
             }
         }
@@ -243,8 +243,8 @@ namespace CAN_Tool.ViewModels
                     LogWriteLine($"Try: {k + 1}");
                 uint crc = 0;
                 var len = 0;
-                Vm.SelectedConnectedDevice.receivedFragmentCrc = 0;
-                Vm.SelectedConnectedDevice.receivedFragmentLength = 0;
+                Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc = 0;
+                Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentLength = 0;
 
                 for (var i = 0; i < (f.Length + 7) / 8; i++)
                 {
@@ -279,7 +279,7 @@ namespace CAN_Tool.ViewModels
             {
                 if (i == 3) { Vm.OmniInstance.CurrentTask.OnFail("Can't erase memory"); return; }
                 EraseFlash();
-                if (WaitForFlag(ref Vm.SelectedConnectedDevice.flagEraseDone, 5000)) break;
+                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone, 5000)) break;
             }
 
             Vm.OmniInstance.CurrentTask.OnDone();
