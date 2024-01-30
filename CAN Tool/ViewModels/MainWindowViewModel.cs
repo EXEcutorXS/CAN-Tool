@@ -27,6 +27,7 @@ using System.Windows;
 using System.Text;
 using ScottPlot.MarkerShapes;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Reflection;
 
 namespace CAN_Tool.ViewModels
 {
@@ -40,6 +41,8 @@ namespace CAN_Tool.ViewModels
         public WorkMode_t[] WorkModes => new WorkMode_t[] { WorkMode_t.Omni, WorkMode_t.Rvc, WorkMode_t.RegularCan };
         public PhyProt_t[] PhyProtocols => new PhyProt_t[2] { PhyProt_t.CAN, PhyProt_t.UART };
 
+        public string Title => "CAN Tool " + Assembly.GetExecutingAssembly().GetName().Version.ToString(); 
+        
         [ObservableProperty] private List<SolidColorBrush> brushes = new();
         [ObservableProperty] private WorkMode_t mode;
         [ObservableProperty] private PhyProt_t selectedProtocol;
@@ -178,47 +181,55 @@ namespace CAN_Tool.ViewModels
         public ICommand TogglePortCommand { get; }
         private void OnTogglePortCommandExecuted(object parameter)
         {
-            if (SelectedProtocol == PhyProt_t.CAN)
+            try
             {
-                if (!CanAdapter.PortOpened)
-                {
-                    CanAdapter.PortName = PortName;
-                    CanAdapter.PortOpen();
-                    PortButtonString = GetString("b_close");
-                    Thread.Sleep(20);
-                    CanAdapter.SetBitrate(5); //250kb/sec
-                    Thread.Sleep(20);
-                    CanAdapter.SetAcceptCode(0);
-                    Thread.Sleep(20);
-                    CanAdapter.SetMask(0);
-                    Thread.Sleep(20);
-                    CanAdapter.StartNormal();
-                    Thread.Sleep(20);
-                }
-                else
-                {
-                    PortButtonString = GetString("b_open");
-                    CanAdapter.PortClose();
-                }
-            }
-            if (SelectedProtocol == PhyProt_t.UART)
-            {
-                if (!UartAdapter.SelectedPort.IsOpen)
-                {
-                    try
-                    {
-                        UartAdapter.SelectedPort.Open();
-                        PortButtonString = GetString("b_close");
-                    }
-                    catch { }
-                }
-                else
-                {
-                    UartAdapter.SelectedPort.Close();
-                    PortButtonString = GetString("b_open");
-                }
-            }
 
+                if (SelectedProtocol == PhyProt_t.CAN)
+                {
+                    if (!CanAdapter.PortOpened)
+                    {
+                        CanAdapter.PortName = PortName;
+                        CanAdapter.PortOpen();
+                        PortButtonString = GetString("b_close");
+                        Thread.Sleep(20);
+                        CanAdapter.SetBitrate(5); //250kb/sec
+                        Thread.Sleep(20);
+                        CanAdapter.SetAcceptCode(0);
+                        Thread.Sleep(20);
+                        CanAdapter.SetMask(0);
+                        Thread.Sleep(20);
+                        CanAdapter.StartNormal();
+                        Thread.Sleep(20);
+                    }
+                    else
+                    {
+                        PortButtonString = GetString("b_open");
+                        CanAdapter.PortClose();
+                    }
+                }
+                if (SelectedProtocol == PhyProt_t.UART)
+                {
+                    if (!UartAdapter.SelectedPort.IsOpen)
+                    {
+                        try
+                        {
+                            UartAdapter.SelectedPort.Open();
+                            PortButtonString = GetString("b_close");
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        UartAdapter.SelectedPort.Close();
+                        PortButtonString = GetString("b_open");
+                    }
+                }
+            }
+            catch
+            (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
         private bool CanTogglePortCommandExecute(object parameter) => (PortName.StartsWith("COM") || CanAdapter.PortOpened || UartAdapter.SelectedPort.IsOpen);
 
