@@ -350,6 +350,7 @@ par_557	PAR_FLOOR_PUMP	Помпа тёплого пола(номер)
 par_558	PAR_FLOOR_TEMP_SENSOR	Датчик пемпературы тёплого пола
 par_559	PAR_ENGINE_PREHEAT_PUMP	Помпа предпускогого подогрева
 par_560	PAR_ENGINE_PREHEAT_TEMP_SENSOR	Датчик температуры предпускового подогрева
+par_561	CURRENT MEASURING COEFFICIENT	Калибровочное значения для измерения тока
 		
 		
 par_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C
@@ -522,6 +523,16 @@ var_118	Year	Год
 		
 var_119	Heater button	Кнопка нагревателя
 var_120	Element button	Кнопка ТЭНа
+var_121	Underfloor heating button	Кнопка Тёплого пола
+var_122	Engine preheat button	Кнопка Предпускового подогрева
+var_123	Outside temperature	Внешняя температура
+var_124	AUX sensor 1	Доп датчик 1
+var_125	AUX sensor 2	Доп датчик 2
+var_126	AUX sensor 3	Доп датчик 3
+var_127	AUX sensor 4	Доп датчик 4
+var_128	Blower current	Ток нагнетателя мА
+		
+		
 		
 vars_1	Stage	Стадия
 vars_2	Mode	Режим
@@ -659,8 +670,16 @@ vars_116	Day	День
 vars_117	Month	Мес
 vars_118	Year	Год
 		
-vars_119	Heater button	Кнопка нагревателя
-vars_120	Element button	Кнопка ТЭНа
+vars_119	Htr btn	Кн.нагр
+vars_120	El.btn	Кн.ТЭН
+vars_121	Flr.heat.btn	Кн.Тёпл.пол
+vars_122	Eng.preh.btn	Кн.Предп.под
+vars_123	Out.temp	Внеш.темп
+vars_124	AUX sen.1	Д.датч.1
+vars_125	AUX sen.2	Д.датч.2
+vars_126	AUX sen.3	Д.датч.3
+vars_127	AUX sen.4	Д.датч.4
+vars_128	BlwrCrnt	Ток нагн
 		
 m_0-1	Waiting for the command	Ожидание команды
 m_0-3	Blowing on power on	Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)
@@ -785,6 +804,7 @@ d_32	30SPG	30СПГ
 d_34	Binar 10D	Бинар 10Д
 d_35	Binar 10B	Бинар 10Б
 d_37	Extension board	Плата расширения
+d_40	Pressure sensor	Датчик давления
 d_123	Bootloader	Программный загрузчик
 d_124	Mobile App	Мобильное приложение
 d_126	Control device	Устройство управления

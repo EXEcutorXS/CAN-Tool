@@ -30,7 +30,7 @@ namespace OmniProtocol
 
     public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency }
 
-    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard }
+    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard,PressureSensor }
 
     public class GotOmniMessageEventArgs : EventArgs
     {
@@ -709,6 +709,7 @@ public partial class MainParameters : ObservableObject, ICloneable
     [ObservableProperty] private int overheatTemp;
     [ObservableProperty] private int panelTemp;
     [ObservableProperty] private int inletTemp;
+    [ObservableProperty] private float pressure;
 
 
     public string StageString => GetString($"m_{Stage}-{Mode}");
@@ -783,6 +784,7 @@ public partial class Omni : ObservableObject
             { 34, new (){Id=34, DevType=DeviceType.Binar, MaxBlower=150}} ,
             { 35, new (){Id=35, DevType=DeviceType.Binar, MaxBlower=150}} ,
             { 37, new (){Id=37, DevType=DeviceType.ExtensionBoard}} ,
+            { 40, new (){Id=40, DevType=DeviceType.PressureSensor}} ,
             { 123, new (){Id=123, DevType=DeviceType.BootLoader }} ,
             { 126, new (){Id=126, DevType=DeviceType.Hcu }},
             { 255, new (){Id=255}}
@@ -980,6 +982,7 @@ public partial class Omni : ObservableObject
         Pgns[11].parameters.Add(new() { Name = "Напряжение питания", BitLength = 16, StartByte = 0, a = 0.1, UnitT = UnitType.Volt, Var = 5 });
         Pgns[11].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 2, UnitT = UnitType.Pressure });
         Pgns[11].parameters.Add(new() { Name = "Ток двигателя, значения АЦП", BitLength = 16, StartByte = 3 });
+        Pgns[11].parameters.Add(new() { Name = "Ток двигателя, мА", BitLength = 16, StartByte = 5 , UnitT = UnitType.Current,a=0.001,Var=128});
 
         Pgns[12].parameters.Add(new() { Name = "Заданные обороты нагнетателя воздуха", BitLength = 8, StartByte = 0, UnitT = UnitType.Rps, Var = 15 });
         Pgns[12].parameters.Add(new() { Name = "Измеренные обороты нагнетателя воздуха,", BitLength = 8, StartByte = 1, UnitT = UnitType.Rps, Var = 16 });
@@ -1230,7 +1233,8 @@ public partial class Omni : ObservableObject
         }
         catch
         {
-            MessageBox.Show("Can't load preset list, empty list initiated");
+            Debug.WriteLine("Can't load preset list, empty list initiated");
+            //MessageBox.Show("Can't load preset list, empty list initiated");
         }
 
         allPresets.ListChanged += PresetCollectionChanged;
@@ -1476,6 +1480,11 @@ public partial class Omni : ObservableObject
                     break;
                 case 41:
                     senderDevice.Parameters.OverheatTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                    break;
+                case 60:
+                    senderDevice.Parameters.Pressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                    if (senderDevice.PressureLogWriting)
+                        senderDevice.PressureLog[senderDevice.PressureLogPointer++] = senderDevice.Parameters.Pressure;
                     break;
             }
         }

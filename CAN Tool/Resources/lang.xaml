@@ -350,6 +350,7 @@
 <v:String x:Key="par_558">PAR_FLOOR_TEMP_SENSOR</v:String>
 <v:String x:Key="par_559">PAR_ENGINE_PREHEAT_PUMP</v:String>
 <v:String x:Key="par_560">PAR_ENGINE_PREHEAT_TEMP_SENSOR</v:String>
+<v:String x:Key="par_561">CURRENT MEASURING COEFFICIENT</v:String>
 
 
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
@@ -522,6 +523,16 @@
 
 <v:String x:Key="var_119">Heater button</v:String>
 <v:String x:Key="var_120">Element button</v:String>
+<v:String x:Key="var_121">Underfloor heating button</v:String>
+<v:String x:Key="var_122">Engine preheat button</v:String>
+<v:String x:Key="var_123">Outside temperature</v:String>
+<v:String x:Key="var_124">AUX sensor 1</v:String>
+<v:String x:Key="var_125">AUX sensor 2</v:String>
+<v:String x:Key="var_126">AUX sensor 3</v:String>
+<v:String x:Key="var_127">AUX sensor 4</v:String>
+<v:String x:Key="var_128">Blower current</v:String>
+
+
 
 <v:String x:Key="vars_1">Stage</v:String>
 <v:String x:Key="vars_2">Mode</v:String>
@@ -659,8 +670,16 @@
 <v:String x:Key="vars_117">Month</v:String>
 <v:String x:Key="vars_118">Year</v:String>
 
-<v:String x:Key="vars_119">Heater button</v:String>
-<v:String x:Key="vars_120">Element button</v:String>
+<v:String x:Key="vars_119">Htr btn</v:String>
+<v:String x:Key="vars_120">El.btn</v:String>
+<v:String x:Key="vars_121">Flr.heat.btn</v:String>
+<v:String x:Key="vars_122">Eng.preh.btn</v:String>
+<v:String x:Key="vars_123">Out.temp</v:String>
+<v:String x:Key="vars_124">AUX sen.1</v:String>
+<v:String x:Key="vars_125">AUX sen.2</v:String>
+<v:String x:Key="vars_126">AUX sen.3</v:String>
+<v:String x:Key="vars_127">AUX sen.4</v:String>
+<v:String x:Key="vars_128">BlwrCrnt</v:String>
 
 <v:String x:Key="m_0-1">Waiting for the command</v:String>
 <v:String x:Key="m_0-3">Blowing on power on</v:String>
@@ -785,6 +804,7 @@
 <v:String x:Key="d_34">Binar 10D</v:String>
 <v:String x:Key="d_35">Binar 10B</v:String>
 <v:String x:Key="d_37">Extension board</v:String>
+<v:String x:Key="d_40">Pressure sensor</v:String>
 <v:String x:Key="d_123">Bootloader</v:String>
 <v:String x:Key="d_124">Mobile App</v:String>
 <v:String x:Key="d_126">Control device</v:String>

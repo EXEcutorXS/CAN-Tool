@@ -3,6 +3,7 @@ using CAN_Tool.Infrastructure.Commands;
 using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
 using CAN_Tool.ViewModels.Base;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,7 +16,7 @@ using static CAN_Tool.Libs.Helper;
 
 namespace OmniProtocol
 {
-    public class DeviceViewModel : ViewModel
+    public partial class DeviceViewModel : ObservableObject
     {
 
         public DeviceViewModel(DeviceId newId)
@@ -112,34 +113,31 @@ namespace OmniProtocol
 
         public MainParameters Parameters { get; set; } = new();
 
-        private DeviceId id;
+        [ObservableProperty] private DeviceId id;
 
-        public DeviceId Id { get => id; set => Set(ref id, value); }
 
-        private DateOnly prodDate;
-
-        public DateOnly ProductionDate { get => prodDate; set => Set(ref prodDate, value); }
+        [ObservableProperty] private DateOnly productionDate;
 
         private byte[] firmware = new byte[4];
 
         [AffectsTo(nameof(FirmwareAsText))]
-        public byte[] Firmware { get => firmware; set => Set(ref firmware, value); }
+        public byte[] Firmware { get => firmware; set => SetProperty(ref firmware, value); }
 
         public string FirmwareAsText => firmware != null ? $"{firmware[0]}.{firmware[1]}.{firmware[2]}.{firmware[3]}" : GetString("t_no_firmware_data");
 
         private uint serial1 = 0;
 
         [AffectsTo(nameof(SerialAsString))]
-        public uint Serial1 { get => serial1; set => Set(ref serial1, value); }
+        public uint Serial1 { get => serial1; set => SetProperty(ref serial1, value); }
 
         private uint serial2 = 0;
 
         [AffectsTo(nameof(SerialAsString))]
-        public uint Serial2 { get => serial2; set => Set(ref serial2, value); }
+        public uint Serial2 { get => serial2; set => SetProperty(ref serial2, value); }
 
         private uint serial3 = 0;
         [AffectsTo(nameof(SerialAsString))]
-        public uint Serial3 { get => serial3; set => Set(ref serial3, value); }
+        public uint Serial3 { get => serial3; set => SetProperty(ref serial3, value); }
 
         public string SerialAsString => $"{serial1}.{serial2}.{serial3}";
 
@@ -155,9 +153,7 @@ namespace OmniProtocol
 
         public Timberline20OmniViewModel TimberlineParams { set; get; } = new();
 
-        private bool manualMode;
-
-        public bool ManualMode { get => manualMode; set => Set(ref manualMode, value); }
+        [ObservableProperty] public bool manualMode;
 
         public bool flagEraseDone = false;
 
@@ -205,21 +201,23 @@ namespace OmniProtocol
 
         public override int GetHashCode() { return Id.GetHashCode(); }
 
-        private bool isLogWriting;
-
-        public bool IsLogWriting { get => isLogWriting; private set => Set(ref isLogWriting, value); }
+        [ObservableProperty] private bool isLogWriting;
 
         public List<double[]> LogData = new();
 
-        private int logCurrentPos;
+        public float[] PressureLog = new float[720000];
 
-        public int LogCurrentPos { get => logCurrentPos; private set => Set(ref logCurrentPos, value); }
+        [ObservableProperty] public int pressureLogPointer = 0;
+        public bool PressureLogWriting = false;
+
+        [ObservableProperty] private int logCurrentPos;
+       
 
         public void LogTick()
         {
             Log.Insert(0,((MainParameters)Parameters.Clone()));
             if (Log.Count > 120) Log.RemoveAt(120);
-            if (!isLogWriting)
+            if (!IsLogWriting)
                 return;
 
             if (LogCurrentPos < LogData[0].Length)

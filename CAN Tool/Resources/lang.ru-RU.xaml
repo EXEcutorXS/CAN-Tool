@@ -350,6 +350,7 @@
 <v:String x:Key="par_558">Датчик пемпературы тёплого пола</v:String>
 <v:String x:Key="par_559">Помпа предпускогого подогрева</v:String>
 <v:String x:Key="par_560">Датчик температуры предпускового подогрева</v:String>
+<v:String x:Key="par_561">Калибровочное значения для измерения тока</v:String>
 
 
 <v:String x:Key="par_600">номер устройства на шине CAN RV-C</v:String>
@@ -522,6 +523,16 @@
 
 <v:String x:Key="var_119">Кнопка нагревателя</v:String>
 <v:String x:Key="var_120">Кнопка ТЭНа</v:String>
+<v:String x:Key="var_121">Кнопка Тёплого пола</v:String>
+<v:String x:Key="var_122">Кнопка Предпускового подогрева</v:String>
+<v:String x:Key="var_123">Внешняя температура</v:String>
+<v:String x:Key="var_124">Доп датчик 1</v:String>
+<v:String x:Key="var_125">Доп датчик 2</v:String>
+<v:String x:Key="var_126">Доп датчик 3</v:String>
+<v:String x:Key="var_127">Доп датчик 4</v:String>
+<v:String x:Key="var_128">Ток нагнетателя мА</v:String>
+
+
 
 <v:String x:Key="vars_1">Стадия</v:String>
 <v:String x:Key="vars_2">Режим</v:String>
@@ -659,8 +670,16 @@
 <v:String x:Key="vars_117">Мес</v:String>
 <v:String x:Key="vars_118">Год</v:String>
 
-<v:String x:Key="vars_119">Кнопка нагревателя</v:String>
-<v:String x:Key="vars_120">Кнопка ТЭНа</v:String>
+<v:String x:Key="vars_119">Кн.нагр</v:String>
+<v:String x:Key="vars_120">Кн.ТЭН</v:String>
+<v:String x:Key="vars_121">Кн.Тёпл.пол</v:String>
+<v:String x:Key="vars_122">Кн.Предп.под</v:String>
+<v:String x:Key="vars_123">Внеш.темп</v:String>
+<v:String x:Key="vars_124">Д.датч.1</v:String>
+<v:String x:Key="vars_125">Д.датч.2</v:String>
+<v:String x:Key="vars_126">Д.датч.3</v:String>
+<v:String x:Key="vars_127">Д.датч.4</v:String>
+<v:String x:Key="vars_128">Ток нагн</v:String>
 
 <v:String x:Key="m_0-1">Ожидание команды</v:String>
 <v:String x:Key="m_0-3">Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)</v:String>
@@ -785,6 +804,7 @@
 <v:String x:Key="d_34">Бинар 10Д</v:String>
 <v:String x:Key="d_35">Бинар 10Б</v:String>
 <v:String x:Key="d_37">Плата расширения</v:String>
+<v:String x:Key="d_40">Датчик давления</v:String>
 <v:String x:Key="d_123">Программный загрузчик</v:String>
 <v:String x:Key="d_124">Мобильное приложение</v:String>
 <v:String x:Key="d_126">Устройство управления</v:String>

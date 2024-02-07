@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO.Ports;
 using System.Text;
+using System.Threading;
+using System.Windows;
 using CAN_Tool.Libs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Timer = System.Timers.Timer;
@@ -231,11 +233,34 @@ namespace CAN_Tool
             serialPort.Open();
             Status = AdapterStatus.Ready;
         }
+
         public void PortClose()
         {
-            serialPort.Close();
+            //serialPort.Close();
+            Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit)); //close port in new thread to avoid hang
+            CloseDown.Start(); //close port in new thread to avoid hang
             Status = AdapterStatus.Closed;
         }
+
+        private void CloseSerialOnExit()
+        {
+            try
+            {
+                serialPort.Close(); //close the serial port
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message); //catch any serial port closing error messages
+            }
+
+            // (new EventHandler(NowClose)); //now close back in the main thread
+        }
+
+        private void NowClose(object sender, EventArgs e)
+        {
+            serialPort.Close(); //now close the form
+        }
+
         public void StartNormal() => serialPort.Write("O\r");
         public void StartListen() => serialPort.Write("L\r");
         public void StartSelfReception() => serialPort.Write("Y\r");

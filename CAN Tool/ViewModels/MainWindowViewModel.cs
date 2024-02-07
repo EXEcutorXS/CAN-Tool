@@ -203,6 +203,8 @@ namespace CAN_Tool.ViewModels
                     }
                     else
                     {
+                        CanAdapter.Stop();
+                        Thread.Sleep(100);
                         PortButtonString = GetString("b_open");
                         CanAdapter.PortClose();
                     }
