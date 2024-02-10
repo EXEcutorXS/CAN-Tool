@@ -55,7 +55,8 @@ namespace CAN_Tool.ViewModels
 
 
         [ObservableProperty] private bool canAdapterSettings = false;
-        [ObservableProperty] private string portButtonString = "Open";
+        [ObservableProperty] private string portButtonString = GetString("b_open");
+        [ObservableProperty] private int selectedCanBitrate = 5;
         [ObservableProperty] private CanAdapter canAdapter;
         [ObservableProperty] UartAdapter uartAdapter;
         [ObservableProperty] public Omni omniInstance;
@@ -191,15 +192,15 @@ namespace CAN_Tool.ViewModels
                         CanAdapter.PortName = PortName;
                         CanAdapter.PortOpen();
                         PortButtonString = GetString("b_close");
-                        Thread.Sleep(20);
-                        CanAdapter.SetBitrate(5); //250kb/sec
-                        Thread.Sleep(20);
+                        Thread.Sleep(10);
+                        CanAdapter.SetBitrate(SelectedCanBitrate); //250kb/sec
+                        Thread.Sleep(10);
                         CanAdapter.SetAcceptCode(0);
-                        Thread.Sleep(20);
+                        Thread.Sleep(10);
                         CanAdapter.SetMask(0);
-                        Thread.Sleep(20);
+                        Thread.Sleep(10);
                         CanAdapter.StartNormal();
-                        Thread.Sleep(20);
+                        Thread.Sleep(10);
                     }
                     else
                     {

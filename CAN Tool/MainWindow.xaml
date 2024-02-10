@@ -73,12 +73,14 @@
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_exit}" Margin="10" Click="ExitButtonClick" FlowDirection="RightToLeft" />
                     </StackPanel>
                 </DockPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Collapsed">
-                    <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" SelectedIndex="3" SelectionChanged="CanBitrateField_SelectionChanged">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Visible">
+                    <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" SelectionChanged="CanBitrateField_SelectionChanged" SelectedIndex="{Binding SelectedCanBitrate,Mode=OneWayToSource}">
                         <ComboBox.ItemsSource>
                             <col:ArrayList>
+                                <sys:Int32>0</sys:Int32>
                                 <sys:Int32>20</sys:Int32>
                                 <sys:Int32>50</sys:Int32>
+                                <sys:Int32>100</sys:Int32>
                                 <sys:Int32>125</sys:Int32>
                                 <sys:Int32>250</sys:Int32>
                                 <sys:Int32>500</sys:Int32>
@@ -623,7 +625,7 @@
                             <Button Content="{DynamicResource b_burn}" Margin="10" Command="{Binding UpdateFirmwareCommand}" />
                             <Button Content="{DynamicResource b_switch_to_main_program}" Margin="10" Command="{Binding SwitchToMainProgramCommand}" />
                             <Button Content="{DynamicResource b_find_boot}" Margin="10" Command="{Binding RequestBootLoaderVersionCommand}" />
-                            <Button Content="{DynamicResource b_get_version}" Margin="10" Command="{Binding GetVersionCommand}" />
+                            <Button Content="{DynamicResource b_get_version}" Margin="10" Command="{Binding GetVersionCommand}"/>
                             <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding Vm.OmniInstance.SelectedConnectedDevice.FirmwareAsText}" />
                             <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding Vm.OmniInstance.SelectedConnectedDevice.ProductionDate}" />
                         </StackPanel>

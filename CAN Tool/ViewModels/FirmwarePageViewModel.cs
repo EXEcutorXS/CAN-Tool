@@ -48,6 +48,7 @@ namespace CAN_Tool.ViewModels
         [RelayCommand]
         private void SwitchToBootLoader()
         {
+            if (Vm?.OmniInstance.SelectedConnectedDevice == null) return;
             OmniMessage msg = new();
             msg.Pgn = 1;
             msg.ReceiverId.Address = Vm.OmniInstance.SelectedConnectedDevice.Id.Address;
@@ -97,6 +98,7 @@ namespace CAN_Tool.ViewModels
         [RelayCommand]
         private void GetVersion()
         {
+            if (Vm?.OmniInstance.SelectedConnectedDevice == null) return;
             OmniMessage msg = new();
             msg.Pgn = 6;
             msg.ReceiverId.Address = Vm.OmniInstance.SelectedConnectedDevice.Id.Address;
