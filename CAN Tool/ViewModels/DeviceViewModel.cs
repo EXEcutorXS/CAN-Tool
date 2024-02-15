@@ -118,12 +118,15 @@ namespace OmniProtocol
 
         [ObservableProperty] private DateOnly productionDate;
 
-        private byte[] firmware = new byte[4];
+        [NotifyPropertyChangedFor(nameof(FirmwareAsText))]
+        [ObservableProperty] private byte[] firmware = new byte[4];
 
-        [AffectsTo(nameof(FirmwareAsText))]
-        public byte[] Firmware { get => firmware; set => SetProperty(ref firmware, value); }
+        public string FirmwareAsText => Firmware != null ? $"{Firmware[0]}.{Firmware[1]}.{Firmware[2]}.{Firmware[3]}" : GetString("t_no_firmware_data");
 
-        public string FirmwareAsText => firmware != null ? $"{firmware[0]}.{firmware[1]}.{firmware[2]}.{firmware[3]}" : GetString("t_no_firmware_data");
+        [NotifyPropertyChangedFor(nameof(BootloaderFirmwareAsText))]
+        [ObservableProperty] private byte[] bootloaderFirmware = new byte[4];
+
+        public string BootloaderFirmwareAsText => BootloaderFirmware != null ? $"{BootloaderFirmware[0]}.{BootloaderFirmware[1]}.{BootloaderFirmware[2]}.{BootloaderFirmware[3]}" : GetString("t_no_firmware_data");
 
         private uint serial1 = 0;
 

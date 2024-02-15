@@ -44,7 +44,6 @@ namespace CAN_Tool.CustomControls
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            //var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + "PressureLog" + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".txt";
             var path = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName) + "\\" + "PressureLog" + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".txt";
 
             using (var sw = new StreamWriter(path))

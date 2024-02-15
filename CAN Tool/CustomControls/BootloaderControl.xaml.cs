@@ -1,5 +1,4 @@
-﻿using OmniProtocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,24 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace CAN_Tool.CustomControls
 {
     /// <summary>
-    /// Логика взаимодействия для HeaterControl.xaml
+    /// Логика взаимодействия для BootloaderControl.xaml
     /// </summary>
-    public partial class HeaterControl : UserControl
+    public partial class BootloaderControl : UserControl
     {
-
-        //public DeviceViewModel Vm => (DeviceViewModel)DataContext;
-        //private DispatcherTimer logTimer = new();
-
-        public HeaterControl()
+        public BootloaderControl()
         {
             InitializeComponent();
-
         }
-
     }
 }

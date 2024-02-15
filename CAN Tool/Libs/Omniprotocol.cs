@@ -30,7 +30,7 @@ namespace OmniProtocol
 
     public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency }
 
-    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard,PressureSensor }
+    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor }
 
     public class GotOmniMessageEventArgs : EventArgs
     {
@@ -982,7 +982,7 @@ public partial class Omni : ObservableObject
         Pgns[11].parameters.Add(new() { Name = "Напряжение питания", BitLength = 16, StartByte = 0, a = 0.1, UnitT = UnitType.Volt, Var = 5 });
         Pgns[11].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 2, UnitT = UnitType.Pressure });
         Pgns[11].parameters.Add(new() { Name = "Ток двигателя, значения АЦП", BitLength = 16, StartByte = 3 });
-        Pgns[11].parameters.Add(new() { Name = "Ток двигателя, мА", BitLength = 16, StartByte = 5 , UnitT = UnitType.Current,a=0.001,Var=128});
+        Pgns[11].parameters.Add(new() { Name = "Ток двигателя, мА", BitLength = 16, StartByte = 5, UnitT = UnitType.Current, a = 0.001, Var = 128 });
 
         Pgns[12].parameters.Add(new() { Name = "Заданные обороты нагнетателя воздуха", BitLength = 8, StartByte = 0, UnitT = UnitType.Rps, Var = 15 });
         Pgns[12].parameters.Add(new() { Name = "Измеренные обороты нагнетателя воздуха,", BitLength = 8, StartByte = 1, UnitT = UnitType.Rps, Var = 16 });
@@ -1262,7 +1262,7 @@ public partial class Omni : ObservableObject
     public static Dictionary<int, OmniCommand> Commands { get; } = new();
 
     public BindingList<DeviceViewModel> ConnectedDevices { get; } = new();
-    [NotifyPropertyChangedFor(nameof(AvailableModels),nameof(AvailableVendors))]
+    [NotifyPropertyChangedFor(nameof(AvailableModels), nameof(AvailableVendors))]
     [ObservableProperty] private DeviceViewModel selectedConnectedDevice;
 
     public UpdatableList<OmniMessage> Messages { get; } = new();
@@ -1281,7 +1281,7 @@ public partial class Omni : ObservableObject
     void LoadPreset()
     {
         SelectedConnectedDevice.ReadParameters.Clear();
-        var Preset = AllPresets.FirstOrDefault(p => p.VendorName == SelectedVendor && p.ModelName == SelectedModel && SelectedConnectedDevice.Id.Type==p.DeviceType);
+        var Preset = AllPresets.FirstOrDefault(p => p.VendorName == SelectedVendor && p.ModelName == SelectedModel && SelectedConnectedDevice.Id.Type == p.DeviceType);
         if (Preset == null)
         {
             MessageBox.Show($"Can't find preset for {SelectedVendor}-{SelectedModel}");
@@ -1301,13 +1301,13 @@ public partial class Omni : ObservableObject
             MessageBox.Show("Model and vendor names must contain at least 3 characters");
             return;
         }
-        var Preset = AllPresets.FirstOrDefault(p => p.VendorName == SelectedVendor && p.ModelName == SelectedModel && p.DeviceType==SelectedConnectedDevice.Id.Type);
+        var Preset = AllPresets.FirstOrDefault(p => p.VendorName == SelectedVendor && p.ModelName == SelectedModel && p.DeviceType == SelectedConnectedDevice.Id.Type);
         if (Preset != null)
         {
             MessageBox.Show($"Preset for \"{SelectedVendor} - {SelectedModel}\" already exists, delete it first");
             return;
         }
-        ConfigPreset newPreset = new ConfigPreset() { ModelName = SelectedModel, VendorName = SelectedVendor,DeviceType=SelectedConnectedDevice.Id.Type };
+        ConfigPreset newPreset = new ConfigPreset() { ModelName = SelectedModel, VendorName = SelectedVendor, DeviceType = SelectedConnectedDevice.Id.Type };
         foreach (var parameter in SelectedConnectedDevice.ReadParameters)
         {
             if (parameter.Id < 12 || parameter.Id > 14) //Excluding serial number
@@ -1328,7 +1328,7 @@ public partial class Omni : ObservableObject
     [RelayCommand]
     void DeletePreset()
     {
-        if (AllPresets.Remove(AllPresets.FirstOrDefault(p => p.ModelName == SelectedModel && p.VendorName == SelectedVendor && p.DeviceType==SelectedConnectedDevice.Id.Type)))
+        if (AllPresets.Remove(AllPresets.FirstOrDefault(p => p.ModelName == SelectedModel && p.VendorName == SelectedVendor && p.DeviceType == SelectedConnectedDevice.Id.Type)))
         {
             try
             {
@@ -1359,7 +1359,7 @@ public partial class Omni : ObservableObject
         get
         {
             var initialCollection = AllPresets;
-            var distincted = initialCollection.Where(p => p.VendorName == SelectedVendor && p.DeviceType==SelectedConnectedDevice.Id.Type).ToList();
+            var distincted = initialCollection.Where(p => p.VendorName == SelectedVendor && p.DeviceType == SelectedConnectedDevice.Id.Type).ToList();
             var ret = new BindingList<string>(distincted.Select(p => p.ModelName).ToList());
             return ret;
         }
@@ -1370,7 +1370,7 @@ public partial class Omni : ObservableObject
         get
         {
             var initialCollection = AllPresets;
-            var distincted = initialCollection.DistinctBy(p => p.VendorName).Where(p=>p.DeviceType==SelectedConnectedDevice?.Id.Type).ToList();
+            var distincted = initialCollection.DistinctBy(p => p.VendorName).Where(p => p.DeviceType == SelectedConnectedDevice?.Id.Type).ToList();
             var ret = new BindingList<string>(distincted.Select(p => p.VendorName).ToList());
             return ret;
         }
@@ -1565,7 +1565,10 @@ public partial class Omni : ObservableObject
             case 18: //Version
                 {
                     senderDevice.flagGetVersionDone = true;
-                    senderDevice.Firmware = m.Data[0..4];
+                    if (m.Data[0] != 123)
+                        senderDevice.Firmware = m.Data[0..4];
+                    else
+                        senderDevice.BootloaderFirmware = m.Data[0..4];
                     if (m.Data[5] != 0xff && m.Data[6] != 0xff && m.Data[7] != 0xff)
                         try
                         {
