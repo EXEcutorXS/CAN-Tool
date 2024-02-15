@@ -1978,10 +1978,10 @@ public partial class Omni : ObservableObject
 
         var currentDevice = ConnectedDevices.FirstOrDefault(i => i.Id.Equals(id));
 
-        for (var parId = 0; parId < 601; parId++) //Currently we have 600 parameters
+        for (var parId = 0; parId < 700; parId++) //Currently we have 600 parameters, 100 just in case
         {
-            if (!GotResource($"par_{parId}")) // Если нет параметра в ресурсах - не запрашиваем ???
-                continue;
+            //if (!GotResource($"par_{parId}")) // Requesting even if we know nothing about it
+            //    continue;
             OmniMessage msg = new();
             msg.Pgn = 7;
             msg.TransmitterId.Address = 6;

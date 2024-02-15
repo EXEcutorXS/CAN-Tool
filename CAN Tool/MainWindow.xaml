@@ -74,7 +74,7 @@
                     </StackPanel>
                 </DockPanel>
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Visible">
-                    <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" SelectionChanged="CanBitrateField_SelectionChanged" SelectedIndex="{Binding SelectedCanBitrate,Mode=OneWayToSource}">
+                    <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" SelectedIndex="{Binding SelectedCanBitrate}">
                         <ComboBox.ItemsSource>
                             <col:ArrayList>
                                 <sys:Int32>0</sys:Int32>
