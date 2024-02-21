@@ -25,7 +25,6 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using System.Windows;
 using System.Text;
-using ScottPlot.MarkerShapes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Reflection;
 

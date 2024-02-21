@@ -46,6 +46,7 @@
 <v:String x:Key="b_firmware">Прошивка</v:String>
 <v:String x:Key="b_load_hex">Загрузить HEX</v:String>
 <v:String x:Key="b_burn">Прошить</v:String>
+<v:String x:Key="b_burn_old">Прошить(старый загрузчик)</v:String>
 <v:String x:Key="b_find_boot">Найти загрузчик</v:String>
 <v:String x:Key="b_switch_to_boot">войти в Bootloader</v:String>
 <v:String x:Key="b_switch_to_main_program">Запустить программу</v:String>
@@ -965,6 +966,7 @@
 <v:String x:Key="t_no_firmware_data">Нет данных о ПО</v:String>
 <v:String x:Key="t_date_time">Дата/Время</v:String>
 <v:String x:Key="t_day_night_backlight">День/Ночь Подсветка</v:String>
+<v:String x:Key="t_hold_shift">Можно использовать колесо мыши, удерживайте shift для выстрого изменения</v:String>
 
 <v:String x:Key="u_s">с</v:String>
 <v:String x:Key="u_hz">Гц</v:String>
@@ -976,7 +978,7 @@
 <v:String x:Key="b_save_current_config">Сохранить настройки</v:String>
 <v:String x:Key="t_in_progress">в процессе</v:String>
 <v:String x:Key="t_done_in">выполнено за</v:String>
-<v:String x:Key="t_canelled">отменено</v:String>
+<v:String x:Key="t_cancelled">отменено</v:String>
 <v:String x:Key="t_failed">сбой выполнения</v:String>
 <v:String x:Key="t_reading_bb_parameters">Чтение параметров чёрного ящика</v:String>
 <v:String x:Key="t_reading_b_errors">Чтение ошибок из черного ящика</v:String>

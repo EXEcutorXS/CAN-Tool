@@ -45,7 +45,8 @@
 <v:String x:Key="b_manual">Manual</v:String>
 <v:String x:Key="b_firmware">Firmware</v:String>
 <v:String x:Key="b_load_hex">Load HEX</v:String>
-<v:String x:Key="b_burn">Write to Flash</v:String>
+<v:String x:Key="b_burn">Program</v:String>
+<v:String x:Key="b_burn_old">Program(obsolete)</v:String>
 <v:String x:Key="b_find_boot">Ping Bootloader</v:String>
 <v:String x:Key="b_switch_to_boot">to Bootloader</v:String>
 <v:String x:Key="b_switch_to_main_program">to Main Program</v:String>
@@ -965,6 +966,7 @@
 <v:String x:Key="t_no_firmware_data">No firmware data</v:String>
 <v:String x:Key="t_date_time">Date/Time</v:String>
 <v:String x:Key="t_day_night_backlight">Day/Night + Backlight</v:String>
+<v:String x:Key="t_hold_shift">You can use mouse wheel, hold shift to change faster</v:String>
 
 <v:String x:Key="u_s">s</v:String>
 <v:String x:Key="u_hz">Hz</v:String>
@@ -976,7 +978,7 @@
 <v:String x:Key="b_save_current_config">Save current</v:String>
 <v:String x:Key="t_in_progress">in progress</v:String>
 <v:String x:Key="t_done_in">done in</v:String>
-<v:String x:Key="t_canelled">cancelled</v:String>
+<v:String x:Key="t_cancelled">cancelled</v:String>
 <v:String x:Key="t_failed">failed</v:String>
 <v:String x:Key="t_reading_bb_parameters">Reading black box parameters</v:String>
 <v:String x:Key="t_reading_b_errors">Reading black box errors</v:String>

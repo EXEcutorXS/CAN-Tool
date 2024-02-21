@@ -10,140 +10,76 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace CAN_Tool.ViewModels
 {
 
-    public class ManualPageViewModel : ViewModel
+    public partial class ManualPageViewModel : ObservableObject
     {
         public MainWindowViewModel Vm { set; get; }
 
-
-        private int manualAirBlower;
-        public int ManualAirBlower { set => Set(ref manualAirBlower, value); get => manualAirBlower; }
-
-        private int manualFuelPump;
-        public int ManualFuelPump { set => Set(ref manualFuelPump, value); get => manualFuelPump; }
-
-        private int manualGlowPlug;
-        public int ManualGlowPlug { set => Set(ref manualGlowPlug, value); get => manualGlowPlug; }
-
-        private bool manualWaterPump;
-        public bool ManualWaterPump { set => Set(ref manualWaterPump, value); get => manualWaterPump; }
+        [ObservableProperty] private int manualAirBlower;
+        [ObservableProperty] private int manualFuelPump;
+        [ObservableProperty] private int manualGlowPlug;
+        [ObservableProperty] private bool manualWaterPump;
 
 
+        [RelayCommand]
+        private void EnterManualMode(object parameter) => Vm.ExecuteCommand(67, new byte[] { 1, 0, 0, 0, 0, 0 });
 
-        public ICommand EnterManualModeCommand { get; }
-        private void OnEnterManualModeCommandExecuted(object parameter)
-        {
-            Vm.ExecuteCommand(67, new byte[] { 1, 0, 0, 0, 0, 0 });
-        }
-
-
-        public ICommand ExitManualModeCommand { get; }
-        private void OnExitManualModeCommandExecuted(object parameter)
+        [RelayCommand]
+        private void ExitManualMode(object parameter)
         {
             ManualAirBlower = 0;
             ManualFuelPump = 0;
             ManualGlowPlug = 0;
             Vm.ExecuteCommand(67, new byte[] { 0, 0, 0, 0, 0, 0 });
         }
-        
-        
-        public ICommand PumpCheckCommand { get; }
-        private void OnPumpCheckCommandExecuted(object parameter)
+
+        [RelayCommand]
+        private void PumpCheck(object parameter)
         {
             Task.Run(() => Vm.OmniInstance.CheckPump(Vm.OmniInstance.SelectedConnectedDevice));
         }
 
-        private bool CanPumpCheckCommandExecute(object parameter)
+        [RelayCommand]
+        private void ChangeManualAirBlower(object parameter)
         {
-            return (Vm.deviceSelected(null) && Vm.OmniInstance.SelectedConnectedDevice.ManualMode && !Vm.OmniInstance.CurrentTask.Occupied);
-        }
-        
-        public ICommand IncreaceManualAirBlowerCommand { get; }
-        private void OnIncreaceManualAirBlowerCommandExecuted(object parameter)
-        {
-            int delta;
-
-            if (parameter == null)
-                delta = 1;
-            else
-                delta = (int)parameter;
-
-            ManualAirBlower += delta;
-            if (ManualAirBlower >= 200)
-                manualAirBlower = 200;
+            ManualAirBlower += (parameter == null) ? 1 : int.Parse(parameter as string);
+            ManualAirBlower = Math.Clamp(ManualAirBlower, 0,200);
 
             updateManualMode();
         }
 
-        public ICommand DecreaseManualAirBlowerCommand { get; }
-        private void OnDecreaseManualAirBlowerCommandExecuted(object parameter)
+        [RelayCommand]
+        private void ChangeManualFuelPump(object parameter)
         {
-            int delta;
-
-            if (parameter == null)
-                delta = -1;
-            else
-                delta = (int)parameter;
-
-            ManualAirBlower += delta;
-            if (ManualAirBlower <= 0)
-                ManualAirBlower = 0;
-
+            ManualFuelPump += (parameter == null) ? 5 : int.Parse(parameter as string);
+            ManualFuelPump = Math.Clamp(ManualFuelPump,0, 700);
             updateManualMode();
         }
 
-        public ICommand IncreaseManualFuelPumpCommand { get; }
-        private void OnIncreaseManualFuelPumpCommandExecuted(object parameter)
+        [RelayCommand]
+        private void ChangeGlowPlug(object parameter)
         {
-            ManualFuelPump += 5;
-            if (ManualFuelPump > 700) ManualFuelPump = 700;
+            ManualGlowPlug += (parameter == null) ? 1 : int.Parse(parameter as string);
+            ManualGlowPlug = Math.Clamp(ManualGlowPlug, 0,100);
             updateManualMode();
         }
 
 
-        public ICommand DecreaseFuelPumpCommand { get; }
-        private void OnDecreaseFuelPumpCommandExecuted(object parameter)
+        [RelayCommand]
+        private void ToggleWaterPump(object parameter)
         {
-            ManualFuelPump -= 5;
-            if (ManualFuelPump < 0) ManualFuelPump = 0;
-            updateManualMode();
-        }
-
-        public ICommand IncreaseGlowPlugCommand { get; }
-        private void OnIncreaseGlowPlugCommandExecuted(object parameter)
-        {
-            ManualGlowPlug += 5;
-            if (ManualGlowPlug > 100) ManualGlowPlug = 100;
-            updateManualMode();
-        }
-        
-        public ICommand DecreaseGlowPlugCommand { get; }
-        private void OnDecreaseGlowPlugCommandExecuted(object parameter)
-        {
-            ManualGlowPlug -= 5;
-            if (ManualGlowPlug < 0) ManualGlowPlug = 0;
-            updateManualMode();
-        }
-
-        public ICommand TurnOnWaterPumpCommand { get; }
-        private void OnTurnOnWaterPumpCommandExecuted(object parameter)
-        {
-            manualWaterPump = true;
-            updateManualMode();
-        }
-
-        public ICommand TurnOffWaterPumpCommand { get; }
-        private void OnTurnOffWaterPumpCommandExecuted(object parameter)
-        {
-            manualWaterPump = false;
+            ManualWaterPump = !ManualWaterPump;
             updateManualMode();
         }
 
         private void updateManualMode()
         {
+            if (Vm.OmniInstance.SelectedConnectedDevice == null) return;
             OmniMessage msg = new();
             msg.TransmitterId.Type = 126;
             msg.TransmitterId.Address = 6;
@@ -153,11 +89,7 @@ namespace CAN_Tool.ViewModels
             msg.Data = new byte[8];
             msg.Data[0] = 0;
             msg.Data[1] = 68;
-
-            if (ManualWaterPump)
-                msg.Data[2] = 1;
-            else
-                msg.Data[2] = 0;
+            msg.Data[2] = (byte)(ManualWaterPump ? 1 : 0);
             msg.Data[3] = (byte)ManualAirBlower;
             msg.Data[4] = (byte)ManualGlowPlug;
             msg.Data[5] = (byte)(ManualFuelPump / 256);
@@ -168,18 +100,6 @@ namespace CAN_Tool.ViewModels
         public ManualPageViewModel(MainWindowViewModel vm)
         {
             Vm = vm;
-
-            EnterManualModeCommand = new LambdaCommand(OnEnterManualModeCommandExecuted, null);
-            ExitManualModeCommand = new LambdaCommand(OnExitManualModeCommandExecuted, Vm.deviceInManualMode);
-            IncreaceManualAirBlowerCommand = new LambdaCommand(OnIncreaceManualAirBlowerCommandExecuted, Vm.deviceInManualMode);
-            DecreaseManualAirBlowerCommand = new LambdaCommand(OnDecreaseManualAirBlowerCommandExecuted, Vm.deviceInManualMode);
-            IncreaseManualFuelPumpCommand = new LambdaCommand(OnIncreaseManualFuelPumpCommandExecuted, Vm.deviceInManualMode);
-            DecreaseFuelPumpCommand = new LambdaCommand(OnDecreaseFuelPumpCommandExecuted, Vm.deviceInManualMode);
-            IncreaseGlowPlugCommand = new LambdaCommand(OnIncreaseGlowPlugCommandExecuted, Vm.deviceInManualMode);
-            DecreaseGlowPlugCommand = new LambdaCommand(OnDecreaseGlowPlugCommandExecuted, Vm.deviceInManualMode);
-            TurnOnWaterPumpCommand = new LambdaCommand(OnTurnOnWaterPumpCommandExecuted, Vm.deviceInManualMode);
-            TurnOffWaterPumpCommand = new LambdaCommand(OnTurnOffWaterPumpCommandExecuted, Vm.deviceInManualMode);
-            PumpCheckCommand = new LambdaCommand(OnPumpCheckCommandExecuted, CanPumpCheckCommandExecute);
         }
     }
 }

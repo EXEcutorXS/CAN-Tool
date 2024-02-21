@@ -23,6 +23,7 @@ using Newtonsoft;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Specialized;
+using ScottPlot.WPF;
 
 
 namespace OmniProtocol
@@ -192,10 +193,6 @@ namespace OmniProtocol
         [ObservableProperty] private int fanStage = 2;
 
         [ObservableProperty] private int currentPwm = 50;
-
-        public Task ManualPercentChangeTask;
-
-        public bool GotChange;
     }
 
     public partial class Timberline20OmniViewModel : ObservableObject
@@ -589,7 +586,6 @@ public partial class OmniTask : ObservableObject
     [NotifyPropertyChangedFor(nameof(TaskStatus))]
     [ObservableProperty]
     private int percentComplete;
-
 
     private DateTime capturedTime;
 
@@ -1716,6 +1712,20 @@ public partial class Omni : ObservableObject
                         break;
                 }
 
+                break;
+            case 100:
+                if (m.Data[0] == 1 && m.Data[1]==1)
+                {
+                    senderDevice.flagEraseDone = true;
+                }
+                if (m.Data[0] == 2 && m.Data[1] == 1)
+                {
+                    senderDevice.flagSetAdrDone = true;
+                }
+                if (m.Data[0] == 3 && m.Data[1] == 1)
+                {
+                    senderDevice.flagProgramDone = true;
+                }
                 break;
             case 105:
                 {

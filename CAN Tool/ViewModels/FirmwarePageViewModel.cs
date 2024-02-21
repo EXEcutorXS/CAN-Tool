@@ -275,7 +275,7 @@ namespace CAN_Tool.ViewModels
         private void UpdateFirmware(List<CodeFragment> fragmentsArg)
         {
             LogWriteLine("Starting Firmware updating procedure");
-            Vm.OmniInstance.CurrentTask.Capture("Memory Erasing");
+            if (!Vm.OmniInstance.CurrentTask.Capture("Memory Erasing")) return;
             LogWriteLine("Starting flash erasing");
             for (var i = 0; i < 4; i++)
             {
@@ -286,7 +286,7 @@ namespace CAN_Tool.ViewModels
 
             Vm.OmniInstance.CurrentTask.OnDone();
 
-            Vm.OmniInstance.CurrentTask.Capture("Programming...");
+            Vm.OmniInstance.CurrentTask.Capture("Programming");
 
             var cnt = 0;
             foreach (var f in fragmentsArg)
@@ -300,22 +300,22 @@ namespace CAN_Tool.ViewModels
 
         }
         #region oldVersionBootloader
-        /*
+        
         private void flashFragmentOld(CodeFragment f)
         {
             writeFragmentToRamOld(f);
             for (int i = 0; i < 4; i++)
             {
-                if (i == 3) { Vm.AC2PInstance.CurrentTask.onFail("Can't flash memory"); return; }
-                startFlashing();
-                if (WaitForFlag(ref Vm.SelectedConnectedDevice.flagProgramDone, 20)) break;
+                if (i == 3) { Vm.OmniInstance.CurrentTask.OnFail("Can't flash memory"); return; }
+                StartFlashing();
+                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone, 20)) break;
             }
         }
 
         private void bootloaderSetAdrLen(uint adress, int len)
         {
             LogWriteLine($"Setting adress to 0X{adress:X}");
-            AC2PMessage msg = new();
+            OmniMessage msg = new();
             msg.Pgn = 100;
             msg.ReceiverId.Type = 123;
             msg.Data[0] = 5;
@@ -329,39 +329,35 @@ namespace CAN_Tool.ViewModels
 
             for (int i = 0; i < 6; i++)
             {
-                if (i == 5) { Vm.AC2PInstance.CurrentTask.onFail("Can't set start adress"); return; }
-                Vm.CanAdapter.Transmit(msg);
-                if (WaitForFlag(ref Vm.SelectedConnectedDevice.flagSetAdrDone, 100)) break;
+                if (i == 5) { Vm.OmniInstance.CurrentTask.OnFail("Can't set start adress"); return; }
+                Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagSetAdrDone, 100)) break;
             }
         }
         private void initAnddressOld()
         {
-            AC2PMessage msg = new()
+            OmniMessage msg = new()
             {
                 Pgn = 100,
-                TransmitterId.Address = 6,
-                TransmitterId.Type = 126,
-                ReceiverId.Address = 0,
-                ReceiverId.Type = 123
+                TransmitterId = new DeviceId(126,6),
+                ReceiverId = new DeviceId(123,0)
             };
             msg.Data[0] = 1;
 
-            Vm.CanAdapter.TransmitForSure(msg, 100);
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            Thread.Sleep(10);
         }
 
         private void writeFragmentToRamOld(CodeFragment f)
         {
             int len = 0;
-            AC2PMessage msg = new()
+            OmniMessage msg = new()
             {
                 Pgn = 101,
-                TransmitterId.Address = 6,
-                TransmitterId.Type = 126,
-                ReceiverId.Address = 0,
-                ReceiverId.Type = 123
+                TransmitterId = new DeviceId(126, 6),
+                ReceiverId = new DeviceId(123,0)
             };
-
-            LogWriteLine($"Starting {f.StartAdress:X} fragment transmission");
+            LogWriteLine($"Starting {f.StartAddress:X} fragment transmission");
             for (int i = 0; i < (f.Length + 7) / 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -377,42 +373,54 @@ namespace CAN_Tool.ViewModels
                 msg.Data[5] = f.Data[i * 8 + 5];
                 msg.Data[6] = f.Data[i * 8 + 6];
                 msg.Data[7] = f.Data[i * 8 + 7];
-                Vm.CanAdapter.TransmitForSure(msg, 10);
-
+                Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                Thread.Sleep(20);
             }
 
         }
-        private void updateFirmwareOld(List<CodeFragment> fragments)
+
+        private void EraseFlashOld()
+        {
+            OmniMessage msg = new();
+            msg.Pgn = 100;
+            msg.ReceiverId.Type = 123;
+            msg.Data[0] = 1; //Flash erase
+            msg.Data[1] = 255;  //Стереть всю память
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone = false;
+        }
+
+        private void UpdateFirmwareOld(List<CodeFragment> fragments)
         {
             LogWriteLine("Starting Firmware updating procedure");
-            Vm.AC2PInstance.CurrentTask.Capture("Memory Erasing");
+            Vm.OmniInstance.CurrentTask.Capture("Memory Erasing");
             LogWriteLine("Starting flash erasing");
             for (int i = 0; i < 4; i++)
             {
-                if (i == 3) { Vm.AC2PInstance.CurrentTask.onFail("Can't erase memory"); return; }
-                eraseFlash();
-                if (WaitForFlag(ref Vm.SelectedConnectedDevice.flagEraseDone, 5000)) break;
+                if (i == 3) { Vm.OmniInstance.CurrentTask.OnFail("Can't erase memory"); return; }
+                EraseFlashOld();
+                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone, 5000)) break;
             }
 
-            Vm.AC2PInstance.CurrentTask.onDone();
+            Vm.OmniInstance.CurrentTask.OnDone();
 
-            Vm.AC2PInstance.CurrentTask.Capture("Programming...");
+            Vm.OmniInstance.CurrentTask.Capture("Programming...");
 
             int cnt = 0;
 
             initAnddressOld();
-
+            Thread.Sleep(20);
             foreach (var f in fragments)
             {
                 flashFragmentOld(f);
-                Vm.AC2PInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
-                if (Vm.AC2PInstance.CurrentTask.CTS.IsCancellationRequested) return;
+                Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
+                if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested) return;
             }
             LogWriteLine("Firmware updating success");
-            Vm.AC2PInstance.CurrentTask.onDone();
+            Vm.OmniInstance.CurrentTask.OnDone();
 
         }
-        */
+        
         #endregion
 
         private void AddFragment(CodeFragment fragment)
@@ -497,6 +505,12 @@ namespace CAN_Tool.ViewModels
         private void UpdateFirmware()
         {
             Task.Run(() => UpdateFirmware(fragments));
+        }
+
+        [RelayCommand]
+        private void UpdateFirmwareOld()
+        {
+            Task.Run(() => UpdateFirmwareOld(fragments));
         }
 
         public FirmwarePageViewModel(MainWindowViewModel vm)

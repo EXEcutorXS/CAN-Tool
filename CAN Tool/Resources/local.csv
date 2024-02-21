@@ -45,7 +45,8 @@ b_glow_plug_set	Glow Plug	Свеча
 b_manual	Manual	Ручник
 b_firmware	Firmware	Прошивка
 b_load_hex	Load HEX	Загрузить HEX
-b_burn	Write to Flash	Прошить
+b_burn	Program	Прошить
+b_burn_old	Program(obsolete)	Прошить(старый загрузчик)
 b_find_boot	Ping Bootloader	Найти загрузчик
 b_switch_to_boot	to Bootloader	войти в Bootloader
 b_switch_to_main_program	to Main Program	Запустить программу
@@ -965,6 +966,7 @@ t_not_used	Not used	Не используется
 t_no_firmware_data	No firmware data	Нет данных о ПО
 t_date_time	Date/Time	Дата/Время
 t_day_night_backlight	Day/Night + Backlight	День/Ночь Подсветка
+t_hold_shift	You can use mouse wheel, hold shift to change faster	Можно использовать колесо мыши, удерживайте shift для выстрого изменения
 		
 u_s	s	с
 u_hz	Hz	Гц
@@ -976,7 +978,7 @@ b_load_preset	Load preset	Загрузить
 b_save_current_config	Save current	Сохранить настройки
 t_in_progress	in progress	в процессе
 t_done_in	done in	выполнено за
-t_canelled	cancelled	отменено
+t_cancelled	cancelled	отменено
 t_failed	failed	сбой выполнения
 t_reading_bb_parameters	Reading black box parameters	Чтение параметров чёрного ящика
 t_reading_b_errors	Reading black box errors	Чтение ошибок из черного ящика

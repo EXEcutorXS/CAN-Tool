@@ -72,8 +72,8 @@ namespace OmniProtocol
             OmniMessage msg = new();
             msg.TransmitterId.Type = 126;
             msg.TransmitterId.Address = 6;
-            msg.ReceiverId.Type = id.Type;
-            msg.ReceiverId.Address = id.Address;
+            msg.ReceiverId.Type = Id.Type;
+            msg.ReceiverId.Address = Id.Address;
             msg.Pgn = 1;
             msg.Data = new byte[8];
             msg.Data[0] = (byte)(cmdNum >> 8);
@@ -192,9 +192,9 @@ namespace OmniProtocol
 
         public Device DeviceReference { get; }
 
-        public string Img => $@"~\..\Images\{id.Type}.jpg";
+        public string Img => $@"~\..\Images\{Id.Type}.jpg";
 
-        public override string ToString() { return DeviceReference != null ? $"{DeviceReference.Name}({id.Address})" : $"Device #<{Id.Type}>({id.Address})"; }
+        public override string ToString() { return DeviceReference != null ? $"{DeviceReference.Name}({Id.Address})" : $"Device #<{Id.Type}>({Id.Address})"; }
 
         public override bool Equals(object obj)
         {
@@ -208,7 +208,7 @@ namespace OmniProtocol
 
         public List<double[]> LogData = new();
 
-        public float[] PressureLog = new float[720000];
+        public double[] PressureLog = new double[720000];
 
         [ObservableProperty] public int pressureLogPointer = 0;
         public bool PressureLogWriting = false;
