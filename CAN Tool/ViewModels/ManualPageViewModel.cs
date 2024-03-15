@@ -24,7 +24,6 @@ namespace CAN_Tool.ViewModels
         [ObservableProperty] private int manualFuelPump;
         [ObservableProperty] private int manualGlowPlug;
         [ObservableProperty] private bool manualWaterPump;
-        private bool togglePumpRequest;
 
 
         [RelayCommand]
@@ -74,7 +73,7 @@ namespace CAN_Tool.ViewModels
         [RelayCommand]
         private void ToggleWaterPump(object parameter)
         {
-            togglePumpRequest = true;
+            ManualWaterPump = !ManualWaterPump;
             updateManualMode();
         }
 
@@ -90,7 +89,7 @@ namespace CAN_Tool.ViewModels
             msg.Data = new byte[8];
             msg.Data[0] = 0;
             msg.Data[1] = 68;
-            msg.Data[2] = (byte)((ManualWaterPump^togglePumpRequest)? 1 : 0);
+            msg.Data[2] = (byte)(ManualWaterPump? 1 : 0);
             msg.Data[3] = (byte)ManualAirBlower;
             msg.Data[4] = (byte)ManualGlowPlug;
             msg.Data[5] = (byte)(ManualFuelPump / 256);

@@ -526,7 +526,7 @@
                             <Button Margin="10" Content="{DynamicResource b_enter_manual}" Command="{Binding EnterManualModeCommand}" />
                             <Button Margin="10" Content="{DynamicResource b_leave_manual}" Command="{Binding ExitManualModeCommand}" />
 
-                            <CheckBox Margin="5" Style="{StaticResource MaterialDesignSwitchDarkToggleButton }" IsChecked="{Binding ManualWaterPump}" IsEnabled="{Binding Vm.OmniInstance.SelectedConnectedDevice.ManualMode,TargetNullValue=false}" Visibility="{Binding Vm.OmniInstance.SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" Command="{Binding ToggleWaterPumpCommand}" />
+                            <CheckBox Margin="5" Style="{StaticResource MaterialDesignSwitchDarkToggleButton }" IsChecked="{Binding ManualWaterPump,Mode=OneWay}" IsEnabled="{Binding Vm.OmniInstance.SelectedConnectedDevice.ManualMode,TargetNullValue=false}" Visibility="{Binding Vm.OmniInstance.SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" Command="{Binding ToggleWaterPumpCommand}" />
                             <TextBlock Margin="5" FontSize="25" VerticalAlignment="Center" Text="{DynamicResource b_water_pump}" Visibility="{Binding Vm.OmniInstance.SelectedConnectedDevice.DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"></TextBlock>
                             <Button Margin="10" Content="{DynamicResource b_1000_ticks}" Command="{Binding PumpCheckCommand}" />
                         </StackPanel>
