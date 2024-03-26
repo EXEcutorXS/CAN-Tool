@@ -320,6 +320,7 @@ namespace CAN_Tool.ViewModels
 
         public void ExecuteCommand(int cmdNum, params byte[] data)
         {
+            if (OmniInstance?.SelectedConnectedDevice == null) return;
             OmniMessage msg = new();
             msg.TransmitterId.Type = 126;
             msg.TransmitterId.Address = 6;

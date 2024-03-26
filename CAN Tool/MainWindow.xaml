@@ -145,7 +145,7 @@
                 <TextBlock VerticalAlignment="Center" Margin="10" Text="DLC:" FontSize="25" />
                 <TextBox ToolTip="DLC" MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.Dlc,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" />
                 <TextBlock VerticalAlignment="Center" Margin="10" Text="Data:" FontSize="25" />
-                <cc:DataBox ToolTip="Enter data in HEX format" Margin="10" DataContext="{Binding CanPage}" Text="{Binding  ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" FontFamily="Courier" />
+                <cc:DataBox ToolTip="Enter data in HEX format" Margin="10" DataContext="{Binding CanPage}" Text="{Binding ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" FontFamily="Courier" />
                 <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.Rtr}" Margin="10" FontSize="20">RTR</CheckBox>
                 <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.Ide}" Margin="10" FontSize="20">IDE</CheckBox>
                 <Button Margin="10" Command="{Binding CanPage.SendCanMessageCommand}">Send</Button>
@@ -357,7 +357,7 @@
                             <Button Content="{DynamicResource b_load_preset}" Margin="10" Command="{Binding OmniInstance.LoadPresetCommand}" />
                             <Button Content="{DynamicResource b_delete_preset}" Margin="10" Command="{Binding OmniInstance.DeletePresetCommand}" />
                         </StackPanel>
-                        <DataGrid DockPanel.Dock="Top" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" x:Name="ConfigParameterField" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding OmniInstance.SelectedConnectedDevice.ReadParameters}">
+                        <DataGrid DockPanel.Dock="Top" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding OmniInstance.SelectedConnectedDevice.ReadParameters,Mode=OneWay}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path = Id}" Header="ID" IsReadOnly="True">
                                 </DataGridTextColumn>
@@ -606,7 +606,7 @@
                                     <Button Margin="5" Grid.Column="1" Content="-10" Command="{Binding ChangeGlowPlugCommand}" CommandParameter="-10" />
                                 </Grid>
 
-                                <TextBlock Grid.ColumnSpan="4" Grid.Column="0" Grid.Row="5" Style="{StaticResource MaterialDesignPasswordCharacterCounterTextBlock}" Text="{DynamicResource t_hold_shift}" />
+                                <TextBox Grid.ColumnSpan="4" Grid.Column="0" Grid.Row="5" Text="{DynamicResource t_hold_shift}" />
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="{DynamicResource b_air_set}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" />
                                 <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center">

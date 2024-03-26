@@ -1524,6 +1524,9 @@ public partial class Omni : ObservableObject
                         senderDevice.flagGetParamDone = true;
                     }
 
+                    if (m.Data[0] == 5) // Parameter not supported
+                        senderDevice.flagGetParamDone = true;
+                    
                     break;
                 }
             case 8: //Black box 
