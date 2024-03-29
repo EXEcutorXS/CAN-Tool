@@ -797,8 +797,10 @@
 <v:String x:Key="d_21">14ТС-10</v:String>
 <v:String x:Key="d_22">30СП (впрысковый)</v:String>
 <v:String x:Key="d_23">Бинар Компакт Бензин</v:String>
+<v:String x:Key="d_24">Бинар VB</v:String>
 <v:String x:Key="d_25">35СП (впрысковый)</v:String>
 <v:String x:Key="d_27">Бинар Компакт Дизель</v:String>
+<v:String x:Key="d_28">Бинар VD</v:String>
 <v:String x:Key="d_29">Бинар 6Г Компакт</v:String>
 <v:String x:Key="d_31">14ТСГ Мини</v:String>
 <v:String x:Key="d_32">30СПГ</v:String>
