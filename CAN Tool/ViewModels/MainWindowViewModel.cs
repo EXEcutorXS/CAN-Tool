@@ -40,7 +40,7 @@ namespace CAN_Tool.ViewModels
         public WorkMode_t[] WorkModes => new WorkMode_t[] { WorkMode_t.Omni, WorkMode_t.Rvc, WorkMode_t.RegularCan };
         public PhyProt_t[] PhyProtocols => new PhyProt_t[2] { PhyProt_t.CAN, PhyProt_t.UART };
 
-        public string Title => "CAN Tool " + Assembly.GetExecutingAssembly().GetName().Version.ToString(); 
+        public string Title => "CAN Tool";// + Assembly.GetExecutingAssembly().GetName().Version.ToString(); 
         
         [ObservableProperty] private List<SolidColorBrush> brushes = new();
         [ObservableProperty] private WorkMode_t mode;

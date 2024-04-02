@@ -11,7 +11,7 @@
 	<Nullable>disable</Nullable>
 	<Platforms>AnyCPU;x86</Platforms>
 	<ApplicationIcon>Images\CANTool.ico</ApplicationIcon>
-	<AssemblyVersion>0.0.0.*</AssemblyVersion>
+	<AssemblyVersion>0.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
