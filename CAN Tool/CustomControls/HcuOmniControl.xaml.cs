@@ -149,7 +149,7 @@ namespace CAN_Tool.CustomControls
         private void ZoneSelected(object sender, SelectionChangedEventArgs e)
         {
             var index = (sender as ListBox).SelectedIndex;
-            if (index > 4) return;
+            if (index > 4|| index<0) return;
             vm.TimberlineParams.SelectedZone = vm.TimberlineParams.Zones[index];
             DaytimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetPointDay);
             NightTimeScroll.SilentChange(vm.TimberlineParams.SelectedZone.TempSetPointNight);
