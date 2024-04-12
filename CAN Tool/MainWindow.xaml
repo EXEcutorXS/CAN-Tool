@@ -184,13 +184,19 @@
             </DataGrid>
         </DockPanel>
         <DockPanel Visibility="{Binding Mode,Converter={StaticResource OmniToVisible}}" DockPanel.Dock="Top">
-            <ListBox x:Name="DeviceSelector" DockPanel.Dock="Top" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding OmniInstance.SelectedConnectedDevice,Mode=OneWayToSource}">
+            <DockPanel DockPanel.Dock="Top">
+            <ListBox x:Name="DeviceSelector" DockPanel.Dock="Left" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding OmniInstance.SelectedConnectedDevice}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
+                <Button Margin="5" Command="{Binding OmniInstance.ClearDevicesCommand}" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                    <fa:ImageAwesome Icon="Solid_Trash" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
+                </Button>
+                
+            </DockPanel>
             <TabControl Style="{DynamicResource MaterialDesignFilledTabControl}">
                 <TabItem>
                     <TabItem.Header>

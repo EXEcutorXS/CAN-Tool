@@ -1030,10 +1030,12 @@ public partial class Omni : ObservableObject
         Pgns[19].parameters.Add(new() { Name = "Помпа", BitLength = 2, StartBit = 2, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
         Pgns[19].parameters.Add(new() { Name = "Вода", BitLength = 2, StartBit = 4, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
         Pgns[19].parameters.Add(new() { Name = "Быстрый нагрев воды", BitLength = 2, StartBit = 6, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
-        Pgns[19].parameters.Add(new() { Name = "Помпа подогревателя статус", BitLength = 2, StartByte = 2, PackNumber = 1, Meanings = DefMeaningsOnOff });
-        Pgns[19].parameters.Add(new() { Name = "Помпа 1 статус", BitLength = 2, StartByte = 2, StartBit = 2, PackNumber = 1, Meanings = DefMeaningsOnOff });
-        Pgns[19].parameters.Add(new() { Name = "Помпа 2 статус", BitLength = 2, StartByte = 2, StartBit = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
-        Pgns[19].parameters.Add(new() { Name = "Помпа 3 статус", BitLength = 2, StartByte = 2, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
+        Pgns[19].parameters.Add(new() { Name = "Помпа подогревателя статус", BitLength = 2, StartByte = 7, PackNumber = 1, Meanings = DefMeaningsOnOff });
+        Pgns[19].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 1 });
+        Pgns[19].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, PackNumber = 1 });
+        Pgns[19].parameters.Add(new() { Name = "Помпа 1 статус", BitLength = 2, StartByte = 7, StartBit = 2, PackNumber = 1, Meanings = DefMeaningsOnOff });
+        Pgns[19].parameters.Add(new() { Name = "Помпа 2 статус", BitLength = 2, StartByte = 7, StartBit = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
+        Pgns[19].parameters.Add(new() { Name = "Помпа 3 статус", BitLength = 2, StartByte = 7, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
         Pgns[19].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 1 });
         Pgns[19].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, PackNumber = 1 });
         Pgns[19].parameters.Add(new() { Name = "Сработал датчик бытовой воды", BitLength = 2, StartByte = 4, PackNumber = 1, Meanings = DefMeaningsYesNo, Var = 108 });
@@ -1041,7 +1043,7 @@ public partial class Omni : ObservableObject
         Pgns[19].parameters.Add(new() { Name = "Доступен предпусковой подогрев", BitLength = 2, StartByte = 5, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
         Pgns[19].parameters.Add(new() { Name = "Доп помпа 1 статус", BitLength = 2, StartByte = 6, StartBit = 0, PackNumber = 1, Meanings = DefMeaningsOnOff });
         Pgns[19].parameters.Add(new() { Name = "Доп помпа 2 статус", BitLength = 2, StartByte = 6, StartBit = 2, PackNumber = 1, Meanings = DefMeaningsOnOff });
-        Pgns[19].parameters.Add(new() { Name = "Доп помпа 3 статус", BitLength = 2, StartByte = 7, StartBit = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
+        Pgns[19].parameters.Add(new() { Name = "Доп помпа 3 статус", BitLength = 2, StartByte = 6, StartBit = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
 
         Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для перехода в ждущий.", BitLength = 8, StartByte = 1, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
         Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для выхода из ждущего.", BitLength = 8, StartByte = 2, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
@@ -1274,6 +1276,12 @@ public partial class Omni : ObservableObject
     [NotifyPropertyChangedFor(nameof(AvailableModels))]
     [ObservableProperty] private string selectedVendor;
     [ObservableProperty] private string selectedModel;
+
+    [RelayCommand]
+    void ClearDevices()
+    {
+        ConnectedDevices.Clear();
+    }
 
     [RelayCommand]
     void LoadPreset()
