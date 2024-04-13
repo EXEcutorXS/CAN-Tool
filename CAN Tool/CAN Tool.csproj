@@ -30,19 +30,33 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Images\1.jpg" />
     <None Remove="Images\10.jpg" />
+    <None Remove="Images\11.jpg" />
+    <None Remove="Images\12.jpg" />
     <None Remove="Images\123.jpg" />
+    <None Remove="Images\125.jpg" />
     <None Remove="Images\126.jpg" />
+    <None Remove="Images\13.jpg" />
+    <None Remove="Images\15.jpg" />
+    <None Remove="Images\17.jpg" />
+    <None Remove="Images\18.jpg" />
+    <None Remove="Images\2.jpg" />
+    <None Remove="Images\21.jpg" />
     <None Remove="Images\23.jpg" />
     <None Remove="Images\24.jpg" />
+    <None Remove="Images\25.jpg" />
     <None Remove="Images\27.jpg" />
     <None Remove="Images\28.jpg" />
+    <None Remove="Images\29.jpg" />
+    <None Remove="Images\3.jpg" />
     <None Remove="Images\34.jpg" />
     <None Remove="Images\37.jpg" />
     <None Remove="Images\40.jpg" />
     <None Remove="Images\6.jpg" />
+    <None Remove="Images\7.jpg" />
+    <None Remove="Images\9.jpg" />
     <None Remove="Images\CANTool.ico" />
-    <None Remove="Images\mouseWheel.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,19 +77,33 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\1.jpg" />
     <Resource Include="Images\10.jpg" />
+    <Resource Include="Images\11.jpg" />
+    <Resource Include="Images\12.jpg" />
     <Resource Include="Images\123.jpg" />
+    <Resource Include="Images\125.jpg" />
     <Resource Include="Images\126.jpg" />
+    <Resource Include="Images\13.jpg" />
+    <Resource Include="Images\15.jpg" />
+    <Resource Include="Images\17.jpg" />
+    <Resource Include="Images\18.jpg" />
+    <Resource Include="Images\2.jpg" />
+    <Resource Include="Images\21.jpg" />
     <Resource Include="Images\23.jpg" />
     <Resource Include="Images\24.jpg" />
+    <Resource Include="Images\25.jpg" />
     <Resource Include="Images\27.jpg" />
     <Resource Include="Images\28.jpg" />
+    <Resource Include="Images\29.jpg" />
+    <Resource Include="Images\3.jpg" />
     <Resource Include="Images\34.jpg" />
     <Resource Include="Images\37.jpg" />
     <Resource Include="Images\40.jpg" />
     <Resource Include="Images\6.jpg" />
+    <Resource Include="Images\7.jpg" />
+    <Resource Include="Images\9.jpg" />
     <Resource Include="Images\CANTool.ico" />
-    <Resource Include="Images\mouseWheel.png" />
   </ItemGroup>
 
   <ItemGroup>
