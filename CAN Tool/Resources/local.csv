@@ -890,6 +890,7 @@ t_eco	Eco	Экологичный
 t_additional_heater	Additional heater	Догреватель
 t_additional_heater_mode	Additional heater mode	Режим работы догревателя
 t_preheater	Preheater	Подогреватель
+t_heating	Room heating	Отопление
 t_heating_systems	Heating systems	Отопительные системы
 t_auto	Auto	Авто
 t_manual	Manual	Ручной
@@ -1001,3 +1002,14 @@ t_channel2_adc_value	Channel 2 ADC value	Значение АЦП 2 канала
 t_channel3_adc_value	Channel 3 ADC value	Значение АЦП 3 канала
 t_channel4_adc_value	Channel 4 ADC value	Значение АЦП 4 канала
 b_def_set	Default Set	По умолчанию
+t_fuel_pump_overriden	Fuel pump overriden flag	ТН переопределено
+t_relay_overriden	Relay overriden flag	Реле переопределено
+t_glow_plug_overriden	Glow plug overriden flag	Свеча переопределена
+t_pump_overriden	Pump state overriden flag	Состояние помпы переопределено
+t_blower_overriden	Air blower overriden flag	Обороты нагнетателя переопределены
+t_ovr_pump_state	Overriden pump state	Заданное состояние помпы
+t_ovr_relay_state	Overriden relay state	Заданное состояние реле
+t_overriden_blower_revs	Overriden air blower revs	Заданные обороты нагнетателя
+t_overriden_glow_plug_power	Overriden glow plug power	Заданная мощность свечи
+t_overriden_fuel_pump_frequency	Overriden fuel pump frequency	Заданная частота ТН
+t_actuator_override	Actuators override	Переопределение исполнительных устройств

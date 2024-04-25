@@ -890,6 +890,7 @@
 <v:String x:Key="t_additional_heater">Догреватель</v:String>
 <v:String x:Key="t_additional_heater_mode">Режим работы догревателя</v:String>
 <v:String x:Key="t_preheater">Подогреватель</v:String>
+<v:String x:Key="t_heating">Отопление</v:String>
 <v:String x:Key="t_heating_systems">Отопительные системы</v:String>
 <v:String x:Key="t_auto">Авто</v:String>
 <v:String x:Key="t_manual">Ручной</v:String>
@@ -1001,4 +1002,15 @@
 <v:String x:Key="t_channel3_adc_value">Значение АЦП 3 канала</v:String>
 <v:String x:Key="t_channel4_adc_value">Значение АЦП 4 канала</v:String>
 <v:String x:Key="b_def_set">По умолчанию</v:String>
+<v:String x:Key="t_fuel_pump_overriden">ТН переопределено</v:String>
+<v:String x:Key="t_relay_overriden">Реле переопределено</v:String>
+<v:String x:Key="t_glow_plug_overriden">Свеча переопределена</v:String>
+<v:String x:Key="t_pump_overriden">Состояние помпы переопределено</v:String>
+<v:String x:Key="t_blower_overriden">Обороты нагнетателя переопределены</v:String>
+<v:String x:Key="t_ovr_pump_state">Заданное состояние помпы</v:String>
+<v:String x:Key="t_ovr_relay_state">Заданное состояние реле</v:String>
+<v:String x:Key="t_overriden_blower_revs">Заданные обороты нагнетателя</v:String>
+<v:String x:Key="t_overriden_glow_plug_power">Заданная мощность свечи</v:String>
+<v:String x:Key="t_overriden_fuel_pump_frequency">Заданная частота ТН</v:String>
+<v:String x:Key="t_actuator_override">Переопределение исполнительных устройств</v:String>
 </ResourceDictionary>

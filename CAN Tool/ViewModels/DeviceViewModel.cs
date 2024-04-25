@@ -18,6 +18,20 @@ namespace OmniProtocol
 {
     public partial class DeviceViewModel : ObservableObject
     {
+        public partial class OverrideStateClass:ObservableObject
+        {
+            [ObservableProperty] public bool blowerOverriden;
+            [ObservableProperty] public bool fuelPumpOverriden;
+            [ObservableProperty] public bool glowPlugOverriden;
+            [ObservableProperty] public bool relayOverriden;
+            [ObservableProperty] public bool pumpOverriden;
+
+            [ObservableProperty] public int blowerOverridenRevs;
+            [ObservableProperty] public int fuelPumpOverridenFrequencyX100;
+            [ObservableProperty] public int glowPlugOverridenPower;
+            [ObservableProperty] public bool relayOverridenState;
+            [ObservableProperty] public bool pumpOverridenState;
+        }
 
         public DeviceViewModel(DeviceId newId)
         {
@@ -157,6 +171,8 @@ namespace OmniProtocol
         public Timberline20OmniViewModel TimberlineParams { set; get; } = new();
 
         [ObservableProperty] public bool manualMode;
+
+        [ObservableProperty] OverrideStateClass overrideState;
 
         public bool flagEraseDone = false;
 

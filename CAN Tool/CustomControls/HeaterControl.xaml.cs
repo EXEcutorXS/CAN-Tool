@@ -32,5 +32,14 @@ namespace CAN_Tool.CustomControls
 
         }
 
+        private void ProgressBar_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+
+        }
+
+        private void ProgressBar_MouseWheel_1(object sender, MouseWheelEventArgs e)
+        {
+
+        }
     }
 }
