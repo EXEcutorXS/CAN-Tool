@@ -4,6 +4,7 @@ using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
 using CAN_Tool.ViewModels.Base;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -45,6 +46,66 @@ namespace OmniProtocol
             CalibrateTermocouplesCommand = new LambdaCommand(x => ExecuteCommand(20), NotInManual);
             if (Omni.Devices.TryGetValue(Id.Type, out var device))
                 DeviceReference = device;
+        }
+
+        [RelayCommand]
+        public void updateOverrideStatus()
+        {
+            byte overrideByte1 = 0;
+            byte overrideByte2 = 0;
+            byte overrideStatesByte = 0;
+            if (OverrideState.FuelPumpOverriden) overrideByte1 |= 1;
+            if (OverrideState.RelayOverriden) overrideByte1 |= 1<<2;
+            if (OverrideState.GlowPlugOverriden) overrideByte1 |= 1<<4;
+            if (OverrideState.PumpOverriden) overrideByte1 |= 1<<6;
+            if (OverrideState.BlowerOverriden) overrideByte2 |= 1;
+            if (OverrideState.PumpOverridenState) overrideStatesByte |= 1;
+            if (OverrideState.RelayOverridenState) overrideStatesByte |= 4;
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)OverrideState.BlowerOverridenRevs, (byte)OverrideState.GlowPlugOverridenPower, (byte)(OverrideState.FuelPumpOverridenFrequencyX100 / 256), (byte)(OverrideState.FuelPumpOverridenFrequencyX100 / 256), 0xFF };
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
+            Transmit(msg.ToCanMessage());
+
+        }
+        [RelayCommand]
+        public void updateOverrideFuelPumpFreq()
+        {
+            byte[] data = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, (byte)(OverrideState.FuelPumpOverridenFrequencyX100/256), (byte)(OverrideState.FuelPumpOverridenFrequencyX100 / 256) ,0xFF};
+            OmniMessage msg = new() {Pgn=47,ReceiverId = Id, Data = data};
+            Transmit(msg.ToCanMessage());
+        }
+
+        [RelayCommand]
+        public void updateOverrideBlower()
+        {
+            byte[] data = { 0xFF, 0xFF, 0xFF, (byte)OverrideState.BlowerOverridenRevs, 0xFF, 0xFF, 0xFF, 0xFF };
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
+            Transmit(msg.ToCanMessage());
+        }
+
+        [RelayCommand]
+        public void updateOverrideGlowPlug()
+        {
+            byte[] data = { 0xFF, 0xFF, 0xFF, 0xFF, (byte)OverrideState.GlowPlugOverridenPower, 0xFF, 0xFF, 0xFF};
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
+            Transmit(msg.ToCanMessage());
+        }
+
+        [RelayCommand]
+        public void updateOverrideGlowPlugFlag()
+        {
+            byte flag = (byte)(OverrideState.GlowPlugOverriden ? 0b11011111 : 0b11001111);
+            byte[] data = { flag, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
+            Transmit(msg.ToCanMessage());
+        }
+
+        [RelayCommand]
+        public void updateOverrideFuelPumpFlag()
+        {
+            byte flag = (byte)(OverrideState.FuelPumpOverriden ? 0b11011111 : 0b11001111);
+            byte[] data = { flag, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
+            Transmit(msg.ToCanMessage());
         }
 
         public void Transmit(CanMessage msg)
@@ -172,7 +233,7 @@ namespace OmniProtocol
 
         [ObservableProperty] public bool manualMode;
 
-        [ObservableProperty] OverrideStateClass overrideState;
+        [ObservableProperty] OverrideStateClass overrideState = new();
 
         public bool flagEraseDone = false;
 

@@ -179,7 +179,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="150" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="{DynamicResource b_air_set}" Margin="5" Opacity="{Binding OverrideState.BlowerOverriden,Converter={StaticResource BoolToOpacity}}"></Button>
+                            <Button Grid.Column="0" Content="{DynamicResource b_air_set}" Margin="5" Opacity="{Binding OverrideState.BlowerOverriden,Converter={StaticResource BoolToOpacity}}" Click="BlowerOverrideClick"></Button>
 
                             <ProgressBar Grid.Column="2" Height="25" MouseWheel="BlowerMouseWheel"></ProgressBar>
                             <TextBlock Grid.Column="2" Text="{Binding OverrideState.BlowerOverridenRevs,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" d:Text="55" IsEnabled="False" Margin="5"></TextBlock>
@@ -191,9 +191,9 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="150" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="{DynamicResource b_fuel_pump_set}" VerticalAlignment="Center" Margin="5" Opacity="{Binding OverrideState.FuelPumpOverriden,Converter={StaticResource BoolToOpacity}}"></Button>
+                            <Button Grid.Column="0" Content="{DynamicResource b_fuel_pump_set}" VerticalAlignment="Center" Margin="5" Opacity="{Binding OverrideState.FuelPumpOverriden,Converter={StaticResource BoolToOpacity}}" Click="FuelPumpClick" ></Button>
 
-                            <ProgressBar Grid.Column="2" Height="25" MouseWheel="PumpMouseWheel"></ProgressBar>
+                            <ProgressBar Grid.Column="2" Height="25" MouseWheel="FuelPumpMouseWheel"></ProgressBar>
                             <TextBlock Grid.Column="2" Text="{Binding OverrideState.FuelPumpOverridenFrequencyX100,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" d:Text="150" IsEnabled="False" Margin="5"></TextBlock>
 
                         </Grid>
@@ -203,7 +203,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="150" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="{DynamicResource b_glow_plug_set}" VerticalAlignment="Center" Margin="5" Opacity="{Binding OverrideState.GlowPlugOverriden,Converter={StaticResource BoolToOpacity}}"></Button>
+                            <Button Grid.Column="0" Content="{DynamicResource b_glow_plug_set}" VerticalAlignment="Center" Margin="5" Opacity="{Binding OverrideState.GlowPlugOverriden,Converter={StaticResource BoolToOpacity}}" Click="GlowPlugClick"></Button>
 
                             <ProgressBar Grid.Column="2" Height="25" MouseWheel="GlowPlugMouseWheel"></ProgressBar>
                             <TextBlock Grid.Column="2" Text="{Binding OverrideState.GlowPlugOverridenPower,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" d:Text="100" IsEnabled="False" Margin="5"></TextBlock>
