@@ -1013,4 +1013,7 @@
 <v:String x:Key="t_overriden_glow_plug_power">Overriden glow plug power</v:String>
 <v:String x:Key="t_overriden_fuel_pump_frequency">Overriden fuel pump frequency</v:String>
 <v:String x:Key="t_actuator_override">Actuators override</v:String>
+<v:String x:Key="t_temperature_1">Temperature 1</v:String>
+<v:String x:Key="t_temperature_2">Temperature 2</v:String>
+<v:String x:Key="t_debug_pack">Debug packet</v:String>
 </ResourceDictionary>

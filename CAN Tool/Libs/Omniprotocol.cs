@@ -837,6 +837,7 @@ public partial class Omni : ObservableObject
         Pgns.Add(45, new() { id = 45, name = "t_generic_board_temp" });
         Pgns.Add(46, new() { id = 46, name = "t_hcu_error_codes" });
         Pgns.Add(47, new() { id = 47, name = "t_actuator_override" });
+        Pgns.Add(99, new() { id = 99, name = "t_debug_pack" });
         Pgns.Add(100, new() { id = 100, name = "t_memory_control_old", multiPack = true });
         Pgns.Add(101, new() { id = 101, name = "t_buffer_data_transmitting_old" });
         Pgns.Add(105, new() { id = 105, name = "t_memory_control" });
@@ -1019,7 +1020,7 @@ public partial class Omni : ObservableObject
         Pgns[17].parameters.Add(new() { Name = "11 канал АЦП ", BitLength = 16, StartByte = 6 });
 
         Pgns[18].parameters.Add(new() { Name = "Вид изделия", BitLength = 8, StartByte = 0, GetMeaning = i => Devices[i]?.Name });
-        Pgns[18].parameters.Add(new() { Name = "Напряжение питания", BitLength = 8, StartByte = 1, Meanings = { { 0, "Универсальное ПО" },{1, "12 Вольт" }, { 2, "24 Вольта" } } });
+        Pgns[18].parameters.Add(new() { Name = "Напряжение питания", BitLength = 8, StartByte = 1, Meanings = { { 0, "Универсальное ПО" }, { 1, "12 Вольт" }, { 2, "24 Вольта" } } });
         Pgns[18].parameters.Add(new() { Name = "Версия ПО", BitLength = 8, StartByte = 2 });
         Pgns[18].parameters.Add(new() { Name = "Модификация ПО", BitLength = 8, StartByte = 3 });
         Pgns[18].parameters.Add(new() { Name = "Дата релиза", BitLength = 24, StartByte = 5, GetMeaning = v => $"{v >> 16}.{(v >> 8) & 0xF}.{v & 0xFF}" });
@@ -1157,8 +1158,8 @@ public partial class Omni : ObservableObject
         Pgns[31].parameters.Add(new() { Name = "Время работы", BitLength = 32, StartByte = 0, UnitT = UnitType.Second, Var = 3 });
         Pgns[31].parameters.Add(new() { Name = "Время работы на режиме", BitLength = 32, StartByte = 4, UnitT = UnitType.Second, Var = 4 });
 
-        Pgns[32].parameters.Add(new() { Name = "t_work_time_minutes", BitLength = 16, StartByte = 0, UnitT = UnitType.Minute});
-        Pgns[32].parameters.Add(new() { Name = "t_heater_mode", BitLength = 4, StartByte = 2, Meanings = { { 0, "t_regular" }, { 1, "t_eco" },{2, "t_additional_heater" },{3,"t_heating" },{4, "t_heating_systems" } } });
+        Pgns[32].parameters.Add(new() { Name = "t_work_time_minutes", BitLength = 16, StartByte = 0, UnitT = UnitType.Minute });
+        Pgns[32].parameters.Add(new() { Name = "t_heater_mode", BitLength = 4, StartByte = 2, Meanings = { { 0, "t_regular" }, { 1, "t_eco" }, { 2, "t_additional_heater" }, { 3, "t_heating" }, { 4, "t_heating_systems" } } });
 
         Pgns[40].parameters.Add(new() { Name = "t_year", BitLength = 8, StartByte = 0, UnitT = UnitType.Year, Var = 118 });
         Pgns[40].parameters.Add(new() { Name = "t_month", BitLength = 8, StartByte = 1, UnitT = UnitType.Month, Var = 117 });
@@ -1208,16 +1209,20 @@ public partial class Omni : ObservableObject
         Pgns[46].parameters.Add(new() { Name = "t_error_code8", BitLength = 8, StartByte = 7, GetMeaning = (x) => GetString($"e_{x}") });
 
 
-        Pgns[47].parameters.Add(new() { Name = "t_fuel_pump_overriden", BitLength = 2, StartByte = 0, Meanings=DefMeaningsYesNo });
-        Pgns[47].parameters.Add(new() { Name = "t_relay_overriden", BitLength = 2, StartByte = 0, StartBit=2, Meanings = DefMeaningsYesNo });
+        Pgns[47].parameters.Add(new() { Name = "t_fuel_pump_overriden", BitLength = 2, StartByte = 0, Meanings = DefMeaningsYesNo });
+        Pgns[47].parameters.Add(new() { Name = "t_relay_overriden", BitLength = 2, StartByte = 0, StartBit = 2, Meanings = DefMeaningsYesNo });
         Pgns[47].parameters.Add(new() { Name = "t_glow_plug_overriden", BitLength = 2, StartByte = 0, StartBit = 4, Meanings = DefMeaningsYesNo });
         Pgns[47].parameters.Add(new() { Name = "t_pump_overriden", BitLength = 2, StartByte = 0, StartBit = 6, Meanings = DefMeaningsYesNo });
         Pgns[47].parameters.Add(new() { Name = "t_blower_overriden", BitLength = 2, StartByte = 1, StartBit = 0, Meanings = DefMeaningsYesNo });
         Pgns[47].parameters.Add(new() { Name = "t_pump_state", BitLength = 2, StartByte = 2, StartBit = 0, Meanings = DefMeaningsOnOff });
         Pgns[47].parameters.Add(new() { Name = "t_relay_state", BitLength = 2, StartByte = 2, StartBit = 2, Meanings = DefMeaningsOnOff });
-        Pgns[47].parameters.Add(new() { Name = "t_overriden_blower_revs", BitLength = 8, StartByte = 3, UnitT=UnitType.Rps });
-        Pgns[47].parameters.Add(new() { Name = "t_overriden_glow_plug_power", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent});
-        Pgns[47].parameters.Add(new() { Name = "t_overriden_fuel_pump_frequency", BitLength = 16, StartByte = 5, a=0.01,UnitT = UnitType.Frequency});
+        Pgns[47].parameters.Add(new() { Name = "t_overriden_blower_revs", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps });
+        Pgns[47].parameters.Add(new() { Name = "t_overriden_glow_plug_power", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
+        Pgns[47].parameters.Add(new() { Name = "t_overriden_fuel_pump_frequency", BitLength = 16, StartByte = 5, a = 0.01, UnitT = UnitType.Frequency });
+
+        Pgns[99].parameters.Add(new() { Name = "t_temperature_1", BitLength = 16, Signed = true, StartByte = 1, UnitT = UnitType.Temp, PackNumber=1 });
+        Pgns[99].parameters.Add(new() { Name = "t_temperature_2", BitLength = 16, Signed = true, StartByte = 3, UnitT = UnitType.Temp, PackNumber = 1 });
+        Pgns[99].parameters.Add(new() { Name = "t_pressure", BitLength = 24, StartByte = 5, UnitT = UnitType.Pressure });
 
 
         Pgns[100].parameters.Add(new() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning = r => $"{GetString("t_starting_address")}: 0X{(r + 0x8000000):X}" });
@@ -1552,7 +1557,7 @@ public partial class Omni : ObservableObject
 
                     if (m.Data[0] == 5) // Parameter not supported
                         senderDevice.flagGetParamDone = true;
-                    
+
                     break;
                 }
             case 8: //Black box 
@@ -1744,9 +1749,9 @@ public partial class Omni : ObservableObject
                 break;
             case 47:
                 if ((m.Data[0] & 3) < 2) senderDevice.OverrideState.FuelPumpOverriden = (m.Data[0] & 3) > 0;
-                if (((m.Data[0]>>2) & 3) < 2) senderDevice.OverrideState.RelayOverriden = ((m.Data[0] >> 2) & 3) > 0;
-                if (((m.Data[0]>>4) & 3) < 2) senderDevice.OverrideState.GlowPlugOverriden = ((m.Data[0] >> 4) & 3) > 0;
-                if (((m.Data[0]>>6) & 3) < 2) senderDevice.OverrideState.PumpOverriden = ((m.Data[0] >> 6) & 3) > 0;
+                if (((m.Data[0] >> 2) & 3) < 2) senderDevice.OverrideState.RelayOverriden = ((m.Data[0] >> 2) & 3) > 0;
+                if (((m.Data[0] >> 4) & 3) < 2) senderDevice.OverrideState.GlowPlugOverriden = ((m.Data[0] >> 4) & 3) > 0;
+                if (((m.Data[0] >> 6) & 3) < 2) senderDevice.OverrideState.PumpOverriden = ((m.Data[0] >> 6) & 3) > 0;
                 if ((m.Data[1] & 3) < 2) senderDevice.OverrideState.BlowerOverriden = (m.Data[1] & 3) > 0;
 
                 if ((m.Data[2] & 3) < 2) senderDevice.OverrideState.PumpOverridenState = (m.Data[1] & 3) > 0;
@@ -1756,7 +1761,7 @@ public partial class Omni : ObservableObject
                 if (m.Data[5] != 255 || m.Data[6] != 255) senderDevice.OverrideState.FuelPumpOverridenFrequencyX100 = m.Data[5] * 256 + m.Data[6];
                 break;
             case 100:
-                if (m.Data[0] == 1 && m.Data[1]==1)
+                if (m.Data[0] == 1 && m.Data[1] == 1)
                 {
                     senderDevice.flagEraseDone = true;
                 }

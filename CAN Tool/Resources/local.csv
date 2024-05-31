@@ -1013,3 +1013,6 @@ t_overriden_blower_revs	Overriden air blower revs	Заданные оборот�
 t_overriden_glow_plug_power	Overriden glow plug power	Заданная мощность свечи
 t_overriden_fuel_pump_frequency	Overriden fuel pump frequency	Заданная частота ТН
 t_actuator_override	Actuators override	Переопределение исполнительных устройств
+t_temperature_1	Temperature 1	Температура 1
+t_temperature_2	Temperature 2	Температура 2
+t_debug_pack	Debug packet	Отладочный пакет

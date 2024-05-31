@@ -197,7 +197,7 @@
                 </Button>
                 
             </DockPanel>
-            <TabControl Style="{DynamicResource MaterialDesignFilledTabControl}">
+            <TabControl Style="{DynamicResource MaterialDesignFilledUniformTabControl}">
                 <TabItem>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
