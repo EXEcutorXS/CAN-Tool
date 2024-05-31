@@ -184,7 +184,7 @@
             </DataGrid>
         </DockPanel>
         <DockPanel Visibility="{Binding Mode,Converter={StaticResource OmniToVisible}}" DockPanel.Dock="Top">
-            <DockPanel DockPanel.Dock="Top">
+            <DockPanel DockPanel.Dock="Top" Visibility="{Binding OmniInstance.ConnectedDevices.Count,Converter={StaticResource IntToVisibileConverter}}">
             <ListBox x:Name="DeviceSelector" DockPanel.Dock="Left" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding OmniInstance.SelectedConnectedDevice}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -197,13 +197,10 @@
                 </Button>
                 
             </DockPanel>
-            <TabControl Style="{DynamicResource MaterialDesignFilledUniformTabControl}">
+            <TabControl Style="{DynamicResource MaterialDesignNavigatilRailTabControl}">
                 <TabItem>
                     <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_IdCardAlt" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_common}"></TextBlock>
-                        </StackPanel>
+                            <fa:ImageAwesome Icon="Solid_IdCardAlt" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>
                     </TabItem.Header>
                     <DockPanel Visibility="{Binding OmniInstance.SelectedConnectedDevice,Converter={StaticResource NullToVisibleConverter}}">
                         <cc:HcuOmniControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}" />
@@ -214,10 +211,7 @@
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_MailBulk" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_messages}" />
-                        </StackPanel>
+                            <fa:ImageAwesome Icon="Solid_MailBulk" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" />
                     </TabItem.Header>
                     <DockPanel>
                         <DockPanel DockPanel.Dock="Top">
@@ -313,10 +307,7 @@
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Regular_Keyboard" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_commands}"></TextBlock>
-                        </StackPanel>
+                            <fa:ImageAwesome Icon="Regular_Keyboard" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>
                     </TabItem.Header>
                     <DockPanel>
 
@@ -343,10 +334,7 @@
                 </TabItem>
                 <TabItem>
                     <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_Wrench" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_config}"></TextBlock>
-                        </StackPanel>
+                            <fa:ImageAwesome Icon="Solid_Wrench" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>
                     </TabItem.Header>
                     <DockPanel>
 
@@ -377,10 +365,7 @@
                 </TabItem>
                 <TabItem x:Name="GraphTab">
                     <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_ChartLine" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_log_chart}"></TextBlock>
-                        </StackPanel>
+                            <fa:ImageAwesome Icon="Solid_ChartLine" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>
                     </TabItem.Header>
                     <Grid>
                         <DockPanel>
@@ -467,10 +452,7 @@
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_InfoCircle" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_status}"></TextBlock>
-                        </StackPanel>
+                            <fa:ImageAwesome Icon="Solid_InfoCircle" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>
                     </TabItem.Header>
                     <DataGrid ItemsSource="{Binding OmniInstance.SelectedConnectedDevice.Status,Mode=OneWay}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
                         <DataGrid.Columns>
@@ -482,10 +464,9 @@
                 </TabItem>
                 <TabItem>
                     <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_BoxOpen" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_black_box}"></TextBlock>
-                        </StackPanel>
+                        
+                            <fa:ImageAwesome Icon="Solid_BoxOpen" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>
+                        
                     </TabItem.Header>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -522,10 +503,9 @@
                 <TabItem DataContext="{Binding ManualPage}">
 
                     <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_Cogs" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_manual}"></TextBlock>
-                        </StackPanel>
+                        
+                            <fa:ImageAwesome Icon="Solid_Cogs" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>
+                        
                     </TabItem.Header>
                     <DockPanel>
                         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
@@ -649,10 +629,9 @@
                 </TabItem>
                 <TabItem DataContext="{Binding FirmwarePage}">
                     <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Solid_FileCode" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            <TextBlock Margin="5 2 2 2" Text="{DynamicResource b_firmware}"></TextBlock>
-                        </StackPanel>
+                        
+                            <fa:ImageAwesome Icon="Solid_FileCode" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>
+                        
                     </TabItem.Header>
                     <DockPanel>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
