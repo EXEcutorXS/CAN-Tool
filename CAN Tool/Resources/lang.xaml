@@ -337,7 +337,7 @@
 
 <v:String x:Key="par_547">ENGINE_PREHEAT_MODULE_CONNECTED</v:String>
 <v:String x:Key="par_548">ENGINE_PREHEAT_SETPOINT_CELSIUS</v:String>
-
+<v:String x:Key="par_549">ENGINE_PREHEAT_DURATION_MINUTES</v:String>
 
 <v:String x:Key="par_550">DEFROSTING_SETPOINT</v:String>
 <v:String x:Key="par_551">DEFROSTING_HYSTERESIS</v:String>
@@ -532,6 +532,9 @@
 <v:String x:Key="var_126">AUX sensor 3</v:String>
 <v:String x:Key="var_127">AUX sensor 4</v:String>
 <v:String x:Key="var_128">Blower current</v:String>
+<v:String x:Key="var_129">Burning chamber bot temp</v:String>
+<v:String x:Key="var_130">Burning chamber side temp</v:String>
+<v:String x:Key="var_131">Exhaust pressure</v:String>
 
 
 
@@ -681,6 +684,9 @@
 <v:String x:Key="vars_126">AUX sen.3</v:String>
 <v:String x:Key="vars_127">AUX sen.4</v:String>
 <v:String x:Key="vars_128">BlwrCrnt</v:String>
+<v:String x:Key="vars_129">ChambBot</v:String>
+<v:String x:Key="vars_130">Cha,bSide</v:String>
+<v:String x:Key="vars_131">ExhPress</v:String>
 
 <v:String x:Key="m_0-1">Waiting for the command</v:String>
 <v:String x:Key="m_0-3">Blowing on power on</v:String>

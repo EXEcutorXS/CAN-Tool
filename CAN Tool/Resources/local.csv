@@ -337,7 +337,7 @@ par_546	UNDERFLOOR_HEATING_HYSTERESIS_CELSIUS	Гистерезис работы 
 		
 par_547	ENGINE_PREHEAT_MODULE_CONNECTED	Признак наличия функции предпускового подогрева
 par_548	ENGINE_PREHEAT_SETPOINT_CELSIUS	Желаемая температура двигателя после подогрева
-		
+par_549	ENGINE_PREHEAT_DURATION_MINUTES	Время предпускового подогрева, минуты
 		
 par_550	DEFROSTING_SETPOINT	Уставка для зон разморозки
 par_551	DEFROSTING_HYSTERESIS	Гистерезис работы зон разморозки
@@ -532,6 +532,9 @@ var_125	AUX sensor 2	Доп датчик 2
 var_126	AUX sensor 3	Доп датчик 3
 var_127	AUX sensor 4	Доп датчик 4
 var_128	Blower current	Ток нагнетателя мА
+var_129	Burning chamber bot temp	Температура низа камеры сгорания
+var_130	Burning chamber side temp	Температура стенки камеры сгорания
+var_131	Exhaust pressure	Давление выхлопа
 		
 		
 		
@@ -681,6 +684,9 @@ vars_125	AUX sen.2	Д.датч.2
 vars_126	AUX sen.3	Д.датч.3
 vars_127	AUX sen.4	Д.датч.4
 vars_128	BlwrCrnt	Ток нагн
+vars_129	ChambBot	Кам.низ
+vars_130	Cha,bSide	Кам.Бок
+vars_131	ExhPress	Давл.выхл
 		
 m_0-1	Waiting for the command	Ожидание команды
 m_0-3	Blowing on power on	Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)

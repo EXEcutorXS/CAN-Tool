@@ -337,7 +337,7 @@
 
 <v:String x:Key="par_547">Признак наличия функции предпускового подогрева</v:String>
 <v:String x:Key="par_548">Желаемая температура двигателя после подогрева</v:String>
-
+<v:String x:Key="par_549">Время предпускового подогрева, минуты</v:String>
 
 <v:String x:Key="par_550">Уставка для зон разморозки</v:String>
 <v:String x:Key="par_551">Гистерезис работы зон разморозки</v:String>
@@ -532,6 +532,9 @@
 <v:String x:Key="var_126">Доп датчик 3</v:String>
 <v:String x:Key="var_127">Доп датчик 4</v:String>
 <v:String x:Key="var_128">Ток нагнетателя мА</v:String>
+<v:String x:Key="var_129">Температура низа камеры сгорания</v:String>
+<v:String x:Key="var_130">Температура стенки камеры сгорания</v:String>
+<v:String x:Key="var_131">Давление выхлопа</v:String>
 
 
 
@@ -681,6 +684,9 @@
 <v:String x:Key="vars_126">Д.датч.3</v:String>
 <v:String x:Key="vars_127">Д.датч.4</v:String>
 <v:String x:Key="vars_128">Ток нагн</v:String>
+<v:String x:Key="vars_129">Кам.низ</v:String>
+<v:String x:Key="vars_130">Кам.Бок</v:String>
+<v:String x:Key="vars_131">Давл.выхл</v:String>
 
 <v:String x:Key="m_0-1">Ожидание команды</v:String>
 <v:String x:Key="m_0-3">Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)</v:String>

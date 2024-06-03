@@ -1220,9 +1220,9 @@ public partial class Omni : ObservableObject
         Pgns[47].parameters.Add(new() { Name = "t_overriden_glow_plug_power", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
         Pgns[47].parameters.Add(new() { Name = "t_overriden_fuel_pump_frequency", BitLength = 16, StartByte = 5, a = 0.01, UnitT = UnitType.Frequency });
 
-        Pgns[99].parameters.Add(new() { Name = "t_temperature_1", BitLength = 16, Signed = true, StartByte = 1, UnitT = UnitType.Temp, PackNumber=1 });
-        Pgns[99].parameters.Add(new() { Name = "t_temperature_2", BitLength = 16, Signed = true, StartByte = 3, UnitT = UnitType.Temp, PackNumber = 1 });
-        Pgns[99].parameters.Add(new() { Name = "t_pressure", BitLength = 24, StartByte = 5, UnitT = UnitType.Pressure });
+        Pgns[99].parameters.Add(new() { Name = "t_temperature_1", BitLength = 16, Signed = true, StartByte = 1, UnitT = UnitType.Temp, PackNumber=1, Var=129});
+        Pgns[99].parameters.Add(new() { Name = "t_temperature_2", BitLength = 16, Signed = true, StartByte = 3, UnitT = UnitType.Temp, PackNumber = 1, Var = 130 });
+        Pgns[99].parameters.Add(new() { Name = "t_pressure", BitLength = 24, StartByte = 5, UnitT = UnitType.Pressure, Var = 131 });
 
 
         Pgns[100].parameters.Add(new() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning = r => $"{GetString("t_starting_address")}: 0X{(r + 0x8000000):X}" });
