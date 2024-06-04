@@ -281,7 +281,7 @@ namespace OmniProtocol
 
         public override int GetHashCode() { return Id.GetHashCode(); }
 
-        [ObservableProperty] private bool isLogWriting;
+        [ObservableProperty] private bool isLogWriting = true;
 
         public List<double[]> LogData = new();
 

@@ -37,12 +37,12 @@ namespace CAN_Tool.ViewModels
 
         private void LogWrite(string str)
         {
-            Log += str;
+            Log = str + Log;
         }
 
         private void LogWriteLine(string str)
         {
-            Log += str + Environment.NewLine;
+            Log = str + Environment.NewLine + Log;
         }
 
         [RelayCommand]
