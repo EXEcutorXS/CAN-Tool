@@ -48,7 +48,7 @@ namespace CAN_Tool.ViewModels
         private void ChangeManualAirBlower(object parameter)
         {
             ManualAirBlower += (parameter == null) ? 1 : int.Parse(parameter as string);
-            ManualAirBlower = Math.Clamp(ManualAirBlower, 0,200);
+            ManualAirBlower = Math.Clamp(ManualAirBlower, 0, 200);
 
             updateManualMode();
         }
@@ -57,7 +57,7 @@ namespace CAN_Tool.ViewModels
         private void ChangeManualFuelPump(object parameter)
         {
             ManualFuelPump += (parameter == null) ? 5 : int.Parse(parameter as string);
-            ManualFuelPump = Math.Clamp(ManualFuelPump,0, 700);
+            ManualFuelPump = Math.Clamp(ManualFuelPump, 0, 700);
             updateManualMode();
         }
 
@@ -65,7 +65,17 @@ namespace CAN_Tool.ViewModels
         private void ChangeGlowPlug(object parameter)
         {
             ManualGlowPlug += (parameter == null) ? 1 : int.Parse(parameter as string);
-            ManualGlowPlug = Math.Clamp(ManualGlowPlug, 0,100);
+            ManualGlowPlug = Math.Clamp(ManualGlowPlug, 0, 100);
+            updateManualMode();
+        }
+
+        [RelayCommand]
+        private void ToggleGlowPlug(object parameter)
+        {
+            if (ManualGlowPlug > 0)
+                ManualGlowPlug = 0;
+            else
+                ManualGlowPlug = 100;
             updateManualMode();
         }
 
@@ -89,7 +99,7 @@ namespace CAN_Tool.ViewModels
             msg.Data = new byte[8];
             msg.Data[0] = 0;
             msg.Data[1] = 68;
-            msg.Data[2] = (byte)(ManualWaterPump? 1 : 0);
+            msg.Data[2] = (byte)(ManualWaterPump ? 1 : 0);
             msg.Data[3] = (byte)ManualAirBlower;
             msg.Data[4] = (byte)ManualGlowPlug;
             msg.Data[5] = (byte)(ManualFuelPump / 256);
