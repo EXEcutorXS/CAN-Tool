@@ -1,32 +1,25 @@
-﻿using System;
+﻿using OmniProtocol;
+using CAN_Tool.ViewModels;
+using MaterialDesignThemes.Wpf;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Controls.Primitives;
+using static CAN_Tool.Libs.Helper;
+using CAN_Tool.CustomControls;
+using RVC;
 using System.ComponentModel;
-using System.IO.Ports;
-using Can_Adapter;
-using AdversCan;
-using CAN_Tool.ViewModels;
-using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using ScottPlot;
 using ScottPlot.Renderable;
-using System.Threading;
-using System.Windows.Data;
-using CAN_Tool.ViewModels.Converters;
-using System.Windows.Media.Animation;
-using System.Text.RegularExpressions;
-using System.Text.Json;
-using System.IO;
-
 
 namespace CAN_Tool
 {
@@ -35,26 +28,62 @@ namespace CAN_Tool
     /// </summary>
 
 
-    public class Settings
+    public partial class Settings : ObservableObject
     {
-        public bool isDark { get; set; }
-        public int themeNumber { get; set; }
-        public int langaugeNumber { get; set; }
+        public Settings()
+        {
+            Random random = new Random((int)DateTime.Now.Ticks);
+            Colors = new System.Windows.Media.Color[140];
+            ShowFlag = new bool[140];
+            LineWidthes = new int[140];
+            LineStyles = new ScottPlot.LineStyle[140];
+            MarkShapes = new ScottPlot.MarkerShape[140];
+            for (int i = 0; i < 140; i++)
+            {
+                Colors[i] = System.Windows.Media.Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255));
+                LineWidthes[i] = 1;
+                MarkShapes[i] = ScottPlot.MarkerShape.none;
+                LineStyles[i] = ScottPlot.LineStyle.Solid;
+            }
+        }
+        public bool IsDark { get; set; }
+        public bool ExpertModeOn { set; get; }
+        public int ThemeNumber { get; set; }
+        public int LangaugeNumber { get; set; }
+
+        public System.Windows.Media.Color[] Colors { get; set; }
+
+        public bool[] ShowFlag { set; get; }
+        public int[] LineWidthes { set; get; }
+        public LineStyle[] LineStyles { set; get; }
+        public MarkerShape[] MarkShapes { set; get; }
+
+        public bool UseImperial { set; get; }
+
+
+
     }
 
 
     public partial class MainWindow : Window
     {
-        private Settings settings = new();
-
         MainWindowViewModel vm;
 
         SynchronizationContext UIcontext = SynchronizationContext.Current;
 
-        public List<Brush> Brushes;
         private void SaveSettings()
         {
-            string serialized = JsonSerializer.Serialize(settings);
+            if (vm.OmniInstance.SelectedConnectedDevice != null)
+
+                foreach (var b in vm.OmniInstance.SelectedConnectedDevice.Status)
+                {
+                    App.Settings.Colors[b.Id] = (b.ChartBrush as SolidColorBrush).Color;
+                    App.Settings.ShowFlag[b.Id] = (b.Display);
+                    App.Settings.LineStyles[b.Id] = (b.LineStyle);
+                    App.Settings.LineWidthes[b.Id] = (b.LineWidth);
+                    App.Settings.MarkShapes[b.Id] = (b.MarkShape);
+                }
+            string serialized = JsonSerializer.Serialize(App.Settings);
             StreamWriter sw = new("settings.json", false);
             sw.Write(serialized);
             sw.Flush();
@@ -66,9 +95,12 @@ namespace CAN_Tool
         {
             try
             {
+
                 using (FileStream fs = new FileStream("settings.json", FileMode.OpenOrCreate))
                 {
-                    settings = JsonSerializer.Deserialize<Settings>(fs);
+                    App.Settings = JsonSerializer.Deserialize<Settings>(fs);
+
+
                 }
             }
             catch
@@ -78,10 +110,9 @@ namespace CAN_Tool
         }
         public MainWindow()
         {
+            vm = new();
+            DataContext = vm;
             InitializeComponent();
-
-
-            vm = (MainWindowViewModel)DataContext;
 
             App.LanguageChanged += LanguageChanged;
 
@@ -100,30 +131,38 @@ namespace CAN_Tool
                 menuLanguage.Items.Add(menuLang);
             }
 
+            vm.myChart = Chart;
+
+            Chart.Plot.AddAxis(Edge.Right, 2, color: System.Drawing.Color.LightGreen);
+
+
             vm.CanAdapter.GotNewMessage += MessageHandler;
 
             vm.RefreshPortListCommand.Execute(null);
 
             TryToLoadSettings();
 
-            menuLanguage.SelectedIndex = settings.langaugeNumber;
-            menuColor.SelectedIndex = settings.themeNumber;
-            DarkModeCheckBox.IsChecked = settings.isDark;
+            menuLanguage.SelectedIndex = App.Settings.LangaugeNumber;
+            menuColor.SelectedIndex = App.Settings.ThemeNumber;
+            DarkModeCheckBox.IsChecked = App.Settings.IsDark;
+            ExpertMode.IsChecked = App.Settings.ExpertModeOn;
+            ImperialUnits.IsChecked = App.Settings.UseImperial;
         }
-
 
         private void MessageHandler(object sender, EventArgs args)
         {
+
             UIcontext.Send(x =>
             {
                 if (LogExpander.IsExpanded)
                 {
-                    CanMessage msg = (args as GotMessageEventArgs).receivedMessage;
-                    AC2PMessage m = new AC2PMessage(msg);
+                    OmniMessage m = new OmniMessage((args as GotCanMessageEventArgs).receivedMessage);
                     LogField.AppendText(m.ToString());
                 }
             }, null);
         }
+
+
         private void LanguageChanged(Object sender, EventArgs e)
         {
             CultureInfo currLang = App.Language;
@@ -134,7 +173,7 @@ namespace CAN_Tool
                 i.IsSelected = i.Tag is CultureInfo ci && ci.Equals(currLang);
             }
 
-            
+
         }
 
         private void ChangeLanguageClick(Object sender, EventArgs e)
@@ -150,10 +189,12 @@ namespace CAN_Tool
             }
 
         }
+
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
+                if (!GraphTab.IsSelected)     //Костыль, решает проблему неправильной интерпретации мыши графиком
                     DragMove();
             }
             catch { }
@@ -177,13 +218,13 @@ namespace CAN_Tool
                 }
 
             vm.CommandParametersArray[Convert.ToInt32((sender as Control).Name.Substring(6))] = value;
-            AC2PCommand cmd = ((KeyValuePair<int, AC2PCommand>)CommandSelector.SelectedItem).Value;
+            OmniCommand cmd = ((KeyValuePair<int, OmniCommand>)CommandSelector.SelectedItem).Value;
             ulong id = (ulong)cmd.Id;
-            ulong res =  id << 48;
-            AC2PParameter[] pars = cmd.Parameters.Where(p => p.AnswerOnly == false).ToArray();
+            ulong res = id << 48;
+            OmniPgnParameter[] pars = cmd.Parameters.Where(p => p.AnswerOnly == false).ToArray();
             for (int i = 0; i < pars.Length; i++)
             {
-                AC2PParameter p = pars[i];
+                OmniPgnParameter p = pars[i];
                 ulong rawValue;
                 rawValue = (ulong)((vm.CommandParametersArray[i] - p.b) / p.a);
                 int shift = 0;
@@ -206,21 +247,24 @@ namespace CAN_Tool
         {
             MainWindowViewModel mainWindowViewModel = (MainWindowViewModel)DataContext;
             ComboBox comboBox = sender as ComboBox;
-            AC2PCommand cmd = ((KeyValuePair<int, AC2PCommand>)comboBox.SelectedItem).Value;
+            OmniCommand cmd = ((KeyValuePair<int, OmniCommand>)comboBox.SelectedItem).Value;
             CommandParameterPanel.Children.Clear();
             mainWindowViewModel.CommandParametersArray = new double[cmd.Parameters.Count];
-            vm.CustomMessage.PGN = 1;
+            vm.CustomMessage.Pgn = 1;
             vm.CustomMessage.Data[1] = (byte)cmd.Id;
-            if (vm.SelectedConnectedDevice != null)
-                vm.CustomMessage.ReceiverId = vm.SelectedConnectedDevice.ID;
+            if (vm.OmniInstance.SelectedConnectedDevice != null)
+            {
+                vm.CustomMessage.ReceiverId.Address = vm.OmniInstance.SelectedConnectedDevice.Id.Address;
+                vm.CustomMessage.ReceiverId.Type = vm.OmniInstance.SelectedConnectedDevice.Id.Type;
+            }
 
             int counter = 0;
-            foreach (AC2PParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))
+            foreach (OmniPgnParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))
             {
                 StackPanel panel = new();
                 panel.Orientation = System.Windows.Controls.Orientation.Horizontal;
-                Label label = new();
-                label.Content = p.Name;
+                System.Windows.Controls.Label label = new();
+                label.Content = GetString(p.Name);
                 label.Name = $"label_{counter}";
                 label.Margin = new Thickness(10);
                 label.VerticalAlignment = System.Windows.VerticalAlignment.Center;
@@ -228,7 +272,7 @@ namespace CAN_Tool
                 if (p.Meanings != null && p.Meanings.Count > 0)
                 {
                     ComboBox cb = new();
-                    cb.ItemsSource = p.Meanings;
+                    cb.ItemsSource = p.Meanings.Select(s => new KeyValuePair<int, string>(s.Key, GetString(s.Value)));
                     cb.DisplayMemberPath = "Value";
                     cb.SelectionChanged += UpdateCommand;
                     cb.Name = $"field_{counter}";
@@ -245,6 +289,7 @@ namespace CAN_Tool
                     tb.TextChanged += UpdateCommand;
                     tb.Margin = new Thickness(10);
                     tb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+                    tb.Style = (System.Windows.Style)App.Current.TryFindResource("MaterialDesignOutlinedTextBox");
                     panel.Children.Add(tb);
                 }
                 mainWindowViewModel.CommandParametersArray[counter++] = p.DefaultValue;
@@ -259,7 +304,7 @@ namespace CAN_Tool
             MainWindowViewModel vm = (MainWindowViewModel)DataContext;
             try
             {
-                vm.SelectedMessage = (AC2PMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
+                vm.SelectedMessage = (OmniMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
             }
             catch { }
         }
@@ -269,59 +314,31 @@ namespace CAN_Tool
 
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void ManualAirMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
         {
-            if (vm.ManualControlPage.TurnOnWaterPumpCommand.CanExecute(null))
-                vm.ManualControlPage.TurnOnWaterPumpCommand.Execute(null);
-
+            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
+                
+            vm.ManualPage.ChangeManualAirBlowerCommand.Execute((Math.Sign(e.Delta)*k).ToString());
         }
 
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        private void ManualFuelMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
         {
-            if (vm.ManualControlPage.TurnOffWaterPumpCommand.CanExecute(null))
-                vm.ManualControlPage.TurnOffWaterPumpCommand.Execute(null);
+            
+            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 100 : 5;
+
+            vm.ManualPage.ChangeManualFuelPumpCommand.Execute((Math.Sign(e.Delta)*k).ToString());
+            
         }
 
-        private void ProgressBar_MouseWheel(object sender, MouseWheelEventArgs e)
+        private void ManualGlowPlugMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
         {
-            if (e.Delta > 0)
-                if (vm.ManualControlPage.IncreaceManualAirBlowerCommand.CanExecute(null))
-                    vm.ManualControlPage.IncreaceManualAirBlowerCommand.Execute(null);
-            if (e.Delta < 0)
-                if (vm.ManualControlPage.DecreaseManualAirBlowerCommand.CanExecute(null))
-                    vm.ManualControlPage.DecreaseManualAirBlowerCommand.Execute(null);
-        }
-
-        private void ProgressBar_MouseWheel_1(object sender, MouseWheelEventArgs e)
-        {
-            if (e.Delta > 0)
-                if (vm.ManualControlPage.IncreaseManualFuelPumpCommand.CanExecute(null))
-                    vm.ManualControlPage.IncreaseManualFuelPumpCommand.Execute(null);
-            if (e.Delta < 0)
-                if (vm.ManualControlPage.DecreaseFuelPumpCommand.CanExecute(null))
-                    vm.ManualControlPage.DecreaseFuelPumpCommand.Execute(null);
-        }
-
-        private void ProgressBar_MouseWheel_2(object sender, MouseWheelEventArgs e)
-        {
-            if (e.Delta > 0)
-                if (vm.ManualControlPage.IncreaseGlowPlugCommand.CanExecute(null))
-                    vm.ManualControlPage.IncreaseGlowPlugCommand.Execute(null);
-            if (e.Delta < 0)
-                if (vm.ManualControlPage.DecreaseGlowPlugCommand.CanExecute(null))
-                    vm.ManualControlPage.DecreaseGlowPlugCommand.Execute(null);
-        }
-
-        private void Disappear(object sender, EventArgs e)
-        {
-            AirArrow.Visibility = Visibility.Hidden;
-            PlugArrow.Visibility = Visibility.Hidden;
-            PumpArrow.Visibility = Visibility.Hidden;
+            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
+                    vm.ManualPage.ChangeGlowPlugCommand.Execute((Math.Sign(e.Delta) * k).ToString());
         }
 
         private void DarkMode_Checked(object sender, RoutedEventArgs e)
         {
-            settings.isDark = (bool)(sender as CheckBox).IsChecked;
+            App.Settings.IsDark = (bool)(sender as CheckBox).IsChecked;
             var resources = Application.Current.Resources.MergedDictionaries;
 
             var existingResourceDictionary = Application.Current.Resources.MergedDictionaries
@@ -329,12 +346,17 @@ namespace CAN_Tool
                                             rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml");
 
 
-            var source = settings.isDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
+            var source = App.Settings.IsDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
             var newResourceDictionary = new ResourceDictionary() { Source = new Uri(source) };
 
             Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
             Application.Current.Resources.MergedDictionaries.Add(newResourceDictionary);
 
+        }
+
+        private void ImperialUnits_Checked(object sender, RoutedEventArgs e)
+        {
+            App.Settings.UseImperial = (bool)ImperialUnits.IsChecked;
         }
 
 
@@ -375,10 +397,10 @@ namespace CAN_Tool
 
             Application.Current.Resources.MergedDictionaries.Remove(existingResourceDictionary);
             Application.Current.Resources.MergedDictionaries.Add(newResourceDictionary);
-            settings.themeNumber = menuColor.SelectedIndex;
+            App.Settings.ThemeNumber = menuColor.SelectedIndex;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ExitButtonClick(object sender, RoutedEventArgs e)
         {
             SaveSettings();
             App.Current.Shutdown();
@@ -386,7 +408,7 @@ namespace CAN_Tool
 
         private void menuLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            settings.langaugeNumber = menuLanguage.SelectedIndex;
+            App.Settings.LangaugeNumber = menuLanguage.SelectedIndex;
         }
 
         private void CanBitrateField_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -395,11 +417,157 @@ namespace CAN_Tool
             {
                 vm?.CanAdapter.SetBitrate(CanBitrateField.SelectedIndex);
             }
-            catch(Exception ex)
-            {
-                vm.Error = ex.Message;
-            }
+            catch { }
         }
+
+        private void ExpertMode_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            App.Settings.ExpertModeOn = (bool)ExpertMode.IsChecked;
+        }
+
+        private void ColorPicker_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
+                (DataSet.SelectedItem as StatusVariable).ChartBrush = new SolidColorBrush((sender as ColorPicker).Color);
+        }
+
+        private void ColorPicker_StylusUp(object sender, StylusEventArgs e)
+        {
+            if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
+                (DataSet.SelectedItem as StatusVariable).ChartBrush = new SolidColorBrush((sender as ColorPicker).Color);
+        }
+
+        private void DataSet_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DataSet.SelectedItem != null)
+                ColorPicker.Color = ((DataSet.SelectedItem as StatusVariable).ChartBrush as SolidColorBrush).Color;
+        }
+
+        private void ScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+            //vm.CanAdapter.Transmit()
+        }
+
+
+
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CanMessage m = new();
+            Random r = new(DateTime.Now.Millisecond);
+            m.Ide = (r.Next(0, 255) % 2) == 0;
+            m.Rtr = (r.Next(0, 255) % 2) == 0;
+            if (m.Ide)
+                m.Id = r.Next(0, 0x1FFFFFFF);
+            else
+                m.Id = r.Next(0, 0x7FF);
+            m.Dlc = (byte)r.Next(1, 9);
+            for (int i = 0; i < m.Dlc; i++)
+                m.Data[i] = (byte)r.Next(0, 256);
+
+            vm.CanPage.MessageList.TryToAdd(m);
+        }
+
+        private void CanListDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (CanMessageList.SelectedItem != null)
+                vm.CanPage.ConstructedMessage.Update(CanMessageList.SelectedItem as CanMessage);
+        }
+
+        private void RVCMessageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
+            try
+            {
+                vm.RvcPage.SelectedMessage = (RvcMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
+            }
+            catch { }
+
+        }
+
+        private void SetTimeButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.SetTime(DateTime.Now);
+        }
+
+        private void ToggleHeaterButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleHeater();
+        }
+
+        private void ToggleElementButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleElement();
+        }
+
+        private void ToggleWaterButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleWater();
+        }
+
+        private void ToggleZoneButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleZone();
+        }
+
+        private void TogglePumpButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.TogglePump();
+        }
+
+        private void ToggleFanManualModeButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleFanManualMode();
+        }
+
+        private void ToggleScheduleModeButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleScheduleMode();
+        }
+
+        private void DaySetPointValueChanged(object sender, RoutedEventArgs e)
+        {
+            vm?.RvcPage.Timberline15.SetDaySetpoint((int)(sender as ScrollBar).Value);
+        }
+
+        private void NightSetPointValueChanged(object sender, RoutedEventArgs e)
+        {
+            vm?.RvcPage.Timberline15.SetNightSetpoint((int)(sender as ScrollBar).Value);
+        }
+
+        private void ManualFanSpeedValueChanged(object sender, RoutedEventArgs e)
+        {
+            vm?.RvcPage.Timberline15.SetFanManualSpeed((byte)(sender as ScrollBar).Value);
+        }
+
+        private void SystemDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.RvcPage.Timberline15.SetSystemDuration((int)(sender as ScrollBar).Value);
+        }
+
+        private void WaterDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.RvcPage.Timberline15.SetWaterDuration((int)(sender as ScrollBar).Value);
+        }
+
+        private void NightTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
+        {
+            vm?.RvcPage.Timberline15.SetNightStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
+        }
+
+
+        private void DayStartChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
+        {
+            vm?.RvcPage.Timberline15.SetDayStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
+        }
+
+        private void ClearErrorsButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm?.RvcPage.Timberline15.ClearErrors();
+        }
+
+
     }
 
 

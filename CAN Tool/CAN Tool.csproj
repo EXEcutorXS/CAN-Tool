@@ -1,23 +1,62 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	
+	
   <PropertyGroup>
+	  <Deterministic>false</Deterministic>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
     <RootNamespace>CAN_Tool</RootNamespace>
     <UseWPF>true</UseWPF>
 	<Nullable>disable</Nullable>
 	<Platforms>AnyCPU;x86</Platforms>
 	<ApplicationIcon>Images\CANTool.ico</ApplicationIcon>
+	<AssemblyVersion>0.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\**" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Data\**" />
+    <None Remove="Models\**" />
+    <None Remove="Services\**" />
+    <Page Remove="Data\**" />
+    <Page Remove="Models\**" />
+    <Page Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Images\1.jpg" />
+    <None Remove="Images\10.jpg" />
+    <None Remove="Images\11.jpg" />
+    <None Remove="Images\12.jpg" />
     <None Remove="Images\123.jpg" />
+    <None Remove="Images\125.jpg" />
     <None Remove="Images\126.jpg" />
+    <None Remove="Images\13.jpg" />
+    <None Remove="Images\15.jpg" />
+    <None Remove="Images\17.jpg" />
+    <None Remove="Images\18.jpg" />
+    <None Remove="Images\2.jpg" />
+    <None Remove="Images\21.jpg" />
     <None Remove="Images\23.jpg" />
+    <None Remove="Images\24.jpg" />
+    <None Remove="Images\25.jpg" />
     <None Remove="Images\27.jpg" />
+    <None Remove="Images\28.jpg" />
+    <None Remove="Images\29.jpg" />
+    <None Remove="Images\3.jpg" />
     <None Remove="Images\34.jpg" />
+    <None Remove="Images\37.jpg" />
+    <None Remove="Images\40.jpg" />
+    <None Remove="Images\6.jpg" />
+    <None Remove="Images\7.jpg" />
+    <None Remove="Images\9.jpg" />
     <None Remove="Images\CANTool.ico" />
-    <None Remove="Images\mouseWheel.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,29 +64,46 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="DocX" Version="3.0.0" />
     <PackageReference Include="FontAwesome5" Version="2.1.11" />
-    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
-    <PackageReference Include="MaterialDesignThemes" Version="4.6.1" />
-    <PackageReference Include="ScottPlot.WPF" Version="4.1.58" />
-    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+    <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.2.20220510" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NUnit" Version="4.0.1" />
+    <PackageReference Include="ScottPlot.WPF" Version="4.1.71" />
+    <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
-    <Folder Include="Models\" />
-    <Folder Include="Services\" />
-    <Folder Include="Views\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Resource Include="Images\1.jpg" />
+    <Resource Include="Images\10.jpg" />
+    <Resource Include="Images\11.jpg" />
+    <Resource Include="Images\12.jpg" />
     <Resource Include="Images\123.jpg" />
+    <Resource Include="Images\125.jpg" />
     <Resource Include="Images\126.jpg" />
+    <Resource Include="Images\13.jpg" />
+    <Resource Include="Images\15.jpg" />
+    <Resource Include="Images\17.jpg" />
+    <Resource Include="Images\18.jpg" />
+    <Resource Include="Images\2.jpg" />
+    <Resource Include="Images\21.jpg" />
     <Resource Include="Images\23.jpg" />
+    <Resource Include="Images\24.jpg" />
+    <Resource Include="Images\25.jpg" />
     <Resource Include="Images\27.jpg" />
+    <Resource Include="Images\28.jpg" />
+    <Resource Include="Images\29.jpg" />
+    <Resource Include="Images\3.jpg" />
     <Resource Include="Images\34.jpg" />
+    <Resource Include="Images\37.jpg" />
+    <Resource Include="Images\40.jpg" />
+    <Resource Include="Images\6.jpg" />
+    <Resource Include="Images\7.jpg" />
+    <Resource Include="Images\9.jpg" />
     <Resource Include="Images\CANTool.ico" />
-    <Resource Include="Images\mouseWheel.png" />
   </ItemGroup>
 
   <ItemGroup>
