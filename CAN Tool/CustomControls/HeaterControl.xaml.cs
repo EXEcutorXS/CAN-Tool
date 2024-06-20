@@ -50,7 +50,7 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
-            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, 0xFF, 0xFF, (byte)(newFrequency>>8), (byte)(newFrequency & 0xFF), 0xFF };
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(newFrequency>>8), (byte)(newFrequency & 0xFF), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
         }
@@ -73,7 +73,7 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
-            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, 0xFF, (byte)newPower, 0xFF, 0xFF, 0xFF };
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)newPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
         }
@@ -93,7 +93,7 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
-            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)newRevs, 0xFF, 0xFF, 0xFF, 0xFF };
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)newRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
         }
@@ -106,23 +106,6 @@ namespace CAN_Tool.CustomControls
             int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
             newRevs += Math.Sign(e.Delta) * k;
             SetBlowerOverrideVal(newRevs);
-            /*
-            if (newRevs < 0) newRevs = 0;
-            if (newRevs > 200) newRevs = 200;
-            byte overrideByte1 = 0;
-            byte overrideByte2 = 0;
-            byte overrideStatesByte = 0;
-            overrideByte1 |= 3;
-            overrideByte1 |= 3 << 2;
-            overrideByte1 |= 3 << 4;
-            overrideByte1 |= 3 << 6;
-            overrideByte2 |= 3;
-            overrideStatesByte |= 3;
-            overrideStatesByte |= 3 << 2;
-            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)newRevs, 0xFF, 0xFF, 0xFF, 0xFF };
-            OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
-            Vm.Transmit(msg.ToCanMessage());
-            */
         }
 
         private void BlowerOverrideClick(object sender, RoutedEventArgs e)
@@ -137,7 +120,7 @@ namespace CAN_Tool.CustomControls
             if (!Vm.OverrideState.BlowerOverriden) overrideByte2 |= 1;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
-            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, 0xFF, 0xFF, 0xFF, 0xFF };
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100>>8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
         }
@@ -154,7 +137,7 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
-            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
         }
@@ -172,7 +155,7 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
-            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
 
