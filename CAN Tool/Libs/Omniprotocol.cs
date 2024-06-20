@@ -84,12 +84,14 @@ namespace OmniProtocol
                     return "0.0"; // For correct farenheit display
                 else
                 {
-                    if (a == 1)
+                    if (a >= 1)
                         return "0";
-                    else if (a >= 0.09)
+                    else if (a >= 0.1)
                         return "0.0";
-                    else
+                    else if (a >= 0.01)
                         return "0.00";
+                    else
+                        return "0.000";
                 }
             }
         }
@@ -779,8 +781,8 @@ public partial class Omni : ObservableObject
             { 29, new (){Id=29, DevType=DeviceType.Binar}} ,
             { 31, new (){Id=31, DevType=DeviceType.Binar}} ,
             { 32, new (){Id=32, DevType=DeviceType.Binar}} ,
-            { 34, new (){Id=34, DevType=DeviceType.Binar, MaxBlower=150}} ,
-            { 35, new (){Id=35, DevType=DeviceType.Binar, MaxBlower=150}} ,
+            { 34, new (){Id=34, DevType=DeviceType.Binar, MaxFuelPump=8, MaxBlower=140}} ,
+            { 35, new (){Id=35, DevType=DeviceType.Binar, MaxFuelPump=8, MaxBlower=140}} ,
             { 37, new (){Id=37, DevType=DeviceType.ExtensionBoard}} ,
             { 40, new (){Id=40, DevType=DeviceType.PressureSensor}} ,
             { 123, new (){Id=123, DevType=DeviceType.BootLoader }} ,
@@ -1222,7 +1224,7 @@ public partial class Omni : ObservableObject
 
         Pgns[99].parameters.Add(new() { Name = "t_temperature_1", BitLength = 16, Signed = true, StartByte = 1, UnitT = UnitType.Temp, PackNumber=1, Var=129});
         Pgns[99].parameters.Add(new() { Name = "t_temperature_2", BitLength = 16, Signed = true, StartByte = 3, UnitT = UnitType.Temp, PackNumber = 1, Var = 130 });
-        Pgns[99].parameters.Add(new() { Name = "t_pressure", BitLength = 24, StartByte = 5, UnitT = UnitType.Pressure, Var = 131 });
+        Pgns[99].parameters.Add(new() { Name = "t_pressure", BitLength = 24, StartByte = 5, a=0.001, UnitT = UnitType.Pressure, Var = 131 });
 
 
         Pgns[100].parameters.Add(new() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning = r => $"{GetString("t_starting_address")}: 0X{(r + 0x8000000):X}" });
