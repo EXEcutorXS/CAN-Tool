@@ -708,6 +708,7 @@ public partial class MainParameters : ObservableObject, ICloneable
     [ObservableProperty] private int panelTemp;
     [ObservableProperty] private int inletTemp;
     [ObservableProperty] private float pressure;
+    [ObservableProperty] private float exPressure;
 
 
     public string StageString => GetString($"m_{Stage}-{Mode}");
@@ -1491,6 +1492,8 @@ public partial class Omni : ObservableObject
                     break;
                 case 15:
                     senderDevice.Parameters.RevSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                    if (!senderDevice.OverrideState.BlowerOverriden)
+                        senderDevice.OverrideState.BlowerOverridenRevs = senderDevice.Parameters.RevSet;
                     break;
                 case 16:
                     senderDevice.Parameters.RevMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
@@ -1514,6 +1517,9 @@ public partial class Omni : ObservableObject
                     senderDevice.Parameters.Pressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                     if (senderDevice.PressureLogWriting)
                         senderDevice.PressureLog[senderDevice.PressureLogPointer++] = senderDevice.Parameters.Pressure;
+                    break;
+                case 131:
+                    senderDevice.Parameters.ExPressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                     break;
             }
         }

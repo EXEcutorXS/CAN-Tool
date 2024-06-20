@@ -78,13 +78,9 @@ namespace CAN_Tool.CustomControls
             Vm.Transmit(msg.ToCanMessage());
         }
 
-        private void BlowerMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            int newRevs = Vm.OverrideState.BlowerOverridenRevs;
 
-            if (Vm == null || !Vm.OverrideState.BlowerOverriden) return;
-            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
-            newRevs += Math.Sign(e.Delta) * k;
+        private void SetBlowerOverrideVal(int newRevs)
+        {
             if (newRevs < 0) newRevs = 0;
             if (newRevs > 200) newRevs = 200;
             byte overrideByte1 = 0;
@@ -100,6 +96,33 @@ namespace CAN_Tool.CustomControls
             byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)newRevs, 0xFF, 0xFF, 0xFF, 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
+        }
+
+        private void BlowerMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            int newRevs = Vm.OverrideState.BlowerOverridenRevs;
+
+            if (Vm == null || !Vm.OverrideState.BlowerOverriden) return;
+            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
+            newRevs += Math.Sign(e.Delta) * k;
+            SetBlowerOverrideVal(newRevs);
+            /*
+            if (newRevs < 0) newRevs = 0;
+            if (newRevs > 200) newRevs = 200;
+            byte overrideByte1 = 0;
+            byte overrideByte2 = 0;
+            byte overrideStatesByte = 0;
+            overrideByte1 |= 3;
+            overrideByte1 |= 3 << 2;
+            overrideByte1 |= 3 << 4;
+            overrideByte1 |= 3 << 6;
+            overrideByte2 |= 3;
+            overrideStatesByte |= 3;
+            overrideStatesByte |= 3 << 2;
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)newRevs, 0xFF, 0xFF, 0xFF, 0xFF };
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
+            Vm.Transmit(msg.ToCanMessage());
+            */
         }
 
         private void BlowerOverrideClick(object sender, RoutedEventArgs e)
@@ -153,6 +176,16 @@ namespace CAN_Tool.CustomControls
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
 
+        }
+
+        private void ReduceOverridenRevsButtonClick(object sender, RoutedEventArgs e)
+        {
+            SetBlowerOverrideVal(Keyboard.IsKeyDown(Key.LeftShift)? Vm.OverrideState.BlowerOverridenRevs-10: Vm.OverrideState.BlowerOverridenRevs-1);
+        }
+
+        private void IncreaseOverridenRevsButtonClick(object sender, RoutedEventArgs e)
+        {
+            SetBlowerOverrideVal(Keyboard.IsKeyDown(Key.LeftShift) ? Vm.OverrideState.BlowerOverridenRevs + 10 : Vm.OverrideState.BlowerOverridenRevs + 1);
         }
     }
 }

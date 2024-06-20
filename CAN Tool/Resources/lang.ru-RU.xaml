@@ -69,6 +69,8 @@
 <v:String x:Key="b_list_paneltemp">Т пульта</v:String>
 <v:String x:Key="b_list_inlettemp">Т вход</v:String>
 <v:String x:Key="b_list_error">Код.ош.</v:String>
+<v:String x:Key="b_list_press_in">Давл</v:String>
+<v:String x:Key="b_list_press_ex">Выхл.давл</v:String>
 <v:String x:Key="b_load_can_log">Загрузить из лога</v:String>
 <v:String x:Key="b_send_from_log">Транслировать из лога</v:String>
 

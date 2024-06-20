@@ -69,6 +69,8 @@
 <v:String x:Key="b_list_paneltemp">Pan.Temp</v:String>
 <v:String x:Key="b_list_inlettemp">In.Temp</v:String>
 <v:String x:Key="b_list_error">Err.code</v:String>
+<v:String x:Key="b_list_press_in">Press</v:String>
+<v:String x:Key="b_list_press_ex">Ex.press</v:String>
 <v:String x:Key="b_load_can_log">Load from log</v:String>
 <v:String x:Key="b_send_from_log">Send from log</v:String>
 
