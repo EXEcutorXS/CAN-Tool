@@ -137,7 +137,7 @@ namespace CAN_Tool.CustomControls
             if (!Vm.OverrideState.BlowerOverriden) overrideByte2 |= 1;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
-            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, 0xFF, 0xFF, 0xFF, 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
         }
