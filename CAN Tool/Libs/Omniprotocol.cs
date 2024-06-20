@@ -1762,11 +1762,11 @@ public partial class Omni : ObservableObject
                 if (((m.Data[0] >> 6) & 3) < 2) senderDevice.OverrideState.PumpOverriden = ((m.Data[0] >> 6) & 3) > 0;
                 if ((m.Data[1] & 3) < 2) senderDevice.OverrideState.BlowerOverriden = (m.Data[1] & 3) > 0;
 
-                if ((m.Data[2] & 3) < 2) senderDevice.OverrideState.PumpOverridenState = (m.Data[1] & 3) > 0;
-                if (((m.Data[2] >> 2) & 3) < 2) senderDevice.OverrideState.RelayOverridenState = ((m.Data[2] >> 2) & 3) > 0;
-                if (m.Data[3] != 255) senderDevice.OverrideState.BlowerOverridenRevs = m.Data[3];
-                if (m.Data[4] != 255) senderDevice.OverrideState.GlowPlugOverridenPower = m.Data[4];
-                if (m.Data[5] != 255 || m.Data[6] != 255) senderDevice.OverrideState.FuelPumpOverridenFrequencyX100 = m.Data[5] * 256 + m.Data[6];
+                if ((m.Data[2] & 3) < 2 && senderDevice.OverrideState.PumpOverriden) senderDevice.OverrideState.PumpOverridenState = (m.Data[1] & 3) > 0;
+                if (((m.Data[2] >> 2) & 3) < 2 && senderDevice.OverrideState.RelayOverriden) senderDevice.OverrideState.RelayOverridenState = ((m.Data[2] >> 2) & 3) > 0;
+                if (m.Data[3] != 255 && senderDevice.OverrideState.BlowerOverriden) senderDevice.OverrideState.BlowerOverridenRevs = m.Data[3];
+                if (m.Data[4] != 255 && senderDevice.OverrideState.GlowPlugOverriden) senderDevice.OverrideState.GlowPlugOverridenPower = m.Data[4];
+                if (m.Data[5] != 255 || m.Data[6] != 255 && senderDevice.OverrideState.FuelPumpOverriden) senderDevice.OverrideState.FuelPumpOverridenFrequencyX100 = m.Data[5] * 256 + m.Data[6];
                 break;
             case 100:
                 if (m.Data[0] == 1 && m.Data[1] == 1)
