@@ -354,6 +354,7 @@
 <v:String x:Key="par_559">Помпа предпускогого подогрева</v:String>
 <v:String x:Key="par_560">Датчик температуры предпускового подогрева</v:String>
 <v:String x:Key="par_561">Калибровочное значения для измерения тока</v:String>
+<v:String x:Key="par_562">Минимальный уровень жидкости</v:String>
 
 
 <v:String x:Key="par_600">номер устройства на шине CAN RV-C</v:String>
@@ -816,9 +817,12 @@
 <v:String x:Key="d_35">Бинар 10Б</v:String>
 <v:String x:Key="d_37">Плата расширения</v:String>
 <v:String x:Key="d_40">Датчик давления</v:String>
+<v:String x:Key="d_41">Нагрузка одноканальная</v:String>
+<v:String x:Key="d_42">Нагрузка трёхканальная</v:String>
 <v:String x:Key="d_123">Программный загрузчик</v:String>
 <v:String x:Key="d_124">Мобильное приложение</v:String>
 <v:String x:Key="d_126">Устройство управления</v:String>
+<v:String x:Key="d_127">Все</v:String>
 
 <v:String x:Key="u_voltage">В</v:String>
 <v:String x:Key="u_pressure">кПа</v:String>
@@ -1021,7 +1025,14 @@
 <v:String x:Key="t_overriden_glow_plug_power">Заданная мощность свечи</v:String>
 <v:String x:Key="t_overriden_fuel_pump_frequency">Заданная частота ТН</v:String>
 <v:String x:Key="t_actuator_override">Переопределение исполнительных устройств</v:String>
+<v:String x:Key="t_generic_load_control">Управления универсальной нагрузкой</v:String>
 <v:String x:Key="t_temperature_1">Температура 1</v:String>
 <v:String x:Key="t_temperature_2">Температура 2</v:String>
 <v:String x:Key="t_debug_pack">Отладочный пакет</v:String>
+<v:String x:Key="t_pwm">ШИМ</v:String>
+<v:String x:Key="t_toggle">Вкл/Выкл</v:String>
+<v:String x:Key="t_hcu_error_codes">Коды неисправности HCU</v:String>
+<v:String x:Key="t_load_channel1">Канал 1</v:String>
+<v:String x:Key="t_load_channel2">Канал 2</v:String>
+<v:String x:Key="t_load_channel3">Канал 3</v:String>
 </ResourceDictionary>

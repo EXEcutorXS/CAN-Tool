@@ -354,6 +354,7 @@
 <v:String x:Key="par_559">PAR_ENGINE_PREHEAT_PUMP</v:String>
 <v:String x:Key="par_560">PAR_ENGINE_PREHEAT_TEMP_SENSOR</v:String>
 <v:String x:Key="par_561">CURRENT MEASURING COEFFICIENT</v:String>
+<v:String x:Key="par_562">MIN_LIQUID_LEVEL</v:String>
 
 
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
@@ -816,9 +817,12 @@
 <v:String x:Key="d_35">Binar 10B</v:String>
 <v:String x:Key="d_37">Extension board</v:String>
 <v:String x:Key="d_40">Pressure sensor</v:String>
+<v:String x:Key="d_41">Generic Load (Single)</v:String>
+<v:String x:Key="d_42">Generic Load(Tripple)</v:String>
 <v:String x:Key="d_123">Bootloader</v:String>
 <v:String x:Key="d_124">Mobile App</v:String>
 <v:String x:Key="d_126">Control device</v:String>
+<v:String x:Key="d_127">Everyone</v:String>
 
 <v:String x:Key="u_voltage">V</v:String>
 <v:String x:Key="u_pressure">kPa</v:String>
@@ -1021,7 +1025,14 @@
 <v:String x:Key="t_overriden_glow_plug_power">Overriden glow plug power</v:String>
 <v:String x:Key="t_overriden_fuel_pump_frequency">Overriden fuel pump frequency</v:String>
 <v:String x:Key="t_actuator_override">Actuators override</v:String>
+<v:String x:Key="t_generic_load_control">Generic load control</v:String>
 <v:String x:Key="t_temperature_1">Temperature 1</v:String>
 <v:String x:Key="t_temperature_2">Temperature 2</v:String>
 <v:String x:Key="t_debug_pack">Debug packet</v:String>
+<v:String x:Key="t_pwm">PWM</v:String>
+<v:String x:Key="t_toggle">Toggle</v:String>
+<v:String x:Key="t_hcu_error_codes">HCU error codes</v:String>
+<v:String x:Key="t_load_channel1">Channel 1</v:String>
+<v:String x:Key="t_load_channel2">Channel 2</v:String>
+<v:String x:Key="t_load_channel3">Channel 3</v:String>
 </ResourceDictionary>

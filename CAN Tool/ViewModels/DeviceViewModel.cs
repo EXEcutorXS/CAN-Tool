@@ -231,6 +231,8 @@ namespace OmniProtocol
 
         public Timberline20OmniViewModel TimberlineParams { set; get; } = new();
 
+        public GenericLoadTrippleViewModel GenericLoadTripple { set; get; } = new();
+
         [ObservableProperty] public bool manualMode;
 
         [ObservableProperty] OverrideStateClass overrideState = new();
@@ -275,8 +277,8 @@ namespace OmniProtocol
 
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            return obj is DeviceViewModel device && Id.Equals(device.Id);
+            if (obj == null || obj.GetType()!=typeof(DeviceViewModel)) return false;
+            return Id.Equals((obj as DeviceViewModel).Id);
         }
 
         public override int GetHashCode() { return Id.GetHashCode(); }
@@ -332,5 +334,6 @@ namespace OmniProtocol
         {
             IsLogWriting = false;
         }
+
     }
 }

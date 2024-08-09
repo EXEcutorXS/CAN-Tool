@@ -37,6 +37,8 @@ namespace CAN_Tool.ViewModels
     {
         private SynchronizationContext UIContext = SynchronizationContext.Current;
 
+        
+
         public WorkMode_t[] WorkModes => new WorkMode_t[] { WorkMode_t.Omni, WorkMode_t.Rvc, WorkMode_t.RegularCan };
         public PhyProt_t[] PhyProtocols => new PhyProt_t[2] { PhyProt_t.CAN, PhyProt_t.UART };
 
@@ -681,7 +683,11 @@ namespace CAN_Tool.ViewModels
                 case PhyProt_t.CAN:
                     switch (Mode)
                     {
-                        case WorkMode_t.Omni: UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+                        case 
+                            WorkMode_t.Omni: 
+                            
+                            UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotCanMessageEventArgs).receivedMessage), null);
+                            break;
                         case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
                         case WorkMode_t.RegularCan: UIContext.Send(x => CanPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
                     }

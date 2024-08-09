@@ -11,6 +11,7 @@
         <c:BootloaderToVisible x:Key="OnlyForBootloaders" />
         <c:PlanarToVisibleConverter x:Key="OnlyForPlanars" />
         <c:HcuToVisibleConverter x:Key="OnlyForHcu" />
+        <c:GenericLoadTrippleToVisible x:Key="OnlyForGenericLoadTripple" />
         <c:StateToBorderBrushConverter x:Key="BoolToBrush" />
         <c:BoolToOpacity x:Key="BoolToOpacity" />
         <c:FarenheitConverter x:Key="ToFarenheit" />
@@ -208,6 +209,7 @@
                         <cc:HeaterControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" />
                         <cc:PressureSensorControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForPressureSensors}}" />
                         <cc:BootloaderControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForBootloaders}}" />
+                        <cc:GenericLoadTrippleControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForGenericLoadTripple}}" />
                     </DockPanel>
                 </TabItem>
                 <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">

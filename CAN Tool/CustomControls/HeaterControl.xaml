@@ -45,7 +45,7 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200" />
-                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="120" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" x:Name="StageTextBlock" HorizontalAlignment="Center" Text="{Binding Parameters.StageString}" FontSize="30" Margin="8" TextWrapping="WrapWithOverflow" />

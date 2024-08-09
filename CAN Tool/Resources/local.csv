@@ -354,6 +354,7 @@ par_558	PAR_FLOOR_TEMP_SENSOR	Датчик пемпературы тёплого
 par_559	PAR_ENGINE_PREHEAT_PUMP	Помпа предпускогого подогрева
 par_560	PAR_ENGINE_PREHEAT_TEMP_SENSOR	Датчик температуры предпускового подогрева
 par_561	CURRENT MEASURING COEFFICIENT	Калибровочное значения для измерения тока
+par_562	MIN_LIQUID_LEVEL	Минимальный уровень жидкости
 		
 		
 par_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C
@@ -816,9 +817,12 @@ d_34	Binar 10D	Бинар 10Д
 d_35	Binar 10B	Бинар 10Б
 d_37	Extension board	Плата расширения
 d_40	Pressure sensor	Датчик давления
+d_41	Generic Load (Single)	Нагрузка одноканальная
+d_42	Generic Load(Tripple)	Нагрузка трёхканальная
 d_123	Bootloader	Программный загрузчик
 d_124	Mobile App	Мобильное приложение
 d_126	Control device	Устройство управления
+d_127	Everyone	Все
 		
 u_voltage	V	В
 u_pressure	kPa	кПа
@@ -1021,6 +1025,13 @@ t_overriden_blower_revs	Overriden air blower revs	Заданные оборот�
 t_overriden_glow_plug_power	Overriden glow plug power	Заданная мощность свечи
 t_overriden_fuel_pump_frequency	Overriden fuel pump frequency	Заданная частота ТН
 t_actuator_override	Actuators override	Переопределение исполнительных устройств
+t_generic_load_control	Generic load control	Управления универсальной нагрузкой
 t_temperature_1	Temperature 1	Температура 1
 t_temperature_2	Temperature 2	Температура 2
 t_debug_pack	Debug packet	Отладочный пакет
+t_pwm	PWM	ШИМ
+t_toggle	Toggle	Вкл/Выкл
+t_hcu_error_codes	HCU error codes	Коды неисправности HCU
+t_load_channel1	Channel 1	Канал 1
+t_load_channel2	Channel 2	Канал 2
+t_load_channel3	Channel 3	Канал 3
