@@ -19,7 +19,7 @@ namespace OmniProtocol
 {
     public partial class DeviceViewModel : ObservableObject
     {
-        public partial class OverrideStateClass:ObservableObject
+        public partial class OverrideStateClass : ObservableObject
         {
             [ObservableProperty] public bool blowerOverriden;
             [ObservableProperty] public bool fuelPumpOverriden;
@@ -44,8 +44,12 @@ namespace OmniProtocol
             StartVentCommand = new LambdaCommand(x => ExecuteCommand(10), NotInManual);
             ClearErrorsCommand = new LambdaCommand(x => ExecuteCommand(5), NotInManual);
             CalibrateTermocouplesCommand = new LambdaCommand(x => ExecuteCommand(20), NotInManual);
+
             if (Omni.Devices.TryGetValue(Id.Type, out var device))
                 DeviceReference = device;
+
+            if (DeviceReference.DevType == DeviceType.Binar || DeviceReference.DevType == DeviceType.Planar)
+                SecondMessages = true;
         }
 
         [RelayCommand]
@@ -200,6 +204,8 @@ namespace OmniProtocol
 
         [NotifyPropertyChangedFor(nameof(BootloaderFirmwareAsText))]
         [ObservableProperty] private byte[] bootloaderFirmware = new byte[4];
+
+        [ObservableProperty] private bool secondMessages = false;
 
         public string BootloaderFirmwareAsText => BootloaderFirmware != null ? $"{BootloaderFirmware[0]}.{BootloaderFirmware[1]}.{BootloaderFirmware[2]}.{BootloaderFirmware[3]}" : GetString("t_no_firmware_data");
 

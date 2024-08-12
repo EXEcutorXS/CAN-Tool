@@ -263,6 +263,7 @@
                                             <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                                         </Button.Content>
                                     </Button>
+                                    <CheckBox IsChecked="{Binding OmniInstance.SelectedConnectedDevice.SecondMessages}" Content="{DynamicResource t_keep_connection}" />
                                 </StackPanel>
                             </Grid>
                             <TextBlock DockPanel.Dock="Right" MaxHeight="200" Margin="10" Text="{Binding Path=CustomMessage.VerboseInfo, Mode=OneWay}"></TextBlock>

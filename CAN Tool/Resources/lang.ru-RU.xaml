@@ -1035,4 +1035,5 @@
 <v:String x:Key="t_load_channel1">Канал 1</v:String>
 <v:String x:Key="t_load_channel2">Канал 2</v:String>
 <v:String x:Key="t_load_channel3">Канал 3</v:String>
+<v:String x:Key="t_keep_connection">Поддерживать связь</v:String>
 </ResourceDictionary>

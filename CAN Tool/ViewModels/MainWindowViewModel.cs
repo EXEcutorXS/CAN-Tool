@@ -642,7 +642,7 @@ namespace CAN_Tool.ViewModels
                         OnChartDrawCommandExecuted(null);
                 }
 
-            foreach (var d in OmniInstance.ConnectedDevices) //Поддержание связи
+            foreach (var d in OmniInstance.ConnectedDevices.Where(d=>d.SecondMessages)) //Поддержание связи только для котлов
             {
                 OmniMessage msg = new();
                 msg.TransmitterId.Address = 6;
@@ -651,7 +651,7 @@ namespace CAN_Tool.ViewModels
                 msg.ReceiverId.Address = d.Id.Address;
                 msg.ReceiverId.Type = d.Id.Type;
                 OmniInstance.SendMessage(msg);
-                Task.Delay(50);
+                Task.Delay(150);
             }
         }
 
