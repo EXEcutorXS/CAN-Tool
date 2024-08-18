@@ -194,14 +194,20 @@ namespace CAN_Tool.ViewModels
                         CanAdapter.PortOpen();
                         PortButtonString = GetString("b_close");
                         Thread.Sleep(10);
-                        CanAdapter.SetBitrate(SelectedCanBitrate); //250kb/sec
+                        CanAdapter.Stop();
+                        CanAdapter.Stop();
+                        CanAdapter.GetSerial();
+                        CanAdapter.PortClose();
                         Thread.Sleep(10);
-                        CanAdapter.SetAcceptCode(0);
+                        CanAdapter.PortOpen();
+                        CanAdapter.GetVersion();
                         Thread.Sleep(10);
-                        CanAdapter.SetMask(0);
+                        CanAdapter.PortClose();
                         Thread.Sleep(10);
+                        CanAdapter.PortOpen();
                         CanAdapter.StartNormal();
-                        Thread.Sleep(10);
+                        CanAdapter.Stop();
+                        CanAdapter.StartNormal();
                     }
                     else
                     {

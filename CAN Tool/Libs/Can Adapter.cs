@@ -261,10 +261,12 @@ namespace CAN_Tool
             serialPort.Close(); //now close the form
         }
 
+        public void GetSerial() => serialPort.Write("N\r");
+        public void GetVersion() => serialPort.Write("V\r");
         public void StartNormal() => serialPort.Write("O\r");
         public void StartListen() => serialPort.Write("L\r");
-        public void StartSelfReception() => serialPort.Write("Y\r");
-        public void Stop() => serialPort.Write("C\r");
+        public void StartSelfReception() => serialPort.Write("\rY\r");
+        public void Stop() => serialPort.Write("\rC\r");
         public void SetBitrate(int bitrate) => serialPort.Write($"S{bitrate}\r");
         public void SetMask(uint mask) => serialPort.Write($"m{mask:X08}\r");
         public void SetAcceptCode(uint code) => serialPort.Write($"M{code:X08}\r");
@@ -291,7 +293,7 @@ namespace CAN_Tool
             str.Append(msg.IdAsText);
             str.Append(msg.Dlc);
             str.Append(msg.GetDataInTextFormat());
-            str.Append('\r');
+            str.Append("\r");
 
             serialPort.Write(str.ToString());
             Status = AdapterStatus.Tx;
@@ -358,6 +360,7 @@ namespace CAN_Tool
         {
             GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
         }
+
 
         public string StatusString => $"Bus use: Rx/Tx(Total):{lastSecondReceived}/{lastSecondTransmitted},Faults:{FailedTransmissions}";
 

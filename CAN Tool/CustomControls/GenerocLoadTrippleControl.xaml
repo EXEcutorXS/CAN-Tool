@@ -27,7 +27,7 @@
         <ProgressBar Margin="10" Minimum="0" Maximum="100" Grid.Column="3" Grid.Row="0" Value="{Binding GenericLoadTripple.PwmLevel1}" Height="30"></ProgressBar>
         <ProgressBar Margin="10" Minimum="0" Maximum="100" Grid.Column="3" Grid.Row="1" Value="{Binding GenericLoadTripple.PwmLevel2}" Height="30"></ProgressBar>
         <ProgressBar Margin="10" Minimum="0" Maximum="100" Grid.Column="3" Grid.Row="2" Value="{Binding GenericLoadTripple.PwmLevel3}" Height="30"></ProgressBar>
-        <Slider x:Name="Slider1" Minimum="0" Maximum="100" Grid.Column="3" Grid.Row="0" Height="30" Margin="0 14 0 5" ValueChanged="PWM1Changed" d:Value="100"/>
+        <Slider x:Name="Slider1" Minimum="0" Maximum="100" Grid.Column="3" Grid.Row="0" Height="30" Margin="0 14 0 5" ValueChanged="PWM1Changed" />
         <Slider x:Name="Slider2" Minimum="0" Maximum="100" Grid.Column="3" Grid.Row="1" Height="30" Margin="0 14 0 5" ValueChanged="PWM2Changed" />
         <Slider x:Name="Slider3" Minimum="0" Maximum="100" Grid.Column="3" Grid.Row="2" Height="30" Margin="0 14 0 5" ValueChanged="PWM3Changed" />
         <TextBlock Text="{Binding GenericLoadTripple.PwmLevel1,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="3" Grid.Row="0" d:Text="50%" VerticalAlignment="Center" HorizontalAlignment="Center" />
