@@ -192,21 +192,8 @@ namespace CAN_Tool.ViewModels
                     {
                         CanAdapter.PortName = PortName;
                         CanAdapter.PortOpen();
+                        Thread.Sleep(100);
                         PortButtonString = GetString("b_close");
-                        Thread.Sleep(10);
-                        CanAdapter.Stop();
-                        CanAdapter.Stop();
-                        CanAdapter.GetSerial();
-                        CanAdapter.PortClose();
-                        Thread.Sleep(10);
-                        CanAdapter.PortOpen();
-                        CanAdapter.GetVersion();
-                        Thread.Sleep(10);
-                        CanAdapter.PortClose();
-                        Thread.Sleep(10);
-                        CanAdapter.PortOpen();
-                        CanAdapter.StartNormal();
-                        CanAdapter.Stop();
                         CanAdapter.StartNormal();
                     }
                     else

@@ -196,6 +196,7 @@ namespace CAN_Tool
 
         private int ptr;
 
+
         public bool PortOpened => serialPort.IsOpen;
 
         [ObservableProperty] private int failedTransmissions;
@@ -230,13 +231,15 @@ namespace CAN_Tool
 
         public void PortOpen()
         {
+            serialPort.BaudRate = 3000000;
+            serialPort.Handshake = Handshake.RequestToSend;
+            serialPort.PortName = "COM15";
             serialPort.Open();
             Status = AdapterStatus.Ready;
         }
 
         public void PortClose()
         {
-            //serialPort.Close();
             Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit)); //close port in new thread to avoid hang
             CloseDown.Start(); //close port in new thread to avoid hang
             Status = AdapterStatus.Closed;
@@ -252,8 +255,6 @@ namespace CAN_Tool
             {
                 MessageBox.Show(ex.Message); //catch any serial port closing error messages
             }
-
-            // (new EventHandler(NowClose)); //now close back in the main thread
         }
 
         private void NowClose(object sender, EventArgs e)
@@ -362,7 +363,17 @@ namespace CAN_Tool
         }
 
 
-        public string StatusString => $"Bus use: Rx/Tx(Total):{lastSecondReceived}/{lastSecondTransmitted},Faults:{FailedTransmissions}";
+        public string StatusString
+        {
+            get
+            {
+                if (PortOpened)
+                    return $"Rx/Tx(Total):{lastSecondReceived}/{lastSecondTransmitted},Faults:{FailedTransmissions}";
+                else
+                    return "Port Closed";
+
+            }
+        }
 
         public CanAdapter()
         {

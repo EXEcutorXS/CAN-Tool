@@ -37,7 +37,7 @@
 
             <StatusBarItem HorizontalAlignment="Right" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="20" Text="{Binding CanAdapter.Status,Mode=OneWay}" Margin="10"></TextBlock>
+                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="20" Text="{Binding CanAdapter.StatusString,Mode=OneWay}" Margin="10"></TextBlock>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>
