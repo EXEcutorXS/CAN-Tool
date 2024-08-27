@@ -25,6 +25,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Specialized;
 using ScottPlot.WPF;
 using System.Collections.ObjectModel;
+using System.Windows.Markup;
 
 
 namespace OmniProtocol
@@ -1474,8 +1475,8 @@ public partial class Omni : ObservableObject
                 senderDevice = new DeviceViewModel(id);
                 ConnectedDevices.Add(senderDevice);
                 NewDeviceAcquired?.Invoke(this, null);
-                //if (senderDevice.Id.Type != 123)        //Requesting basic data, but not for bootloaders
-                //    Task.Run(() => RequestBasicData(id));
+                if (senderDevice.Id.Type != 123)        //Requesting basic data, but not for bootloaders
+                    Task.Run(() => RequestSerial(id));
             }
 
             foreach (var p in Pgns[m.Pgn].parameters)
@@ -2141,65 +2142,12 @@ public partial class Omni : ObservableObject
         Done();
     }
 
-    public async void RequestBasicData(DeviceId id)
+    public async void RequestSerial(DeviceId id)
     {
-        var currentDevice = ConnectedDevices.FirstOrDefault(i => i.Id.Equals(id));
-
-        for (var parId = 12; parId < 15; parId++) //ID1 ID2 ID3
+        for (byte i = 1; i < 4; i++)
         {
-            OmniMessage msg = new();
-            msg.Pgn = 7;
-            msg.TransmitterId.Address = 6;
-            msg.TransmitterId.Type = 126;
-            msg.ReceiverId.Address = id.Address;
-            msg.ReceiverId.Type = id.Type;
-            msg.Data[0] = 3; //Read Param
-            msg.Data[1] = 0xFF; //Read Param
-            msg.Data[2] = (byte)(parId / 256);
-            msg.Data[3] = (byte)(parId % 256);
-
-            currentDevice.flagGetParamDone = false;
-
-            for (var t = 0; t < 7; t++)
-            {
-                SendMessage(msg);
-                var success = false;
-
-                for (var j = 0; j < 50; j++)
-                {
-                    if (currentDevice.flagGetParamDone)
-                    {
-                        success = true;
-                        break;
-                    }
-                    await Task.Delay(1);
-                    Debug.WriteLineIf(j == 49, $"Error reading parameter {parId}, attempt {t + 1})");
-                }
-                if (success) break;
-            }
+            RequestPgn(id, 33, i);
             await Task.Delay(100);
-
-            msg.Pgn = 6;
-            msg.Data[0] = 0;
-            msg.Data[1] = 18;
-            for (var t = 0; t < 7; t++)
-            {
-                currentDevice.flagGetVersionDone = false;
-                SendMessage(msg);
-                var success = false;
-
-                for (var j = 0; j < 50; j++)
-                {
-                    if (currentDevice.flagGetParamDone)
-                    {
-                        success = true;
-                        break;
-                    }
-                    await Task.Delay(1);
-                    Debug.WriteLineIf(j == 49, $"Error reading version for {currentDevice.ToString()}");
-                }
-                if (success) break;
-            }
         }
     }
 
@@ -2294,6 +2242,23 @@ public partial class Omni : ObservableObject
             else
                 message.Data[i + 2] = 0xFF;
         }
+        SendMessage(message);
+    }
+
+    public void RequestPgn(DeviceId device, int pgn, byte? multiPack)
+    {
+        var message = new OmniMessage();
+        message.Pgn = 6;
+        message.TransmitterId.Address = 6;
+        message.TransmitterId.Type = 126;
+        message.ReceiverId.Address = device.Address;
+        message.ReceiverId.Type = device.Type;
+        message.Data[0] = (byte)(pgn>>8);
+        message.Data[1] = (byte)(pgn&0xFF);
+        if (multiPack != null)
+            message.Data[2] = (byte)multiPack;
+        else
+            message.Data[2] = 255;
         SendMessage(message);
     }
 

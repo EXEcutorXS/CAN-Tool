@@ -233,7 +233,6 @@ namespace CAN_Tool
         {
             serialPort.BaudRate = 3000000;
             serialPort.Handshake = Handshake.RequestToSend;
-            serialPort.PortName = "COM15";
             serialPort.Open();
             Status = AdapterStatus.Ready;
         }
