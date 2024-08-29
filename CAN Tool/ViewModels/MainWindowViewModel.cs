@@ -475,7 +475,7 @@ namespace CAN_Tool.ViewModels
             var doc = DocX.Create(path);
             var headParagraph = doc.InsertParagraph();
             headParagraph.AppendLine(GetString("t_device_report") + ": ").Append(OmniInstance.SelectedConnectedDevice.Name).Bold();
-            headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(OmniInstance.SelectedConnectedDevice.SerialAsString).Bold();
+            headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(OmniInstance.SelectedConnectedDevice.Serial[0].ToString()+"."+ OmniInstance.SelectedConnectedDevice.Serial[1].ToString()+"."+ OmniInstance.SelectedConnectedDevice.Serial[2].ToString()).Bold();
             headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(OmniInstance.SelectedConnectedDevice.ProductionDate.ToString()).Bold();
             headParagraph.AppendLine(GetString("t_formed") + ": ").Append(DateTime.Now.ToLocalTime().ToString()).Bold();
             headParagraph.AppendLine();

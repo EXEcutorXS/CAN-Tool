@@ -19,6 +19,7 @@
         <c:RvcToVisibleConverter x:Key="RvcToVisible" />
         <c:HexStringToIntConverter x:Key="HexConverter" />
         <c:HexStringToUlongConverter x:Key="HexToUlongConverter" />
+        <c:BindingListToStringConverter x:Key="VersionConverter" />
     </UserControl.Resources>
     <UserControl.Triggers>
         <EventTrigger RoutedEvent="Loaded">
@@ -61,9 +62,9 @@
                 </Border.Background>
             </Border>
             <StackPanel Grid.Row="1" Grid.Column="1">
-                <TextBlock Margin="5" Grid.Row="0" Text="{Binding FirmwareAsText}" VerticalAlignment="Center" FontSize="20" />
-                <TextBlock Margin="5" Grid.Row="1" Text="{Binding ProductionDate}" VerticalAlignment="Center" FontSize="20" />
-                <TextBlock Margin="5" Grid.Row="2" Text="{Binding SerialAsString}" VerticalAlignment="Center" FontSize="20" />
+                <TextBlock Margin="5" Grid.Row="0" Text="{Binding Firmware,Converter={StaticResource VersionConverter},Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
+                <TextBlock Margin="5" Grid.Row="1" Text="{Binding ProductionDate,Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
+                <TextBlock Margin="5" Grid.Row="2" Text="{Binding Serial,Converter={StaticResource VersionConverter},Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
             </StackPanel>
 
             <Border Grid.Row="2" Grid.ColumnSpan="3" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignDivider}" CornerRadius="5" Margin="2">

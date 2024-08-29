@@ -8,10 +8,31 @@ using System.Windows.Data;
 using System.Windows.Media;
 using RVC;
 using System.Linq;
+using System.ComponentModel;
 
 
 namespace CAN_Tool.ViewModels.Converters
 {
+
+    public class BindingListToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || value.GetType() != typeof(BindingList<int>))
+                return "0";
+            StringBuilder sb = new StringBuilder("");
+            
+            foreach (var val in value as BindingList<int>)
+                sb.Append($"{val}.");
+            sb.Remove(sb.Length - 1, 1);
+            return sb.ToString();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     public class DataToStringConverter : IValueConverter
     {

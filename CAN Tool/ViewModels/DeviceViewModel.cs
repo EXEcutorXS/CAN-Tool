@@ -177,7 +177,7 @@ namespace OmniProtocol
                 msg.Data[i + 2] = arg.Item3[i];
             TransmitStatic(msg.ToCanMessage());
         }
-
+        
         public ICommand StartHeaterCommand { get; }
 
         public ICommand StopHeaterCommand { get; }
@@ -194,36 +194,13 @@ namespace OmniProtocol
 
         [ObservableProperty] private DeviceId id;
 
-
         [ObservableProperty] private DateOnly productionDate;
-
-        [NotifyPropertyChangedFor(nameof(FirmwareAsText))]
-        [ObservableProperty] private byte[] firmware = new byte[4];
-
-        public string FirmwareAsText => Firmware != null ? $"{Firmware[0]}.{Firmware[1]}.{Firmware[2]}.{Firmware[3]}" : GetString("t_no_firmware_data");
-
-        [NotifyPropertyChangedFor(nameof(BootloaderFirmwareAsText))]
-        [ObservableProperty] private byte[] bootloaderFirmware = new byte[4];
 
         [ObservableProperty] private bool secondMessages = false;
 
-        public string BootloaderFirmwareAsText => BootloaderFirmware != null ? $"{BootloaderFirmware[0]}.{BootloaderFirmware[1]}.{BootloaderFirmware[2]}.{BootloaderFirmware[3]}" : GetString("t_no_firmware_data");
-
-        private uint serial1 = 0;
-
-        [AffectsTo(nameof(SerialAsString))]
-        public uint Serial1 { get => serial1; set => SetProperty(ref serial1, value); }
-
-        private uint serial2 = 0;
-
-        [AffectsTo(nameof(SerialAsString))]
-        public uint Serial2 { get => serial2; set => SetProperty(ref serial2, value); }
-
-        private uint serial3 = 0;
-        [AffectsTo(nameof(SerialAsString))]
-        public uint Serial3 { get => serial3; set => SetProperty(ref serial3, value); }
-
-        public string SerialAsString => $"{serial1}.{serial2}.{serial3}";
+        public BindingList<int> Serial { get; } = new() { 0, 0, 0 };
+        public BindingList<int> Firmware { get; } = new() { 0, 0, 0 ,0};
+        public BindingList<int> BootFirmware { get; } = new() { 0, 0, 0, 0 };
 
         public UpdatableList<StatusVariable> Status { get; } = new();
 
@@ -260,8 +237,6 @@ namespace OmniProtocol
         public uint receiverDataCrc = 0;
 
         public bool flagGetParamDone = false;
-
-        public bool flagGetVersionDone = false;
 
         public bool flagGetBbDone = false;
 
