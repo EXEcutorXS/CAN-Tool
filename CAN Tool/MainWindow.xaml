@@ -188,20 +188,23 @@
             </DataGrid>
         </DockPanel>
         <DockPanel Visibility="{Binding Mode,Converter={StaticResource OmniToVisible}}" DockPanel.Dock="Top">
-            <DockPanel DockPanel.Dock="Top" >
-            <ListBox x:Name="DeviceSelector" DockPanel.Dock="Left" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding OmniInstance.SelectedConnectedDevice}">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-            </ListBox>
+            <DockPanel DockPanel.Dock="Top" Visibility="{Binding OmniInstance.ConnectedDevices.Count, Converter={StaticResource IntToVisibileConverter},Mode=OneWay}">
+                <Separator />
+                <ListBox x:Name="DeviceSelector" DockPanel.Dock=" Left" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding OmniInstance.SelectedConnectedDevice}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
                 <Button Margin="5" Command="{Binding OmniInstance.ClearDevicesCommand}" HorizontalAlignment="Right" DockPanel.Dock="Right">
                     <fa:ImageAwesome Icon="Solid_Trash" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
                 </Button>
-                
             </DockPanel>
-            <TabControl Style="{DynamicResource MaterialDesignNavigationRailTabControl}">
+            <Separator />
+            
+            <TabControl Style="{DynamicResource MaterialDesignNavigationRailTabControl}" >
+                
                 <TabItem>
                     <TabItem.Header>
                             <fa:ImageAwesome ToolTip="{DynamicResource b_common}" Icon="Solid_IdCardAlt" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>

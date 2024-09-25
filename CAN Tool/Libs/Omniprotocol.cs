@@ -1319,7 +1319,9 @@ public partial class Omni : ObservableObject
 
     public static Dictionary<int, OmniCommand> Commands { get; } = new();
 
-    public BindingList<DeviceViewModel> ConnectedDevices { get; } = new();
+    
+    [ObservableProperty] private ObservableCollection<DeviceViewModel> connectedDevices = new();
+    
     [NotifyPropertyChangedFor(nameof(AvailableModels), nameof(AvailableVendors))]
     [ObservableProperty] private DeviceViewModel selectedConnectedDevice;
 

@@ -31,15 +31,15 @@ namespace CAN_Tool
         {
             get
             {
-                return System.Threading.Thread.CurrentThread.CurrentUICulture;
+                return Thread.CurrentThread.CurrentUICulture;
             }
             set
             {
                 if (value == null) throw new ArgumentNullException("value");
-                if (value == System.Threading.Thread.CurrentThread.CurrentUICulture) return;
+                if (value == Thread.CurrentThread.CurrentUICulture) return;
 
                 //1. Меняем язык приложения:
-                System.Threading.Thread.CurrentThread.CurrentUICulture = value;
+                Thread.CurrentThread.CurrentUICulture = value;
 
                 //2. Создаём ResourceDictionary для новой культуры
                 var dict = new ResourceDictionary();

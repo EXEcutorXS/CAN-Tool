@@ -400,10 +400,6 @@ namespace CAN_Tool.ViewModels
         {
             OmniInstance.ReadAllParameters(OmniInstance.SelectedConnectedDevice.Id);
         }
-        private bool CanReadConfigCommandExecute(object parameter) =>
-            (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
-
-
 
         public ICommand SaveConfigCommand { get; }
         private void OnSaveConfigCommandExecuted(object parameter)
@@ -732,7 +728,7 @@ namespace CAN_Tool.ViewModels
 
             TogglePortCommand = new LambdaCommand(OnTogglePortCommandExecuted, CanTogglePortCommandExecute);
             RefreshPortListCommand = new LambdaCommand(OnRefreshPortsCommandExecuted);
-            ReadConfigCommand = new LambdaCommand(OnReadConfigCommandExecuted, CanReadConfigCommandExecute);
+            ReadConfigCommand = new LambdaCommand(OnReadConfigCommandExecuted, null);
             ReadBlackBoxDataCommand = new LambdaCommand(OnReadBlackBoxDataCommandExecuted, CanReadBlackBoxDataExecute);
             ReadBlackBoxErrorsCommand = new LambdaCommand(OnReadBlackBoxErrorsCommandExecuted, CanReadBlackBoxErrorsExecute);
             EraseBlackBoxErrorsCommand = new LambdaCommand(OnEraseBlackBoxErrorsCommandExecuted, CanEraseBlackBoxErrorsExecute);
@@ -762,11 +758,6 @@ namespace CAN_Tool.ViewModels
             CustomMessage.TransmitterId.Address = 6;
             CustomMessage.TransmitterId.Type = 126;
 
-            brushes.Add(new SolidColorBrush(Colors.Red));
-            brushes.Add(new SolidColorBrush(Colors.DeepPink));
-            brushes.Add(new SolidColorBrush(Colors.MediumPurple));
-            brushes.Add(new SolidColorBrush(Colors.BlueViolet));
-            brushes.Add(new SolidColorBrush(Colors.DarkSlateBlue));
             brushes.Add(new SolidColorBrush(Colors.PowderBlue));
             brushes.Add(new SolidColorBrush(Colors.LightSkyBlue));
             brushes.Add(new SolidColorBrush(Colors.Cyan));
@@ -781,6 +772,11 @@ namespace CAN_Tool.ViewModels
             brushes.Add(new SolidColorBrush(Colors.Peru));
             brushes.Add(new SolidColorBrush(Colors.Gray));
             brushes.Add(new SolidColorBrush(Colors.SlateGray));
+            brushes.Add(new SolidColorBrush(Colors.Red));
+            brushes.Add(new SolidColorBrush(Colors.DeepPink));
+            brushes.Add(new SolidColorBrush(Colors.MediumPurple));
+            brushes.Add(new SolidColorBrush(Colors.BlueViolet));
+            brushes.Add(new SolidColorBrush(Colors.DarkSlateBlue));
         }
     }
 }
