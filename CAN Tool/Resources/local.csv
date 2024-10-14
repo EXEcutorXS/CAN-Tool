@@ -300,6 +300,43 @@ par_131	Use pressure measurement for the fuel pump correction	Использов
 par_132	Set delay time to determine overvoltage error	Установить значение реакции на пониженное напряжение
 par_133	Set delay time to determine undervoltage error	Установить значение реакции на повышенное напряжение
 		
+par_400	RV_LOAD_MODE_0	Режим работы доп. нагрузки 0
+par_401	RV_LOAD_MODE_1	Режим работы доп. нагрузки 1
+par_402	RV_LOAD_MODE_2	Режим работы доп. нагрузки 2
+par_403	RV_LOAD_MODE_3	Режим работы доп. нагрузки 3
+par_404	RV_LOAD_MODE_4	Режим работы доп. нагрузки 4
+par_405	RV_LOAD_MODE_5	Режим работы доп. нагрузки 5
+par_406	RV_LOAD_MODE_6	Режим работы доп. нагрузки 6
+par_407	RV_LOAD_MODE_7	Режим работы доп. нагрузки 7
+par_408	RV_LOAD_MODE_8	Режим работы доп. нагрузки 8
+par_409	RV_LOAD_MODE_9	Режим работы доп. нагрузки 9
+		
+par_410	RV_LOAD_CHANNEL_0	Канал упрвления нагрузки 0
+par_411	RV_LOAD_CHANNEL_1	Канал упрвления нагрузки 1
+par_412	RV_LOAD_CHANNEL_2	Канал упрвления нагрузки 2
+par_413	RV_LOAD_CHANNEL_3	Канал упрвления нагрузки 3
+par_414	RV_LOAD_CHANNEL_4	Канал упрвления нагрузки 4
+par_415	RV_LOAD_CHANNEL_5	Канал упрвления нагрузки 5
+par_416	RV_LOAD_CHANNEL_6	Канал упрвления нагрузки 6
+par_417	RV_LOAD_CHANNEL_7	Канал упрвления нагрузки 7
+par_418	RV_LOAD_CHANNEL_8	Канал упрвления нагрузки 8
+par_419	RV_LOAD_CHANNEL_9	Канал упрвления нагрузки 9
+		
+par_420	RV_LOAD_ICON_0	Иконка нагрузки нагрузки 0
+par_421	RV_LOAD_ICON_1	Иконка нагрузки нагрузки 1
+par_422	RV_LOAD_ICON_2	Иконка нагрузки нагрузки 2
+par_423	RV_LOAD_ICON_3	Иконка нагрузки нагрузки 3
+par_424	RV_LOAD_ICON_4	Иконка нагрузки нагрузки 4
+par_425	RV_LOAD_ICON_5	Иконка нагрузки нагрузки 5
+par_426	RV_LOAD_ICON_6	Иконка нагрузки нагрузки 6
+par_427	RV_LOAD_ICON_7	Иконка нагрузки нагрузки 7
+par_428	RV_LOAD_ICON_8	Иконка нагрузки нагрузки 8
+par_429	RV_LOAD_ICON_9	Иконка нагрузки нагрузки 9
+		
+par_430	PAR_RV_TANK_SENSOR_CH1_MODE	Режим работы 1 канала  датчика бака
+par_431	PAR_RV_TANK_SENSOR_CH1_MODE	Режим работы 2 канала  датчика бака
+par_432	PAR_RV_TANK_SENSOR_CH1_MODE	Режим работы 3 канала  датчика бака
+par_433	PAR_RV_TANK_SENSOR_CH1_MODE	Режим работы 4 канала  датчика бака
 par_501	DISPLAY_ZONE1_DAY_T	Уставка дневной температуры зоны 1, С
 par_502	DISPLAY_ZONE2_DAY_T	Уставка дневной температуры зоны 2, С
 par_503	DISPLAY_ZONE3_DAY_T	Уставка дневной температуры зоны 3, С

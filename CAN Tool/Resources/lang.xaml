@@ -300,6 +300,43 @@
 <v:String x:Key="par_132">Set delay time to determine overvoltage error</v:String>
 <v:String x:Key="par_133">Set delay time to determine undervoltage error</v:String>
 
+<v:String x:Key="par_400">RV_LOAD_MODE_0</v:String>
+<v:String x:Key="par_401">RV_LOAD_MODE_1</v:String>
+<v:String x:Key="par_402">RV_LOAD_MODE_2</v:String>
+<v:String x:Key="par_403">RV_LOAD_MODE_3</v:String>
+<v:String x:Key="par_404">RV_LOAD_MODE_4</v:String>
+<v:String x:Key="par_405">RV_LOAD_MODE_5</v:String>
+<v:String x:Key="par_406">RV_LOAD_MODE_6</v:String>
+<v:String x:Key="par_407">RV_LOAD_MODE_7</v:String>
+<v:String x:Key="par_408">RV_LOAD_MODE_8</v:String>
+<v:String x:Key="par_409">RV_LOAD_MODE_9</v:String>
+
+<v:String x:Key="par_410">RV_LOAD_CHANNEL_0</v:String>
+<v:String x:Key="par_411">RV_LOAD_CHANNEL_1</v:String>
+<v:String x:Key="par_412">RV_LOAD_CHANNEL_2</v:String>
+<v:String x:Key="par_413">RV_LOAD_CHANNEL_3</v:String>
+<v:String x:Key="par_414">RV_LOAD_CHANNEL_4</v:String>
+<v:String x:Key="par_415">RV_LOAD_CHANNEL_5</v:String>
+<v:String x:Key="par_416">RV_LOAD_CHANNEL_6</v:String>
+<v:String x:Key="par_417">RV_LOAD_CHANNEL_7</v:String>
+<v:String x:Key="par_418">RV_LOAD_CHANNEL_8</v:String>
+<v:String x:Key="par_419">RV_LOAD_CHANNEL_9</v:String>
+
+<v:String x:Key="par_420">RV_LOAD_ICON_0</v:String>
+<v:String x:Key="par_421">RV_LOAD_ICON_1</v:String>
+<v:String x:Key="par_422">RV_LOAD_ICON_2</v:String>
+<v:String x:Key="par_423">RV_LOAD_ICON_3</v:String>
+<v:String x:Key="par_424">RV_LOAD_ICON_4</v:String>
+<v:String x:Key="par_425">RV_LOAD_ICON_5</v:String>
+<v:String x:Key="par_426">RV_LOAD_ICON_6</v:String>
+<v:String x:Key="par_427">RV_LOAD_ICON_7</v:String>
+<v:String x:Key="par_428">RV_LOAD_ICON_8</v:String>
+<v:String x:Key="par_429">RV_LOAD_ICON_9</v:String>
+
+<v:String x:Key="par_430">PAR_RV_TANK_SENSOR_CH1_MODE</v:String>
+<v:String x:Key="par_431">PAR_RV_TANK_SENSOR_CH1_MODE</v:String>
+<v:String x:Key="par_432">PAR_RV_TANK_SENSOR_CH1_MODE</v:String>
+<v:String x:Key="par_433">PAR_RV_TANK_SENSOR_CH1_MODE</v:String>
 <v:String x:Key="par_501">DISPLAY_ZONE1_DAY_T</v:String>
 <v:String x:Key="par_502">DISPLAY_ZONE2_DAY_T</v:String>
 <v:String x:Key="par_503">DISPLAY_ZONE3_DAY_T</v:String>

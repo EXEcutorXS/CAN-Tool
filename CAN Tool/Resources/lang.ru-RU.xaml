@@ -300,6 +300,43 @@
 <v:String x:Key="par_132">Установить значение реакции на пониженное напряжение</v:String>
 <v:String x:Key="par_133">Установить значение реакции на повышенное напряжение</v:String>
 
+<v:String x:Key="par_400">Режим работы доп. нагрузки 0</v:String>
+<v:String x:Key="par_401">Режим работы доп. нагрузки 1</v:String>
+<v:String x:Key="par_402">Режим работы доп. нагрузки 2</v:String>
+<v:String x:Key="par_403">Режим работы доп. нагрузки 3</v:String>
+<v:String x:Key="par_404">Режим работы доп. нагрузки 4</v:String>
+<v:String x:Key="par_405">Режим работы доп. нагрузки 5</v:String>
+<v:String x:Key="par_406">Режим работы доп. нагрузки 6</v:String>
+<v:String x:Key="par_407">Режим работы доп. нагрузки 7</v:String>
+<v:String x:Key="par_408">Режим работы доп. нагрузки 8</v:String>
+<v:String x:Key="par_409">Режим работы доп. нагрузки 9</v:String>
+
+<v:String x:Key="par_410">Канал упрвления нагрузки 0</v:String>
+<v:String x:Key="par_411">Канал упрвления нагрузки 1</v:String>
+<v:String x:Key="par_412">Канал упрвления нагрузки 2</v:String>
+<v:String x:Key="par_413">Канал упрвления нагрузки 3</v:String>
+<v:String x:Key="par_414">Канал упрвления нагрузки 4</v:String>
+<v:String x:Key="par_415">Канал упрвления нагрузки 5</v:String>
+<v:String x:Key="par_416">Канал упрвления нагрузки 6</v:String>
+<v:String x:Key="par_417">Канал упрвления нагрузки 7</v:String>
+<v:String x:Key="par_418">Канал упрвления нагрузки 8</v:String>
+<v:String x:Key="par_419">Канал упрвления нагрузки 9</v:String>
+
+<v:String x:Key="par_420">Иконка нагрузки нагрузки 0</v:String>
+<v:String x:Key="par_421">Иконка нагрузки нагрузки 1</v:String>
+<v:String x:Key="par_422">Иконка нагрузки нагрузки 2</v:String>
+<v:String x:Key="par_423">Иконка нагрузки нагрузки 3</v:String>
+<v:String x:Key="par_424">Иконка нагрузки нагрузки 4</v:String>
+<v:String x:Key="par_425">Иконка нагрузки нагрузки 5</v:String>
+<v:String x:Key="par_426">Иконка нагрузки нагрузки 6</v:String>
+<v:String x:Key="par_427">Иконка нагрузки нагрузки 7</v:String>
+<v:String x:Key="par_428">Иконка нагрузки нагрузки 8</v:String>
+<v:String x:Key="par_429">Иконка нагрузки нагрузки 9</v:String>
+
+<v:String x:Key="par_430">Режим работы 1 канала  датчика бака</v:String>
+<v:String x:Key="par_431">Режим работы 2 канала  датчика бака</v:String>
+<v:String x:Key="par_432">Режим работы 3 канала  датчика бака</v:String>
+<v:String x:Key="par_433">Режим работы 4 канала  датчика бака</v:String>
 <v:String x:Key="par_501">Уставка дневной температуры зоны 1, С</v:String>
 <v:String x:Key="par_502">Уставка дневной температуры зоны 2, С</v:String>
 <v:String x:Key="par_503">Уставка дневной температуры зоны 3, С</v:String>
