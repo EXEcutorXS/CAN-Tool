@@ -865,7 +865,11 @@ public partial class Omni : ObservableObject
         Pgns.Add(45, new() { id = 45, name = "t_generic_board_temp" });
         Pgns.Add(46, new() { id = 46, name = "t_hcu_error_codes" });
         Pgns.Add(47, new() { id = 47, name = "t_actuator_override" });
+        Pgns.Add(48, new() { id = 48, name = "t_test_report" });
         Pgns.Add(49, new() { id = 49, name = "t_generic_load_control" });
+        Pgns.Add(50, new() { id = 50, name = "t_compressor_control" });
+        Pgns.Add(51, new() { id = 51, name = "t_ac_control" });
+        Pgns.Add(55, new() { id = 55, name = "t_tank_levels" });
         Pgns.Add(99, new() { id = 99, name = "t_debug_pack" });
         Pgns.Add(100, new() { id = 100, name = "t_memory_control_old", multiPack = true });
         Pgns.Add(101, new() { id = 101, name = "t_buffer_data_transmitting_old" });
@@ -1248,6 +1252,30 @@ public partial class Omni : ObservableObject
         Pgns[47].parameters.Add(new() { Name = "t_overriden_blower_revs", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps });
         Pgns[47].parameters.Add(new() { Name = "t_overriden_glow_plug_power", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
         Pgns[47].parameters.Add(new() { Name = "t_overriden_fuel_pump_frequency", BitLength = 16, StartByte = 5, a = 0.01, UnitT = UnitType.Frequency });
+
+        Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 0, UnitT = UnitType.Rps });
+        Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 1, UnitT = UnitType.Rps });
+        Pgns[50].parameters.Add(new() { Name = "t_condenser_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps });
+        Pgns[50].parameters.Add(new() { Name = "t_condenser_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps });
+        Pgns[50].parameters.Add(new() { Name = "t_condenser_pwm_set", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
+        
+        Pgns[51].parameters.Add(new() { Name = "t_ac_mode", BitLength = 8, StartByte = 0, Meanings = DefMeaningsOnOff});
+        Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 1, b = -75,UnitT=UnitType.Temp});
+        Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 1, b = -75, UnitT = UnitType.Temp });
+        Pgns[51].parameters.Add(new() { Name = "t_ac_fan_mode", BitLength = 8, StartByte = 2,Meanings = { {0,"t_auto" }, { 1, "t_1st_speed" }, { 2, "t_2nd_speed" }, { 3, "t_3rd_speed" }, { 4, "t_4th_speed" }, { 5, "t_5th_speed" } } });
+
+        Pgns[55].parameters.Add(new() { Name = "t_tank1_level", BitLength = 8, StartByte = 0, UnitT = UnitType.Percent });
+        Pgns[55].parameters.Add(new() { Name = "t_tank2_level", BitLength = 8, StartByte = 1, UnitT = UnitType.Percent });
+        Pgns[55].parameters.Add(new() { Name = "t_tank3_level", BitLength = 8, StartByte = 2, UnitT = UnitType.Percent });
+        Pgns[55].parameters.Add(new() { Name = "t_tank4_level", BitLength = 8, StartByte = 3, UnitT = UnitType.Percent });
+        Pgns[55].parameters.Add(new() { Name = "t_tank1_content", BitLength = 4, StartByte = 4, Meanings = { { 0, "t_off" }, { 1, "t_white_tank" }, { 2, "t_grey_tank" }, { 3, "t_black_tank" }, { 4, "t_fuel_tank" } } });
+        Pgns[55].parameters.Add(new() { Name = "t_tank1_resistance", BitLength = 4, StartByte = 4, StartBit = 4, Meanings = { { 0, "t_0-190_ohm" }, { 1, "t_240-33_ohm" }, { 2, "t_short_full" }, { 3, "t_open_full" } } });
+        Pgns[55].parameters.Add(new() { Name = "t_tank2_content", BitLength = 4, StartByte = 5, Meanings = { { 0, "t_off" }, { 1, "t_white_tank" }, { 2, "t_grey_tank" }, { 3, "t_black_tank" }, { 4, "t_fuel_tank" } } });
+        Pgns[55].parameters.Add(new() { Name = "t_tank2_resistance", BitLength = 4, StartByte = 5, StartBit = 4, Meanings = { { 0, "t_0-190_ohm" }, { 1, "t_240-33_ohm" }, { 2, "t_short_full" }, { 3, "t_open_full" } } });
+        Pgns[55].parameters.Add(new() { Name = "t_tank3_content", BitLength = 4, StartByte = 6, Meanings = { { 0, "t_off" }, { 1, "t_white_tank" }, { 2, "t_grey_tank" }, { 3, "t_black_tank" }, { 4, "t_fuel_tank" } } });
+        Pgns[55].parameters.Add(new() { Name = "t_tank3_resistance", BitLength = 4, StartByte = 6, StartBit = 4, Meanings = { { 0, "t_0-190_ohm" }, { 1, "t_240-33_ohm" }, { 2, "t_short_full" }, { 3, "t_open_full" } } });
+        Pgns[55].parameters.Add(new() { Name = "t_tank4_content", BitLength = 4, StartByte = 7, Meanings = { { 0, "t_off" }, { 1, "t_white_tank" }, { 2, "t_grey_tank" }, { 3, "t_black_tank" }, { 4, "t_fuel_tank" } } });
+        Pgns[55].parameters.Add(new() { Name = "t_tank4_resistance", BitLength = 4, StartByte = 7, StartBit = 4, Meanings = { { 0, "t_0-190_ohm" }, { 1, "t_240-33_ohm" }, { 2, "t_short_full" }, { 3, "t_open_full" } } });
 
         Pgns[49].parameters.Add(new() { Name = "t_load_channel1", BitLength = 2, StartByte = 0, StartBit = 0, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
         Pgns[49].parameters.Add(new() { Name = "t_load_channel2", BitLength = 2, StartByte = 0, StartBit = 2, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
