@@ -575,6 +575,7 @@ var_128	Blower current	Ток нагнетателя мА
 var_129	Burning chamber bot temp	Температура низа камеры сгорания
 var_130	Burning chamber side temp	Температура стенки камеры сгорания
 var_131	Exhaust pressure	Давление выхлопа
+var_132	Set power level	Желаемый уровеь мощности
 		
 		
 		
@@ -917,6 +918,7 @@ c_7	Request power mode transition steps	запрос температурных 
 c_8	Valves control	задать состояние клапанов устройства ”Блок управления клапанами”
 c_9	Air heater set parameters	задать параметры работы воздушного отопителя
 c_10	Ventilation start	запуск в режиме вентиляции (для воздушных отопителей)
+c_19	Set desired power level	Задать желаемый режим мощности
 c_20	Thermocouples calibration start	калибровка термопар
 c_21	Set air blower PWM frequency 	задать параметры частоты ШИМ нагнетателя воздуха
 c_22	Reset MCU	Перезагрузка контроллера

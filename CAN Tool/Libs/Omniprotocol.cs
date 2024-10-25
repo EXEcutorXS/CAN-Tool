@@ -712,6 +712,7 @@ public partial class MainParameters : ObservableObject, ICloneable
     [ObservableProperty] private double voltage;
     [ObservableProperty] private int stageTime;
     [ObservableProperty] private int modeTime;
+    [ObservableProperty] private int setPowerLevel;
 
     [NotifyPropertyChangedFor(nameof(StageString))]
     [ObservableProperty] private int stage;
@@ -888,6 +889,7 @@ public partial class Omni : ObservableObject
         Commands.Add(8, new() { Id = 8 });
         Commands.Add(9, new() { Id = 9 });
         Commands.Add(10, new() { Id = 10 });
+        Commands.Add(19, new() { Id = 19 });
         Commands.Add(20, new() { Id = 20 });
         Commands.Add(21, new() { Id = 21 });
         Commands.Add(22, new() { Id = 22 });
@@ -939,6 +941,8 @@ public partial class Omni : ObservableObject
         Commands[9].Parameters.Add(new() { StartByte = 7, BitLength = 4, Name = "t_power_setpoint" });
 
         Commands[10].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Temp });
+        
+        Commands[19].Parameters.Add(new() { StartByte = 2, BitLength = 8, Name = "t_set_power_level" });
 
         Commands[20].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_1st_tcouple_cal", AnswerOnly = true });
         Commands[20].Parameters.Add(new() { StartByte = 4, BitLength = 16, Name = "t_2nd_tcouple_cal", AnswerOnly = true });
@@ -1011,6 +1015,7 @@ public partial class Omni : ObservableObject
         Pgns[10].parameters.Add(new() { Name = "Помпа неисправна", BitLength = 2, StartByte = 3, Meanings = DefMeaningsYesNo });
         Pgns[10].parameters.Add(new() { Name = "Код предупреждения", BitLength = 8, StartByte = 4 });
         Pgns[10].parameters.Add(new() { Name = "Количество морганий", BitLength = 8, StartByte = 5, Var = 25 });
+        Pgns[10].parameters.Add(new() { Name = "Желаемый режим мощности", BitLength = 8, StartByte = 6,Var = 132});
 
         Pgns[11].parameters.Add(new() { Name = "Напряжение питания", BitLength = 16, StartByte = 0, a = 0.1, UnitT = UnitType.Volt, Var = 5 });
         Pgns[11].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 2, UnitT = UnitType.Pressure });
@@ -1579,9 +1584,11 @@ public partial class Omni : ObservableObject
                     if (senderDevice.PressureLogWriting)
                         senderDevice.PressureLog[senderDevice.PressureLogPointer++] = senderDevice.Parameters.Pressure;
                     break;
-
                 case 131:
                     senderDevice.Parameters.ExPressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                    break;
+                case 132:
+                    senderDevice.Parameters.SetPowerLevel = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                     break;
             }
         }

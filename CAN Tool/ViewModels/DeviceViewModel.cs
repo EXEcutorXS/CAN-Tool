@@ -53,6 +53,32 @@ namespace OmniProtocol
         }
 
         [RelayCommand]
+        public void IncPowerLevel(object parameter)
+        {
+
+            byte powerLevel = (byte)(Parameters.SetPowerLevel);
+            if (powerLevel == 254) return;
+            if (powerLevel > 9) powerLevel = 254;
+            else powerLevel++;
+            byte[] data = { 0, 19, powerLevel, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            OmniMessage msg = new() { Pgn = 1, ReceiverId = Id, Data = data };
+            Transmit(msg.ToCanMessage());
+        }
+
+        [RelayCommand]
+        public void DecPowerLevel(object parameter)
+        {
+
+            byte powerLevel = (byte)(Parameters.SetPowerLevel);
+            if (powerLevel == 0) return;
+            if (powerLevel == 254) powerLevel = 9;
+            else powerLevel--;
+            byte[] data = { 0, 19, powerLevel, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            OmniMessage msg = new() { Pgn = 1, ReceiverId = Id, Data = data };
+            Transmit(msg.ToCanMessage());
+        }
+
+        [RelayCommand]
         public void updateOverrideStatus()
         {
             byte overrideByte1 = 0;

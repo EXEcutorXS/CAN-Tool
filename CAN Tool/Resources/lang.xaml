@@ -917,6 +917,7 @@
 <v:String x:Key="c_8">Valves control</v:String>
 <v:String x:Key="c_9">Air heater set parameters</v:String>
 <v:String x:Key="c_10">Ventilation start</v:String>
+<v:String x:Key="c_19">Set desired power level</v:String>
 <v:String x:Key="c_20">Thermocouples calibration start</v:String>
 <v:String x:Key="c_21">Set air blower PWM frequency </v:String>
 <v:String x:Key="c_22">Reset MCU</v:String>
