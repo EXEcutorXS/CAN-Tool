@@ -167,6 +167,13 @@
                         </Grid>
                     </StackPanel>
                 </Border>
+                <Border Width="60" BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
+                    <StackPanel Margin="5">
+                        <Button Content="+" Margin="5" Command="{Binding IncPowerLevelCommand}" />
+                        <TextBlock Margin="5" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding Parameters.SetPowerLevel}" Height="80" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        <Button Margin="5" Content="-" Command="{Binding DecPowerLevelCommand}" />
+                    </StackPanel>
+                </Border>
                 <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}" Width="400">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -225,13 +232,7 @@
                         </Grid>
                     </Grid>
                 </Border>
-                <Border Width="60" BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
-                    <StackPanel Margin="5">
-                        <Button Content="+" Margin="5" Command="{Binding IncPowerLevelCommand}"/>
-                        <TextBlock Margin="5" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{Binding Parameters.SetPowerLevel}" Height="80" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <Button Margin="5" Content="-" Command="{Binding DecPowerLevelCommand}"/>
-                    </StackPanel>
-                </Border>
+                
             </StackPanel>
 
         </Grid>

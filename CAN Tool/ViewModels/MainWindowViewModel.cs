@@ -647,7 +647,8 @@ namespace CAN_Tool.ViewModels
 
         public void NewDeviceHandler(object sender, EventArgs e)
         {
-            //OmniInstance.SelectedConnectedDevice = OmniInstance.ConnectedDevices[^1];
+            if (OmniInstance.ConnectedDevices.Count==1) //Select first device
+                OmniInstance.SelectedConnectedDevice = OmniInstance.ConnectedDevices[0];
         }
 
 
@@ -716,7 +717,7 @@ namespace CAN_Tool.ViewModels
 
 
             var timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 1);
+            timer.Interval = new TimeSpan(0, 0, 0, 0 ,100);
             timer.Tick += TimerTick;
             timer.Start();
 

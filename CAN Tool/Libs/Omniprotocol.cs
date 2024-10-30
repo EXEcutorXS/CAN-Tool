@@ -828,6 +828,7 @@ public partial class Omni : ObservableObject
         Pgns.Add(6, new() { id = 6, name = "t_pgn_request" });
         Pgns.Add(7, new() { id = 7, name = "t_flash_conf_read_write" });
         Pgns.Add(8, new() { id = 8, name = "t_black_box_operation" });
+        Pgns.Add(9, new() { id = 9, name = "t_pwm_data" });
         Pgns.Add(10, new() { id = 10, name = "t_stage_mode_failures" });
         Pgns.Add(11, new() { id = 11, name = "t_voltage_pressure_current" });
         Pgns.Add(12, new() { id = 12, name = "t_blower_fp_plug_relay" });
@@ -1008,6 +1009,7 @@ public partial class Omni : ObservableObject
         Pgns[8].parameters.Add(new() { Name = "Номер параметра", CustomDecoder = d => { if (d[0] == 4) return "Параметр:" + (d[2] * 256 + d[3]).ToString() + ";"; else return ""; } });
         Pgns[8].parameters.Add(new() { Name = "Значение параметра", CustomDecoder = d => { if (d[0] == 4) return "Значение:" + (d[4] * 0x1000000 + d[5] * 0x10000 + d[6] * 0x100 + d[7]).ToString() + ";"; else return ""; }, AnswerOnly = true });
 
+        Pgns[9].parameters.Add(new() { Name = "Текущий ШИМ", BitLength = 16, a=0.01 , UnitT=UnitType.Percent ,Var=133});
 
         Pgns[10].parameters.Add(new() { Name = "Стадия", BitLength = 8, StartByte = 0, Meanings = Stages, Var = 1 });
         Pgns[10].parameters.Add(new() { Name = "Режим", BitLength = 8, StartByte = 1, Var = 2 });

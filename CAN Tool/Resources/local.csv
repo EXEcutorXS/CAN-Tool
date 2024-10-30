@@ -576,6 +576,7 @@ var_129	Burning chamber bot temp	Температура низа камеры с
 var_130	Burning chamber side temp	Температура стенки камеры сгорания
 var_131	Exhaust pressure	Давление выхлопа
 var_132	Set power level	Желаемый уровеь мощности
+var_133	Current PWM	Текущий ШИМ НВ
 		
 		
 		
@@ -728,6 +729,8 @@ vars_128	BlwrCrnt	Ток нагн
 vars_129	ChambBot	Кам.низ
 vars_130	Cha,bSide	Кам.Бок
 vars_131	ExhPress	Давл.выхл
+vars_132	SetPower	Жел.Мощн.
+vars_133	CurrPWM	Тек.Шим.НВ
 		
 m_0-1	Waiting for the command	Ожидание команды
 m_0-3	Blowing on power on	Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)
