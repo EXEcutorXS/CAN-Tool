@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -192,7 +194,7 @@ namespace CAN_Tool
 
     public partial class CanAdapter : ObservableObject
     {
-        private readonly char[] currentBuf = new char[1024];
+        private string currentBuf = "";
 
         private int ptr;
 
@@ -200,11 +202,6 @@ namespace CAN_Tool
         public bool PortOpened => serialPort.IsOpen;
 
         [ObservableProperty] private int failedTransmissions;
-
-        [ObservableProperty] private int successTransmissions;
-
-        [ObservableProperty] private int receivedMessagesCount;
-
 
         private int lastSecondReceived;
         private int lastSecondTransmitted;
@@ -300,60 +297,49 @@ namespace CAN_Tool
             currentSecondTransmitted++;
         }
 
+        //Ret value - More messages available in buffer
         private void UartMessageProcess()
         {
-            switch (currentBuf[0])
-            {
-                case 'T':
-                case 't':
-                case 'r':
-                case 'R':
-                    try
+            string[] splitted = currentBuf.Split('\r');
+            foreach (var line in splitted)
+                {
+                if (line.Length == 0) continue;
+                    switch (line[0])
                     {
-                        var m = new CanMessage(new string(currentBuf));
-                        GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
-                        currentSecondReceived++;
-                        ReceivedMessagesCount++;
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
+                        case 'T':
+                        case 't':
+                        case 'r':
+                        case 'R':
+                            try
+                            {
+                                var m = new CanMessage(new string(currentBuf));
+                                GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
+                            }
+                            catch
+                            {
+                                // ignored
+                            }
 
-                    break;
-                case 'z':
-                case 'Z':
-                    Status = AdapterStatus.Ready;
-                    SuccessTransmissions++;
-                    break;
-                case '\a':
-                    FailedTransmissions++;
-                    Status = AdapterStatus.Ready;
-                    break;
-                default:
-                    ptr = 0;
-                    break;
-
-            }
+                            break;
+                        case 'z':
+                        case 'Z':
+                            Status = AdapterStatus.Ready;
+                            break;
+                        case '\a':
+                            FailedTransmissions++;
+                            Status = AdapterStatus.Ready;
+                            break;
+                        default:
+                            continue;
+                    }
+                }
+            currentBuf = splitted[^1]; //If last messge is not completed it will be saved to buffer, otherwise it will be zero length string
         }
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs args)
         {
-            while (serialPort.IsOpen && serialPort.BytesToRead > 0)
-            {
-                var newByte = serialPort.ReadByte();
-                if (newByte is 13 or 0 or 7 or 'Z' or 'z' or '\a')
-                {
-                    if (newByte == 13)
-                        currentBuf[ptr] = '\0';
-                    else
-                        currentBuf[ptr] = (char)newByte;
-                    UartMessageProcess();
-                    ptr = 0;
-                }
-                else
-                    currentBuf[ptr++] = (char)newByte;
-            }
+            currentBuf+=(serialPort.ReadExisting());
+            UartMessageProcess();
         }
 
         public void InjectMessage(CanMessage m)
