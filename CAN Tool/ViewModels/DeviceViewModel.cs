@@ -48,7 +48,7 @@ namespace OmniProtocol
             if (Omni.Devices.TryGetValue(Id.Type, out var device))
                 DeviceReference = device;
 
-            if (DeviceReference.DevType == DeviceType.Binar || DeviceReference.DevType == DeviceType.Planar)
+            if (DeviceReference?.DevType == DeviceType.Binar || DeviceReference?.DevType == DeviceType.Planar)
                 SecondMessages = true;
         }
 

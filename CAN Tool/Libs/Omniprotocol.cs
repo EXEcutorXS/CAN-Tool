@@ -442,7 +442,7 @@ namespace OmniProtocol
             if (Pgn == 1 || Pgn == 2)
                 if (Data[1] != m.Data[1])
                     return false;
-            if (Pgns[Pgn].multiPack && Data[0] != m.Data[0]) //Другой номер мультипакета
+            if (Pgns.ContainsKey(Pgn) && Pgns[Pgn].multiPack && Data[0] != m.Data[0]) //Другой номер мультипакета
                 return false;
             return true;
         }
@@ -1516,6 +1516,7 @@ public partial class Omni : ObservableObject
                 Task.Run(() => RequestSerial(id));
         }
 
+        if (Pgns.ContainsKey(m.Pgn))
         foreach (var p in Pgns[m.Pgn].parameters)
         {
 
