@@ -339,6 +339,7 @@ namespace OmniProtocol
             long ret;
             switch (bitLength)
             {
+                case 0: ret = 0; break; //Usually used Custom decoder
                 case 1: ret = data[startByte] >> startBit & 0b1; break;
                 case 2: ret = data[startByte] >> startBit & 0b11; break;
                 case 3: ret = data[startByte] >> startBit & 0b111; break;
