@@ -857,9 +857,10 @@ d_32	30SPG	30СПГ
 d_34	Binar 10D	Бинар 10Д
 d_35	Binar 10B	Бинар 10Б
 d_37	Extension board	Плата расширения
-d_40	Pressure sensor	Датчик давления
 d_41	Generic Load (Single)	Нагрузка одноканальная
 d_42	Generic Load(Tripple)	Нагрузка трёхканальная
+d_50	AD Driver	Инвертор кондиционера
+d_60	Pressure sensor	Датчик давления
 d_123	Bootloader	Программный загрузчик
 d_124	Mobile App	Мобильное приложение
 d_126	Control device	Устройство управления

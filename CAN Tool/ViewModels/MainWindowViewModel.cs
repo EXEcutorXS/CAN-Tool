@@ -717,7 +717,7 @@ namespace CAN_Tool.ViewModels
 
 
             var timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 0, 0 ,100);
+            timer.Interval = new TimeSpan(0, 0, 0, 1 ,0);
             timer.Tick += TimerTick;
             timer.Start();
 

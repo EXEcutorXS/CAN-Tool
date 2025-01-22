@@ -18,9 +18,9 @@
                 <ImageBrush ImageSource="{Binding Img}" Stretch="Fill" />
             </Border.Background>
         </Border>
-        <TextBlock Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding FirmwareAsText}" VerticalAlignment="Center" FontSize="20" />
+        <TextBlock Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Firmware}" VerticalAlignment="Center" FontSize="20" />
         <TextBlock Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding ProductionDate}" VerticalAlignment="Center" FontSize="20" />
-        <TextBlock Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding SerialAsString}" VerticalAlignment="Center" FontSize="20" />
+        <TextBlock Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding Serial}" VerticalAlignment="Center" FontSize="20" />
         <Button Margin="5" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left" Click="Channel1ModeClick" Content="{Binding GenericLoadTripple.LoadMode1}" />
         <Button Margin="5" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Click="Channel2ModeClick" Content="{Binding GenericLoadTripple.LoadMode2}" />
         <Button Margin="5" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Click="Channel3ModeClick" Content="{Binding GenericLoadTripple.LoadMode3}" />

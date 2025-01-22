@@ -28,7 +28,7 @@
                     <TextBlock x:Name="SizeTextBlock" Text="600" VerticalAlignment="Center" FontSize="20" Margin="10" Width="100" HorizontalAlignment="Left" />
                 </StackPanel>
                 
-                <TextBlock Margin="5" Grid.Row="2" Text="{Binding SerialAsString}" VerticalAlignment="Center" FontSize="20" />
+                <TextBlock Margin="5" Grid.Row="2" Text="{Binding Serial}" VerticalAlignment="Center" FontSize="20" />
                 <StackPanel Orientation="Horizontal">
                     <Button HorizontalAlignment="Left" Margin="10" Width="100" Click="Button_Click">Start Log</Button>
                     <Button HorizontalAlignment="Left" Margin="10" Width="100" Click="Button_Click_1">Stop Log</Button>

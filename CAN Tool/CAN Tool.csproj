@@ -112,12 +112,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="CustomControls\ACInverterControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="CustomControls\GenerocLoadTrippleControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="CustomControls\ACInverterControl.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Resources\lang.ru-RU.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

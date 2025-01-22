@@ -218,6 +218,18 @@ namespace OmniProtocol
         [ObservableProperty] public int pwmLevel3;
     }
 
+    public partial class ACInverterViewModel : ObservableObject
+    {
+        [ObservableProperty] public int compressorRevsSet;
+        [ObservableProperty] public int compressorRevsMeasured;
+        [ObservableProperty] public float current;
+        [ObservableProperty] public float condensorPwmSet;
+        [ObservableProperty] public float pcbTemperature;
+        [ObservableProperty] public float voltage;
+        [ObservableProperty] public int faultCode;
+
+    }
+
     public partial class Timberline20OmniViewModel : ObservableObject
     {
         //private void ZoneChanged(OmniZoneHandler newSelectedZone) => SelectedZone = newSelectedZone;
@@ -397,7 +409,8 @@ namespace OmniProtocol
             var retString = new StringBuilder();
             if (!Pgns.ContainsKey(this.Pgn))
                 return "Pgn not found";
-            var pgn = Pgns[this.Pgn];
+            
+            var pgn = Pgns[Pgn];
             var sender = Devices.ContainsKey(TransmitterId.Type) ? Devices[TransmitterId.Type].Name : $"({GetString("t_unknown_device")} №{TransmitterId.Type})";
             var receiver = Devices.ContainsKey(ReceiverId.Type) ? Devices[ReceiverId.Type].Name : $"({GetString("t_unknown_device")} №{ReceiverId.Type})";
             retString.Append($"{sender}({TransmitterId.Address})->{receiver}({ReceiverId.Address});;");
@@ -809,7 +822,7 @@ public partial class Omni : ObservableObject
             { 35, new (){Id=35, DevType=DeviceType.Binar, MaxFuelPump=8, MaxBlower=140}} ,
             { 37, new (){Id=37, DevType=DeviceType.ExtensionBoard}} ,
             { 39, new (){Id=39, DevType=DeviceType.Planar}} ,
-            { 40, new (){Id=40, DevType=DeviceType.PressureSensor}} ,
+            { 60, new (){Id=60, DevType=DeviceType.PressureSensor}} ,
             { 41, new (){Id=41, DevType=DeviceType.GenericLoadSingle}} ,
             { 42, new (){Id=42, DevType=DeviceType.GenericLoadTripple}} ,
             { 123, new (){Id=123, DevType=DeviceType.BootLoader }} ,

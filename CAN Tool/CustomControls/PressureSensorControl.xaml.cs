@@ -94,7 +94,8 @@ namespace CAN_Tool.CustomControls
                 averageTextBlock.Text = average.ToString("F2");
                 medianTextBlock.Text = median.ToString("F2");
                 amplitudeTextBlock.Text = amplitude.ToString("F2");
-                PressurePlot.Plot.SetAxisLimitsY(minimum, maximum );
+                if (minimum<maximum)
+                    PressurePlot.Plot.SetAxisLimitsY(minimum, maximum );
                 PressurePlot.Refresh();
             }
         }

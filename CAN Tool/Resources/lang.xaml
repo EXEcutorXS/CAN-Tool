@@ -857,9 +857,10 @@
 <v:String x:Key="d_34">Binar 10D</v:String>
 <v:String x:Key="d_35">Binar 10B</v:String>
 <v:String x:Key="d_37">Extension board</v:String>
-<v:String x:Key="d_40">Pressure sensor</v:String>
 <v:String x:Key="d_41">Generic Load (Single)</v:String>
 <v:String x:Key="d_42">Generic Load(Tripple)</v:String>
+<v:String x:Key="d_50">AD Driver</v:String>
+<v:String x:Key="d_60">Pressure sensor</v:String>
 <v:String x:Key="d_123">Bootloader</v:String>
 <v:String x:Key="d_124">Mobile App</v:String>
 <v:String x:Key="d_126">Control device</v:String>

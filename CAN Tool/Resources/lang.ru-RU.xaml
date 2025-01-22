@@ -857,9 +857,10 @@
 <v:String x:Key="d_34">Бинар 10Д</v:String>
 <v:String x:Key="d_35">Бинар 10Б</v:String>
 <v:String x:Key="d_37">Плата расширения</v:String>
-<v:String x:Key="d_40">Датчик давления</v:String>
 <v:String x:Key="d_41">Нагрузка одноканальная</v:String>
 <v:String x:Key="d_42">Нагрузка трёхканальная</v:String>
+<v:String x:Key="d_50">Инвертор кондиционера</v:String>
+<v:String x:Key="d_60">Датчик давления</v:String>
 <v:String x:Key="d_123">Программный загрузчик</v:String>
 <v:String x:Key="d_124">Мобильное приложение</v:String>
 <v:String x:Key="d_126">Устройство управления</v:String>

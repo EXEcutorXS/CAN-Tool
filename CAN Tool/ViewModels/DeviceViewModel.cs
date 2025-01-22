@@ -240,6 +240,8 @@ namespace OmniProtocol
 
         public Timberline20OmniViewModel TimberlineParams { set; get; } = new();
 
+        public ACInverterViewModel ACInverterParams { set; get; }
+
         public GenericLoadTrippleViewModel GenericLoadTripple { set; get; } = new();
 
         [ObservableProperty] public bool manualMode;
