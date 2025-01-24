@@ -7,9 +7,10 @@ using System.Windows.Controls;
 
 namespace CAN_Tool.CustomControls
 {
-    public class SilentSlider:Slider
+    public class SilentSlider : Slider
     {
-        public SilentSlider() {
+        public SilentSlider()
+        {
             ValueChanged += CustomChange;
         }
 
@@ -26,7 +27,7 @@ namespace CAN_Tool.CustomControls
         private bool silentFlag = false;
 
         public void SilentChange(double value)
-        { 
+        {
             silentFlag = true;
             Value = value;
         }

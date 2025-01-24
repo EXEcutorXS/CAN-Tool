@@ -121,7 +121,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="CustomControls\ACInverterControl.xaml">
+    <Page Update="CustomControls\AcInverterControl.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Resources\lang.ru-RU.xaml">

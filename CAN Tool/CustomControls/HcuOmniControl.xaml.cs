@@ -1,5 +1,4 @@
-﻿using CAN_Tool.CustomControls;
-using OmniProtocol;
+﻿using OmniProtocol;
 using System;
 using System.Windows;
 using System.Windows.Controls;

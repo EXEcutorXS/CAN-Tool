@@ -33,7 +33,7 @@ namespace OmniProtocol
 
     public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency }
 
-    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple }
+    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter }
 
     public enum LoadMode_t { Off = 0, Toggle = 1, Pwm = 2 };
 
@@ -825,6 +825,7 @@ public partial class Omni : ObservableObject
             { 60, new (){Id=60, DevType=DeviceType.PressureSensor}} ,
             { 41, new (){Id=41, DevType=DeviceType.GenericLoadSingle}} ,
             { 42, new (){Id=42, DevType=DeviceType.GenericLoadTripple}} ,
+            { 50, new (){Id=50, DevType=DeviceType.AcInverter}} ,
             { 123, new (){Id=123, DevType=DeviceType.BootLoader }} ,
             { 126, new (){Id=126, DevType=DeviceType.Hcu }},
             { 255, new (){Id=255}}
@@ -1275,8 +1276,8 @@ public partial class Omni : ObservableObject
 
         Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 0, UnitT = UnitType.Rps });
         Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 1, UnitT = UnitType.Rps });
-        Pgns[50].parameters.Add(new() { Name = "t_condenser_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps });
-        Pgns[50].parameters.Add(new() { Name = "t_condenser_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps });
+        Pgns[50].parameters.Add(new() { Name = "t_condenser_pwm", BitLength = 16, StartByte = 2, UnitT = UnitType.Percent });
+        Pgns[50].parameters.Add(new() { Name = "t_condenser_current", BitLength = 16, StartByte = 3, UnitT = UnitType.Rps });
         Pgns[50].parameters.Add(new() { Name = "t_condenser_pwm_set", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
         
         Pgns[51].parameters.Add(new() { Name = "t_ac_mode", BitLength = 8, StartByte = 0, Meanings = DefMeaningsOnOff});
@@ -1865,6 +1866,7 @@ public partial class Omni : ObservableObject
                 if (m.Data[5] != 255 || m.Data[6] != 255 && senderDevice.OverrideState.FuelPumpOverriden) senderDevice.OverrideState.FuelPumpOverridenFrequencyX100 = m.Data[5] * 256 + m.Data[6];
                 break;
 
+            
             case 49:
                 if ((m.Data[0] & 3) < 3)
                     senderDevice.GenericLoadTripple.LoadMode1 = (LoadMode_t)(m.Data[0] & 3);
@@ -1880,6 +1882,21 @@ public partial class Omni : ObservableObject
                 if (m.Data[3] <= 100)
                     senderDevice.GenericLoadTripple.PwmLevel3 = m.Data[3];
                 break;
+
+            case 50:
+                if (m.Data[0] != 255)
+                    senderDevice.ACInverterParams.CompressorRevsSet = m.Data[0];
+                if (m.Data[1] != 255)
+                    senderDevice.ACInverterParams.CompressorRevsMeasured = m.Data[1];
+
+                if (m.Data[2] != 255 || m.Data[3] != 255)
+                    senderDevice.ACInverterParams.CondensorPwmSet = (m.Data[2] * 256 + m.Data[3]) / 100.0f;
+                if (m.Data[4] != 255 || m.Data[5] != 255)
+                    senderDevice.ACInverterParams.Voltage = (m.Data[4] * 256 + m.Data[5]) / 10.0f;
+                if (m.Data[6] != 255 || m.Data[7] != 255)
+                    senderDevice.ACInverterParams.FaultCode = m.Data[6] * 256 + m.Data[7];
+                break;
+
             case 100:
                 if (m.Data[0] == 1 && m.Data[1] == 1)
                 {
