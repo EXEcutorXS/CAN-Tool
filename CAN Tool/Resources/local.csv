@@ -577,6 +577,18 @@ var_130	Burning chamber side temp	Температура стенки камер
 var_131	Exhaust pressure	Давление выхлопа
 var_132	Set power level	Желаемый уровеь мощности
 var_133	Current PWM	Текущий ШИМ НВ
+var_134	Compressor rev set	Заданные обороты компрессора
+var_135	Compressor rev measured	измеренные обороты компрессора
+var_136	Condensor fan PWM set	Заданный ШИМ вент. конденсора
+var_137	Evaporator fan PWM set	Заданный ШИМ вент. испарителя
+var_138	Compressor current	Ток компрессора
+var_139	Condensor fan current	Ток вент. конденсора
+var_140	Evaporator fan current	Ток вент. испарителя
+var_141	High pressure sensor	Дачик высокого давления
+var_142	Low pressure sensor	Дачик низкого давления
+var_143	AC Temperature setpoint	Уставка температуры кондиционера
+var_144	AC Fan mode	Режим вентилятора кондиционера
+var_145	PCB Temperature	Темп.платы
 		
 		
 		
@@ -727,10 +739,23 @@ vars_126	AUX sen.3	Д.датч.3
 vars_127	AUX sen.4	Д.датч.4
 vars_128	BlwrCrnt	Ток нагн
 vars_129	ChambBot	Кам.низ
-vars_130	Cha,bSide	Кам.Бок
+vars_130	ChambSide	Кам.Бок
 vars_131	ExhPress	Давл.выхл
 vars_132	SetPower	Жел.Мощн.
 vars_133	CurrPWM	Тек.Шим.НВ
+		
+vars_134	Comp.rev.set	Зад.об.комп
+vars_135	Comp.rev.meas	Изм.об.комп
+vars_136	Cond.fan.PWM	Зад.ШИМ конд
+vars_137	Evap.fan.PWM	Зад.ШИМ испар
+vars_138	Comp.cur	I компр.
+vars_139	Cond.fan.cur	I конд
+vars_140	Evap.fan.cur	I испар
+vars_141	Hi.pres.	Выс.давл
+vars_142	Lo.pres.	Низ.давл
+vars_143	AC T set	Уст Темп
+vars_144	AC Fan mod	Реж.вент
+vars_145	PCB temp	Т платы
 		
 m_0-1	Waiting for the command	Ожидание команды
 m_0-3	Blowing on power on	Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)

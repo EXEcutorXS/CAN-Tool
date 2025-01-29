@@ -31,10 +31,11 @@
         <TextBlock Text="{Binding ACInverterParams.CompressorRevsSet,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="0" d:Text="45" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <TextBlock Text="{Binding ACInverterParams.CompressorRevsMeasured,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="1" d:Text="44" VerticalAlignment="Center" HorizontalAlignment="Center" />
         <TextBlock Text="{Binding ACInverterParams.CondensorPwmSet,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="2" d:Text="90%" VerticalAlignment="Center" HorizontalAlignment="Center" />
-        <TextBlock Text="{Binding ACInverterParams.PcbTemperature,Mode=OneWay}"  Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" d:Text="PCB Temp: 67°" VerticalAlignment="Center" HorizontalAlignment="Left" />
-        <TextBlock Text="{Binding ACInverterParams.Current,Mode=OneWay}" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" d:Text="Current: 14,03" VerticalAlignment="Center" HorizontalAlignment="Left" />
-        <TextBlock Text="{Binding ACInverterParams.Voltage,Mode=OneWay}" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" d:Text="Voltage: 25,5" VerticalAlignment="Center" HorizontalAlignment="Left" />
-        <TextBlock Text="{Binding ACInverterParams.FaultCode,Mode=OneWay}" Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" d:Text="Fault code: 0" VerticalAlignment="Center" HorizontalAlignment="Left" />
+        <TextBlock Text="{Binding Parameters.PcbTemp,Mode=OneWay,StringFormat={}PCB Temp: {0}}"  Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" d:Text="PCB Temp: 67°" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+        <TextBlock Text="{Binding ACInverterParams.CompressorCurrent,Mode=OneWay,StringFormat={}Compressor current: {0}}" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" d:Text="Current: 14,03" VerticalAlignment="Center" HorizontalAlignment="Left" />
+        <TextBlock Text="{Binding ACInverterParams.CondensorCurrent,Mode=OneWay,StringFormat={}Condens current: {0}}" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" d:Text="Current: 14,03" VerticalAlignment="Center" HorizontalAlignment="Left" />
+        <TextBlock Text="{Binding Parameters.Voltage,Mode=OneWay,StringFormat={}Voltage: {0}}" Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" d:Text="Voltage: 25,5" VerticalAlignment="Center" HorizontalAlignment="Left" />
+        
 
     </Grid>
 </UserControl>

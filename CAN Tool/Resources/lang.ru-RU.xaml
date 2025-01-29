@@ -577,6 +577,18 @@
 <v:String x:Key="var_131">Давление выхлопа</v:String>
 <v:String x:Key="var_132">Желаемый уровеь мощности</v:String>
 <v:String x:Key="var_133">Текущий ШИМ НВ</v:String>
+<v:String x:Key="var_134">Заданные обороты компрессора</v:String>
+<v:String x:Key="var_135">измеренные обороты компрессора</v:String>
+<v:String x:Key="var_136">Заданный ШИМ вент. конденсора</v:String>
+<v:String x:Key="var_137">Заданный ШИМ вент. испарителя</v:String>
+<v:String x:Key="var_138">Ток компрессора</v:String>
+<v:String x:Key="var_139">Ток вент. конденсора</v:String>
+<v:String x:Key="var_140">Ток вент. испарителя</v:String>
+<v:String x:Key="var_141">Дачик высокого давления</v:String>
+<v:String x:Key="var_142">Дачик низкого давления</v:String>
+<v:String x:Key="var_143">Уставка температуры кондиционера</v:String>
+<v:String x:Key="var_144">Режим вентилятора кондиционера</v:String>
+<v:String x:Key="var_145">Темп.платы</v:String>
 
 
 
@@ -731,6 +743,19 @@
 <v:String x:Key="vars_131">Давл.выхл</v:String>
 <v:String x:Key="vars_132">Жел.Мощн.</v:String>
 <v:String x:Key="vars_133">Тек.Шим.НВ</v:String>
+
+<v:String x:Key="vars_134">Зад.об.комп</v:String>
+<v:String x:Key="vars_135">Изм.об.комп</v:String>
+<v:String x:Key="vars_136">Зад.ШИМ конд</v:String>
+<v:String x:Key="vars_137">Зад.ШИМ испар</v:String>
+<v:String x:Key="vars_138">I компр.</v:String>
+<v:String x:Key="vars_139">I конд</v:String>
+<v:String x:Key="vars_140">I испар</v:String>
+<v:String x:Key="vars_141">Выс.давл</v:String>
+<v:String x:Key="vars_142">Низ.давл</v:String>
+<v:String x:Key="vars_143">Уст Темп</v:String>
+<v:String x:Key="vars_144">Реж.вент</v:String>
+<v:String x:Key="vars_145">Т платы</v:String>
 
 <v:String x:Key="m_0-1">Ожидание команды</v:String>
 <v:String x:Key="m_0-3">Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)</v:String>

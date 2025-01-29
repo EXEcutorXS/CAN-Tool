@@ -222,12 +222,9 @@ namespace OmniProtocol
     {
         [ObservableProperty] public int compressorRevsSet;
         [ObservableProperty] public int compressorRevsMeasured;
-        [ObservableProperty] public float current;
+        [ObservableProperty] public float compressorCurrent;
+        [ObservableProperty] public float condensorCurrent;
         [ObservableProperty] public float condensorPwmSet;
-        [ObservableProperty] public float pcbTemperature;
-        [ObservableProperty] public float voltage;
-        [ObservableProperty] public int faultCode;
-
     }
 
     public partial class Timberline20OmniViewModel : ObservableObject
@@ -410,7 +407,7 @@ namespace OmniProtocol
             var retString = new StringBuilder();
             if (!Pgns.ContainsKey(this.Pgn))
                 return "Pgn not found";
-            
+
             var pgn = Pgns[Pgn];
             var sender = Devices.ContainsKey(TransmitterId.Type) ? Devices[TransmitterId.Type].Name : $"({GetString("t_unknown_device")} №{TransmitterId.Type})";
             var receiver = Devices.ContainsKey(ReceiverId.Type) ? Devices[ReceiverId.Type].Name : $"({GetString("t_unknown_device")} №{ReceiverId.Type})";
@@ -717,7 +714,7 @@ public partial class OmniTask : ObservableObject
 
 }
 
-public partial class MainParameters : ObservableObject, ICloneable
+public partial class CommonParameters : ObservableObject, ICloneable
 {
     [ObservableProperty] private int revMeasured;
     [ObservableProperty] private int revSet;
@@ -745,6 +742,8 @@ public partial class MainParameters : ObservableObject, ICloneable
     [ObservableProperty] private int inletTemp;
     [ObservableProperty] private float pressure;
     [ObservableProperty] private float exPressure;
+    [ObservableProperty] private float pcbTemp;
+    [ObservableProperty] private float mcuTemp;
 
 
     public string StageString => GetString($"m_{Stage}-{Mode}");
@@ -886,6 +885,7 @@ public partial class Omni : ObservableObject
         Pgns.Add(49, new() { id = 49, name = "t_generic_load_control" });
         Pgns.Add(50, new() { id = 50, name = "t_compressor_control" });
         Pgns.Add(51, new() { id = 51, name = "t_ac_control" });
+        Pgns.Add(52, new() { id = 52, name = "t_ac_manual_control" });
         Pgns.Add(55, new() { id = 55, name = "t_tank_levels" });
         Pgns.Add(99, new() { id = 99, name = "t_debug_pack" });
         Pgns.Add(100, new() { id = 100, name = "t_memory_control_old", multiPack = true });
@@ -957,7 +957,7 @@ public partial class Omni : ObservableObject
         Commands[9].Parameters.Add(new() { StartByte = 7, BitLength = 4, Name = "t_power_setpoint" });
 
         Commands[10].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Temp });
-        
+
         Commands[19].Parameters.Add(new() { StartByte = 2, BitLength = 8, Name = "t_set_power_level" });
 
         Commands[20].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_1st_tcouple_cal", AnswerOnly = true });
@@ -1024,7 +1024,7 @@ public partial class Omni : ObservableObject
         Pgns[8].parameters.Add(new() { Name = "Номер параметра", CustomDecoder = d => { if (d[0] == 4) return "Параметр:" + (d[2] * 256 + d[3]).ToString() + ";"; else return ""; } });
         Pgns[8].parameters.Add(new() { Name = "Значение параметра", CustomDecoder = d => { if (d[0] == 4) return "Значение:" + (d[4] * 0x1000000 + d[5] * 0x10000 + d[6] * 0x100 + d[7]).ToString() + ";"; else return ""; }, AnswerOnly = true });
 
-        Pgns[9].parameters.Add(new() { Name = "Текущий ШИМ", BitLength = 16, a=0.01 , UnitT=UnitType.Percent ,Var=133});
+        Pgns[9].parameters.Add(new() { Name = "Текущий ШИМ", BitLength = 16, a = 0.01, UnitT = UnitType.Percent, Var = 133 });
 
         Pgns[10].parameters.Add(new() { Name = "Стадия", BitLength = 8, StartByte = 0, Meanings = Stages, Var = 1 });
         Pgns[10].parameters.Add(new() { Name = "Режим", BitLength = 8, StartByte = 1, Var = 2 });
@@ -1032,7 +1032,7 @@ public partial class Omni : ObservableObject
         Pgns[10].parameters.Add(new() { Name = "Помпа неисправна", BitLength = 2, StartByte = 3, Meanings = DefMeaningsYesNo });
         Pgns[10].parameters.Add(new() { Name = "Код предупреждения", BitLength = 8, StartByte = 4 });
         Pgns[10].parameters.Add(new() { Name = "Количество морганий", BitLength = 8, StartByte = 5, Var = 25 });
-        Pgns[10].parameters.Add(new() { Name = "Желаемый режим мощности", BitLength = 8, StartByte = 6,Var = 132});
+        Pgns[10].parameters.Add(new() { Name = "Желаемый режим мощности", BitLength = 8, StartByte = 6, Var = 132 });
 
         Pgns[11].parameters.Add(new() { Name = "Напряжение питания", BitLength = 16, StartByte = 0, a = 0.1, UnitT = UnitType.Volt, Var = 5 });
         Pgns[11].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 2, UnitT = UnitType.Pressure });
@@ -1275,16 +1275,33 @@ public partial class Omni : ObservableObject
         Pgns[47].parameters.Add(new() { Name = "t_overriden_glow_plug_power", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
         Pgns[47].parameters.Add(new() { Name = "t_overriden_fuel_pump_frequency", BitLength = 16, StartByte = 5, a = 0.01, UnitT = UnitType.Frequency });
 
-        Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 0, UnitT = UnitType.Rps });
-        Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 1, UnitT = UnitType.Rps });
-        Pgns[50].parameters.Add(new() { Name = "t_condenser_pwm", BitLength = 16, StartByte = 2, UnitT = UnitType.Percent });
-        Pgns[50].parameters.Add(new() { Name = "t_condenser_current", BitLength = 16, StartByte = 3, UnitT = UnitType.Rps });
-        Pgns[50].parameters.Add(new() { Name = "t_condenser_pwm_set", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
-        
-        Pgns[51].parameters.Add(new() { Name = "t_ac_mode", BitLength = 8, StartByte = 0, Meanings = DefMeaningsOnOff});
-        Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 1, b = -75,UnitT=UnitType.Temp});
-        Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 1, b = -75, UnitT = UnitType.Temp });
-        Pgns[51].parameters.Add(new() { Name = "t_ac_fan_mode", BitLength = 8, StartByte = 2,Meanings = { {0,"t_auto" }, { 1, "t_1st_speed" }, { 2, "t_2nd_speed" }, { 3, "t_3rd_speed" }, { 4, "t_4th_speed" }, { 5, "t_5th_speed" } } });
+        Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 1, UnitT = UnitType.Rps, Var = 134, PackNumber = 1 });
+        Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 135, PackNumber = 1 });
+        Pgns[50].parameters.Add(new() { Name = "t_condensor_pwm", BitLength = 16, StartByte = 3, UnitT = UnitType.Percent, a = 100, Var = 136, PackNumber = 1 }); ;
+
+        Pgns[50].parameters.Add(new() { Name = "t_compressor_current", BitLength = 16, StartByte = 1, UnitT = UnitType.Current, a = 100, Var = 138, PackNumber = 2 });
+        Pgns[50].parameters.Add(new() { Name = "t_condensor_current", BitLength = 16, StartByte = 3, UnitT = UnitType.Current, a = 100, PackNumber = 2 });
+        Pgns[50].parameters.Add(new() { Name = "t_mcu_temp", BitLength = 8, StartByte = 5, UnitT = UnitType.Temp, b = -75, Var = 59, PackNumber = 2 });
+        Pgns[50].parameters.Add(new() { Name = "t_pcb_temp", BitLength = 8, StartByte = 6, UnitT = UnitType.Temp, b = -75, Var = 145, PackNumber = 2 });
+
+        Pgns[50].parameters.Add(new() { Name = "t_high_pressure", BitLength = 16, StartByte = 1, UnitT = UnitType.Pressure, PackNumber = 3, a = 100 });
+        Pgns[50].parameters.Add(new() { Name = "t_low_pressure", BitLength = 16, StartByte = 3, UnitT = UnitType.Pressure, PackNumber = 3, a = 100 });
+        Pgns[50].parameters.Add(new() { Name = "t_ac_press_sensor", BitLength = 8, StartByte = 5, Meanings = DefMeaningsAllow, PackNumber = 3 });
+
+        Pgns[51].parameters.Add(new() { Name = "t_ac_mode", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_off" }, { 1, "t_cool" }, { 2, "t_dry" }, { 3, "t_eco" }, { 4, "t_night" }, { 5, "t_power" } },PackNumber=1 });
+        Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 1 });
+        Pgns[51].parameters.Add(new() { Name = "t_ac_fan_mode", BitLength = 8, StartByte = 3, Meanings = { { 0, "t_auto" }, { 1, "t_1st_speed" }, { 2, "t_2nd_speed" }, { 3, "t_3rd_speed" }, { 4, "t_4th_speed" }, { 5, "t_5th_speed" } }, PackNumber = 1 });
+        Pgns[51].parameters.Add(new() { Name = "t_ac_current_evap_pwm", BitLength = 16, StartByte = 4, UnitT = UnitType.Percent, PackNumber = 1 ,Var=137});
+        Pgns[51].parameters.Add(new() { Name = "t_ac_measured_evap_rev", BitLength = 8, StartByte = 6, UnitT = UnitType.Rps, PackNumber = 1});
+
+        Pgns[51].parameters.Add(new() { Name = "t_ac_intake_air_t", BitLength = 8, StartByte = 1, b = -75, UnitT = UnitType.Temp, PackNumber = 2 });
+        Pgns[51].parameters.Add(new() { Name = "t_ac_evap_t", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 2 });
+        Pgns[51].parameters.Add(new() { Name = "t_ac_cond_in_t", BitLength = 8, StartByte = 3, b = -75, UnitT = UnitType.Temp, PackNumber = 2 });
+        Pgns[51].parameters.Add(new() { Name = "t_ac_cond_out_t", BitLength = 8, StartByte = 4, b = -75, UnitT = UnitType.Temp, PackNumber = 2 });
+
+        Pgns[52].parameters.Add(new() { Name = "t_ac_man_comp_rev_set", BitLength = 8, StartByte = 0, UnitT = UnitType.Rps });
+        Pgns[52].parameters.Add(new() { Name = "t_ac_man_evap_pwm_set", BitLength = 16, StartByte = 1, UnitT = UnitType.Percent, a = 100 });
+        Pgns[52].parameters.Add(new() { Name = "t_ac_man_cond_pwm_set", BitLength = 16, StartByte = 3, UnitT = UnitType.Percent, a = 100 });
 
         Pgns[55].parameters.Add(new() { Name = "t_tank1_level", BitLength = 8, StartByte = 0, UnitT = UnitType.Percent });
         Pgns[55].parameters.Add(new() { Name = "t_tank2_level", BitLength = 8, StartByte = 1, UnitT = UnitType.Percent });
@@ -1369,9 +1386,9 @@ public partial class Omni : ObservableObject
 
     public static Dictionary<int, OmniCommand> Commands { get; } = new();
 
-    
+
     [ObservableProperty] private ObservableCollection<DeviceViewModel> connectedDevices = new();
-    
+
     [NotifyPropertyChangedFor(nameof(AvailableModels), nameof(AvailableVendors))]
     [ObservableProperty] private DeviceViewModel selectedConnectedDevice;
 
@@ -1532,84 +1549,105 @@ public partial class Omni : ObservableObject
         }
 
         if (Pgns.ContainsKey(m.Pgn))
-        foreach (var p in Pgns[m.Pgn].parameters)
-        {
-
-            if (Pgns[m.Pgn].multiPack && p.PackNumber != m.Data[0]) continue;
-            if (p.Var == 0) continue;
-            var sv = new StatusVariable(p.Var);
-            sv.AssignedParameter = p;
-            var rawValue = OmniMessage.GetRawValue(m.Data, p.BitLength, p.StartBit, p.StartByte, p.Signed);
-            if (Math.Abs(rawValue - (Math.Pow(2, p.BitLength) - 1)) < 0.3) continue; //Unsupported parameter
-            sv.RawValue = rawValue;
-            senderDevice.SupportedVariables[sv.Id] = true;
-            senderDevice.Status.TryToAdd(sv);
-
-            switch (sv.Id)
+            foreach (var p in Pgns[m.Pgn].parameters)
             {
-                case 1:
-                    senderDevice.Parameters.Stage = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                    break;
-                case 2:
-                    senderDevice.Parameters.Mode = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                    break;
-                case 3:
-                    senderDevice.Parameters.WorkTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                    break;
-                case 4:
-                    senderDevice.Parameters.StageTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                    break;
-                case 5:
-                    senderDevice.Parameters.Voltage = rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b;
-                    break;
-                case 6:
-                    senderDevice.Parameters.FlameSensor = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                    break;
-                case 7:
-                    senderDevice.Parameters.BodyTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                    break;
-                case 8:
-                    senderDevice.Parameters.PanelTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                    break;
-                case 10:
-                    senderDevice.Parameters.InletTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                    break;
-                case 15:
-                    senderDevice.Parameters.RevSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                    if (!senderDevice.OverrideState.BlowerOverriden)
-                        senderDevice.OverrideState.BlowerOverridenRevs = senderDevice.Parameters.RevSet;
-                    break;
-                case 16:
-                    senderDevice.Parameters.RevMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                    break;
-                case 18:
-                    senderDevice.Parameters.FuelPumpMeasured = (rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                    break;
-                case 21:
-                    senderDevice.Parameters.GlowPlug = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                    break;
-                case 24:
-                    senderDevice.Parameters.Error = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                    break;
-                case 40:
-                    senderDevice.Parameters.LiquidTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                    break;
-                case 41:
-                    senderDevice.Parameters.OverheatTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                    break;
-                case 60:
-                    senderDevice.Parameters.Pressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                    if (senderDevice.PressureLogWriting)
-                        senderDevice.PressureLog[senderDevice.PressureLogPointer++] = senderDevice.Parameters.Pressure;
-                    break;
-                case 131:
-                    senderDevice.Parameters.ExPressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                    break;
-                case 132:
-                    senderDevice.Parameters.SetPowerLevel = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                    break;
+
+                if (Pgns[m.Pgn].multiPack && p.PackNumber != m.Data[0]) continue;
+                if (p.Var == 0) continue;
+                var sv = new StatusVariable(p.Var);
+                sv.AssignedParameter = p;
+                var rawValue = OmniMessage.GetRawValue(m.Data, p.BitLength, p.StartBit, p.StartByte, p.Signed);
+                if (Math.Abs(rawValue - (Math.Pow(2, p.BitLength) - 1)) < 0.3) continue; //Unsupported parameter
+                sv.RawValue = rawValue;
+                senderDevice.SupportedVariables[sv.Id] = true;
+                senderDevice.Status.TryToAdd(sv);
+
+                switch (sv.Id)
+                {
+                    case 1:
+                        senderDevice.Parameters.Stage = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 2:
+                        senderDevice.Parameters.Mode = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 3:
+                        senderDevice.Parameters.WorkTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 4:
+                        senderDevice.Parameters.StageTime = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 5:
+                        senderDevice.Parameters.Voltage = rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b;
+                        break;
+                    case 6:
+                        senderDevice.Parameters.FlameSensor = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                        break;
+                    case 7:
+                        senderDevice.Parameters.BodyTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                        break;
+                    case 8:
+                        senderDevice.Parameters.PanelTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                        break;
+                    case 10:
+                        senderDevice.Parameters.InletTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                        break;
+                    case 15:
+                        senderDevice.Parameters.RevSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        if (!senderDevice.OverrideState.BlowerOverriden)
+                            senderDevice.OverrideState.BlowerOverridenRevs = senderDevice.Parameters.RevSet;
+                        break;
+                    case 16:
+                        senderDevice.Parameters.RevMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 18:
+                        senderDevice.Parameters.FuelPumpMeasured = (rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 21:
+                        senderDevice.Parameters.GlowPlug = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 24:
+                        senderDevice.Parameters.Error = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 40:
+                        senderDevice.Parameters.LiquidTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                        break;
+                    case 41:
+                        senderDevice.Parameters.OverheatTemp = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                        break;
+                    case 59:
+                        senderDevice.Parameters.McuTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 60:
+                        senderDevice.Parameters.Pressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                        if (senderDevice.PressureLogWriting)
+                            senderDevice.PressureLog[senderDevice.PressureLogPointer++] = senderDevice.Parameters.Pressure;
+                        break;
+                    case 131:
+                        senderDevice.Parameters.ExPressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                        break;
+                    case 132:
+                        senderDevice.Parameters.SetPowerLevel = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
+                        break;
+                    case 134:
+                        senderDevice.ACInverterParams.CompressorRevsSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 135:
+                        senderDevice.ACInverterParams.CompressorRevsMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 136:
+                        senderDevice.ACInverterParams.CondensorPwmSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 138:
+                        senderDevice.ACInverterParams.CompressorCurrent = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 139:
+                        senderDevice.ACInverterParams.CondensorCurrent = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                    case 145:
+                        senderDevice.Parameters.PcbTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        break;
+                }
             }
-        }
 
         switch (m.Pgn)
         {
@@ -1868,7 +1906,7 @@ public partial class Omni : ObservableObject
                 if (m.Data[5] != 255 || m.Data[6] != 255 && senderDevice.OverrideState.FuelPumpOverriden) senderDevice.OverrideState.FuelPumpOverridenFrequencyX100 = m.Data[5] * 256 + m.Data[6];
                 break;
 
-            
+
             case 49:
                 if ((m.Data[0] & 3) < 3)
                     senderDevice.GenericLoadTripple.LoadMode1 = (LoadMode_t)(m.Data[0] & 3);
@@ -1886,17 +1924,16 @@ public partial class Omni : ObservableObject
                 break;
 
             case 50:
-                if (m.Data[0] != 255)
-                    senderDevice.ACInverterParams.CompressorRevsSet = m.Data[0];
-                if (m.Data[1] != 255)
-                    senderDevice.ACInverterParams.CompressorRevsMeasured = m.Data[1];
+                switch (m.Data[0])
+                {
+                    case 0:
+                        if (m.Data[1] != 255)
+                            senderDevice.ACInverterParams.CompressorRevsSet = m.Data[1];
+                        if (m.Data[2] != 255)
+                            senderDevice.ACInverterParams.CompressorRevsMeasured = m.Data[2];
+                        break;
 
-                if (m.Data[2] != 255 || m.Data[3] != 255)
-                    senderDevice.ACInverterParams.CondensorPwmSet = (m.Data[2] * 256 + m.Data[3]) / 100.0f;
-                if (m.Data[4] != 255 || m.Data[5] != 255)
-                    senderDevice.ACInverterParams.Voltage = (m.Data[4] * 256 + m.Data[5]) / 10.0f;
-                if (m.Data[6] != 255 || m.Data[7] != 255)
-                    senderDevice.ACInverterParams.FaultCode = m.Data[6] * 256 + m.Data[7];
+                }
                 break;
 
             case 100:

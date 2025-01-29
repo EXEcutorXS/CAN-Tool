@@ -216,7 +216,7 @@ namespace OmniProtocol
 
         public ICommand CalibrateTermocouplesCommand { get; }
 
-        public MainParameters Parameters { get; set; } = new();
+        public CommonParameters Parameters { get; set; } = new();
 
         [ObservableProperty] private DeviceId id;
 
@@ -236,7 +236,7 @@ namespace OmniProtocol
 
         public BindingList<BbError> BbErrors { get; } = new();
 
-        public ObservableCollection<MainParameters> Log { get; } = new();
+        public ObservableCollection<CommonParameters> Log { get; } = new();
 
         public Timberline20OmniViewModel TimberlineParams { set; get; } = new();
 
@@ -306,7 +306,7 @@ namespace OmniProtocol
 
         public void LogTick()
         {
-            Log.Insert(0,((MainParameters)Parameters.Clone()));
+            Log.Insert(0,((CommonParameters)Parameters.Clone()));
             if (Log.Count > 120) Log.RemoveAt(120);
             if (!IsLogWriting)
                 return;

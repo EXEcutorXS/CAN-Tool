@@ -577,6 +577,18 @@
 <v:String x:Key="var_131">Exhaust pressure</v:String>
 <v:String x:Key="var_132">Set power level</v:String>
 <v:String x:Key="var_133">Current PWM</v:String>
+<v:String x:Key="var_134">Compressor rev set</v:String>
+<v:String x:Key="var_135">Compressor rev measured</v:String>
+<v:String x:Key="var_136">Condensor fan PWM set</v:String>
+<v:String x:Key="var_137">Evaporator fan PWM set</v:String>
+<v:String x:Key="var_138">Compressor current</v:String>
+<v:String x:Key="var_139">Condensor fan current</v:String>
+<v:String x:Key="var_140">Evaporator fan current</v:String>
+<v:String x:Key="var_141">High pressure sensor</v:String>
+<v:String x:Key="var_142">Low pressure sensor</v:String>
+<v:String x:Key="var_143">AC Temperature setpoint</v:String>
+<v:String x:Key="var_144">AC Fan mode</v:String>
+<v:String x:Key="var_145">PCB Temperature</v:String>
 
 
 
@@ -727,10 +739,23 @@
 <v:String x:Key="vars_127">AUX sen.4</v:String>
 <v:String x:Key="vars_128">BlwrCrnt</v:String>
 <v:String x:Key="vars_129">ChambBot</v:String>
-<v:String x:Key="vars_130">Cha,bSide</v:String>
+<v:String x:Key="vars_130">ChambSide</v:String>
 <v:String x:Key="vars_131">ExhPress</v:String>
 <v:String x:Key="vars_132">SetPower</v:String>
 <v:String x:Key="vars_133">CurrPWM</v:String>
+
+<v:String x:Key="vars_134">Comp.rev.set</v:String>
+<v:String x:Key="vars_135">Comp.rev.meas</v:String>
+<v:String x:Key="vars_136">Cond.fan.PWM</v:String>
+<v:String x:Key="vars_137">Evap.fan.PWM</v:String>
+<v:String x:Key="vars_138">Comp.cur</v:String>
+<v:String x:Key="vars_139">Cond.fan.cur</v:String>
+<v:String x:Key="vars_140">Evap.fan.cur</v:String>
+<v:String x:Key="vars_141">Hi.pres.</v:String>
+<v:String x:Key="vars_142">Lo.pres.</v:String>
+<v:String x:Key="vars_143">AC T set</v:String>
+<v:String x:Key="vars_144">AC Fan mod</v:String>
+<v:String x:Key="vars_145">PCB temp</v:String>
 
 <v:String x:Key="m_0-1">Waiting for the command</v:String>
 <v:String x:Key="m_0-3">Blowing on power on</v:String>
