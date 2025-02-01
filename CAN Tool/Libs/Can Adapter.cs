@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows;
 using CAN_Tool.Libs;
 using CommunityToolkit.Mvvm.ComponentModel;
+using VSCom.CanApi;
 using Timer = System.Timers.Timer;
 
 namespace CAN_Tool
@@ -194,83 +195,35 @@ namespace CAN_Tool
 
     public partial class CanAdapter : ObservableObject
     {
-        private string currentBuf = "";
-
-        private int ptr;
-
-
-        public bool PortOpened => serialPort.IsOpen;
-
-        [ObservableProperty] private int failedTransmissions;
-
-        private int lastSecondReceived;
-        private int lastSecondTransmitted;
-        private int currentSecondReceived;
-        private int currentSecondTransmitted;
-
-        public AdapterStatus Status { private set; get; } = AdapterStatus.Closed;
-
-        private readonly SerialPort serialPort;
-
-        public string PortName
-        {
-            get => serialPort.PortName;
-            set
-            {
-                if (serialPort.IsOpen)
-                    serialPort.Close();
-                serialPort.PortName = value;
-                OnPropertyChanged();
-            }
-        }
+        VSCAN canWrapper = new();
 
         public event EventHandler GotNewMessage;
 
-        public void PortOpen()
+        public void PortOpen(string portName) => canWrapper.Open(portName, VSCAN.VSCAN_MODE_NORMAL);
+
+        public void PortClose() => canWrapper.Close();
+
+        public void SetBitrate(int bitrate) => canWrapper.SetSpeed(bitrate);
+        
+        
+        public void Transmit(CanMessage message)
         {
-            serialPort.BaudRate = 3000000;
-            serialPort.Handshake = Handshake.RequestToSend;
-            serialPort.Open();
-            Status = AdapterStatus.Ready;
-        }
+            VSCAN_MSG[] msg = new VSCAN_MSG[1];
+            msg[0].Data = message.Data;
+            if (message.Ide)
+                msg[0].Flags |= VSCAN.VSCAN_FLAGS_EXTENDED;
+            else
+                msg[0].Flags |= VSCAN.VSCAN_FLAGS_STANDARD;
+            if (message.Rtr)
+                msg[0].Flags |= VSCAN.VSCAN_FLAGS_REMOTE;
 
-        public void PortClose()
-        {
-            Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit)); //close port in new thread to avoid hang
-            CloseDown.Start(); //close port in new thread to avoid hang
-            Status = AdapterStatus.Closed;
-        }
+            msg[0].Size = (byte)message.Dlc;
+            msg[0].Id = (uint)message.Id;
+            uint written = 0;
+            canWrapper.Write(msg, 1, ref written);
 
-        private void CloseSerialOnExit()
-        {
-            try
-            {
-                serialPort.Close(); //close the serial port
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message); //catch any serial port closing error messages
-            }
-        }
 
-        private void NowClose(object sender, EventArgs e)
-        {
-            serialPort.Close(); //now close the form
-        }
-
-        public void GetSerial() => serialPort.Write("N\r");
-        public void GetVersion() => serialPort.Write("V\r");
-        public void StartNormal() => serialPort.Write("O\r");
-        public void StartListen() => serialPort.Write("L\r");
-        public void StartSelfReception() => serialPort.Write("\rY\r");
-        public void Stop() => serialPort.Write("\rC\r");
-        public void SetBitrate(int bitrate) => serialPort.Write($"S{bitrate}\r");
-        public void SetMask(uint mask) => serialPort.Write($"m{mask:X08}\r");
-        public void SetAcceptCode(uint code) => serialPort.Write($"M{code:X08}\r");
-
-        public void Transmit(CanMessage msg)
-        {
-
+            /*
             if (serialPort.IsOpen == false)
                 return;
 
@@ -294,7 +247,7 @@ namespace CAN_Tool
 
             serialPort.Write(str.ToString());
             Status = AdapterStatus.Tx;
-            currentSecondTransmitted++;
+            currentSecondTransmitted++;*/
         }
 
         //Ret value - More messages available in buffer
@@ -302,43 +255,43 @@ namespace CAN_Tool
         {
             string[] splitted = currentBuf.Split('\r');
             foreach (var line in splitted)
-                {
+            {
                 if (line.Length == 0) continue;
-                    switch (line[0])
-                    {
-                        case 'T':
-                        case 't':
-                        case 'r':
-                        case 'R':
-                            try
-                            {
-                                var m = new CanMessage(new string(currentBuf));
-                                GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
-                            }
-                            catch
-                            {
-                                // ignored
-                            }
+                switch (line[0])
+                {
+                    case 'T':
+                    case 't':
+                    case 'r':
+                    case 'R':
+                        try
+                        {
+                            var m = new CanMessage(new string(currentBuf));
+                            GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
 
-                            break;
-                        case 'z':
-                        case 'Z':
-                            Status = AdapterStatus.Ready;
-                            break;
-                        case '\a':
-                            FailedTransmissions++;
-                            Status = AdapterStatus.Ready;
-                            break;
-                        default:
-                            continue;
-                    }
+                        break;
+                    case 'z':
+                    case 'Z':
+                        Status = AdapterStatus.Ready;
+                        break;
+                    case '\a':
+                        FailedTransmissions++;
+                        Status = AdapterStatus.Ready;
+                        break;
+                    default:
+                        continue;
                 }
+            }
             currentBuf = splitted[^1]; //If last messge is not completed it will be saved to buffer, otherwise it will be zero length string
         }
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs args)
         {
-            currentBuf+=(serialPort.ReadExisting());
+            currentBuf += (serialPort.ReadExisting());
             UartMessageProcess();
         }
 
@@ -363,7 +316,7 @@ namespace CAN_Tool
         public CanAdapter()
         {
             serialPort = new SerialPort();
-            serialPort.BaudRate = 250000;
+            serialPort.BaudRate = 3000000;
             serialPort.DataReceived += DataReceivedHandler;
             Timer adapterTimer = new(15);
             adapterTimer.Elapsed += TimerTick;
