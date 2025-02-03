@@ -1,5 +1,5 @@
 ﻿<Window x:Name="window" x:Class="CAN_Tool.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:col="clr-namespace:System.Collections;assembly=mscorlib" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" xmlns:cc="clr-namespace:CAN_Tool.CustomControls" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" mc:Ignorable="d" xmlns:sctplt="clr-namespace:ScottPlot;assembly=ScottPlot" d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}" Title="{Binding Title}" Height="900" Width="1500" MaxWidth="3000" MaxHeight="2000" TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextElement.FontWeight="Regular" TextElement.FontSize="13" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto" Background="{DynamicResource MaterialDesignPaper}" FontFamily="{DynamicResource MaterialDesignFont}" WindowStyle="ThreeDBorderWindow" MouseLeftButtonDown="Window_MouseLeftButtonDown">
-    
+
     <Window.Resources>
         <c:DataToStringConverter x:Key="DataConverter" />
         <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
@@ -16,11 +16,7 @@
         <c:StateToBorderBrushConverter x:Key="BoolToBrush" />
         <c:BoolToOpacity x:Key="BoolToOpacity" />
         <c:FarenheitConverter x:Key="ToFarenheit" />
-        <c:DgnConverter x:Key="ToDgn" />
         <c:TimeSpanConverter x:Key="ToTimeSpan" />
-        <c:RegularCanToVisibleConverter x:Key="RegularCanToVisible" />
-        <c:OmniToVisibleConverter x:Key="OmniToVisible" />
-        <c:RvcToVisibleConverter x:Key="RvcToVisible" />
         <c:HexStringToIntConverter x:Key="HexConverter" />
         <c:HexStringToUlongConverter x:Key="HexToUlongConverter" />
         <c:NullToVisibleConverter x:Key="NullToVisibleConverter" />
@@ -36,34 +32,29 @@
                 <Button Content="{DynamicResource b_cancel}" Command="{Binding CancelOperationCommand}" Margin="5" Visibility="{Binding OmniInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></Button>
             </StatusBarItem>
 
-            <StatusBarItem HorizontalAlignment="Right" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StatusBarItem HorizontalAlignment="Right">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="20" Text="{Binding CanAdapter.StatusString,Mode=OneWay}" Margin="10"></TextBlock>
+                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="20" Text="" Margin="10"></TextBlock>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>
 
-        
-            <Grid DockPanel.Dock="Top">
+        <Grid DockPanel.Dock="Top">
             <StackPanel>
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="5">
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="5" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="PortNameList" Margin="5" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
-                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" Margin="5" MinWidth="40" ItemsSource="{Binding PhyProtocols}" SelectedItem="{Binding SelectedProtocol}" />
-
-                        <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="ModeSelector" Margin="5" MinWidth="70" ItemsSource="{Binding WorkModes}" SelectedIndex="2" SelectedItem="{Binding Mode}" />
 
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="5" Content="{Binding PortButtonString,Mode=OneWay}" Command="{Binding TogglePortCommand}" Cursor="Hand" />
 
-                        <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal">
 
                         </StackPanel>
 
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
                         <CheckBox x:Name="AdapterSettings" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Adapter settings" FontSize="20" IsChecked="{Binding CanAdapterSettings}" Cursor="Hand"></CheckBox>
-                        <CheckBox x:Name="ExpertMode" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="{DynamicResource b_expert}" FontSize="20" Checked="ExpertMode_CheckedChanged" Unchecked="ExpertMode_CheckedChanged"></CheckBox>
                         <CheckBox x:Name="DarkModeCheckBox" Margin="10" IsChecked="True" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Dark" FontSize="20" Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"></CheckBox>
                         <CheckBox x:Name="ImperialUnits" Margin="10" Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" Content="Imperial" FontSize="20" IsChecked="{Binding OmniInstance.UseImperial}" Checked="ImperialUnits_Checked" Unchecked="ImperialUnits_Checked"></CheckBox>
                         <ComboBox Style="{DynamicResource MaterialDesignComboBox}" x:Name="menuColor" HorizontalAlignment="Right" Margin="5" SelectionChanged="menuColor_SelectionChanged" ItemsSource="{Binding Brushes}">
@@ -94,10 +85,16 @@
                             </col:ArrayList>
                         </ComboBox.ItemsSource>
                     </ComboBox>
-                    <Button Content="{DynamicResource b_normal}" Margin="10" Command="{Binding SetAdapterNormalModeCommand}" />
-                    <Button Content="{DynamicResource b_listen}" Margin="10" Command="{Binding SetAdapterListedModeCommand}" />
-                    <Button Content="{DynamicResource b_self_reception}" Margin="10" Command="{Binding SetAdapterSelfReceptionModeCommand}" />
-                    <Button Content="{DynamicResource b_stop}" Margin="10" Command="{Binding StopCanAdapterCommand}" />
+                    <ComboBox x:Name="ModeSelector" Margin="10" MinWidth="70" SelectedIndex="{Binding SelectedCanMode}">
+                        <ComboBox.ItemsSource>
+                            <col:ArrayList>
+                                <sys:String>Normal</sys:String>
+                                <sys:String>Listen Only</sys:String>
+                                <sys:String>Self Reception</sys:String>
+
+                            </col:ArrayList>
+                        </ComboBox.ItemsSource>
+                    </ComboBox>
                     <Button Content="{DynamicResource b_load_can_log}" Margin="10" Command="{Binding LoadFromLogCommand}" />
                     <Button Content="{DynamicResource b_send_from_log}" Margin="10" Command="{Binding SendFromLogCommand}" Cursor="Hand" />
                     <Button Content="{Binding ToggleCanLogButtonName}" Margin="10" Command="{Binding ToggleCanLogCommand}" />
@@ -113,82 +110,9 @@
                     </TextBox>
 
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Visibility="{Binding CanAdapterSettings,Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Collapsed">
-                    <ComboBox Margin="10" MinWidth="70" SelectedIndex="3" SelectedItem="{Binding UartAdapter.SelectedPort.BaudRate, Mode=OneWayToSource}">
-                        <ComboBox.ItemsSource>
-                            <col:ArrayList>
-                                <sys:Int32>2400</sys:Int32>
-                                <sys:Int32>2500</sys:Int32>
-                                <sys:Int32>4800</sys:Int32>
-                                <sys:Int32>9600</sys:Int32>
-                            </col:ArrayList>
-                        </ComboBox.ItemsSource>
-                    </ComboBox>
-                    <Button Content="{DynamicResource b_load_can_log}" Margin="10" Command="{Binding LoadFromLogCommand}" />
-                    <Button Content="{DynamicResource b_send_from_log}" Margin="10" Command="{Binding SendFromLogCommand}" Cursor="Hand" />
-                    <Button Content="{Binding ToggleUartLogButtonName}" Margin="10" Command="{Binding ToggleCanLogCommand}" />
-                    <TextBlock VerticalAlignment="Center" Margin="10" Text="{DynamicResource t_delay}" FontSize="25" />
-                    <TextBox VerticalAlignment="Center" Margin="10" FontSize="25" MinWidth="40">
-                        <TextBox.Text>
-                            <Binding Path="MessageDelay" UpdateSourceTrigger="PropertyChanged">
-                                <Binding.ValidationRules>
-                                    <v:RangeRule Min="7" Max="5000" />
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-
-                </StackPanel>
-
             </StackPanel>
         </Grid>
-        <DockPanel Visibility="{Binding Mode, Converter={StaticResource RegularCanToVisible}}" d:Visibility="Visible" DockPanel.Dock="Top">
-            <StackPanel Grid.Row="0" Orientation="Horizontal" DockPanel.Dock="Top">
-                <TextBlock VerticalAlignment="Center" Margin="10" Text="ID:" FontSize="25" />
-                <TextBox ToolTip="ID" MinWidth="160" Margin="10" Text="{Binding CanPage.ConstructedMessage.Id,Converter={StaticResource HexConverter},UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" d:Text="1FF2D4E" />
-                <TextBlock VerticalAlignment="Center" Margin="10" Text="DLC:" FontSize="25" />
-                <TextBox ToolTip="DLC" MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.Dlc,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" d:Text="8"/>
-                <TextBlock VerticalAlignment="Center" Margin="10" Text="Data:" FontSize="25" />
-                <cc:DataBox ToolTip="Enter data in HEX format" Margin="10" DataContext="{Binding CanPage}" Text="{Binding ConstructedMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" FontFamily="Courier" />
-
-                <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.Rtr}" Margin="10" FontSize="20">RTR</CheckBox>
-                <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.Ide}" Margin="10" FontSize="20">IDE</CheckBox>
-                <Button Margin="10" Command="{Binding CanPage.SendCanMessageCommand}">Send</Button>
-                <TextBox ToolTip="Interval" MinWidth="70" Margin="10" Style="{DynamicResource MaterialDesignOutlinedTextBox}">
-                    <TextBox.Text>
-                        <Binding Path="CanPage.SendInterval" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <v:RangeRule Min="7" Max="5000" />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox.Text>
-                </TextBox>
-                <CheckBox ToolTip="Autosend" Margin="10" FontSize="25" IsChecked="{Binding CanPage.AutoSend, Mode=OneWayToSource}">Autosend</CheckBox>
-                <Button Content="Add random message" Click="Button_Click" />
-            </StackPanel>
-            <DataGrid x:Name="CanMessageList" DockPanel.Dock="Top" ItemsSource="{Binding CanPage.MessageList,Mode=OneWay}" AutoGenerateColumns="false" Margin="15" MouseDoubleClick="CanListDoubleClick">
-                <DataGrid.RowStyle>
-                    <Style TargetType="DataGridRow">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Fresh}" Value="true">
-                                <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}"></Setter>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Fresh}" Value="false">
-                                <Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}"></Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </DataGrid.RowStyle>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID" Binding="{Binding IdAsText,Mode=OneWay}"></DataGridTextColumn>
-                    <DataGridCheckBoxColumn Header="IDE" Binding="{Binding Ide,Mode=OneWay}"></DataGridCheckBoxColumn>
-                    <DataGridCheckBoxColumn Header="RTR" Binding="{Binding Rtr,Mode=OneWay}"></DataGridCheckBoxColumn>
-                    <DataGridTextColumn Header="DLC" Binding="{Binding Dlc,Mode=OneWay}"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Data" Binding="{Binding DataAsText,Mode=OneWay}"></DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </DockPanel>
-        <DockPanel Visibility="{Binding Mode,Converter={StaticResource OmniToVisible}}" DockPanel.Dock="Top">
+        <DockPanel DockPanel.Dock="Top">
             <DockPanel DockPanel.Dock="Top" Visibility="{Binding OmniInstance.ConnectedDevices.Count, Converter={StaticResource IntToVisibileConverter},Mode=OneWay}">
                 <Separator />
                 <ListBox x:Name="DeviceSelector" DockPanel.Dock=" Left" ItemsSource="{Binding OmniInstance.ConnectedDevices}" SelectedItem="{Binding OmniInstance.SelectedConnectedDevice}">
@@ -203,12 +127,12 @@
                 </Button>
             </DockPanel>
             <Separator />
-            
-            <TabControl Style="{DynamicResource MaterialDesignNavigationRailTabControl}" >
-                
+
+            <TabControl Style="{DynamicResource MaterialDesignNavigatilRailTabControl}">
+
                 <TabItem>
                     <TabItem.Header>
-                            <fa:ImageAwesome ToolTip="{DynamicResource b_common}" Icon="Solid_IdCardAlt" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40"/>
+                        <fa:ImageAwesome ToolTip="{DynamicResource b_common}" Icon="Solid_IdCardAlt" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" />
                     </TabItem.Header>
                     <DockPanel Visibility="{Binding OmniInstance.SelectedConnectedDevice,Converter={StaticResource NullToVisibleConverter}}">
                         <cc:HcuOmniControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}" />
@@ -219,9 +143,9 @@
                         <cc:AcInverterControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForAcInverter}}" />
                     </DockPanel>
                 </TabItem>
-                <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TabItem.Header >
-                        <fa:ImageAwesome Icon="Solid_MailBulk" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_messages}"/>
+                <TabItem >
+                    <TabItem.Header>
+                        <fa:ImageAwesome Icon="Solid_MailBulk" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_messages}" />
                     </TabItem.Header>
                     <DockPanel>
                         <DockPanel DockPanel.Dock="Top">
@@ -264,7 +188,8 @@
                                         </TextBox.Text>
                                     </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Data:</TextBlock>
-                                    <cc:DataBox ToolTip="Enter data in HEX format" Width="240" Margin="5 10" Text="{Binding Path=CustomMessage.DataAsULong,UpdateSourceTrigger=PropertyChanged,Converter = {StaticResource HexToUlongConverter},Mode=OneWayToSource}" Style="{StaticResource MaterialDesignTextBox}" FontSize="22"  />
+                                    <cc:DataBox  ToolTip="Enter data in HEX format"   Margin="5 10"  Style="{StaticResource MaterialDesignTextBox}" FontSize="22" />
+                                    <cc:DataBox ToolTip="Enter data in HEX format"  Margin="5 10" Style="{StaticResource MaterialDesignTextBox}" FontSize="22" />
                                     <Button Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}" Cursor="Hand">
                                         <Button.Content>
                                             <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
@@ -277,7 +202,7 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding OmniInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged" >
+                            <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding OmniInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged">
                                 <DataGrid.RowStyle>
                                     <Style TargetType="DataGridRow">
                                         <Style.Triggers>
@@ -316,9 +241,9 @@
                     </DockPanel>
 
                 </TabItem>
-                <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TabItem >
                     <TabItem.Header>
-                        <fa:ImageAwesome Icon="Regular_Keyboard" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_commands}"/>
+                        <fa:ImageAwesome Icon="Regular_Keyboard" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_commands}" />
                     </TabItem.Header>
                     <DockPanel>
 
@@ -345,7 +270,7 @@
                 </TabItem>
                 <TabItem>
                     <TabItem.Header>
-                        <fa:ImageAwesome Icon="Solid_Wrench" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_config}"/>
+                        <fa:ImageAwesome Icon="Solid_Wrench" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_config}" />
                     </TabItem.Header>
                     <DockPanel>
 
@@ -376,7 +301,7 @@
                 </TabItem>
                 <TabItem x:Name="GraphTab">
                     <TabItem.Header>
-                        <fa:ImageAwesome Icon="Solid_ChartLine" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_log_chart}"/>
+                        <fa:ImageAwesome Icon="Solid_ChartLine" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_log_chart}" />
                     </TabItem.Header>
                     <Grid>
                         <DockPanel>
@@ -461,9 +386,9 @@
                     </Grid>
 
                 </TabItem>
-                <TabItem Visibility="{Binding ElementName=ExpertMode,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TabItem >
                     <TabItem.Header>
-                            <fa:ImageAwesome Icon="Solid_InfoCircle" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_status}"/>
+                        <fa:ImageAwesome Icon="Solid_InfoCircle" Margin="2 2 5 2" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_status}" />
                     </TabItem.Header>
                     <DataGrid ItemsSource="{Binding OmniInstance.SelectedConnectedDevice.Status,Mode=OneWay}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
                         <DataGrid.Columns>
@@ -476,8 +401,8 @@
                 <TabItem>
                     <TabItem.Header>
 
-                        <fa:ImageAwesome Icon="Solid_BoxOpen" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_black_box}"/>
-                        
+                        <fa:ImageAwesome Icon="Solid_BoxOpen" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_black_box}" />
+
                     </TabItem.Header>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -518,7 +443,7 @@
                         <KeyBinding Key="A" Command="{Binding ChangeGlowPlugCommand}" CommandParameter="-1" />
                         <KeyBinding Key="A" Command="{Binding ChangeGlowPlugCommand}" Modifiers="Shift" CommandParameter="-10" />
                         <KeyBinding Key="Z" Command="{Binding ToggleGlowPlugCommand}" />
-                        
+
                         <KeyBinding Key="W" Command="{Binding ChangeManualAirBlowerCommand}" CommandParameter="1" />
                         <KeyBinding Key="W" Command="{Binding ChangeManualAirBlowerCommand}" Modifiers="Shift" CommandParameter="10" />
                         <KeyBinding Key="S" Command="{Binding ChangeManualAirBlowerCommand}" CommandParameter="-1" />
@@ -537,8 +462,8 @@
 
                     </TabItem.InputBindings>
 
-                <TabItem.Header>
-                        <fa:ImageAwesome Icon="Solid_Cogs" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_manual}"/>
+                    <TabItem.Header>
+                        <fa:ImageAwesome Icon="Solid_Cogs" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_manual}" />
                     </TabItem.Header>
                     <DockPanel>
                         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
@@ -635,7 +560,7 @@
                                 </StackPanel>
                                 <Rectangle x:Name="SetAirRect" Grid.Column="0" Grid.Row="3" Margin="10"></Rectangle>
                                 <ProgressBar VerticalAlignment="Center" HorizontalAlignment="Center" Margin="40 0 40 0" Foreground="{DynamicResource PrimaryHueDarkBrush}" Grid.Column="0" Grid.Row="3" Maximum="200" Value="{Binding ManualAirBlower,Mode=OneWay,TargetNullValue=0 }" Orientation="Vertical" MouseWheel="ManualAirMouseWheelEventHandler" Width="{Binding ElementName=SetAirRect,Path=ActualHeight}" Height="{Binding ElementName=SetAirRect,Path=ActualWidth}" Panel.ZIndex="2" />
-                                <ProgressBar VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource SecondaryHueMidBrush}"  Grid.Column="0"  Grid.Row="3" Maximum="200"  Value="{Binding Vm.OmniInstance.SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0,Mode=OneWay}" Orientation="Vertical" Width="{Binding ElementName=SetAirRect,Path=ActualHeight}" Height="{Binding ElementName=SetAirRect,Path=ActualWidth}" Panel.ZIndex="1" />
+                                <ProgressBar VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource SecondaryHueMidBrush}" Grid.Column="0" Grid.Row="3" Maximum="200" Value="{Binding Vm.OmniInstance.SelectedConnectedDevice.Parameters.RevMeasured,TargetNullValue=0,Mode=OneWay}" Orientation="Vertical" Width="{Binding ElementName=SetAirRect,Path=ActualHeight}" Height="{Binding ElementName=SetAirRect,Path=ActualWidth}" Panel.ZIndex="1" />
 
                                 <TextBlock Grid.Column="1" Grid.Row="0" FontSize="20" Text="{DynamicResource b_fuel_pump_set}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <TextBlock Grid.Column="1" Grid.Row="1" FontSize="20" Text="{Binding ManualFuelPump,Mode=OneWay,Converter={StaticResource FuelPumpConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" d:Text="3"></TextBlock>
@@ -663,8 +588,8 @@
                 <TabItem DataContext="{Binding FirmwarePage}">
                     <TabItem.Header>
 
-                        <fa:ImageAwesome Icon="Solid_FileCode" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_firmware}"/>
-                        
+                        <fa:ImageAwesome Icon="Solid_FileCode" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_firmware}" />
+
                     </TabItem.Header>
                     <DockPanel>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
@@ -687,237 +612,6 @@
                 </TabItem>
             </TabControl>
         </DockPanel>
-        <TabControl DockPanel.Dock="Top" Style="{DynamicResource MaterialDesignFilledTabControl}" DataContext="{Binding RvcPage}" Visibility="{Binding VM.Mode,Converter={StaticResource RvcToVisible}}" d:Visibility="Visible">
-            <TabItem Header="Timberline 1.5" Selector.IsSelected="{Binding Timberline15.Selected}">
-                <DockPanel>
-                    <StackPanel DockPanel.Dock="Left" Margin="5">
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.HeaterEnabled}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Heater" Margin="5" Click="ToggleHeaterButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ElementEnabled}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Element" Margin="5" Click="ToggleElementButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterEnabled}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Water" Margin="5" Cursor="Hand" Click="ToggleWaterButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneEnabled}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Zone Heating" Margin="5" Cursor="Hand" Click="ToggleZoneButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.WaterPumpOverride}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Pump override" Margin="5" Cursor="Hand" Click="TogglePumpButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ZoneManualFanMode}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Fan manual" Margin="5" Cursor="Hand" Click="ToggleFanManualModeButtonPressed" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" Margin="5" IsChecked="{Binding Timberline15.ScheduleMode}" IsEnabled="false" />
-                            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Schedule mode" Margin="5" Cursor="Hand" Click="ToggleScheduleModeButtonPressed" />
-                        </StackPanel>
-
-                        <Button Margin="5" Content="Sync time" Click="SetTimeButtonPressed"></Button>
-                        <Button Margin="5" Content="Clear errors" Click="ClearErrorsButtonPressed"></Button>
-                    </StackPanel>
-                    <StackPanel DockPanel.Dock="Left" Margin="5" Orientation="Vertical" Width="550">
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Day setpoint,C°"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointDay,Mode=OneWay}" ValueChanged="DaySetPointValueChanged"></ScrollBar>
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointDay}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Night setpoint,C°"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="32" Value="{Binding Timberline15.SetpointNight,Mode=OneWay}" ValueChanged="NightSetPointValueChanged" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SetpointNight}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Fan manual speed,%"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="100" Value="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" ValueChanged="ManualFanSpeedValueChanged" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.ZoneManualFanSpeed,Mode=OneWay}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="RVC-Temperature,C°"></TextBlock>
-                            <ScrollBar DockPanel.Dock="Right" LargeChange="5" SmallChange="1" Orientation="Horizontal" Width="300" Margin="5" Minimum="10" Maximum="40" Value="{Binding Timberline15.RvcTemperature}" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.RvcTemperature,Mode=OneWay}" HorizontalAlignment="Right" />
-                            <CheckBox DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignSwitchAccentToggleButton}" HorizontalAlignment="Right" IsChecked="{Binding Timberline15.BroadcastTemperature}" />
-
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Day Start"></TextBlock>
-                            <materialDesign:TimePicker SelectedTime="{Binding Timberline15.DayStart}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="DayStartChanged" />
-
-                            <materialDesign:TimePicker DockPanel.Dock="Right" SelectedTime="{Binding Timberline15.NightStart}" Is24Hours="True" MinWidth="50" SelectedTimeChanged="NightTimeChanged" />
-                            <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Night Start" HorizontalAlignment="Right" />
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="System Limit, minutes"></TextBlock>
-                            <ScrollBar SmallChange="60" LargeChange="60" DockPanel.Dock="Right" Orientation="Horizontal" Width="300" Margin="5" Minimum="60" Maximum="7200" Value="{Binding Timberline15.SystemDuration,Mode=OneWay}" ValueChanged="SystemDurationValueChanged" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.SystemDuration,Mode=OneWay}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock VerticalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="5" Text="Water Limit, minutes"></TextBlock>
-                            <ScrollBar SmallChange="1" LargeChange="5" DockPanel.Dock="Right" Orientation="Horizontal" Width="300" Margin="5" Minimum="30" Maximum="60" Value="{Binding Timberline15.WaterDuration,Mode=OneWay}" ValueChanged="WaterDurationValueChanged" />
-                            <TextBlock DockPanel.Dock="Right" Margin="5" Style="{DynamicResource MaterialDesignBody1TextBlock}" Text="{Binding Timberline15.WaterDuration,Mode=OneWay}" HorizontalAlignment="Right" />
-
-                        </DockPanel>
-
-                    </StackPanel>
-                    <StackPanel Margin="5" Width="300" HorizontalAlignment="Left">
-                        <StackPanel.Resources>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Margin" Value="3" />
-                            </Style>
-                        </StackPanel.Resources>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Tank Temperature: " />
-                            <TextBlock Text="{Binding Timberline15.TankTemperature,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Heatexchanger Temperature: " />
-                            <TextBlock Text="{Binding Timberline15.HeatExchangerTemperature,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Heater Temperature: " />
-                            <TextBlock Text="{Binding Timberline15.HeaterTemperature,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Current setpoint: " />
-                            <TextBlock Text="{Binding Timberline15.CurrentSetpoint,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Day setpoint: " />
-                            <TextBlock Text="{Binding Timberline15.SetpointDay,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Night setpoint: " />
-                            <TextBlock Text="{Binding Timberline15.SetpointNight,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Fan measured speed: " />
-                            <TextBlock Text="{Binding Timberline15.ZoneFanMeasuredSpeed,Mode=OneWay}" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Heater version: " />
-                            <TextBlock Text="{Binding Timberline15.HeaterVersionString,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="HCU version: " />
-                            <TextBlock Text="{Binding Timberline15.HcuVersionString,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Panel version: " />
-                            <TextBlock Text="{Binding Timberline15.PanelVersionString,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Solenoid status: " />
-                            <TextBlock Text="{Binding Timberline15.SolenoidStatus,Mode=OneWay}" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="System timer: " />
-                            <TextBlock Text="{Binding Timberline15.SystemEstimatedTime,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Water timer: " />
-                            <TextBlock Text="{Binding Timberline15.WaterEstimatedTime,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Pump timer: " />
-                            <TextBlock Text="{Binding Timberline15.PumpEstimatedTime,Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Pump status: " />
-                            <TextBlock Text="{Binding Timberline15.WaterPumpStatus,Mode=OneWay}" />
-                        </StackPanel>
-
-                    </StackPanel>
-                </DockPanel>
-
-            </TabItem>
-            <TabItem Header="Timberline 2.0" Selector.IsSelected="{Binding Timberline20.Selected}">
-                <cc:TimberlineRvcControl DataContext="{Binding Timberline20}" />
-            </TabItem>
-            <TabItem Header="{DynamicResource b_messages}">
-                <DockPanel>
-                    <Grid DockPanel.Dock="Right" Background="{DynamicResource MaterialDesignCardBackground}">
-                        <Border CornerRadius="10" Margin="10" BorderThickness="2" Background="{DynamicResource MaterialDesignDarkBackground}">
-                            <TextBox Text="{Binding ConstructedMessage.VerboseInfo,Mode=OneWay}" Margin="5" />
-                        </Border>
-                    </Grid>
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="{DynamicResource MaterialDesignCardBackground}">
-
-                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10">DGN:</TextBlock>
-                        <TextBox Text="{Binding ConstructedMessage.Dgn,Converter={StaticResource HexConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center"></TextBox>
-                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> SA</TextBlock>
-                        <TextBox Text="{Binding ConstructedMessage.SourceAdress,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" VerticalAlignment="Center" />
-                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Priority:</TextBlock>
-                        <TextBox Text="{Binding ConstructedMessage.Priority,UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}" />
-                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Data:</TextBlock>
-                        <cc:DataBox Text="{Binding ConstructedMessage.DataAsULong,Converter={StaticResource HexToUlongConverter},UpdateSourceTrigger=PropertyChanged}" FontSize="25" Margin="10" Style="{DynamicResource MaterialDesignTextBox}" />
-                        <Button Margin="10" Command="{Binding SendRvcMessageCommand}">
-                            <Button.Content>
-                                <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />
-                            </Button.Content>
-                        </Button>
-                    </StackPanel>
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="{DynamicResource MaterialDesignCardBackground}">
-
-                        <TextBlock VerticalAlignment="Center" FontSize="25" Margin="10 10 0 10"> Spam interval:</TextBlock>
-                        <TextBox ToolTip="In milliseconds" FontSize="25" Margin="10" VerticalAlignment="Center" MinWidth="40" TextAlignment="Center">
-                            <TextBox.Text>
-                                <Binding Path="SpamInterval" UpdateSourceTrigger="PropertyChanged">
-                                    <Binding.ValidationRules>
-                                        <v:RangeRule Min="6" Max="1000" />
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </TextBox.Text>
-                        </TextBox>
-                        <CheckBox ToolTip="Enable spam function" IsChecked="{Binding SpamEnabled}" FontSize="25" Margin="10">Spam</CheckBox>
-                        <CheckBox ToolTip="Can corrupt data if DGN match registred" IsChecked="{Binding RandomDgn}" FontSize="25" Margin="10">Randomise DGN</CheckBox>
-                        <Button Margin="10" Content="Save Log" Command="{Binding SaveRvcLogCommand}" />
-                    </StackPanel>
-
-                    <DataGrid x:Name="RVCMessageList" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" DockPanel.Dock="Left" Margin="10" ItemsSource="{Binding MessageList}" SelectionChanged="RVCMessageList_SelectionChanged" AutoGenerateColumns="False">
-                        <DataGrid.RowStyle>
-                            <Style TargetType="DataGridRow">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Fresh}" Value="true">
-                                        <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}"></Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Fresh}" Value="false">
-                                        <Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.RowStyle>
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Dgn,Mode=OneWay,StringFormat=X05}" Header="DGN"></DataGridTextColumn>
-                            <DataGridTextColumn Binding="{Binding Priority,Mode=OneWay}" Header="Priority"></DataGridTextColumn>
-                            <DataGridTextColumn Binding="{Binding SourceAdress,Mode=OneWay}" Header="SA"></DataGridTextColumn>
-                            <DataGridTextColumn Binding="{Binding DataAsText,Mode=OneWay}" Header="Data"></DataGridTextColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-
-                    <Border BorderBrush="{DynamicResource MaterialDesignCardBackground}" CornerRadius="10" BorderThickness="3" Margin="10">
-                        <TextBlock DockPanel.Dock="Left" Text="{Binding SelectedMessage.VerboseInfo,Mode=OneWay}" Margin="10" FontSize="18" />
-                    </Border>
-
-                </DockPanel>
-            </TabItem>
-
-        </TabControl>
-
     </DockPanel>
 </Window>
 

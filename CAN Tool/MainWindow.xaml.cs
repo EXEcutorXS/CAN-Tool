@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MaterialDesignThemes.Wpf;
 using OmniProtocol;
-using RVC;
 using ScottPlot;
 using ScottPlot.Renderable;
 using System;
@@ -45,7 +44,6 @@ namespace CAN_Tool
             }
         }
         public bool IsDark { get; set; }
-        public bool ExpertModeOn { set; get; }
         public int ThemeNumber { get; set; }
         public int LangaugeNumber { get; set; }
 
@@ -97,8 +95,6 @@ namespace CAN_Tool
                 using (FileStream fs = new FileStream("settings.json", FileMode.OpenOrCreate))
                 {
                     App.Settings = JsonSerializer.Deserialize<Settings>(fs);
-
-
                 }
             }
             catch
@@ -143,7 +139,6 @@ namespace CAN_Tool
             menuLanguage.SelectedIndex = App.Settings.LangaugeNumber;
             menuColor.SelectedIndex = App.Settings.ThemeNumber;
             DarkModeCheckBox.IsChecked = App.Settings.IsDark;
-            ExpertMode.IsChecked = App.Settings.ExpertModeOn;
             ImperialUnits.IsChecked = App.Settings.UseImperial;
         }
 
@@ -315,23 +310,23 @@ namespace CAN_Tool
         private void ManualAirMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
         {
             int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
-                
-            vm.ManualPage.ChangeManualAirBlowerCommand.Execute((Math.Sign(e.Delta)*k).ToString());
+
+            vm.ManualPage.ChangeManualAirBlowerCommand.Execute((Math.Sign(e.Delta) * k).ToString());
         }
 
         private void ManualFuelMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
         {
-            
+
             int k = Keyboard.IsKeyDown(Key.LeftShift) ? 100 : 5;
 
-            vm.ManualPage.ChangeManualFuelPumpCommand.Execute((Math.Sign(e.Delta)*k).ToString());
-            
+            vm.ManualPage.ChangeManualFuelPumpCommand.Execute((Math.Sign(e.Delta) * k).ToString());
+
         }
 
         private void ManualGlowPlugMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
         {
             int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
-                    vm.ManualPage.ChangeGlowPlugCommand.Execute((Math.Sign(e.Delta) * k).ToString());
+            vm.ManualPage.ChangeGlowPlugCommand.Execute((Math.Sign(e.Delta) * k).ToString());
         }
 
         private void DarkMode_Checked(object sender, RoutedEventArgs e)
@@ -388,7 +383,8 @@ namespace CAN_Tool
                 case 16: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Pink.xaml"; break;
                 case 17: source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Purple.xaml"; break;
                 case 18
-                : source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml"; break;
+                :
+                    source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml"; break;
                 default: break;
             }
 
@@ -419,11 +415,6 @@ namespace CAN_Tool
             catch { }
         }
 
-        private void ExpertMode_CheckedChanged(object sender, RoutedEventArgs e)
-        {
-            App.Settings.ExpertModeOn = (bool)ExpertMode.IsChecked;
-        }
-
         private void ColorPicker_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
@@ -442,129 +433,7 @@ namespace CAN_Tool
                 ColorPicker.Color = ((DataSet.SelectedItem as StatusVariable).ChartBrush as SolidColorBrush).Color;
         }
 
-        private void ScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
 
-            //vm.CanAdapter.Transmit()
-        }
-
-
-
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            CanMessage m = new();
-            Random r = new(DateTime.Now.Millisecond);
-            m.Ide = (r.Next(0, 255) % 2) == 0;
-            m.Rtr = (r.Next(0, 255) % 2) == 0;
-            if (m.Ide)
-                m.Id = r.Next(0, 0x1FFFFFFF);
-            else
-                m.Id = r.Next(0, 0x7FF);
-            m.Dlc = (byte)r.Next(1, 9);
-            for (int i = 0; i < m.Dlc; i++)
-                m.Data[i] = (byte)r.Next(0, 256);
-
-            vm.CanPage.MessageList.TryToAdd(m);
-        }
-
-        private void CanListDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (CanMessageList.SelectedItem != null)
-                vm.CanPage.ConstructedMessage.Update(CanMessageList.SelectedItem as CanMessage);
-        }
-
-        private void RVCMessageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
-            try
-            {
-                vm.RvcPage.SelectedMessage = (RvcMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
-            }
-            catch { }
-
-        }
-
-        private void SetTimeButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.SetTime(DateTime.Now);
-        }
-
-        private void ToggleHeaterButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleHeater();
-        }
-
-        private void ToggleElementButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleElement();
-        }
-
-        private void ToggleWaterButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleWater();
-        }
-
-        private void ToggleZoneButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleZone();
-        }
-
-        private void TogglePumpButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.TogglePump();
-        }
-
-        private void ToggleFanManualModeButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleFanManualMode();
-        }
-
-        private void ToggleScheduleModeButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleScheduleMode();
-        }
-
-        private void DaySetPointValueChanged(object sender, RoutedEventArgs e)
-        {
-            vm?.RvcPage.Timberline15.SetDaySetpoint((int)(sender as ScrollBar).Value);
-        }
-
-        private void NightSetPointValueChanged(object sender, RoutedEventArgs e)
-        {
-            vm?.RvcPage.Timberline15.SetNightSetpoint((int)(sender as ScrollBar).Value);
-        }
-
-        private void ManualFanSpeedValueChanged(object sender, RoutedEventArgs e)
-        {
-            vm?.RvcPage.Timberline15.SetFanManualSpeed((byte)(sender as ScrollBar).Value);
-        }
-
-        private void SystemDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            vm?.RvcPage.Timberline15.SetSystemDuration((int)(sender as ScrollBar).Value);
-        }
-
-        private void WaterDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            vm?.RvcPage.Timberline15.SetWaterDuration((int)(sender as ScrollBar).Value);
-        }
-
-        private void NightTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
-        {
-            vm?.RvcPage.Timberline15.SetNightStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
-        }
-
-
-        private void DayStartChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
-        {
-            vm?.RvcPage.Timberline15.SetDayStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
-        }
-
-        private void ClearErrorsButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm?.RvcPage.Timberline15.ClearErrors();
-        }
 
     }
 

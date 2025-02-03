@@ -26,6 +26,7 @@ using System.Collections.Specialized;
 using ScottPlot.WPF;
 using System.Collections.ObjectModel;
 using System.Windows.Markup;
+using CAN_Tool.CustomControls;
 
 
 namespace OmniProtocol
@@ -36,6 +37,11 @@ namespace OmniProtocol
     public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter }
 
     public enum LoadMode_t { Off = 0, Toggle = 1, Pwm = 2 };
+
+    public enum zoneType_t { Disconnected = 0, Furnace = 1, Defrosting = 2,Radiator = 3 };
+
+    public enum zoneState_t { Off = 0, Heat = 1, Fan = 2};
+
 
     public class GotOmniMessageEventArgs : EventArgs
     {
@@ -269,6 +275,11 @@ namespace OmniProtocol
             Data = new byte[8];
             for (var i = 0; i < 8; i++)
                 Data[i] = 0xff;
+
+            _byteArrayWrapper = new ByteArrayWrapper
+            {
+                ByteArray = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
+            };
         }
         public OmniMessage(CanMessage m) : this()
         {
@@ -285,9 +296,10 @@ namespace OmniProtocol
 
         public long updateTick;
 
+
         [ObservableProperty] private bool fresh;
 
-        [NotifyPropertyChangedFor(nameof(DataAsText), nameof(DataAsULong), nameof(VerboseInfo))]
+        [NotifyPropertyChangedFor(nameof(DataAsText), nameof(VerboseInfo))]
         [ObservableProperty] private byte[] data = new byte[8];
 
         public CanMessage ToCanMessage()
@@ -1342,12 +1354,10 @@ public partial class Omni : ObservableObject
     }
 
 
-    public Omni(CanAdapter canAdapter, UartAdapter uartAdapter)
+    public Omni(CanAdapter canAdapter)
     {
         ArgumentNullException.ThrowIfNull(canAdapter);
-        ArgumentNullException.ThrowIfNull(uartAdapter);
         this.canAdapter = canAdapter;
-        this.uartAdapter = uartAdapter;
         SeedStaticData();
 
         try
@@ -1395,7 +1405,6 @@ public partial class Omni : ObservableObject
     public UpdatableList<OmniMessage> Messages { get; } = new();
 
     private readonly CanAdapter canAdapter;
-    private readonly UartAdapter uartAdapter;
 
     [ObservableProperty] private bool readingBbErrorsMode = false;
     [NotifyPropertyChangedFor(nameof(AvailableModels), nameof(AvailableVendors))]
@@ -2332,8 +2341,6 @@ public partial class Omni : ObservableObject
     {
         if ((bool)canAdapter?.PortOpened)
             canAdapter.Transmit(m.ToCanMessage());
-        if (uartAdapter.SelectedPort != null && uartAdapter.SelectedPort.IsOpen)
-            uartAdapter.Transmit(m);
     }
 
     public void SendMessage(DeviceId from, DeviceId to, int pgn, byte[] data)

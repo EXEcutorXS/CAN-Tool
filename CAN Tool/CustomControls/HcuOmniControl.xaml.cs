@@ -134,7 +134,7 @@ namespace CAN_Tool.CustomControls
                 m.Pgn = 22;
                 var zoneNumber = vm.TimberlineParams.Zones.IndexOf(vm.TimberlineParams.SelectedZone);
                 var newState = (int)vm.TimberlineParams.SelectedZone.State + 1;
-                if (vm.TimberlineParams.Zones[zoneNumber].Connected == ViewModels.zoneType_t.Radiator && newState != 1 || newState > 2) //Radiator zones can only be 0 and 1
+                if (vm.TimberlineParams.Zones[zoneNumber].Connected == zoneType_t.Radiator && newState != 1 || newState > 2) //Radiator zones can only be 0 and 1
                     newState = 0;
 
                 var newStateByte = (byte)(~(3 << ((zoneNumber % 4)*2)) | newState << ((zoneNumber % 4)*2));

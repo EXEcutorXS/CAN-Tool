@@ -96,6 +96,7 @@ namespace OmniProtocol
             Transmit(msg.ToCanMessage());
 
         }
+
         [RelayCommand]
         public void updateOverrideFuelPumpFreq()
         {

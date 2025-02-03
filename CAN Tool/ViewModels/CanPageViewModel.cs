@@ -9,7 +9,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.ComponentModel;
-using RVC;
 using CAN_Tool.Libs;
 using System.Timers;
 using System.Windows.Controls.Primitives;

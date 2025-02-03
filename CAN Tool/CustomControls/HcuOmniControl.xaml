@@ -11,11 +11,7 @@
         <c:StateToBorderBrushConverter x:Key="BoolToBrush" />
         <c:BoolToOpacity x:Key="BoolToOpacity" />
         <c:FarenheitConverter x:Key="ToFarenheit" />
-        <c:DgnConverter x:Key="ToDgn" />
         <c:TimeSpanConverter x:Key="ToTimeSpan" />
-        <c:RegularCanToVisibleConverter x:Key="RegularCanToVisible" />
-        <c:OmniToVisibleConverter x:Key="OmniToVisible" />
-        <c:RvcToVisibleConverter x:Key="RvcToVisible" />
         <c:HexStringToIntConverter x:Key="HexConverter" />
         <c:HexStringToUlongConverter x:Key="HexToUlongConverter" />
         <c:ConnectedZoneTypeToVisible x:Key="OnlyConnected" />

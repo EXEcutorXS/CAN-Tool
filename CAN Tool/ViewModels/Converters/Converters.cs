@@ -6,7 +6,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using RVC;
 using System.Linq;
 using System.ComponentModel;
 
@@ -411,21 +410,6 @@ namespace CAN_Tool.ViewModels.Converters
         }
     }
 
-    public class DgnConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return RVC.RVC.DGNs[(int)value];
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value != null)
-                return ((KeyValuePair<int, DGN>)value).Key;
-            else
-                return null;
-        }
-    }
 
     public class TimeSpanConverter : IValueConverter
     {
@@ -440,55 +424,8 @@ namespace CAN_Tool.ViewModels.Converters
         }
     }
 
-    public class RegularCanToVisibleConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if ((WorkMode_t)value==WorkMode_t.RegularCan)
-                return Visibility.Visible;
-            else
-                return Visibility.Collapsed;
-            
-        }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException("This is one way converter!");
-        }
-    }
 
-    public class OmniToVisibleConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if ((WorkMode_t)value == WorkMode_t.Omni)
-                return Visibility.Visible;
-            else
-                return Visibility.Collapsed;
-
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException("This is one way converter!");
-        }
-    }
-
-    public class RvcToVisibleConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if ((WorkMode_t)value == WorkMode_t.Rvc)
-                return Visibility.Visible;
-            else
-                return Visibility.Collapsed;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException("This is one way converter!");
-        }
-    }
 
     public class ConnectedZoneTypeToVisible : IValueConverter
     {
