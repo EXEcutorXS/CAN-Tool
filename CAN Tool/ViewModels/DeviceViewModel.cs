@@ -96,7 +96,6 @@ namespace OmniProtocol
             Transmit(msg.ToCanMessage());
 
         }
-
         [RelayCommand]
         public void updateOverrideFuelPumpFreq()
         {
@@ -279,7 +278,7 @@ namespace OmniProtocol
 
         public string Name => ToString();
 
-        public Device DeviceReference { get; }
+        public DeviceTemplate DeviceReference { get; }
 
         public string Img => $@"~\..\Images\{Id.Type}.jpg";
 
