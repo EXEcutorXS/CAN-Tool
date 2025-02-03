@@ -21,6 +21,8 @@
         <c:HexStringToUlongConverter x:Key="HexToUlongConverter" />
         <c:NullToVisibleConverter x:Key="NullToVisibleConverter" />
         <c:BindingListToStringConverter x:Key="VersionConverter" />
+        <c:DataConverter x:Key="HexToDataConverter" />
+
     </Window.Resources>
     <DockPanel>
         <StatusBar x:Name="MyStatusbar" DockPanel.Dock="Bottom" Background="{DynamicResource MaterialDesignCardBackground}">
@@ -188,8 +190,8 @@
                                         </TextBox.Text>
                                     </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Data:</TextBlock>
-                                    <cc:DataBox  ToolTip="Enter data in HEX format"   Margin="5 10"  Style="{StaticResource MaterialDesignTextBox}" FontSize="22" />
-                                    <cc:DataBox ToolTip="Enter data in HEX format"  Margin="5 10" Style="{StaticResource MaterialDesignTextBox}" FontSize="22" />
+                                    <cc:DataBox  ToolTip="Enter data in HEX format"   Text="{Binding CustomMessage.Data,Converter={StaticResource HexToDataConverter},UpdateSourceTrigger=PropertyChanged}" Margin="5 10"  Style="{StaticResource MaterialDesignTextBox}" FontSize="22" />
+                                    <cc:DataBox ToolTip="Enter data in HEX format" Text="{Binding CustomMessage.Data,Converter={StaticResource HexToDataConverter},UpdateSourceTrigger=PropertyChanged}" Margin="5 10" Style="{StaticResource MaterialDesignTextBox}" FontSize="22" />
                                     <Button Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}" Cursor="Hand">
                                         <Button.Content>
                                             <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />

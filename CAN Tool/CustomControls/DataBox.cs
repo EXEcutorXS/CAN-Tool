@@ -14,40 +14,10 @@ namespace CAN_Tool.CustomControls
     public class DataBox : TextBox
     {
 
-      
-        private void UpdateTextFromByteArray(byte[] byteArray)
-        {
-            string hexString = BitConverter.ToString(byteArray).Replace("-", " ");
-            Text = hexString;
-        }
-        // Массив байт, к которому привязан TextBox
-        private byte[] _byteArray = new byte[8];
-
-        // Свойство для привязки массива байт
-        public byte[] ByteArray
-        {
-            get => _byteArray;
-            set
-            {
-                if (value == null || value.Length != 8)
-                    throw new ArgumentException("Byte array must have exactly 8 elements.");
-
-                _byteArray = value;
-                UpdateTextFromByteArray();
-            }
-        }
-
-
-        // Конструктор
+          // Конструктор
         public DataBox()
         {
-
-
-            // Инициализация массива значениями 0xFF
-            for (int i = 0; i < 8; i++)
-            {
-                _byteArray[i] = 0xFF;
-            }
+            Text = "FF FF FF FF FF FF FF FF";
 
             // Ограничиваем длину текста (8 байт * 2 символа + 7 пробелов)
             MaxLength = 23;
@@ -60,37 +30,6 @@ namespace CAN_Tool.CustomControls
 
             // Обработка вставки текста
             DataObject.AddPastingHandler(this, OnPaste);
-
-            // Инициализация текста
-            UpdateTextFromByteArray();
-        }
-
-        // Обновление текста в TextBox на основе массива байт
-        private void UpdateTextFromByteArray()
-        {
-            string hexString = BitConverter.ToString(_byteArray).Replace("-", " ");
-            Text = hexString;
-        }
-
-        // Обновление массива байт на основе текста в TextBox
-        private void UpdateByteArrayFromText()
-        {
-            string text = Text.Replace(" ", ""); // Удаляем пробелы
-            if (text.Length != 16) // 16 символов = 8 байт
-                return;
-
-            for (int i = 0; i < 8; i++)
-            {
-                string byteString = text.Substring(i * 2, 2);
-                if (byte.TryParse(byteString, System.Globalization.NumberStyles.HexNumber, null, out byte result))
-                {
-                    _byteArray[i] = result;
-                }
-                else
-                {
-                    _byteArray[i] = 0xFF; // В случае ошибки сбрасываем байт в 0xFF
-                }
-            }
         }
 
         // Обработка изменения текста
@@ -117,9 +56,6 @@ namespace CAN_Tool.CustomControls
 
             // Восстанавливаем позицию курсора
             CaretIndex = caretIndex;
-
-            // Обновляем массив байт
-            UpdateByteArrayFromText();
         }
 
         // Обработка ввода, чтобы разрешить только шестнадцатеричные символы

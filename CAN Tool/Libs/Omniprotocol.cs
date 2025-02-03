@@ -275,11 +275,6 @@ namespace OmniProtocol
             Data = new byte[8];
             for (var i = 0; i < 8; i++)
                 Data[i] = 0xff;
-
-            _byteArrayWrapper = new ByteArrayWrapper
-            {
-                ByteArray = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
-            };
         }
         public OmniMessage(CanMessage m) : this()
         {

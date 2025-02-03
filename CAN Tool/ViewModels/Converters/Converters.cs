@@ -557,4 +557,38 @@ namespace CAN_Tool.ViewModels.Converters
         }
     }
 
+    public class DataConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || value.GetType() != typeof(Byte[]))
+                return false;
+            return BitConverter.ToString((Byte[])value).Replace("-", " ");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            byte[] _byteArray = new byte[8];
+            if (value == null || value.GetType() != typeof(String))
+                return false;
+                string text = ((string)value).Replace(" ", ""); // Удаляем пробелы
+            if (text.Length != 16) // 16 символов = 8 байт
+                return false;
+
+            for (int i = 0; i < 8; i++)
+            {
+                string byteString = text.Substring(i * 2, 2);
+                if (byte.TryParse(byteString, NumberStyles.HexNumber, null, out byte result))
+                {
+                    _byteArray[i] = result;
+                }
+                else
+                {
+                    _byteArray[i] = 0xFF; // В случае ошибки сбрасываем байт в 0xFF
+                }
+            }
+            return _byteArray;
+        }
+    }
+
 }
