@@ -191,7 +191,6 @@
                                     </TextBox>
                                     <TextBlock Margin="5" VerticalAlignment="Center" FontSize="25">Data:</TextBlock>
                                     <cc:DataBox  ToolTip="Enter data in HEX format"   Text="{Binding CustomMessage.Data,Converter={StaticResource HexToDataConverter},UpdateSourceTrigger=PropertyChanged}" Margin="5 10"  Style="{StaticResource MaterialDesignTextBox}" FontSize="22" />
-                                    <cc:DataBox ToolTip="Enter data in HEX format" Text="{Binding CustomMessage.Data,Converter={StaticResource HexToDataConverter},UpdateSourceTrigger=PropertyChanged}" Margin="5 10" Style="{StaticResource MaterialDesignTextBox}" FontSize="22" />
                                     <Button Margin="5 10" Command="{Binding Path=SendCustomMessageCommand}" Cursor="Hand">
                                         <Button.Content>
                                             <fa:ImageAwesome Icon="Solid_AngleRight" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" />

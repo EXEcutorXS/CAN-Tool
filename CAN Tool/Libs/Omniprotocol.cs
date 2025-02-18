@@ -773,9 +773,9 @@ public partial class DeviceId : ObservableObject
 public partial class Omni : ObservableObject
 {
 
-    public static Dictionary<int, DeviceTemplate> Devices { set; get; }
-    public static Dictionary<int, PgnClass> Pgns { get; }
-    public static Dictionary<int, OmniCommand> Commands { get; }
+    public static Dictionary<int, DeviceTemplate> Devices { get; } = new();
+    public static Dictionary<int, PgnClass> Pgns { get; } = new();
+    public static Dictionary<int, OmniCommand> Commands { get; } = new();
 
     partial void SeedStaticData();
 
