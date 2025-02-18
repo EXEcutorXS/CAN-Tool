@@ -14,6 +14,7 @@ using ScottPlot.Drawing.Colormaps;
 using ScottPlot.Renderable;
 using VSCom.CanApi;
 using Windows.Devices.Input;
+using Windows.Networking;
 using static CAN_Tool.Libs.Helper;
 
 namespace CAN_Tool
@@ -185,12 +186,12 @@ namespace CAN_Tool
             canWrapper.Close();
         }
 
-        public void PortOpenNormal()
+        public void PortOpenNormal(string portName = VSCAN.VSCAN_FIRST_FOUND)
         {
             if (!PortOpened)
             {
                 PortOpened = true;
-                canWrapper.Open(VSCAN.VSCAN_FIRST_FOUND, VSCAN.VSCAN_MODE_NORMAL);
+                canWrapper.Open(portName, VSCAN.VSCAN_MODE_NORMAL);
                 canWrapper.SetSpeed(Speed);
                 canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
                 canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
@@ -203,12 +204,12 @@ namespace CAN_Tool
             }
         }
 
-        public void PortOpenSelfReception()
+        public void PortOpenSelfReception(string portName = VSCAN.VSCAN_FIRST_FOUND)
         {
             if (!PortOpened)
             {
                 PortOpened = true;
-                canWrapper.Open(VSCAN.VSCAN_FIRST_FOUND, VSCAN.VSCAN_MODE_SELF_RECEPTION);
+                canWrapper.Open(portName, VSCAN.VSCAN_MODE_SELF_RECEPTION);
                 canWrapper.SetSpeed(Speed);
                 canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
                 canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
@@ -221,12 +222,12 @@ namespace CAN_Tool
             }
         }
 
-        public void PortOpenListenOnly()
+        public void PortOpenListenOnly(string portName = VSCAN.VSCAN_FIRST_FOUND)
         {
             if (!PortOpened)
             {
                 PortOpened = true;
-                canWrapper.Open(VSCAN.VSCAN_FIRST_FOUND, VSCAN.VSCAN_MODE_LISTEN_ONLY);
+                canWrapper.Open(portName, VSCAN.VSCAN_MODE_LISTEN_ONLY);
                 canWrapper.SetSpeed(Speed);
                 canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
                 canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);

@@ -25,7 +25,7 @@ namespace OmniProtocol
         public static Dictionary<int, PgnClass> Pgns { get; } = new();
         public static Dictionary<int, OmniCommand> Commands { get; } = new();
 
-        public partial void SeedStaticData()
+        public void SeedStaticData()
         {
 
             Devices = new Dictionary<int, DeviceTemplate>() {
