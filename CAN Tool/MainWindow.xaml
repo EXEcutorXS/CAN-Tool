@@ -48,7 +48,7 @@
                         <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Content="{DynamicResource b_refreshPorts}" Margin="5" Command="{Binding Path=RefreshPortListCommand}" Cursor="Hand" />
                         <ComboBox Style="{StaticResource MaterialDesignComboBox}" x:Name="PortNameList" Margin="5" MinWidth="70" ItemsSource="{Binding PortList}" SelectedItem="{Binding PortName}" />
 
-                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="5" Content="{Binding PortButtonString,Mode=OneWay}" Command="{Binding TogglePortCommand}" Cursor="Hand" />
+                        <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="5" Content="{Binding PortButtonString,Mode=OneWay}" Command="{Binding TogglePortCommand}" Cursor="" />
 
                         <StackPanel Orientation="Horizontal">
 

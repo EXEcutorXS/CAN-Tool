@@ -21,7 +21,7 @@ namespace OmniProtocol
         private static readonly Dictionary<int, string> DefMeaningsAllow = new() { { 0, "t_disabled" }, { 1, "t_enabled" }, { 2, "t_no_data" }, { 3, "t_no_data" } };
         private static readonly Dictionary<int, string> Stages = new() { { 0, "STAGE_Z" }, { 1, "STAGE_P" }, { 2, "STAGE_H" }, { 3, "STAGE_W" }, { 4, "STAGE_F" }, { 5, "STAGE_T" }, { 6, "STAGE_M" } };
 
-        public static Dictionary<int, DeviceTemplate> Devices { set; get; } 
+        public static Dictionary<int, DeviceTemplate> Devices { set; get; } = new();
         public static Dictionary<int, PgnClass> Pgns { get; } = new();
         public static Dictionary<int, OmniCommand> Commands { get; } = new();
 

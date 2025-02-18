@@ -183,7 +183,6 @@ namespace CAN_Tool
                 canWrapper.Read(ref msgs, 1, ref readbytes);
                 GotNewMessage.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = new CanMessage(msgs[0]) });
             }
-            canWrapper.Close();
         }
 
         public void PortOpenNormal(string portName = VSCAN.VSCAN_FIRST_FOUND)
@@ -242,7 +241,12 @@ namespace CAN_Tool
 
 
 
-        public void PortClose() => PortOpened = false;
+        public void PortClose()
+            {
+            PortOpened = false;
+            canWrapper.Close();
+            
+            }
 
         public void SetBitrate(int bitrate) => canWrapper.SetSpeed(bitrate);
 
