@@ -121,6 +121,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="dll\vs_can_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Update="CustomControls\AcInverterControl.xaml">
       <SubType>Designer</SubType>
     </Page>
