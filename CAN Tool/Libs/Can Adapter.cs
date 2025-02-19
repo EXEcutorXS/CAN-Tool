@@ -52,6 +52,12 @@ namespace CAN_Tool
         [NotifyPropertyChangedFor(nameof(VerboseInfo), nameof(DataAsText))]
         [ObservableProperty] private byte[] data = new byte[8];
 
+        [ObservableProperty] private string statusString;
+
+        [NotifyPropertyChangedFor(nameof(StatusString))]
+        [ObservableProperty] private string errorCount;
+
+
 
 
         public string DataAsText => GetDataInTextFormat("", " ");
@@ -272,7 +278,7 @@ namespace CAN_Tool
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                
             }
         }
 

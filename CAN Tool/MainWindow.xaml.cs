@@ -30,12 +30,12 @@ namespace CAN_Tool
         public Settings()
         {
             Random random = new Random((int)DateTime.Now.Ticks);
-            Colors = new Color[140];
-            ShowFlag = new bool[140];
-            LineWidthes = new int[140];
-            LineStyles = new LineStyle[140];
-            MarkShapes = new MarkerShape[140];
-            for (int i = 0; i < 140; i++)
+            Colors = new Color[250];
+            ShowFlag = new bool[250];
+            LineWidthes = new int[250];
+            LineStyles = new LineStyle[250];
+            MarkShapes = new MarkerShape[250];
+            for (int i = 0; i < 250; i++)
             {
                 Colors[i] = Color.FromRgb((byte)random.Next(255), (byte)random.Next(255), (byte)random.Next(255));
                 LineWidthes[i] = 1;

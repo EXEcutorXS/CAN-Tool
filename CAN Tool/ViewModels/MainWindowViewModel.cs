@@ -117,9 +117,9 @@ namespace CAN_Tool.ViewModels
                 {
                     switch (SelectedCanMode)
                     {
-                        case 0: CanAdapter.PortOpenNormal(); break;
-                        case 1: CanAdapter.PortOpenListenOnly(); break;
-                        case 2: CanAdapter.PortOpenSelfReception(); break;
+                        case 0: CanAdapter.PortOpenNormal(PortName); break;
+                        case 1: CanAdapter.PortOpenListenOnly(PortName); break;
+                        case 2: CanAdapter.PortOpenSelfReception(PortName); break;
                     }
                     PortButtonString = GetString("b_close");
                 }

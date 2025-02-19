@@ -1,4 +1,5 @@
-﻿using OmniProtocol;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using OmniProtocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +24,6 @@ namespace CAN_Tool.CustomControls
     public partial class HeaterControl : UserControl
     {
         DeviceViewModel Vm => (DeviceViewModel)DataContext;
-
-        //public DeviceViewModel Vm => (DeviceViewModel)DataContext;
-        //private DispatcherTimer logTimer = new();
 
         public HeaterControl()
         {
