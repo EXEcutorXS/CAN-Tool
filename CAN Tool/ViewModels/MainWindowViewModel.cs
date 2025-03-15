@@ -42,7 +42,6 @@ namespace CAN_Tool.ViewModels
 
         public FirmwarePageViewModel FirmwarePage { set; get; }
         public ManualPageViewModel ManualPage { set; get; }
-        public CanPageViewModel CanPage { set; get; }
 
 
         [ObservableProperty] private bool canAdapterSettings = false;
@@ -524,7 +523,6 @@ namespace CAN_Tool.ViewModels
             OmniInstance.plot = myChart;
             FirmwarePage = new(this);
             ManualPage = new(this);
-            CanPage = new(this);
 
             CanAdapter.GotNewMessage += NewMessgeReceived;
 

@@ -224,9 +224,9 @@ namespace OmniProtocol
 
         [ObservableProperty] private bool secondMessages = false;
 
-        public BindingList<int> Serial { get; } = new() { 0, 0, 0 };
-        public BindingList<int> Firmware { get; } = new() { 0, 0, 0 ,0};
-        public BindingList<int> BootFirmware { get; } = new() { 0, 0, 0, 0 };
+        [ObservableProperty] public BindingList<int> serial  = new() { 0, 0, 0 };
+        [ObservableProperty] public BindingList<int> firmware = new() { 0, 0, 0 ,0};
+        [ObservableProperty] public BindingList<int> bootFirmware = new() { 0, 0, 0, 0 };
 
         public UpdatableList<StatusVariable> Status { get; } = new();
 

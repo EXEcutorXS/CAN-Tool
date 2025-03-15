@@ -1154,17 +1154,12 @@ namespace OmniProtocol
                     {
                         if (m.Data[0] != 123)
                         {
-                            senderDevice.Firmware[0] = m.Data[0];
-                            senderDevice.Firmware[1] = m.Data[1];
-                            senderDevice.Firmware[2] = m.Data[2];
-                            senderDevice.Firmware[3] = m.Data[3];
+                            senderDevice.Firmware = new BindingList<int> { m.Data[0], m.Data[1], m.Data[2], m.Data[3] };
+                            
                         }
                         else
                         {
-                            senderDevice.BootFirmware[0] = m.Data[0];
-                            senderDevice.BootFirmware[1] = m.Data[1];
-                            senderDevice.BootFirmware[2] = m.Data[2];
-                            senderDevice.BootFirmware[3] = m.Data[3];
+                            senderDevice.BootFirmware = new BindingList<int> { m.Data[0], m.Data[1], m.Data[2], m.Data[3] };
                         }
                         if (m.Data[5] != 0xff && m.Data[6] != 0xff && m.Data[7] != 0xff)
                             try

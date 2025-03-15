@@ -287,7 +287,7 @@ namespace OmniProtocol
             Pgns[12].parameters.Add(new() { Name = "Состояние реле печки кабины", BitLength = 2, StartByte = 7, StartBit = 2, Meanings = DefMeaningsOnOff, Var = 45 });
             Pgns[12].parameters.Add(new() { Name = "Состояние состояние канала сигнализации", BitLength = 2, StartByte = 7, StartBit = 4, Meanings = DefMeaningsOnOff, Var = 47 });
 
-            Pgns[13].parameters.Add(new() { Name = "Температура ИП", BitLength = 16, StartByte = 0, UnitT = UnitType.Temp, Var = 6 });
+            Pgns[13].parameters.Add(new() { Name = "Температура ИП", BitLength = 16, StartByte = 0, UnitT = UnitType.Temp, Signed=true, Var = 6 });
             Pgns[13].parameters.Add(new() { Name = "Температура платы/процессора", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, Var = 59 });
             Pgns[13].parameters.Add(new() { Name = "Температура жидкости", BitLength = 8, StartByte = 3, b = -75, UnitT = UnitType.Temp, Var = 40 });
             Pgns[13].parameters.Add(new() { Name = "Температура перегрева", BitLength = 8, StartByte = 4, b = -75, UnitT = UnitType.Temp, Var = 41 });
@@ -313,11 +313,11 @@ namespace OmniProtocol
             Pgns[17].parameters.Add(new() { Name = "10 канал АЦП ", BitLength = 16, StartByte = 4 });
             Pgns[17].parameters.Add(new() { Name = "11 канал АЦП ", BitLength = 16, StartByte = 6 });
 
-            Pgns[18].parameters.Add(new() { Name = "Вид изделия", BitLength = 8, StartByte = 0, GetMeaning = i => Devices[i]?.Name });
-            Pgns[18].parameters.Add(new() { Name = "Напряжение питания", BitLength = 8, StartByte = 1, Meanings = { { 0, "Универсальное ПО" }, { 1, "12 Вольт" }, { 2, "24 Вольта" } } });
-            Pgns[18].parameters.Add(new() { Name = "Версия ПО", BitLength = 8, StartByte = 2 });
-            Pgns[18].parameters.Add(new() { Name = "Модификация ПО", BitLength = 8, StartByte = 3 });
-            Pgns[18].parameters.Add(new() { Name = "Дата релиза", BitLength = 24, StartByte = 5, GetMeaning = v => $"{v >> 16}.{(v >> 8) & 0xF}.{v & 0xFF}" });
+            Pgns[18].parameters.Add(new() { Name = "Вид изделия", BitLength = 8, StartByte = 0, CustomDecoder = i => $"{i[0]}.{i[1]}.{i[2]}.{i[3]}\r\n" });
+            //Pgns[18].parameters.Add(new() { Name = "Напряжение питания", BitLength = 8, StartByte = 1, Meanings = { { 0, "Универсальное ПО" }, { 1, "12 Вольт" }, { 2, "24 Вольта" } } });
+            //Pgns[18].parameters.Add(new() { Name = "Версия ПО", BitLength = 8, StartByte = 2 });
+            //Pgns[18].parameters.Add(new() { Name = "Модификация ПО", BitLength = 8, StartByte = 3 });
+            Pgns[18].parameters.Add(new() { Name = "Дата релиза", BitLength = 24, StartByte = 5, GetMeaning = v => $"{v >> 16}.{(v >> 8) & 0xF}.{v & 0xFF}\r\n" });
             //Pgns[18].parameters.Add(new () { Name = "День ", BitLength = 8, StartByte = 5 });    Не красиво выглядит...луше одной строкой
             //Pgns[18].parameters.Add(new () { Name = "Месяц", BitLength = 8, StartByte = 6 });
             //Pgns[18].parameters.Add(new () { Name = "Год", BitLength = 8, StartByte = 7 });
