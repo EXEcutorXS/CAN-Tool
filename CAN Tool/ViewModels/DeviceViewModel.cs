@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -318,14 +319,38 @@ namespace OmniProtocol
                 LogCurrentPos++;
             }
             else
-                LogStop();
+            {
+                saveLog();
+                LogStart();
+            }
+              
         }
 
-        public void LogInit(int length = 14400)
+        public void saveLog()
+        {
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DeviceReference.Name + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
+
+            using (var sw = new StreamWriter(path))
+            {
+                foreach (var v in Status)
+                    sw.Write(GetString($"vars_{v.Id}") + ";");
+                sw.WriteLine();
+                for (var i = 0; i < LogCurrentPos; i++)
+                {
+                    foreach (var v in Status)
+                        sw.Write(LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
+                    sw.WriteLine();
+                }
+                sw.Flush();
+                sw.Close();
+            }
+        }
+
+        public void LogInit(int length = 86400)
         {
             LogCurrentPos = 0;
             LogData = new List<double[]>();
-            for (var i = 0; i < 150; i++) //Переменных в paramsname.h пока намного меньше, но поставим пока 150
+            for (var i = 0; i < 200; i++) //Переменных в paramsname.h пока намного меньше, но поставим пока 200
             {
                 LogData.Add(new double[length]);
             }

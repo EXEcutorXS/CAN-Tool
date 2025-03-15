@@ -381,22 +381,7 @@ namespace CAN_Tool.ViewModels
         [RelayCommand]
         private void SaveLog(object parameter)
         {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + OmniInstance.SelectedConnectedDevice.Id.Type + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
-
-            using (var sw = new StreamWriter(path))
-            {
-                foreach (var v in OmniInstance.SelectedConnectedDevice.Status)
-                    sw.Write(GetString($"vars_{v.Id}") + ";");
-                sw.WriteLine();
-                for (var i = 0; i < OmniInstance.SelectedConnectedDevice.LogCurrentPos; i++)
-                {
-                    foreach (var v in OmniInstance.SelectedConnectedDevice.Status)
-                        sw.Write(OmniInstance.SelectedConnectedDevice.LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
-                    sw.WriteLine();
-                }
-                sw.Flush();
-                sw.Close();
-            }
+            OmniInstance.SelectedConnectedDevice.saveLog();
         }
 
 
