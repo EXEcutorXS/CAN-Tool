@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="dll\vs_can_api.dll" />
     <None Remove="Images\1.jpg" />
     <None Remove="Images\10.jpg" />
     <None Remove="Images\11.jpg" />
@@ -63,6 +64,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <DesignData Include="dll\vs_can_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </DesignData>
     <Content Include="Images\CANTool.ico" />
   </ItemGroup>
 
@@ -121,12 +125,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="dll\vs_can_api.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Page Update="CustomControls\AcInverterControl.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -135,5 +133,12 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+
+	<ItemGroup>
+		<ContentWithTargetPath Include="dll\vs_can_api.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>vs_can_api.dll</TargetPath>
+		</ContentWithTargetPath >
+	</ItemGroup>
 
 </Project>
