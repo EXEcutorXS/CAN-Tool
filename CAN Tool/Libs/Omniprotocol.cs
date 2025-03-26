@@ -213,7 +213,7 @@ namespace OmniProtocol
         [ObservableProperty] public int compressorRevsMeasured;
         [ObservableProperty] public float compressorCurrent;
         [ObservableProperty] public float condensorCurrent;
-        [ObservableProperty] public float condensorPwmSet;
+        [ObservableProperty] public int condensorPwmSet;
     }
 
     public partial class Timberline20OmniViewModel : ObservableObject
@@ -1060,13 +1060,13 @@ namespace OmniProtocol
                             senderDevice.ACInverterParams.CondensorPwmSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                             break;
                         case 138:
-                            senderDevice.ACInverterParams.CompressorCurrent = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                            senderDevice.ACInverterParams.CompressorCurrent = (float)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                             break;
                         case 139:
-                            senderDevice.ACInverterParams.CondensorCurrent = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                            senderDevice.ACInverterParams.CondensorCurrent = (float)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                             break;
                         case 145:
-                            senderDevice.Parameters.PcbTemp = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                            senderDevice.Parameters.PcbTemp = (float)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                             break;
                     }
                 }
