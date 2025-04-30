@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using static CAN_Tool.Libs.Helper;
+
 namespace CAN_Tool.ViewModels
 {
 
@@ -164,7 +167,7 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new()
             {
                 Pgn = 105,
-                ReceiverId = new(123,0),
+                ReceiverId = new(123, 0),
                 Data =
                 {
                     [0] = 2
@@ -274,6 +277,11 @@ namespace CAN_Tool.ViewModels
 
         private void UpdateFirmware(List<CodeFragment> fragmentsArg)
         {
+            if (fragmentsArg.Count == 0)
+            {
+                MessageBox.Show(GetString("t_load_hex_first"));
+                return;
+            }
             LogWriteLine("Starting Firmware updating procedure");
             if (!Vm.OmniInstance.CurrentTask.Capture("Memory Erasing")) return;
             LogWriteLine("Starting flash erasing");
@@ -300,7 +308,7 @@ namespace CAN_Tool.ViewModels
 
         }
         #region oldVersionBootloader
-        
+
         private void flashFragmentOld(CodeFragment f)
         {
             writeFragmentToRamOld(f);
@@ -339,8 +347,8 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new()
             {
                 Pgn = 100,
-                TransmitterId = new DeviceId(126,6),
-                ReceiverId = new DeviceId(123,0)
+                TransmitterId = new DeviceId(126, 6),
+                ReceiverId = new DeviceId(123, 0)
             };
             msg.Data[0] = 1;
 
@@ -355,7 +363,7 @@ namespace CAN_Tool.ViewModels
             {
                 Pgn = 101,
                 TransmitterId = new DeviceId(126, 6),
-                ReceiverId = new DeviceId(123,0)
+                ReceiverId = new DeviceId(123, 0)
             };
             LogWriteLine($"Starting {f.StartAddress:X} fragment transmission");
             for (int i = 0; i < (f.Length + 7) / 8; i++)
@@ -420,7 +428,7 @@ namespace CAN_Tool.ViewModels
             Vm.OmniInstance.CurrentTask.OnDone();
 
         }
-        
+
         #endregion
 
         private void AddFragment(CodeFragment fragment)
@@ -480,7 +488,7 @@ namespace CAN_Tool.ViewModels
                                 AddFragment(currentFragment);
                                 currentFragment = new CodeFragment(maxFragmentSize);
                             }
-                        
+
                         break;
                     case 4:
                         if (currentFragment.Length != 0)
