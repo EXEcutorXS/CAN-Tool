@@ -45,10 +45,8 @@
     <None Remove="Images\2.jpg" />
     <None Remove="Images\21.jpg" />
     <None Remove="Images\23.jpg" />
-    <None Remove="Images\24.jpg" />
     <None Remove="Images\25.jpg" />
     <None Remove="Images\27.jpg" />
-    <None Remove="Images\28.jpg" />
     <None Remove="Images\29.jpg" />
     <None Remove="Images\3.jpg" />
     <None Remove="Images\34.jpg" />
@@ -56,6 +54,8 @@
     <None Remove="Images\40.jpg" />
     <None Remove="Images\41.jpg" />
     <None Remove="Images\42.jpg" />
+    <None Remove="Images\43.jpg" />
+    <None Remove="Images\44.jpg" />
     <None Remove="Images\50.jpg" />
     <None Remove="Images\6.jpg" />
     <None Remove="Images\7.jpg" />
@@ -97,10 +97,8 @@
     <Resource Include="Images\2.jpg" />
     <Resource Include="Images\21.jpg" />
     <Resource Include="Images\23.jpg" />
-    <Resource Include="Images\24.jpg" />
     <Resource Include="Images\25.jpg" />
     <Resource Include="Images\27.jpg" />
-    <Resource Include="Images\28.jpg" />
     <Resource Include="Images\29.jpg" />
     <Resource Include="Images\3.jpg" />
     <Resource Include="Images\34.jpg" />
@@ -108,6 +106,8 @@
     <Resource Include="Images\40.jpg" />
     <Resource Include="Images\41.jpg" />
     <Resource Include="Images\42.jpg" />
+    <Resource Include="Images\43.jpg" />
+    <Resource Include="Images\44.jpg" />
     <Resource Include="Images\50.jpg" />
     <Resource Include="Images\6.jpg" />
     <Resource Include="Images\7.jpg" />
@@ -138,7 +138,7 @@
 		<ContentWithTargetPath Include="dll\vs_can_api.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>vs_can_api.dll</TargetPath>
-		</ContentWithTargetPath >
+		</ContentWithTargetPath>
 	</ItemGroup>
 
 </Project>
