@@ -6,7 +6,7 @@ namespace OmniProtocol
 {
     public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency }
 
-    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter }
+    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter, AcControl }
 
     public enum LoadMode_t { Off = 0, Toggle = 1, Pwm = 2 };
 
@@ -69,6 +69,7 @@ namespace OmniProtocol
             { 44, new() { Id = 44, DevType = DeviceType.Binar, MaxBlower = 90, MaxFuelPump = 4.3 } },
             { 50, new() { Id = 50, DevType = DeviceType.AcInverter }} ,
             { 123, new() { Id = 123, DevType = DeviceType.BootLoader }} ,
+            { 124, new() { Id = 124, DevType = DeviceType.AcControl }},
             { 126, new() { Id = 126, DevType = DeviceType.Hcu }},
             { 255, new() { Id = 255 }}
         };
@@ -514,12 +515,14 @@ namespace OmniProtocol
             Pgns[47].parameters.Add(new() { Name = "t_overriden_glow_plug_power", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
             Pgns[47].parameters.Add(new() { Name = "t_overriden_fuel_pump_frequency", BitLength = 16, StartByte = 5, a = 0.01, UnitT = UnitType.Frequency });
 
-            Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 1, UnitT = UnitType.Rps, Var = 134, PackNumber = 1 });
-            Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 135, PackNumber = 1 });
-            Pgns[50].parameters.Add(new() { Name = "t_condensor_pwm", BitLength = 16, StartByte = 3, UnitT = UnitType.Percent, a = 0.01, Var = 136, PackNumber = 1 }); ;
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" }}, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 134, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, Var = 135, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 146, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Percent, PackNumber = 1 });
 
             Pgns[50].parameters.Add(new() { Name = "t_compressor_current", BitLength = 16, StartByte = 1, UnitT = UnitType.Current, a = 0.01, Var = 138, PackNumber = 2 });
-            Pgns[50].parameters.Add(new() { Name = "t_condensor_current", BitLength = 16, StartByte = 3, UnitT = UnitType.Current, a = 0.01, PackNumber = 2 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_current", BitLength = 16, StartByte = 3, UnitT = UnitType.Current, a = 0.01, Var = 139, PackNumber = 2 });
             Pgns[50].parameters.Add(new() { Name = "t_mcu_temp", BitLength = 8, StartByte = 5, UnitT = UnitType.Temp, b = -75, Var = 59, PackNumber = 2 });
             Pgns[50].parameters.Add(new() { Name = "t_pcb_temp", BitLength = 8, StartByte = 6, UnitT = UnitType.Temp, b = -75, Var = 145, PackNumber = 2 });
 
@@ -527,9 +530,16 @@ namespace OmniProtocol
             Pgns[50].parameters.Add(new() { Name = "t_low_pressure", BitLength = 16, StartByte = 3, UnitT = UnitType.Pressure, PackNumber = 3, a = 0.01 });
             Pgns[50].parameters.Add(new() { Name = "t_ac_press_sensor", BitLength = 8, StartByte = 5, Meanings = DefMeaningsAllow, PackNumber = 3 });
 
-            Pgns[51].parameters.Add(new() { Name = "t_ac_mode", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_off" }, { 1, "t_cool" }, { 2, "t_dry" }, { 3, "t_eco" }, { 4, "t_night" }, { 5, "t_power" } }, PackNumber = 1 });
-            Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" } }, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 134, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, Var = 135, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 146, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Percent, PackNumber = 4 });
+
+            Pgns[51].parameters.Add(new() { Name = "t_ac_mode", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_off" }, { 1, "t_cool" }, { 2, "t_dry" }, { 3, "t_eco" }, { 4, "t_night" }, { 5, "t_power" }, { 5, "t_manual" } }, PackNumber = 1 });
+            Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, Var = 143, PackNumber = 1 });
             Pgns[51].parameters.Add(new() { Name = "t_ac_fan_mode", BitLength = 8, StartByte = 3, Meanings = { { 0, "t_auto" }, { 1, "t_1st_speed" }, { 2, "t_2nd_speed" }, { 3, "t_3rd_speed" }, { 4, "t_4th_speed" }, { 5, "t_5th_speed" } }, PackNumber = 1 });
+            
             Pgns[51].parameters.Add(new() { Name = "t_ac_current_evap_pwm", BitLength = 16, StartByte = 4, UnitT = UnitType.Percent, PackNumber = 1, Var = 137 });
             Pgns[51].parameters.Add(new() { Name = "t_ac_measured_evap_rev", BitLength = 8, StartByte = 6, UnitT = UnitType.Rps, PackNumber = 1 });
 
