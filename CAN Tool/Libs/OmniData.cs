@@ -4,7 +4,7 @@ using static CAN_Tool.Libs.Helper;
 
 namespace OmniProtocol
 {
-    public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency }
+    public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency,Power }
 
     public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter, AcControl }
 
@@ -125,7 +125,7 @@ namespace OmniProtocol
             Pgns.Add(48, new() { id = 48, name = "t_test_report" });
             Pgns.Add(49, new() { id = 49, name = "t_generic_load_control" });
             Pgns.Add(50, new() { id = 50, name = "t_compressor_control",multiPack=true });
-            Pgns.Add(51, new() { id = 51, name = "t_ac_control" });
+            Pgns.Add(51, new() { id = 51, name = "t_ac_control", multiPack = true });
             Pgns.Add(52, new() { id = 52, name = "t_ac_manual_control" });
             Pgns.Add(55, new() { id = 55, name = "t_tank_levels" });
             Pgns.Add(99, new() { id = 99, name = "t_debug_pack" });
@@ -519,7 +519,7 @@ namespace OmniProtocol
             Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 134, PackNumber = 1 });
             Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, Var = 135, PackNumber = 1 });
             Pgns[50].parameters.Add(new() { Name = "t_compressor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 146, PackNumber = 1 });
-            Pgns[50].parameters.Add(new() { Name = "t_compressor_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Percent, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_power_set", BitLength = 16, StartByte = 6, UnitT = UnitType.Power, PackNumber = 1 });
 
             Pgns[50].parameters.Add(new() { Name = "t_compressor_current", BitLength = 16, StartByte = 1, UnitT = UnitType.Current, a = 0.01, Var = 138, PackNumber = 2 });
             Pgns[50].parameters.Add(new() { Name = "t_condensor_current", BitLength = 16, StartByte = 3, UnitT = UnitType.Current, a = 0.01, Var = 139, PackNumber = 2 });

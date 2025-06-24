@@ -887,7 +887,7 @@ d_42	Generic Load(Tripple)	Нагрузка трёхканальная
 d_50	AD Driver	Инвертор кондиционера
 d_60	Pressure sensor	Датчик давления
 d_123	Bootloader	Программный загрузчик
-d_124	Mobile App	Мобильное приложение
+d_124	AC control	Пульт кондиционера
 d_126	Control device	Устройство управления
 d_127	Everyone	Все
 		
