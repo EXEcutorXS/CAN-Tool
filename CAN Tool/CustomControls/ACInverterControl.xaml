@@ -26,12 +26,12 @@
         <TextBlock Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Firmware,Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" FontSize="20" />
         <TextBlock Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding ProductionDate}" VerticalAlignment="Center" FontSize="20" />
         <TextBlock Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding Serial,Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" FontSize="20" />
-        <ProgressBar Margin="10" Minimum="0" Maximum="65" Grid.Column="2" Grid.Row="0" Value="{Binding ACInverterParams.CompressorRevsSet}" Height="30"></ProgressBar>
-        <ProgressBar Margin="10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="1" Value="{Binding ACInverterParams.CompressorRevsMeasured}" Height="30"></ProgressBar>
+        <ProgressBar Margin="10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="0" Value="{Binding ACInverterParams.CompressorPwmsSet}" Height="30"></ProgressBar>
+        <ProgressBar Margin="10" Minimum="0" Maximum="60" Grid.Column="2" Grid.Row="1" Value="{Binding ACInverterParams.CompressorRevsMeasured}" Height="30"></ProgressBar>
         <ProgressBar Margin="10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="2" Value="{Binding GenericLoadTripple.PwmLevel3}" Height="30"></ProgressBar>
-        <Slider x:Name="CompressorRevSlider" Minimum="0" Maximum="65" Grid.Column="2" Grid.Row="0" Height="30" Margin="0 14 0 5" ValueChanged="CompressorRevsChanged" />
+        <Slider x:Name="CompressorRevSlider" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="0" Height="30" Margin="0 14 0 5" ValueChanged="CompressorPwmChanged" />
         <Slider x:Name="CondensorPwmSet" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="2" Height="30" Margin="0 14 0 5" ValueChanged="CondPwmChanged" />
-        <TextBlock Text="{Binding ACInverterParams.CompressorRevsSet,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="0" d:Text="45" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding ACInverterParams.CompressorPwmsSet,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="0" d:Text="45" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <TextBlock Text="{Binding ACInverterParams.CompressorRevsMeasured,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="1" d:Text="44" VerticalAlignment="Center" HorizontalAlignment="Center" />
         <TextBlock Text="{Binding ACInverterParams.CondensorPwmSet,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="2" d:Text="90%" VerticalAlignment="Center" HorizontalAlignment="Center" />
         <TextBlock Text="{Binding Parameters.PcbTemp,Mode=OneWay,StringFormat={}PCB Temp: {0}}"  Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" d:Text="PCB Temp: 67°" VerticalAlignment="Center" HorizontalAlignment="Left"/>

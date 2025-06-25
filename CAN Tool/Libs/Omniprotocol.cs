@@ -209,11 +209,12 @@ namespace OmniProtocol
 
     public partial class ACInverterViewModel : ObservableObject
     {
+        [ObservableProperty] public double compressorPwmsSet;
         [ObservableProperty] public int compressorRevsSet;
         [ObservableProperty] public int compressorRevsMeasured;
         [ObservableProperty] public float compressorCurrent;
         [ObservableProperty] public float condensorCurrent;
-        [ObservableProperty] public int condensorPwmSet;
+        [ObservableProperty] public double condensorPwmSet;
     }
 
     public partial class Timberline20OmniViewModel : ObservableObject
@@ -1343,11 +1344,23 @@ namespace OmniProtocol
                 case 50:
                     switch (m.Data[0])
                     {
-                        case 0:
-                            if (m.Data[1] != 255)
-                                senderDevice.ACInverterParams.CompressorRevsSet = m.Data[1];
+                        case 1:
+                            if (m.Data[4] != 255 || m.Data[5] != 255)
+                                senderDevice.ACInverterParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5])/100.0;
                             if (m.Data[2] != 255)
-                                senderDevice.ACInverterParams.CompressorRevsMeasured = m.Data[2];
+                                senderDevice.ACInverterParams.CompressorRevsMeasured = m.Data[3];
+                            break;
+                        case 2:
+                            if (m.Data[1] != 255 || m.Data[2] != 255)
+                                senderDevice.ACInverterParams.CompressorCurrent = (m.Data[1] * 256 + m.Data[2]) * 10;
+                            if (m.Data[3] != 255 || m.Data[4] != 255)
+                                senderDevice.ACInverterParams.CondensorCurrent = (m.Data[3] * 256 + m.Data[4]) * 10;
+                            break;
+                        case 4:
+                            if (m.Data[4] != 255 || m.Data[5] != 255)
+                                senderDevice.ACInverterParams.CondensorPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                            if (m.Data[2] != 255)
+                                senderDevice.ACInverterParams.CompressorRevsMeasured = m.Data[3];
                             break;
 
                     }

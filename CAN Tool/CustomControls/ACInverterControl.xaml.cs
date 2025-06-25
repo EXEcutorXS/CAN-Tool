@@ -37,20 +37,21 @@ namespace CAN_Tool.CustomControls
             m.ReceiverId.Type = vm.Id.Type;
             m.ReceiverId.Address = vm.Id.Address;
             m.Pgn = 50;
-            m.Data = new byte[] { 1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-            m.Data[3] = (byte)((uint)((sender as Slider).Value * 100) >> 8);
-            m.Data[4] = (byte)((uint)((sender as Slider).Value * 100));
+            m.Data = new byte[] { 4, 0, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            m.Data[4] = (byte)((uint)((sender as Slider).Value * 100) >> 8);
+            m.Data[5] = (byte)((uint)((sender as Slider).Value * 100));
             vm.Transmit(m.ToCanMessage());
         }
 
-        private void CompressorRevsChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void CompressorPwmChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             OmniMessage m = new();
             m.ReceiverId.Type = vm.Id.Type;
             m.ReceiverId.Address = vm.Id.Address;
             m.Pgn = 50;
-            m.Data = new byte[] { 0x1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-            m.Data[1] = (byte)Math.Round((sender as Slider).Value);
+            m.Data = new byte[] { 1, 0, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            m.Data[4] = (byte)((uint)((sender as Slider).Value * 100) >> 8);
+            m.Data[5] = (byte)((uint)((sender as Slider).Value * 100));
             vm.Transmit(m.ToCanMessage());
         }
     }

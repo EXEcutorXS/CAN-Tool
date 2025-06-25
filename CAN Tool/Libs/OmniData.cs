@@ -4,7 +4,7 @@ using static CAN_Tool.Libs.Helper;
 
 namespace OmniProtocol
 {
-    public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency,Power }
+    public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency, Power }
 
     public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter, AcControl }
 
@@ -124,9 +124,9 @@ namespace OmniProtocol
             Pgns.Add(47, new() { id = 47, name = "t_actuator_override" });
             Pgns.Add(48, new() { id = 48, name = "t_test_report" });
             Pgns.Add(49, new() { id = 49, name = "t_generic_load_control" });
-            Pgns.Add(50, new() { id = 50, name = "t_compressor_control",multiPack=true });
+            Pgns.Add(50, new() { id = 50, name = "t_compressor_control", multiPack = true });
             Pgns.Add(51, new() { id = 51, name = "t_ac_control", multiPack = true });
-            Pgns.Add(52, new() { id = 52, name = "t_ac_manual_control" });
+            Pgns.Add(52, new() { id = 52, name = "t_ac_manual_control", multiPack = true });
             Pgns.Add(55, new() { id = 55, name = "t_tank_levels" });
             Pgns.Add(99, new() { id = 99, name = "t_debug_pack" });
             Pgns.Add(100, new() { id = 100, name = "t_memory_control_old", multiPack = true });
@@ -158,7 +158,7 @@ namespace OmniProtocol
             Commands.Add(70, new() { Id = 70 });
 
 
-            
+
             Commands[0].Parameters.Add(new() { StartByte = 2, BitLength = 8, GetMeaning = i => (GetString("t_device") + ": " + GetString($"d_{i}") + ";"), AnswerOnly = true }); ;
             Commands[0].Parameters.Add(new() { StartByte = 3, BitLength = 8, Meanings = { { 0, "t_12 volts" }, { 1, "t_24_volts" } }, AnswerOnly = true });
             Commands[0].Parameters.Add(new() { StartByte = 4, BitLength = 8, Name = "t_firmware", AnswerOnly = true });
@@ -237,9 +237,9 @@ namespace OmniProtocol
             Commands[70].Parameters.Add(new() { StartByte = 2, StartBit = 4, BitLength = 2, Name = "t_glow_plug_state", Meanings = DefMeaningsOnOff });
             Commands[70].Parameters.Add(new() { StartByte = 2, StartBit = 6, BitLength = 2, Name = "t_pump_state", Meanings = DefMeaningsOnOff });
             Commands[70].Parameters.Add(new() { StartByte = 3, StartBit = 0, BitLength = 2, Name = "t_blower_state", Meanings = DefMeaningsOnOff });
-            
 
-            
+
+
 
             Pgns[3].parameters.Add(new() { Name = "SPN", BitLength = 16, StartByte = 0 });
 
@@ -288,7 +288,7 @@ namespace OmniProtocol
             Pgns[12].parameters.Add(new() { Name = "Состояние реле печки кабины", BitLength = 2, StartByte = 7, StartBit = 2, Meanings = DefMeaningsOnOff, Var = 45 });
             Pgns[12].parameters.Add(new() { Name = "Состояние состояние канала сигнализации", BitLength = 2, StartByte = 7, StartBit = 4, Meanings = DefMeaningsOnOff, Var = 47 });
 
-            Pgns[13].parameters.Add(new() { Name = "Температура ИП", BitLength = 16, StartByte = 0, UnitT = UnitType.Temp, Signed=true, Var = 6 });
+            Pgns[13].parameters.Add(new() { Name = "Температура ИП", BitLength = 16, StartByte = 0, UnitT = UnitType.Temp, Signed = true, Var = 6 });
             Pgns[13].parameters.Add(new() { Name = "Температура платы/процессора", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, Var = 59 });
             Pgns[13].parameters.Add(new() { Name = "Температура жидкости", BitLength = 8, StartByte = 3, b = -75, UnitT = UnitType.Temp, Var = 40 });
             Pgns[13].parameters.Add(new() { Name = "Температура перегрева", BitLength = 8, StartByte = 4, b = -75, UnitT = UnitType.Temp, Var = 41 });
@@ -515,7 +515,7 @@ namespace OmniProtocol
             Pgns[47].parameters.Add(new() { Name = "t_overriden_glow_plug_power", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
             Pgns[47].parameters.Add(new() { Name = "t_overriden_fuel_pump_frequency", BitLength = 16, StartByte = 5, a = 0.01, UnitT = UnitType.Frequency });
 
-            Pgns[50].parameters.Add(new() { Name = "t_compressor_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" }}, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" } }, PackNumber = 1 });
             Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 134, PackNumber = 1 });
             Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, Var = 135, PackNumber = 1 });
             Pgns[50].parameters.Add(new() { Name = "t_compressor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 146, PackNumber = 1 });
@@ -534,23 +534,27 @@ namespace OmniProtocol
             Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 134, PackNumber = 4 });
             Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, Var = 135, PackNumber = 4 });
             Pgns[50].parameters.Add(new() { Name = "t_condensor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 146, PackNumber = 4 });
-            Pgns[50].parameters.Add(new() { Name = "t_condensor_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Percent, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Power, PackNumber = 4 });
 
             Pgns[51].parameters.Add(new() { Name = "t_ac_mode", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_off" }, { 1, "t_cool" }, { 2, "t_dry" }, { 3, "t_eco" }, { 4, "t_night" }, { 5, "t_power" }, { 6, "t_manual" } }, PackNumber = 1 });
             Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, Var = 143, PackNumber = 1 });
             Pgns[51].parameters.Add(new() { Name = "t_ac_fan_mode", BitLength = 8, StartByte = 3, Meanings = { { 0, "t_auto" }, { 1, "t_1st_speed" }, { 2, "t_2nd_speed" }, { 3, "t_3rd_speed" }, { 4, "t_4th_speed" }, { 5, "t_5th_speed" } }, PackNumber = 1 });
-            
-            Pgns[51].parameters.Add(new() { Name = "t_ac_current_evap_pwm", BitLength = 16, StartByte = 4, UnitT = UnitType.Percent, PackNumber = 1, Var = 137 });
-            Pgns[51].parameters.Add(new() { Name = "t_ac_measured_evap_rev", BitLength = 8, StartByte = 6, UnitT = UnitType.Rps, PackNumber = 1 });
 
-            Pgns[51].parameters.Add(new() { Name = "t_ac_intake_air_t", BitLength = 8, StartByte = 1, b = -75, UnitT = UnitType.Temp, PackNumber = 2 });
-            Pgns[51].parameters.Add(new() { Name = "t_ac_evap_t", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 2 });
-            Pgns[51].parameters.Add(new() { Name = "t_ac_cond_in_t", BitLength = 8, StartByte = 3, b = -75, UnitT = UnitType.Temp, PackNumber = 2 });
-            Pgns[51].parameters.Add(new() { Name = "t_ac_cond_out_t", BitLength = 8, StartByte = 4, b = -75, UnitT = UnitType.Temp, PackNumber = 2 });
+            Pgns[51].parameters.Add(new() { Name = "t_evap_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" } }, PackNumber = 2 });
+            Pgns[51].parameters.Add(new() { Name = "t_evap_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 134, PackNumber = 2 });
+            Pgns[51].parameters.Add(new() { Name = "t_evap_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, Var = 135, PackNumber = 2 });
+            Pgns[51].parameters.Add(new() { Name = "t_evap_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 146, PackNumber = 2 });
+            Pgns[51].parameters.Add(new() { Name = "t_evap_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Power, PackNumber = 2 });
 
-            Pgns[52].parameters.Add(new() { Name = "t_ac_man_comp_rev_set", BitLength = 8, StartByte = 0, UnitT = UnitType.Rps });
+            Pgns[51].parameters.Add(new() { Name = "t_ac_cabin_air_t", BitLength = 8, StartByte = 1, b = -75, UnitT = UnitType.Temp, PackNumber = 3 ,Var = 149});
+            Pgns[51].parameters.Add(new() { Name = "t_ac_evap_t", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 3 ,Var = 148});
+            Pgns[51].parameters.Add(new() { Name = "t_ac_aux1_t", BitLength = 8, StartByte = 3, b = -75, UnitT = UnitType.Temp, PackNumber = 3 });
+            Pgns[51].parameters.Add(new() { Name = "t_ac_aux2_t", BitLength = 8, StartByte = 4, b = -75, UnitT = UnitType.Temp, PackNumber = 3 });
+
+
             Pgns[52].parameters.Add(new() { Name = "t_ac_man_evap_pwm_set", BitLength = 16, StartByte = 1, UnitT = UnitType.Percent, a = 0.01 });
             Pgns[52].parameters.Add(new() { Name = "t_ac_man_cond_pwm_set", BitLength = 16, StartByte = 3, UnitT = UnitType.Percent, a = 0.01 });
+            Pgns[52].parameters.Add(new() { Name = "t_ac_man_comp_pwm_set", BitLength = 16, StartByte = 5, UnitT = UnitType.Percent, a = 0.01 });
 
             Pgns[55].parameters.Add(new() { Name = "t_tank1_level", BitLength = 8, StartByte = 0, UnitT = UnitType.Percent });
             Pgns[55].parameters.Add(new() { Name = "t_tank2_level", BitLength = 8, StartByte = 1, UnitT = UnitType.Percent });
@@ -585,7 +589,7 @@ namespace OmniProtocol
 
             Pgns[101].parameters.Add(new() { Name = "Первое слово", BitLength = 32, StartByte = 0, GetMeaning = r => $"1st: 0X{(r):X}" });
             Pgns[101].parameters.Add(new() { Name = "Второе слово", BitLength = 32, StartByte = 4, GetMeaning = r => $"2nd: 0X{(r):X}" });
-            
+
         }
     }
 }
