@@ -532,7 +532,7 @@ namespace OmniProtocol
 
             Pgns[50].parameters.Add(new() { Name = "t_condensor_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" } }, PackNumber = 4 });
             Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 134, PackNumber = 4 });
-            Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, Var = 135, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, PackNumber = 4 });
             Pgns[50].parameters.Add(new() { Name = "t_condensor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 146, PackNumber = 4 });
             Pgns[50].parameters.Add(new() { Name = "t_condensor_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Power, PackNumber = 4 });
 

@@ -36,6 +36,7 @@
     <None Remove="Images\11.jpg" />
     <None Remove="Images\12.jpg" />
     <None Remove="Images\123.jpg" />
+    <None Remove="Images\124.jpg" />
     <None Remove="Images\125.jpg" />
     <None Remove="Images\126.jpg" />
     <None Remove="Images\13.jpg" />
@@ -88,6 +89,7 @@
     <Resource Include="Images\11.jpg" />
     <Resource Include="Images\12.jpg" />
     <Resource Include="Images\123.jpg" />
+    <Resource Include="Images\124.jpg" />
     <Resource Include="Images\125.jpg" />
     <Resource Include="Images\126.jpg" />
     <Resource Include="Images\13.jpg" />

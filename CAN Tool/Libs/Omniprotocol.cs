@@ -1347,8 +1347,6 @@ namespace OmniProtocol
                         case 1:
                             if (m.Data[4] != 255 || m.Data[5] != 255)
                                 senderDevice.ACInverterParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5])/100.0;
-                            if (m.Data[2] != 255)
-                                senderDevice.ACInverterParams.CompressorRevsMeasured = m.Data[3];
                             break;
                         case 2:
                             if (m.Data[1] != 255 || m.Data[2] != 255)
