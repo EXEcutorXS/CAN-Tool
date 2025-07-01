@@ -589,6 +589,11 @@ var_142	Low pressure sensor	Дачик низкого давления
 var_143	AC Temperature setpoint	Уставка температуры кондиционера
 var_144	AC Fan mode	Режим вентилятора кондиционера
 var_145	PCB Temperature	Темп.платы
+var_146	Compressor PWM	ШИМ компрессора
+var_147	Evaporator fan PWM	ШИМ Вент.Испарителя
+var_148	Evaporator temperature	Температура испарителя
+var_149	Cabin temperature	Температура кабины
+var_150	AC AUX Temperature 1	Доп датчик температуры 1
 		
 		
 		
@@ -756,6 +761,11 @@ vars_142	Lo.pres.	Низ.давл
 vars_143	AC T set	Уст Темп
 vars_144	AC Fan mod	Реж.вент
 vars_145	PCB temp	Т платы
+vars_146	Compr.PWM	ШИМ компр
+vars_147	Evap.PWM	ШИМ испар
+vars_148	Evap.temp	Т испар
+vars_149	Cabin temp	Т кабины
+vars_150	Aux t1	Доп Т1
 		
 m_0-1	Waiting for the command	Ожидание команды
 m_0-3	Blowing on power on	Проверка при подаче питания (индиктора пламени/датчика корпуса на неостылость)
@@ -886,6 +896,7 @@ d_41	Generic Load (Single)	Нагрузка одноканальная
 d_42	Generic Load(Tripple)	Нагрузка трёхканальная
 d_50	AD Driver	Инвертор кондиционера
 d_60	Pressure sensor	Датчик давления
+d_121	Modem	Модем
 d_123	Bootloader	Программный загрузчик
 d_124	AC control	Пульт кондиционера
 d_126	Control device	Устройство управления

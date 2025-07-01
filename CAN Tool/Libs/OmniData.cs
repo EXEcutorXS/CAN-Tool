@@ -546,12 +546,10 @@ namespace OmniProtocol
             Pgns[51].parameters.Add(new() { Name = "t_evap_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 146, PackNumber = 2 });
             Pgns[51].parameters.Add(new() { Name = "t_evap_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Power, PackNumber = 2 });
 
-            Pgns[51].parameters.Add(new() { Name = "t_ac_cabin_air_t", BitLength = 8, StartByte = 1, b = -75, UnitT = UnitType.Temp, PackNumber = 3 ,Var = 149});
-            Pgns[51].parameters.Add(new() { Name = "t_ac_evap_t", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 3 ,Var = 148});
-            Pgns[51].parameters.Add(new() { Name = "t_ac_aux1_t", BitLength = 8, StartByte = 3, b = -75, UnitT = UnitType.Temp, PackNumber = 3 });
-            Pgns[51].parameters.Add(new() { Name = "t_ac_aux2_t", BitLength = 8, StartByte = 4, b = -75, UnitT = UnitType.Temp, PackNumber = 3 });
-
-
+            Pgns[51].parameters.Add(new() { Name = "t_ac_cabin_air_t", BitLength = 16, StartByte = 1, UnitT = UnitType.Temp, PackNumber = 3 ,Var = 149, a=0.01,Signed=true});
+            Pgns[51].parameters.Add(new() { Name = "t_ac_evap_t", BitLength = 16, StartByte = 2,  UnitT = UnitType.Temp, PackNumber = 3 ,Var = 148, a = 0.01, Signed = true });
+            Pgns[51].parameters.Add(new() { Name = "t_ac_aux1_t", BitLength = 16, StartByte = 3,  UnitT = UnitType.Temp, PackNumber = 3, Var = 150, a = 0.01, Signed = true });
+            
             Pgns[52].parameters.Add(new() { Name = "t_ac_man_evap_pwm_set", BitLength = 16, StartByte = 1, UnitT = UnitType.Percent, a = 0.01 });
             Pgns[52].parameters.Add(new() { Name = "t_ac_man_cond_pwm_set", BitLength = 16, StartByte = 3, UnitT = UnitType.Percent, a = 0.01 });
             Pgns[52].parameters.Add(new() { Name = "t_ac_man_comp_pwm_set", BitLength = 16, StartByte = 5, UnitT = UnitType.Percent, a = 0.01 });
