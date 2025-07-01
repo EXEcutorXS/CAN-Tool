@@ -217,6 +217,15 @@ namespace OmniProtocol
         [ObservableProperty] public double condensorPwmSet;
     }
 
+    public partial class ACPanelViewModel : ObservableObject
+    {
+        
+
+        [ObservableProperty] public double compressorPwmsSet;
+        [ObservableProperty] public float condensorCurrent;
+        [ObservableProperty] public double condensorPwmSet;
+    }
+
     public partial class Timberline20OmniViewModel : ObservableObject
     {
         //private void ZoneChanged(OmniZoneHandler newSelectedZone) => SelectedZone = newSelectedZone;

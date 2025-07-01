@@ -118,6 +118,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="CustomControls\ACPanelControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="CustomControls\ACInverterControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
