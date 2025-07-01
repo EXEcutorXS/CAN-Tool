@@ -356,7 +356,7 @@ namespace OmniProtocol
             }
         }
 
-        public bool[] SupportedVariables { get; } = new bool[150];
+        public bool[] SupportedVariables { get; } = new bool[200];
 
         public void LogStart()
         {
