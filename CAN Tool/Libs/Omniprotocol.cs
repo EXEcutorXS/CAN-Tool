@@ -1372,17 +1372,26 @@ namespace OmniProtocol
                     {
                         case 1:
                             if (m.Data[4] != 255 || m.Data[5] != 255)
+                            {
                                 senderDevice.ACInverterParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                                senderDevice.ACPanelParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                            }
                             break;
                         case 2:
                             if (m.Data[1] != 255 || m.Data[2] != 255)
+                            {
                                 senderDevice.ACInverterParams.CompressorCurrent = (m.Data[1] * 256 + m.Data[2]) * 10;
+                                senderDevice.ACPanelParams.CompressorCurrent = (m.Data[1] * 256 + m.Data[2]) * 10;
+                            }
                             if (m.Data[3] != 255 || m.Data[4] != 255)
                                 senderDevice.ACInverterParams.CondensorCurrent = (m.Data[3] * 256 + m.Data[4]) * 10;
                             break;
                         case 4:
                             if (m.Data[4] != 255 || m.Data[5] != 255)
+                            {
                                 senderDevice.ACInverterParams.CondensorPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                                senderDevice.ACPanelParams.CondensorCurrent = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                            }
                             break;
 
                     }
