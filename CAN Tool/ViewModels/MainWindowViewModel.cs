@@ -425,6 +425,32 @@ namespace CAN_Tool.ViewModels
                     case 41:
                         v.Display = true;
                         v.ChartBrush = new SolidColorBrush(Colors.Yellow); break;
+                    case 135:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.White); 
+                        v.LineStyle = LineStyle.Dash; break;
+                    case 136:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.LightBlue);
+                        v.LineStyle = LineStyle.DashDot; break;
+                    case 137:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.White);
+                        v.LineStyle = LineStyle.DashDotDot; break;
+                    case 146:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.Purple);
+                        break;
+                    case 148:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.Pink);
+                        break;
+                    case 149:
+                        v.Display = true;
+                        v.ChartBrush = new SolidColorBrush(Colors.Green);
+                        v.LineWidth = 2;
+                        break;
+
                     default:
                         v.Display = false;
                         break;
