@@ -758,7 +758,7 @@ namespace OmniProtocol
 
         public string StageString => GetString($"m_{Stage}-{Mode}");
 
-        public string ErrorString =>  (Error!=0) ? Error + " - " + GetString($"e_{Error}"):"";
+        public string ErrorString => (Error != 0) ? Error + " - " + GetString($"e_{Error}") : "";
 
         public object Clone() => MemberwiseClone();
     }
@@ -1390,7 +1390,7 @@ namespace OmniProtocol
                             if (m.Data[4] != 255 || m.Data[5] != 255)
                             {
                                 senderDevice.ACInverterParams.CondensorPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
-                                senderDevice.ACPanelParams.CondensorCurrent = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                                senderDevice.ACPanelParams.CondensorPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
                             }
                             break;
 
@@ -1404,10 +1404,16 @@ namespace OmniProtocol
                         case 1:
                             if (m.Data[1] < 8)
                                 senderDevice.ACPanelParams.AcMode = m.Data[1];
-                            if (m.Data[2]-75 >= 16 && m.Data[2]-75 <= 30)
-                                senderDevice.ACPanelParams.Setpoint = (byte)(m.Data[2]-75);
+                            if (m.Data[2] - 75 >= 16 && m.Data[2] - 75 <= 30)
+                                senderDevice.ACPanelParams.Setpoint = (byte)(m.Data[2] - 75);
                             if (m.Data[3] < 6)
                                 senderDevice.ACPanelParams.AcFanMode = m.Data[3];
+                            break;
+                        case 2:
+                            if (m.Data[4] != 255 || m.Data[5] != 255)
+                            {
+                                senderDevice.ACPanelParams.EvapoPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                            }
                             break;
                     }
                     break;
