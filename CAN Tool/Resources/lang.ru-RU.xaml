@@ -150,6 +150,34 @@
 <v:String x:Key="e_91">Низкий уровень жидкости</v:String>
 <v:String x:Key="e_92">КЗ цепи датчика уровня</v:String>
 <v:String x:Key="e_93">Обрыв цепи датчика уровня</v:String>
+<v:String x:Key="e_95">Обрыв цепи доп датчика температуры 1</v:String>
+<v:String x:Key="e_96">КЗ в цепи доп датчика температуры 1</v:String>
+<v:String x:Key="e_97">Обрыв цепи доп датчика температуры 2</v:String>
+<v:String x:Key="e_98">КЗ в цепи доп датчика температуры 2</v:String>
+<v:String x:Key="e_99">Обрыв цепи доп датчика температуры 1</v:String>
+<v:String x:Key="e_100">КЗ в цепи доп датчика температуры 1</v:String>
+<v:String x:Key="e_101">Обрыв цепи доп датчика температуры 1</v:String>
+<v:String x:Key="e_102">КЗ в цепи доп датчика температуры 1</v:String>
+<v:String x:Key="e_103">Нет связи с платой расширения</v:String>
+<v:String x:Key="e_104">Ошибочная настройка зон/помп</v:String>
+
+<v:String x:Key="e_200">Нет связи с инвертором</v:String>
+<v:String x:Key="e_201">КЗ вентилятора испарителя</v:String>
+<v:String x:Key="e_202">Обрыв вентилятора испарителя</v:String>
+<v:String x:Key="e_203">Превышен ток вентилятора испарителя</v:String>
+<v:String x:Key="e_204">КЗ датчика температуры испарителя</v:String>
+<v:String x:Key="e_205">Обрыв датчика температуры испарителя</v:String>
+<v:String x:Key="e_206">КЗ датчика температуры кабины</v:String>
+<v:String x:Key="e_207">Обрыв датчика температуры кабины</v:String>
+
+<v:String x:Key="e_210">КЗ компрессора</v:String>
+<v:String x:Key="e_211">Обрыв фазы компрессора</v:String>
+<v:String x:Key="e_212">Превышен ток компрессора</v:String>
+<v:String x:Key="e_213">КЗ вентилятора конденсатора</v:String>
+<v:String x:Key="e_214">Обрыв вентилятора конденсатора</v:String>
+<v:String x:Key="e_215">Превышен ток вентилятора конденсатора</v:String>
+<v:String x:Key="e_216">Низкое напряжение (менее 20.5 В в течение 10 сек)</v:String>
+<v:String x:Key="e_217">Перегрев платы инвертора (более 90 градусов в течение 10 минут)</v:String>
 
 <v:String x:Key="t_no_error_code">Нет кода ошибки</v:String>
 <v:String x:Key="t_error">Ошибка</v:String>

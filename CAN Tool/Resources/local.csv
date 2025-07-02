@@ -150,6 +150,34 @@ e_88	Open circuit of the fan 5	Обрыв в цепи вентилятора 5
 e_91	Liquid level too low	Низкий уровень жидкости
 e_92	Level sensor short circuit	КЗ цепи датчика уровня
 e_93	Level sensor open circuit	Обрыв цепи датчика уровня
+e_95	open circ. aux temp. sens 1	Обрыв цепи доп датчика температуры 1
+e_96	short circ. aux temp. sens 1	КЗ в цепи доп датчика температуры 1
+e_97	open circ. aux temp. sens 2	Обрыв цепи доп датчика температуры 2
+e_98	short circ. aux temp. sens 2	КЗ в цепи доп датчика температуры 2
+e_99	open circ. aux temp. sens 3	Обрыв цепи доп датчика температуры 1
+e_100	short circ. aux temp. sens 3	КЗ в цепи доп датчика температуры 1
+e_101	open circ. aux temp. sens 4	Обрыв цепи доп датчика температуры 1
+e_102	short circ. aux temp. sens 4	КЗ в цепи доп датчика температуры 1
+e_103	Extension board link fault	Нет связи с платой расширения
+e_104	Zone-pump conflict	Ошибочная настройка зон/помп
+		
+e_200	No connection with inverter	Нет связи с инвертором
+e_201	Evaporator fan short circuit	КЗ вентилятора испарителя
+e_202	Evaporator fan open circuit	Обрыв вентилятора испарителя
+e_203	Evaporator fan overcurrent	Превышен ток вентилятора испарителя
+e_204	Evaporator sensor SC	КЗ датчика температуры испарителя
+e_205	Evaporator sensor OC	Обрыв датчика температуры испарителя
+e_206	Cabin temp sensor SC	КЗ датчика температуры кабины
+e_207	Cabin temp sensor OC	Обрыв датчика температуры кабины
+		
+e_210	Compressor short circuit	КЗ компрессора
+e_211	Single phase OC	Обрыв фазы компрессора
+e_212	Compressor overcurrent	Превышен ток компрессора
+e_213	Condensor fan SC	КЗ вентилятора конденсатора
+e_214	Condensor fan OC	Обрыв вентилятора конденсатора
+e_215	Condensor fan overcurrent	Превышен ток вентилятора конденсатора
+e_216	Low voltage	Низкое напряжение (менее 20.5 В в течение 10 сек)
+e_217	Inverter PCB overheat	Перегрев платы инвертора (более 90 градусов в течение 10 минут)
 		
 t_no_error_code	No error code	Нет кода ошибки
 t_error	Error	Ошибка

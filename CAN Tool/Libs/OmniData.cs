@@ -6,7 +6,7 @@ namespace OmniProtocol
 {
     public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency, Power }
 
-    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter, AcControl }
+    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter, AcPanel }
 
     public enum LoadMode_t { Off = 0, Toggle = 1, Pwm = 2 };
 
@@ -14,9 +14,9 @@ namespace OmniProtocol
 
     public enum zoneState_t { Off = 0, Heat = 1, Fan = 2 };
 
-    public enum acMode_t { ac_off, ac_cool, ac_dry, ac_eco, ac_night, ac_max, ac_manual, ac_error };
+    //public enum acMode_t { ac_off, ac_cool, ac_dry, ac_eco, ac_night, ac_max, ac_manual, ac_error };
 
-    public enum acFanMode_t { fan_auto, fan_1, fan_2, fan_3, fan_4, fan_5};
+    //public enum acFanMode_t { fan_auto, fan_1, fan_2, fan_3, fan_4, fan_5};
 
     public partial class Omni : ObservableObject
     {
@@ -73,7 +73,7 @@ namespace OmniProtocol
             { 44, new() { Id = 44, DevType = DeviceType.Binar, MaxBlower = 90, MaxFuelPump = 4.3 } },
             { 50, new() { Id = 50, DevType = DeviceType.AcInverter }} ,
             { 123, new() { Id = 123, DevType = DeviceType.BootLoader }} ,
-            { 124, new() { Id = 124, DevType = DeviceType.AcControl }},
+            { 124, new() { Id = 124, DevType = DeviceType.AcPanel }},
             { 126, new() { Id = 126, DevType = DeviceType.Hcu }},
             { 255, new() { Id = 255 }}
         };
@@ -543,6 +543,7 @@ namespace OmniProtocol
             Pgns[51].parameters.Add(new() { Name = "t_ac_mode", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_off" }, { 1, "t_cool" }, { 2, "t_dry" }, { 3, "t_eco" }, { 4, "t_night" }, { 5, "t_power" }, { 6, "t_manual" } }, PackNumber = 1 });
             Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, Var = 143, PackNumber = 1 });
             Pgns[51].parameters.Add(new() { Name = "t_ac_fan_mode", BitLength = 8, StartByte = 3, Meanings = { { 0, "t_auto" }, { 1, "t_1st_speed" }, { 2, "t_2nd_speed" }, { 3, "t_3rd_speed" }, { 4, "t_4th_speed" }, { 5, "t_5th_speed" } }, PackNumber = 1 ,Var = 144});
+            Pgns[51].parameters.Add(new() { Name = "t_ac_panel_current", BitLength = 16, StartByte = 4, PackNumber = 1, Var = 140, a=0.01 ,UnitT=UnitType.Current});
 
             Pgns[51].parameters.Add(new() { Name = "t_evap_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" } }, PackNumber = 2 });
             Pgns[51].parameters.Add(new() { Name = "t_evap_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, PackNumber = 2 });

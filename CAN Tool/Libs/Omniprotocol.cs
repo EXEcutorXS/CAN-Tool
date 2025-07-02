@@ -219,11 +219,21 @@ namespace OmniProtocol
 
     public partial class ACPanelViewModel : ObservableObject
     {
-        
+
 
         [ObservableProperty] public double compressorPwmsSet;
-        [ObservableProperty] public float condensorCurrent;
+        [ObservableProperty] public double compressorRevMeasured;
+        [ObservableProperty] public double compressorCurrent;
         [ObservableProperty] public double condensorPwmSet;
+        [ObservableProperty] public double condensorCurrent;
+        [ObservableProperty] public double evapoPwmSet;
+        [ObservableProperty] public double evapCurrent;
+        [ObservableProperty] public double voltage;
+        [ObservableProperty] public int errorCode;
+        [ObservableProperty] public byte acMode;
+        [ObservableProperty] public byte acFanMode;
+        [ObservableProperty] public byte setpoint;
+
     }
 
     public partial class Timberline20OmniViewModel : ObservableObject
@@ -748,7 +758,7 @@ namespace OmniProtocol
 
         public string StageString => GetString($"m_{Stage}-{Mode}");
 
-        public string ErrorString => Error + " - " + GetString($"e_{Error}");
+        public string ErrorString =>  (Error!=0) ? Error + " - " + GetString($"e_{Error}"):"";
 
         public object Clone() => MemberwiseClone();
     }
@@ -1165,7 +1175,7 @@ namespace OmniProtocol
                         if (m.Data[0] != 123)
                         {
                             senderDevice.Firmware = new BindingList<int> { m.Data[0], m.Data[1], m.Data[2], m.Data[3] };
-                            
+
                         }
                         else
                         {
@@ -1192,6 +1202,13 @@ namespace OmniProtocol
                             if (m.Data[5] < 4) senderDevice.TimberlineParams.Zones[4].Connected = (zoneType_t)m.Data[5];
                         }
 
+                        break;
+                    }
+
+                case 20:
+                    {
+                        if (m.Data[0] != 255)
+                            senderDevice.Parameters.Error = m.Data[0];
                         break;
                     }
                 case 21:
@@ -1355,7 +1372,7 @@ namespace OmniProtocol
                     {
                         case 1:
                             if (m.Data[4] != 255 || m.Data[5] != 255)
-                                senderDevice.ACInverterParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5])/100.0;
+                                senderDevice.ACInverterParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
                             break;
                         case 2:
                             if (m.Data[1] != 255 || m.Data[2] != 255)
@@ -1368,6 +1385,21 @@ namespace OmniProtocol
                                 senderDevice.ACInverterParams.CondensorPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
                             break;
 
+                    }
+                    break;
+
+
+                case 51:
+                    switch (m.Data[0])
+                    {
+                        case 1:
+                            if (m.Data[1] < 8)
+                                senderDevice.ACPanelParams.AcMode = m.Data[1];
+                            if (m.Data[2]-75 >= 16 && m.Data[2]-75 <= 30)
+                                senderDevice.ACPanelParams.Setpoint = (byte)(m.Data[2]-75);
+                            if (m.Data[3] < 6)
+                                senderDevice.ACPanelParams.AcFanMode = m.Data[3];
+                            break;
                     }
                     break;
 

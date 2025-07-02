@@ -242,6 +242,8 @@ namespace OmniProtocol
         public Timberline20OmniViewModel TimberlineParams { set; get; } = new();
 
         public ACInverterViewModel ACInverterParams { set; get; } = new();
+        
+        public ACPanelViewModel ACPanelParams { set; get; } = new();
 
         public GenericLoadTrippleViewModel GenericLoadTripple { set; get; } = new();
 

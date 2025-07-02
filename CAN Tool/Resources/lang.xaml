@@ -150,6 +150,34 @@
 <v:String x:Key="e_91">Liquid level too low</v:String>
 <v:String x:Key="e_92">Level sensor short circuit</v:String>
 <v:String x:Key="e_93">Level sensor open circuit</v:String>
+<v:String x:Key="e_95">open circ. aux temp. sens 1</v:String>
+<v:String x:Key="e_96">short circ. aux temp. sens 1</v:String>
+<v:String x:Key="e_97">open circ. aux temp. sens 2</v:String>
+<v:String x:Key="e_98">short circ. aux temp. sens 2</v:String>
+<v:String x:Key="e_99">open circ. aux temp. sens 3</v:String>
+<v:String x:Key="e_100">short circ. aux temp. sens 3</v:String>
+<v:String x:Key="e_101">open circ. aux temp. sens 4</v:String>
+<v:String x:Key="e_102">short circ. aux temp. sens 4</v:String>
+<v:String x:Key="e_103">Extension board link fault</v:String>
+<v:String x:Key="e_104">Zone-pump conflict</v:String>
+
+<v:String x:Key="e_200">No connection with inverter</v:String>
+<v:String x:Key="e_201">Evaporator fan short circuit</v:String>
+<v:String x:Key="e_202">Evaporator fan open circuit</v:String>
+<v:String x:Key="e_203">Evaporator fan overcurrent</v:String>
+<v:String x:Key="e_204">Evaporator sensor SC</v:String>
+<v:String x:Key="e_205">Evaporator sensor OC</v:String>
+<v:String x:Key="e_206">Cabin temp sensor SC</v:String>
+<v:String x:Key="e_207">Cabin temp sensor OC</v:String>
+
+<v:String x:Key="e_210">Compressor short circuit</v:String>
+<v:String x:Key="e_211">Single phase OC</v:String>
+<v:String x:Key="e_212">Compressor overcurrent</v:String>
+<v:String x:Key="e_213">Condensor fan SC</v:String>
+<v:String x:Key="e_214">Condensor fan OC</v:String>
+<v:String x:Key="e_215">Condensor fan overcurrent</v:String>
+<v:String x:Key="e_216">Low voltage</v:String>
+<v:String x:Key="e_217">Inverter PCB overheat</v:String>
 
 <v:String x:Key="t_no_error_code">No error code</v:String>
 <v:String x:Key="t_error">Error</v:String>

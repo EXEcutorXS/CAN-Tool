@@ -2,6 +2,17 @@
     <UserControl.Resources>
         <c:BindingListToStringConverter x:Key="VersionConverter" />
     </UserControl.Resources>
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <EventTrigger.Actions>
+                <BeginStoryboard>
+                    <Storyboard TargetProperty="Opacity" TargetName="ErrorString">
+                        <DoubleAnimation From="0.2" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:2" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger.Actions>
+        </EventTrigger>
+    </UserControl.Triggers>
     <Grid>
 
         <Grid.ColumnDefinitions>
@@ -13,32 +24,71 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
+            <RowDefinition Height="29.333" />
+            <RowDefinition Height="20.667" />
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
-            <RowDefinition Height="50" />
-            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+            
         </Grid.RowDefinitions>
-        <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" CornerRadius="15" Margin="10" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2" Width="120" Height="120" HorizontalAlignment="Left">
+        <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" CornerRadius="15" Margin="10,15,0,15" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2" Width="120" Height="120" HorizontalAlignment="Left">
             <Border.Background>
                 <ImageBrush ImageSource="{Binding Img}" Stretch="Fill" />
             </Border.Background>
         </Border>
-        <TextBlock Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Firmware,Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" FontSize="20" />
-        <TextBlock Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding ProductionDate}" VerticalAlignment="Center" FontSize="20" />
-        <TextBlock Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding Serial,Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" FontSize="20" />
-        <ProgressBar Margin="10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="0" Value="{Binding ACInverterParams.CompressorPwmsSet}" Height="30"></ProgressBar>
-        <ProgressBar Margin="10" Minimum="0" Maximum="60" Grid.Column="2" Grid.Row="1" Value="{Binding ACInverterParams.CompressorRevsMeasured}" Height="30"></ProgressBar>
-        <ProgressBar Margin="10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="2" Value="{Binding GenericLoadTripple.PwmLevel3}" Height="30"></ProgressBar>
-        <Slider x:Name="CompressorRevSlider" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="0" Height="30" Margin="0 14 0 5" ValueChanged="CompressorPwmChanged" />
-        <Slider x:Name="CondensorPwmSet" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="2" Height="30" Margin="0 14 0 5" ValueChanged="CondPwmChanged" />
-        <TextBlock Text="{Binding ACInverterParams.CompressorPwmsSet,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="0" d:Text="45" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <TextBlock Text="{Binding ACInverterParams.CompressorRevsMeasured,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="1" d:Text="44" VerticalAlignment="Center" HorizontalAlignment="Center" />
-        <TextBlock Text="{Binding ACInverterParams.CondensorPwmSet,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="2" d:Text="90%" VerticalAlignment="Center" HorizontalAlignment="Center" />
-        <TextBlock Text="{Binding Parameters.PcbTemp,Mode=OneWay,StringFormat={}PCB Temp: {0}}"  Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" d:Text="PCB Temp: 67°" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-        <TextBlock Text="{Binding ACInverterParams.CompressorCurrent,Mode=OneWay,StringFormat={}Compressor current: {0:F3}}" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" d:Text="Current: 14,03" VerticalAlignment="Center" HorizontalAlignment="Left" />
-        <TextBlock Text="{Binding ACInverterParams.CondensorCurrent,Mode=OneWay,StringFormat={}Condens current: {0:F3}}" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" d:Text="Current: 14,03" VerticalAlignment="Center" HorizontalAlignment="Left" />
-        <TextBlock Text="{Binding Parameters.Voltage,Mode=OneWay,StringFormat={}Voltage: {0:F3}}" Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" d:Text="Voltage: 25,5" VerticalAlignment="Center" HorizontalAlignment="Left" />
-        
 
+        <TextBlock Margin="5,0,5,0" Grid.Column="1" Text="{Binding Firmware,Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" FontSize="20" />
+        <TextBlock Margin="5,0,5,0" Grid.Column="1" Grid.Row="1" Text="{Binding ProductionDate}" VerticalAlignment="Center" FontSize="20" />
+        <TextBlock Margin="5,0,5,0" Grid.Column="1" Grid.Row="2" Text="{Binding Serial,Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" FontSize="20" />
+        <ProgressBar Margin="10,10,10,10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="0" Value="{Binding ACPanelParams.CompressorPwmsSet}" Height="30"></ProgressBar>
+        <ProgressBar Margin="10,10,10,10" Minimum="0" Maximum="60" Grid.Column="2" Grid.Row="1" Value="{Binding ACPanelParams.CondensorPwmSet}" Height="30"></ProgressBar>
+        <ProgressBar Margin="10,10,10,10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="2" Value="{Binding ACPanelParams.EvapoPwmSet}" Height="30"></ProgressBar>
+        <TextBlock Text="{Binding ACPanelParams.CompressorPwmsSet,Mode=OneWay, StringFormat=Compressor {0}%}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" d:Text="45" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        <TextBlock Text="{Binding ACPanelParams.CondensorPwmSet,Mode=OneWay, StringFormat=Condens.Fan {0}%}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="1" d:Text="44" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        <TextBlock Text="{Binding ACPanelParams.EvapoPwmSet,Mode=OneWay, StringFormat=Evap.Fan {0}%}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="2" Grid.Row="2" d:Text="90%" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="6" Orientation="Horizontal">
+            <Slider x:Name="SetpointSlider" Minimum="16" Maximum="30" Height="30" Margin="0 14 0 5" ValueChanged="SetpointChanged" Width="300" />
+            <TextBlock Foreground="Beige" VerticalAlignment="Center" FontSize="25" Text="{Binding ACPanelParams.Setpoint}" d:Text="15" Width="30" Margin="10"></TextBlock>
+            <TextBlock x:Name="ErrorString" Text="{Binding Parameters.ErrorString}" FontSize="25" Margin="10" Foreground="PaleVioletRed" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" Grid.RowSpan="2">
+            <ListBox SelectedIndex="{Binding ACPanelParams.AcMode}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <Button  Click="Button_Click">Off</Button>
+                <Button  Click="Button_Click_1">Cool</Button>
+                <Button  Click="Button_Click_2">Dry</Button>
+                <Button  Click="Button_Click_3">Eco</Button>
+                <Button  Click="Button_Click_4">Night</Button>
+                <Button  Click="Button_Click_5">Max</Button>
+                <Button  Click="Button_Click_6">Manual</Button>
+                <Button >Error</Button>
+            </ListBox>
+            <Button Click="Button_Click_13">Clear faults</Button>
+        </StackPanel>
+        <ListBox Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="3" SelectedIndex="{Binding ACPanelParams.AcFanMode}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <Button  Click="Button_Click_7">AUTO</Button>
+            <Button  Click="Button_Click_8">1st</Button>
+            <Button  Click="Button_Click_9">2nd</Button>
+            <Button  Click="Button_Click_10">3rd</Button>
+            <Button  Click="Button_Click_11">4th</Button>
+            <Button  Click="Button_Click_12">5th</Button>
+        </ListBox>
+        <DataGrid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="7"  ItemsSource="{Binding Status,Mode=OneWay}" AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Path=Name,Mode=OneWay}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Value" Binding="{Binding Path=FormattedValue,Mode=OneWay}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Unit" Binding="{Binding Path=AssignedParameter.Unit,Mode=OneWay}"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </UserControl>
