@@ -192,7 +192,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.Binar)
+            if (value != null && (DeviceType_t)value == DeviceType_t.Binar)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -208,7 +208,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.AcInverter)
+            if (value != null && (DeviceType_t)value == DeviceType_t.AcInverter)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -224,7 +224,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.AcPanel)
+            if (value != null && (DeviceType_t)value == DeviceType_t.AcPanel)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -241,7 +241,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.PressureSensor)
+            if (value != null && (DeviceType_t)value == DeviceType_t.PressureSensor)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -257,7 +257,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.GenericLoadTripple)
+            if (value != null && (DeviceType_t)value == DeviceType_t.GenericLoadTripple)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -273,7 +273,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.BootLoader)
+            if (value != null && (DeviceType_t)value == DeviceType_t.BootLoader)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -290,7 +290,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.Planar)
+            if (value != null && (DeviceType_t)value == DeviceType_t.Planar)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -306,7 +306,7 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.Binar || (DeviceType)value == DeviceType.Planar)
+            if (value != null && (DeviceType_t)value == DeviceType_t.Binar || (DeviceType_t)value == DeviceType_t.Planar)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
@@ -322,7 +322,23 @@ namespace CAN_Tool.ViewModels.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && (DeviceType)value == DeviceType.Hcu)
+            if (value != null && (DeviceType_t)value == DeviceType_t.Hcu)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class ModemToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && (DeviceType_t)value == DeviceType_t.Modem)
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;

@@ -35,6 +35,7 @@
     <None Remove="Images\10.jpg" />
     <None Remove="Images\11.jpg" />
     <None Remove="Images\12.jpg" />
+    <None Remove="Images\121.jpg" />
     <None Remove="Images\123.jpg" />
     <None Remove="Images\124.jpg" />
     <None Remove="Images\125.jpg" />
@@ -88,6 +89,7 @@
     <Resource Include="Images\10.jpg" />
     <Resource Include="Images\11.jpg" />
     <Resource Include="Images\12.jpg" />
+    <Resource Include="Images\121.jpg" />
     <Resource Include="Images\123.jpg" />
     <Resource Include="Images\124.jpg" />
     <Resource Include="Images\125.jpg" />
@@ -122,6 +124,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="CustomControls\ACInverterControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="CustomControls\ModemControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="CustomControls\GenerocLoadTrippleControl.xaml.cs">

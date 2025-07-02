@@ -4,9 +4,9 @@ using static CAN_Tool.Libs.Helper;
 
 namespace OmniProtocol
 {
-    public enum UnitType { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency, Power }
+    public enum UnitType_t { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency, Power }
 
-    public enum DeviceType { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter, AcPanel }
+    public enum DeviceType_t { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter, AcPanel, Modem}
 
     public enum LoadMode_t { Off = 0, Toggle = 1, Pwm = 2 };
 
@@ -34,47 +34,48 @@ namespace OmniProtocol
 
             Devices = new Dictionary<int, DeviceTemplate>() {
             { 0, new (){Id=0, }} ,
-            { 1, new() { Id = 1, DevType = DeviceType.Binar }} ,
-            { 2, new() { Id = 2, DevType = DeviceType.Planar }} ,
-            { 3, new() { Id = 3, DevType = DeviceType.Planar }} ,
-            { 4, new() { Id = 4, DevType = DeviceType.Binar }} ,
-            { 5, new() { Id = 5, DevType = DeviceType.Binar }} ,
-            { 6, new() { Id = 6, DevType = DeviceType.Binar, MaxBlower = 200 }} ,
-            { 7, new() { Id = 7, DevType = DeviceType.Planar }} ,
-            { 8, new() { Id = 8, DevType = DeviceType.Binar }} ,
-            { 9, new() { Id = 9, DevType = DeviceType.Planar }} ,
-            { 10, new() { Id = 10, DevType = DeviceType.Binar, MaxBlower = 200 }} ,
-            { 11, new() { Id = 11, DevType = DeviceType.Planar }} ,
-            { 12, new() { Id = 12, DevType = DeviceType.Planar }} ,
-            { 13, new() { Id = 13, DevType = DeviceType.Planar }} ,
-            { 14, new() { Id = 14, DevType = DeviceType.CookingPanel }} ,
-            { 15, new() { Id = 15, DevType = DeviceType.Planar }} ,
-            { 16, new() { Id = 16, DevType = DeviceType.Binar }} ,
-            { 17, new() { Id = 17, DevType = DeviceType.Binar }} ,
-            { 18, new() { Id = 18, DevType = DeviceType.Planar }} ,
-            { 19, new() { Id = 19, DevType = DeviceType.ValveControl }} ,
-            { 20, new() { Id = 20, DevType = DeviceType.Planar }} ,
-            { 21, new() { Id = 21, DevType = DeviceType.Binar }} ,
-            { 22, new() { Id = 22, DevType = DeviceType.Binar }} ,
-            { 23, new() { Id = 23, DevType = DeviceType.Binar, MaxBlower = 90, MaxFuelPump = 4.3 }} ,
-            { 25, new() { Id = 25, DevType = DeviceType.Binar }} ,
-            { 27, new() { Id = 27, DevType = DeviceType.Binar, MaxBlower = 90, MaxFuelPump = 4.3 } } ,
-            { 29, new() { Id = 29, DevType = DeviceType.Binar }} ,
-            { 31, new() { Id = 31, DevType = DeviceType.Binar }} ,
-            { 32, new() { Id = 32, DevType = DeviceType.Binar }} ,
-            { 34, new() { Id = 34, DevType = DeviceType.Binar, MaxFuelPump = 8, MaxBlower = 140 }} ,
-            { 35, new() { Id = 35, DevType = DeviceType.Binar, MaxFuelPump = 8, MaxBlower = 140 }} ,
-            { 37, new() { Id = 37, DevType = DeviceType.ExtensionBoard }} ,
-            { 39, new() { Id = 39, DevType = DeviceType.Planar }} ,
-            { 60, new() { Id = 60, DevType = DeviceType.PressureSensor }} ,
-            { 41, new() { Id = 41, DevType = DeviceType.GenericLoadSingle }} ,
-            { 42, new() { Id = 42, DevType = DeviceType.GenericLoadTripple }} ,
-            { 43, new() { Id = 43, DevType = DeviceType.Binar, MaxBlower = 90, MaxFuelPump = 4.3 }} ,
-            { 44, new() { Id = 44, DevType = DeviceType.Binar, MaxBlower = 90, MaxFuelPump = 4.3 } },
-            { 50, new() { Id = 50, DevType = DeviceType.AcInverter }} ,
-            { 123, new() { Id = 123, DevType = DeviceType.BootLoader }} ,
-            { 124, new() { Id = 124, DevType = DeviceType.AcPanel }},
-            { 126, new() { Id = 126, DevType = DeviceType.Hcu }},
+            { 1, new() { Id = 1, DevType = DeviceType_t.Binar }} ,
+            { 2, new() { Id = 2, DevType = DeviceType_t.Planar }} ,
+            { 3, new() { Id = 3, DevType = DeviceType_t.Planar }} ,
+            { 4, new() { Id = 4, DevType = DeviceType_t.Binar }} ,
+            { 5, new() { Id = 5, DevType = DeviceType_t.Binar }} ,
+            { 6, new() { Id = 6, DevType = DeviceType_t.Binar, MaxBlower = 200 }} ,
+            { 7, new() { Id = 7, DevType = DeviceType_t.Planar }} ,
+            { 8, new() { Id = 8, DevType = DeviceType_t.Binar }} ,
+            { 9, new() { Id = 9, DevType = DeviceType_t.Planar }} ,
+            { 10, new() { Id = 10, DevType = DeviceType_t.Binar, MaxBlower = 200 }} ,
+            { 11, new() { Id = 11, DevType = DeviceType_t.Planar }} ,
+            { 12, new() { Id = 12, DevType = DeviceType_t.Planar }} ,
+            { 13, new() { Id = 13, DevType = DeviceType_t.Planar }} ,
+            { 14, new() { Id = 14, DevType = DeviceType_t.CookingPanel }} ,
+            { 15, new() { Id = 15, DevType = DeviceType_t.Planar }} ,
+            { 16, new() { Id = 16, DevType = DeviceType_t.Binar }} ,
+            { 17, new() { Id = 17, DevType = DeviceType_t.Binar }} ,
+            { 18, new() { Id = 18, DevType = DeviceType_t.Planar }} ,
+            { 19, new() { Id = 19, DevType = DeviceType_t.ValveControl }} ,
+            { 20, new() { Id = 20, DevType = DeviceType_t.Planar }} ,
+            { 21, new() { Id = 21, DevType = DeviceType_t.Binar }} ,
+            { 22, new() { Id = 22, DevType = DeviceType_t.Binar }} ,
+            { 23, new() { Id = 23, DevType = DeviceType_t.Binar, MaxBlower = 90, MaxFuelPump = 4.3 }} ,
+            { 25, new() { Id = 25, DevType = DeviceType_t.Binar }} ,
+            { 27, new() { Id = 27, DevType = DeviceType_t.Binar, MaxBlower = 90, MaxFuelPump = 4.3 } } ,
+            { 29, new() { Id = 29, DevType = DeviceType_t.Binar }} ,
+            { 31, new() { Id = 31, DevType = DeviceType_t.Binar }} ,
+            { 32, new() { Id = 32, DevType = DeviceType_t.Binar }} ,
+            { 34, new() { Id = 34, DevType = DeviceType_t.Binar, MaxFuelPump = 8, MaxBlower = 140 }} ,
+            { 35, new() { Id = 35, DevType = DeviceType_t.Binar, MaxFuelPump = 8, MaxBlower = 140 }} ,
+            { 37, new() { Id = 37, DevType = DeviceType_t.ExtensionBoard }} ,
+            { 39, new() { Id = 39, DevType = DeviceType_t.Planar }} ,
+            { 60, new() { Id = 60, DevType = DeviceType_t.PressureSensor }} ,
+            { 41, new() { Id = 41, DevType = DeviceType_t.GenericLoadSingle }} ,
+            { 42, new() { Id = 42, DevType = DeviceType_t.GenericLoadTripple }} ,
+            { 43, new() { Id = 43, DevType = DeviceType_t.Binar, MaxBlower = 90, MaxFuelPump = 4.3 }} ,
+            { 44, new() { Id = 44, DevType = DeviceType_t.Binar, MaxBlower = 90, MaxFuelPump = 4.3 } },
+            { 50, new() { Id = 50, DevType = DeviceType_t.AcInverter }} ,
+            { 121, new() { Id = 121, DevType = DeviceType_t.Modem }},
+            { 123, new() { Id = 123, DevType = DeviceType_t.BootLoader }} ,
+            { 124, new() { Id = 124, DevType = DeviceType_t.AcPanel }},
+            { 126, new() { Id = 126, DevType = DeviceType_t.Hcu }},
             { 255, new() { Id = 255 }}
         };
 
@@ -168,13 +169,13 @@ namespace OmniProtocol
             Commands[0].Parameters.Add(new() { StartByte = 4, BitLength = 8, Name = "t_firmware", AnswerOnly = true });
             Commands[0].Parameters.Add(new() { StartByte = 5, BitLength = 8, Name = "t_modification", AnswerOnly = true });
 
-            Commands[1].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Minute });
+            Commands[1].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType_t.Minute });
 
-            Commands[4].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Minute });
+            Commands[4].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType_t.Minute });
 
             Commands[6].Parameters.Add(new() { StartByte = 4, BitLength = 4, Name = "t_working_mode", Meanings = { { 0, "t_regular" }, { 1, "t_eco" }, { 2, "t_additional_heater" }, { 3, "t_preheater" }, { 4, "t_heating_systems" } } });
             Commands[6].Parameters.Add(new() { StartByte = 4, StartBit = 4, BitLength = 4, Name = "t_additional_heater_mode", Meanings = { { 0, "t_off" }, { 1, "t_auto" }, { 2, "t_manual" } } });
-            Commands[6].Parameters.Add(new() { StartByte = 5, BitLength = 16, Name = "t_temp_setpoint", UnitT = UnitType.Temp });
+            Commands[6].Parameters.Add(new() { StartByte = 5, BitLength = 16, Name = "t_temp_setpoint", UnitT = UnitType_t.Temp });
             Commands[6].Parameters.Add(new() { StartByte = 7, BitLength = 2, Name = "t_pump_in_idle", Meanings = DefMeaningsOnOff });
             Commands[6].Parameters.Add(new() { StartByte = 7, BitLength = 2, StartBit = 2, Name = "t_pump_while_engine_running", Meanings = DefMeaningsOnOff });
 
@@ -193,14 +194,14 @@ namespace OmniProtocol
             Commands[8].Parameters.Add(new() { StartByte = 3, BitLength = 2, StartBit = 6, Name = "t_valve_8_state", Meanings = DefMeaningsOnOff });
             Commands[8].Parameters.Add(new() { StartByte = 4, BitLength = 1, StartBit = 0, Meanings = { { 0, "t_do_not_clear_codes" }, { 1, "t_clear_error_codes" } } });
 
-            Commands[9].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Minute });
+            Commands[9].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType_t.Minute });
             Commands[9].Parameters.Add(new() { StartByte = 4, BitLength = 4, Name = "t_working_mode", Meanings = { { 0, "t_not_used" }, { 1, "t_work_by_pcb_temp" }, { 2, "t_work_by_panel_sensor_temp" }, { 3, "t_work_by_external_sensor" }, { 4, "t_work_by_power" } } });
             Commands[9].Parameters.Add(new() { StartByte = 4, StartBit = 4, BitLength = 2, Name = "t_enable_idle_while_working_by_temp_sensor", Meanings = DefMeaningsAllow });
             Commands[9].Parameters.Add(new() { StartByte = 4, StartBit = 6, BitLength = 2, Name = "t_enable_blower_while_idle", Meanings = DefMeaningsAllow });
-            Commands[9].Parameters.Add(new() { StartByte = 5, BitLength = 16, Name = "t_set_room_temperature", UnitT = UnitType.Temp });
+            Commands[9].Parameters.Add(new() { StartByte = 5, BitLength = 16, Name = "t_set_room_temperature", UnitT = UnitType_t.Temp });
             Commands[9].Parameters.Add(new() { StartByte = 7, BitLength = 4, Name = "t_power_setpoint" });
 
-            Commands[10].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType.Temp });
+            Commands[10].Parameters.Add(new() { StartByte = 2, BitLength = 16, Name = "t_working_time", UnitT = UnitType_t.Temp });
 
             Commands[19].Parameters.Add(new() { StartByte = 2, BitLength = 8, Name = "t_set_power_level" });
 
@@ -209,7 +210,7 @@ namespace OmniProtocol
 
             Commands[21].Parameters.Add(new() { StartByte = 2, BitLength = 8, Name = "t_prescaler" });
             Commands[21].Parameters.Add(new() { StartByte = 3, BitLength = 8, Name = "t_pwm_period" });
-            Commands[21].Parameters.Add(new() { StartByte = 5, BitLength = 8, Name = "t_required_freq", UnitT = UnitType.Frequency });
+            Commands[21].Parameters.Add(new() { StartByte = 5, BitLength = 8, Name = "t_required_freq", UnitT = UnitType_t.Frequency });
 
             Commands[22].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "t_action_after_reset", Meanings = { { 0, "t_stay_in_boot" }, { 1, "t_to_main_program_without_delay" }, { 2, "t_5_sec_in_boot" } } });
 
@@ -223,15 +224,15 @@ namespace OmniProtocol
             Commands[45].Parameters.Add(new() { StartByte = 3, StartBit = 6, BitLength = 2, Name = "t_mask_overheating_failures", Meanings = DefMeaningsYesNo });
 
             Commands[65].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "", Meanings = { { 7, "t_liquid_temp" }, { 10, "t_overheat_temp" }, { 12, "t_flame_temperature" }, { 13, "t_body_temp" }, { 27, "t_air_temp" } } });
-            Commands[65].Parameters.Add(new() { StartByte = 3, BitLength = 16, Name = "t_temp_value", UnitT = UnitType.Temp });
+            Commands[65].Parameters.Add(new() { StartByte = 3, BitLength = 16, Name = "t_temp_value", UnitT = UnitType_t.Temp });
 
             Commands[67].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "", Meanings = { { 0, "t_leave_m" }, { 1, "t_ener_m" } } });
             Commands[67].Parameters.Add(new() { StartByte = 2, StartBit = 2, BitLength = 2, Name = "", Meanings = { { 0, "t_leave_t" }, { 1, "t_enter_t" } } });
 
             Commands[68].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 2, Name = "t_pump_state", Meanings = DefMeaningsOnOff });
-            Commands[68].Parameters.Add(new() { StartByte = 3, StartBit = 0, BitLength = 8, Name = "t_blower_revs", UnitT = UnitType.Rps });
-            Commands[68].Parameters.Add(new() { StartByte = 4, StartBit = 0, BitLength = 8, Name = "t_glow_plug", UnitT = UnitType.Percent });
-            Commands[68].Parameters.Add(new() { StartByte = 5, StartBit = 0, BitLength = 16, Name = "t_fuel_pump_freq", a = 0.01, UnitT = UnitType.Frequency });
+            Commands[68].Parameters.Add(new() { StartByte = 3, StartBit = 0, BitLength = 8, Name = "t_blower_revs", UnitT = UnitType_t.Rps });
+            Commands[68].Parameters.Add(new() { StartByte = 4, StartBit = 0, BitLength = 8, Name = "t_glow_plug", UnitT = UnitType_t.Percent });
+            Commands[68].Parameters.Add(new() { StartByte = 5, StartBit = 0, BitLength = 16, Name = "t_fuel_pump_freq", a = 0.01, UnitT = UnitType_t.Frequency });
 
             Commands[69].Parameters.Add(new() { StartByte = 2, StartBit = 0, BitLength = 8, Name = "t_exec_dev_type", Meanings = { { 0, "t_fpx10" }, { 1, "t_relay01" }, { 2, "t_glow_plug_perc" }, { 3, "t_pump_perc" }, { 4, "t_blower_perc" }, { 23, "t_blower_revs_rps" } } });
             Commands[69].Parameters.Add(new() { StartByte = 3, StartBit = 0, BitLength = 16, Name = "Значение" });
@@ -268,7 +269,7 @@ namespace OmniProtocol
             Pgns[8].parameters.Add(new() { Name = "Номер параметра", CustomDecoder = d => { if (d[0] == 4) return "Параметр:" + (d[2] * 256 + d[3]).ToString() + ";"; else return ""; } });
             Pgns[8].parameters.Add(new() { Name = "Значение параметра", CustomDecoder = d => { if (d[0] == 4) return "Значение:" + (d[4] * 0x1000000 + d[5] * 0x10000 + d[6] * 0x100 + d[7]).ToString() + ";"; else return ""; }, AnswerOnly = true });
 
-            Pgns[9].parameters.Add(new() { Name = "Текущий ШИМ", BitLength = 16, a = 0.01, UnitT = UnitType.Percent, Var = 133 });
+            Pgns[9].parameters.Add(new() { Name = "Текущий ШИМ", BitLength = 16, a = 0.01, UnitT = UnitType_t.Percent, Var = 133 });
 
             Pgns[10].parameters.Add(new() { Name = "Стадия", BitLength = 8, StartByte = 0, Meanings = Stages, Var = 1 });
             Pgns[10].parameters.Add(new() { Name = "Режим", BitLength = 8, StartByte = 1, Var = 2 });
@@ -278,29 +279,29 @@ namespace OmniProtocol
             Pgns[10].parameters.Add(new() { Name = "Количество морганий", BitLength = 8, StartByte = 5, Var = 25 });
             Pgns[10].parameters.Add(new() { Name = "Желаемый режим мощности", BitLength = 8, StartByte = 6, Var = 132 });
 
-            Pgns[11].parameters.Add(new() { Name = "Напряжение питания", BitLength = 16, StartByte = 0, a = 0.1, UnitT = UnitType.Volt, Var = 5 });
-            Pgns[11].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 2, UnitT = UnitType.Pressure });
+            Pgns[11].parameters.Add(new() { Name = "Напряжение питания", BitLength = 16, StartByte = 0, a = 0.1, UnitT = UnitType_t.Volt, Var = 5 });
+            Pgns[11].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Pressure });
             Pgns[11].parameters.Add(new() { Name = "Ток двигателя, значения АЦП", BitLength = 16, StartByte = 3 });
-            Pgns[11].parameters.Add(new() { Name = "Ток двигателя, мА", BitLength = 16, StartByte = 5, UnitT = UnitType.Current, a = 0.001, Var = 128 });
+            Pgns[11].parameters.Add(new() { Name = "Ток двигателя, мА", BitLength = 16, StartByte = 5, UnitT = UnitType_t.Current, a = 0.001, Var = 128 });
 
-            Pgns[12].parameters.Add(new() { Name = "Заданные обороты нагнетателя воздуха", BitLength = 8, StartByte = 0, UnitT = UnitType.Rps, Var = 15 });
-            Pgns[12].parameters.Add(new() { Name = "Измеренные обороты нагнетателя воздуха,", BitLength = 8, StartByte = 1, UnitT = UnitType.Rps, Var = 16 });
-            Pgns[12].parameters.Add(new() { Name = "Заданная частота ТН", BitLength = 16, StartByte = 2, a = 0.01, UnitT = UnitType.Frequency, Var = 17 });
-            Pgns[12].parameters.Add(new() { Name = "Реализованная частота ТН", BitLength = 16, StartByte = 4, a = 0.01, UnitT = UnitType.Frequency, Var = 18 });
-            Pgns[12].parameters.Add(new() { Name = "Мощность свечи", BitLength = 8, StartByte = 6, UnitT = UnitType.Percent, Var = 21 });
+            Pgns[12].parameters.Add(new() { Name = "Заданные обороты нагнетателя воздуха", BitLength = 8, StartByte = 0, UnitT = UnitType_t.Rps, Var = 15 });
+            Pgns[12].parameters.Add(new() { Name = "Измеренные обороты нагнетателя воздуха,", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Rps, Var = 16 });
+            Pgns[12].parameters.Add(new() { Name = "Заданная частота ТН", BitLength = 16, StartByte = 2, a = 0.01, UnitT = UnitType_t.Frequency, Var = 17 });
+            Pgns[12].parameters.Add(new() { Name = "Реализованная частота ТН", BitLength = 16, StartByte = 4, a = 0.01, UnitT = UnitType_t.Frequency, Var = 18 });
+            Pgns[12].parameters.Add(new() { Name = "Мощность свечи", BitLength = 8, StartByte = 6, UnitT = UnitType_t.Percent, Var = 21 });
             Pgns[12].parameters.Add(new() { Name = "Состояние помпы", BitLength = 2, StartByte = 7, Meanings = DefMeaningsOnOff, Var = 46 });
             Pgns[12].parameters.Add(new() { Name = "Состояние реле печки кабины", BitLength = 2, StartByte = 7, StartBit = 2, Meanings = DefMeaningsOnOff, Var = 45 });
             Pgns[12].parameters.Add(new() { Name = "Состояние состояние канала сигнализации", BitLength = 2, StartByte = 7, StartBit = 4, Meanings = DefMeaningsOnOff, Var = 47 });
 
-            Pgns[13].parameters.Add(new() { Name = "Температура ИП", BitLength = 16, StartByte = 0, UnitT = UnitType.Temp, Signed = true, Var = 6 });
-            Pgns[13].parameters.Add(new() { Name = "Температура платы/процессора", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, Var = 59 });
-            Pgns[13].parameters.Add(new() { Name = "Температура жидкости", BitLength = 8, StartByte = 3, b = -75, UnitT = UnitType.Temp, Var = 40 });
-            Pgns[13].parameters.Add(new() { Name = "Температура перегрева", BitLength = 8, StartByte = 4, b = -75, UnitT = UnitType.Temp, Var = 41 });
+            Pgns[13].parameters.Add(new() { Name = "Температура ИП", BitLength = 16, StartByte = 0, UnitT = UnitType_t.Temp, Signed = true, Var = 6 });
+            Pgns[13].parameters.Add(new() { Name = "Температура платы/процессора", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType_t.Temp, Var = 59 });
+            Pgns[13].parameters.Add(new() { Name = "Температура жидкости", BitLength = 8, StartByte = 3, b = -75, UnitT = UnitType_t.Temp, Var = 40 });
+            Pgns[13].parameters.Add(new() { Name = "Температура перегрева", BitLength = 8, StartByte = 4, b = -75, UnitT = UnitType_t.Temp, Var = 41 });
 
-            Pgns[14].parameters.Add(new() { Name = "Минимальная температура пламени перед розжигом", BitLength = 16, StartByte = 0, UnitT = UnitType.Temp, Var = 36, Signed = true });
-            Pgns[14].parameters.Add(new() { Name = "Граница срыва пламени", BitLength = 16, StartByte = 2, UnitT = UnitType.Temp, Var = 37, Signed = true });
-            Pgns[14].parameters.Add(new() { Name = "Граница срыва пламени на прогреве", BitLength = 16, StartByte = 4, UnitT = UnitType.Temp, Signed = true });
-            Pgns[14].parameters.Add(new() { Name = "Скорость изменения температуры ИП", BitLength = 16, StartByte = 6, UnitT = UnitType.Temp, Signed = true });
+            Pgns[14].parameters.Add(new() { Name = "Минимальная температура пламени перед розжигом", BitLength = 16, StartByte = 0, UnitT = UnitType_t.Temp, Var = 36, Signed = true });
+            Pgns[14].parameters.Add(new() { Name = "Граница срыва пламени", BitLength = 16, StartByte = 2, UnitT = UnitType_t.Temp, Var = 37, Signed = true });
+            Pgns[14].parameters.Add(new() { Name = "Граница срыва пламени на прогреве", BitLength = 16, StartByte = 4, UnitT = UnitType_t.Temp, Signed = true });
+            Pgns[14].parameters.Add(new() { Name = "Скорость изменения температуры ИП", BitLength = 16, StartByte = 6, UnitT = UnitType_t.Temp, Signed = true });
 
 
             Pgns[15].parameters.Add(new() { Name = "0 канал АЦП ", BitLength = 16, StartByte = 0, Var = 49 });
@@ -332,13 +333,13 @@ namespace OmniProtocol
             Pgns[19].parameters.Add(new() { Name = "Вода", BitLength = 2, StartBit = 4, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Быстрый нагрев воды", BitLength = 2, StartBit = 6, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Помпа подогревателя статус", BitLength = 2, StartByte = 7, PackNumber = 1, Meanings = DefMeaningsOnOff });
-            Pgns[19].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 1 });
-            Pgns[19].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, PackNumber = 1 });
+            Pgns[19].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType_t.Temp, PackNumber = 1 });
+            Pgns[19].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Temp, PackNumber = 1 });
             Pgns[19].parameters.Add(new() { Name = "Помпа 1 статус", BitLength = 2, StartByte = 7, StartBit = 2, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Помпа 2 статус", BitLength = 2, StartByte = 7, StartBit = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Помпа 3 статус", BitLength = 2, StartByte = 7, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
-            Pgns[19].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, PackNumber = 1 });
-            Pgns[19].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, PackNumber = 1 });
+            Pgns[19].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType_t.Temp, PackNumber = 1 });
+            Pgns[19].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Temp, PackNumber = 1 });
             Pgns[19].parameters.Add(new() { Name = "Сработал датчик бытовой воды", BitLength = 2, StartByte = 4, PackNumber = 1, Meanings = DefMeaningsYesNo, Var = 108 });
             Pgns[19].parameters.Add(new() { Name = "Доступен тёплый пол", BitLength = 2, StartByte = 5, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Доступен предпусковой подогрев", BitLength = 2, StartByte = 5, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
@@ -346,17 +347,17 @@ namespace OmniProtocol
             Pgns[19].parameters.Add(new() { Name = "Доп помпа 2 статус", BitLength = 2, StartByte = 6, StartBit = 2, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Доп помпа 3 статус", BitLength = 2, StartByte = 6, StartBit = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
 
-            Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для перехода в ждущий.", BitLength = 8, StartByte = 1, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
-            Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для выхода из ждущего.", BitLength = 8, StartByte = 2, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
-            Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для выхода из ждущего при разборе воды.", BitLength = 8, StartByte = 3, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
-            Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для перехода в ждущий.", BitLength = 8, StartByte = 4, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
-            Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего.", BitLength = 8, StartByte = 5, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
-            Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего при разборе воды.", BitLength = 8, StartByte = 6, b = -75, PackNumber = 2, UnitT = UnitType.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для перехода в ждущий.", BitLength = 8, StartByte = 1, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для выхода из ждущего.", BitLength = 8, StartByte = 2, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для выхода из ждущего при разборе воды.", BitLength = 8, StartByte = 3, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для перехода в ждущий.", BitLength = 8, StartByte = 4, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего.", BitLength = 8, StartByte = 5, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего при разборе воды.", BitLength = 8, StartByte = 6, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
 
-            Pgns[19].parameters.Add(new() { Name = "Уставка температуры для тёплого пола", BitLength = 8, StartByte = 1, b = -75, PackNumber = 3, UnitT = UnitType.Temp });
-            Pgns[19].parameters.Add(new() { Name = "Гистерезис работы тёплого пола ", BitLength = 8, StartByte = 2, PackNumber = 3, UnitT = UnitType.Temp });
-            Pgns[19].parameters.Add(new() { Name = "Уставка предпускового подогрева", BitLength = 8, StartByte = 3, b = -75, PackNumber = 3, UnitT = UnitType.Temp });
-            Pgns[19].parameters.Add(new() { Name = "Ограничение работы по времени предпускового подогрева, мин", BitLength = 16, StartByte = 4, PackNumber = 3, UnitT = UnitType.Minute });
+            Pgns[19].parameters.Add(new() { Name = "Уставка температуры для тёплого пола", BitLength = 8, StartByte = 1, b = -75, PackNumber = 3, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Гистерезис работы тёплого пола ", BitLength = 8, StartByte = 2, PackNumber = 3, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Уставка предпускового подогрева", BitLength = 8, StartByte = 3, b = -75, PackNumber = 3, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Ограничение работы по времени предпускового подогрева, мин", BitLength = 16, StartByte = 4, PackNumber = 3, UnitT = UnitType_t.Minute });
 
             Pgns[19].parameters.Add(new() { Name = "Подключенная зона 1", BitLength = 8, StartByte = 1, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
             Pgns[19].parameters.Add(new() { Name = "Подключенная зона 2", BitLength = 8, StartByte = 2, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
@@ -374,11 +375,11 @@ namespace OmniProtocol
             Pgns[20].parameters.Add(new() { Name = "Байт неисправностей 5", BitLength = 8, StartByte = 6 });
             Pgns[20].parameters.Add(new() { Name = "Байт неисправностей 6", BitLength = 8, StartByte = 7 });
 
-            Pgns[21].parameters.Add(new() { Name = "Опорное напряжение процессора", BitLength = 8, StartByte = 0, UnitT = UnitType.Volt, a = 0.1 });
-            Pgns[21].parameters.Add(new() { Name = "Температура процессора", BitLength = 8, StartByte = 1, UnitT = UnitType.Temp, b = -75 });
-            Pgns[21].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, UnitT = UnitType.Temp, b = -75, Var = 106 });
-            Pgns[21].parameters.Add(new() { Name = "Температура теплообменника", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, b = -75 });
-            Pgns[21].parameters.Add(new() { Name = "Температура наружного воздуха", BitLength = 8, StartByte = 4, UnitT = UnitType.Temp, b = -75, Var = 107 });
+            Pgns[21].parameters.Add(new() { Name = "Опорное напряжение процессора", BitLength = 8, StartByte = 0, UnitT = UnitType_t.Volt, a = 0.1 });
+            Pgns[21].parameters.Add(new() { Name = "Температура процессора", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Temp, b = -75 });
+            Pgns[21].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Temp, b = -75, Var = 106 });
+            Pgns[21].parameters.Add(new() { Name = "Температура теплообменника", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Temp, b = -75 });
+            Pgns[21].parameters.Add(new() { Name = "Температура наружного воздуха", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Temp, b = -75, Var = 107 });
             Pgns[21].parameters.Add(new() { Name = "Иконка подогревателя", BitLength = 8, StartByte = 5, Meanings = { { 0, "Ожидание" }, { 1, "Продувка" }, { 2, "Розжиг" }, { 3, "Работа на мощности" } } });
             Pgns[21].parameters.Add(new() { Name = "Уровень жидкости в баке", BitLength = 8, StartByte = 6, Var = 105 });
             Pgns[21].parameters.Add(new() { Name = "Режим хранения", BitLength = 2, StartByte = 7, Meanings = DefMeaningsYesNo });
@@ -391,51 +392,51 @@ namespace OmniProtocol
             Pgns[22].parameters.Add(new() { Name = "Зона 3", BitLength = 2, StartByte = 0, StartBit = 4, Meanings = DefMeaningsOnOff, Var = 67 });
             Pgns[22].parameters.Add(new() { Name = "Зона 4", BitLength = 2, StartByte = 0, StartBit = 6, Meanings = DefMeaningsOnOff, Var = 68 });
             Pgns[22].parameters.Add(new() { Name = "Зона 5", BitLength = 2, StartByte = 1, StartBit = 0, Meanings = DefMeaningsOnOff, Var = 69 });
-            Pgns[22].parameters.Add(new() { Name = "Температура зоны 1", BitLength = 8, StartByte = 2, UnitT = UnitType.Temp, b = -75, Var = 70 });
-            Pgns[22].parameters.Add(new() { Name = "Температура зоны 2", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, b = -75, Var = 71 });
-            Pgns[22].parameters.Add(new() { Name = "Температура зоны 3", BitLength = 8, StartByte = 4, UnitT = UnitType.Temp, b = -75, Var = 72 });
-            Pgns[22].parameters.Add(new() { Name = "Температура зоны 4", BitLength = 8, StartByte = 5, UnitT = UnitType.Temp, b = -75, Var = 73 });
-            Pgns[22].parameters.Add(new() { Name = "Температура зоны 5", BitLength = 8, StartByte = 6, UnitT = UnitType.Temp, b = -75, Var = 74 });
+            Pgns[22].parameters.Add(new() { Name = "Температура зоны 1", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Temp, b = -75, Var = 70 });
+            Pgns[22].parameters.Add(new() { Name = "Температура зоны 2", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Temp, b = -75, Var = 71 });
+            Pgns[22].parameters.Add(new() { Name = "Температура зоны 3", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Temp, b = -75, Var = 72 });
+            Pgns[22].parameters.Add(new() { Name = "Температура зоны 4", BitLength = 8, StartByte = 5, UnitT = UnitType_t.Temp, b = -75, Var = 73 });
+            Pgns[22].parameters.Add(new() { Name = "Температура зоны 5", BitLength = 8, StartByte = 6, UnitT = UnitType_t.Temp, b = -75, Var = 74 });
             Pgns[22].parameters.Add(new() { Name = "Кнопка Подогреватель", BitLength = 2, StartByte = 7, StartBit = 0, Meanings = DefMeaningsOnOff, Var = 119 });
             Pgns[22].parameters.Add(new() { Name = "Кнопка ТЭН", BitLength = 2, StartByte = 7, StartBit = 2, Meanings = DefMeaningsOnOff, Var = 120 });
             Pgns[22].parameters.Add(new() { Name = "Кнопка Тёплый пол", BitLength = 2, StartByte = 7, StartBit = 4, Meanings = DefMeaningsOnOff });
             Pgns[22].parameters.Add(new() { Name = "Кнопка Предпусковой подогрев", BitLength = 2, StartByte = 7, StartBit = 5, Meanings = DefMeaningsOnOff });
 
-            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType.Percent, Var = 100 });
-            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType.Percent, Var = 101 });
-            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 3", BitLength = 8, StartByte = 2, UnitT = UnitType.Percent, Var = 102 });
-            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 4", BitLength = 8, StartByte = 3, UnitT = UnitType.Percent, Var = 103 });
-            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 5", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent, Var = 104 });
+            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType_t.Percent, Var = 100 });
+            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Percent, Var = 101 });
+            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 3", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Percent, Var = 102 });
+            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 4", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Percent, Var = 103 });
+            Pgns[23].parameters.Add(new() { Name = "Зад. ШИМ вентилятора зоны 5", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Percent, Var = 104 });
 
             Pgns[24].parameters.Add(new() { Name = "Ступень скорости вентилятора зоны 1", BitLength = 4, StartByte = 0, });
             Pgns[24].parameters.Add(new() { Name = "Ступень скорости вентилятора зоны 2", BitLength = 4, StartByte = 0, StartBit = 4 });
             Pgns[24].parameters.Add(new() { Name = "Ступень скорости вентилятора зоны 3", BitLength = 4, StartByte = 1, });
             Pgns[24].parameters.Add(new() { Name = "Ступень скорости вентилятора зоны 4", BitLength = 4, StartByte = 1, StartBit = 4 });
             Pgns[24].parameters.Add(new() { Name = "Ступень скорости вентилятора зоны 5", BitLength = 4, StartByte = 2, });
-            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 1", BitLength = 8, StartByte = 3, UnitT = UnitType.Percent, Var = 95 });
-            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 2", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent, Var = 96 });
-            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 3", BitLength = 8, StartByte = 5, UnitT = UnitType.Percent, Var = 97 });
-            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 4", BitLength = 8, StartByte = 6, UnitT = UnitType.Percent, Var = 98 });
-            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 5", BitLength = 8, StartByte = 7, UnitT = UnitType.Percent, Var = 99 });
+            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 1", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Percent, Var = 95 });
+            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 2", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Percent, Var = 96 });
+            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 3", BitLength = 8, StartByte = 5, UnitT = UnitType_t.Percent, Var = 97 });
+            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 4", BitLength = 8, StartByte = 6, UnitT = UnitType_t.Percent, Var = 98 });
+            Pgns[24].parameters.Add(new() { Name = "Тек. ШИМ вентилятора зоны 5", BitLength = 8, StartByte = 7, UnitT = UnitType_t.Percent, Var = 99 });
 
-            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType.Temp, b = -75, Var = 75 });
-            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType.Temp, b = -75, Var = 76 });
-            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 3", BitLength = 8, StartByte = 2, UnitT = UnitType.Temp, b = -75, Var = 77 });
-            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 4", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, b = -75, Var = 78 });
-            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 5", BitLength = 8, StartByte = 4, UnitT = UnitType.Temp, b = -75, Var = 79 });
+            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType_t.Temp, b = -75, Var = 75 });
+            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Temp, b = -75, Var = 76 });
+            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 3", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Temp, b = -75, Var = 77 });
+            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 4", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Temp, b = -75, Var = 78 });
+            Pgns[25].parameters.Add(new() { Name = "Дневная уставка зоны 5", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Temp, b = -75, Var = 79 });
 
-            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType.Temp, b = -75, Var = 80 });
-            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType.Temp, b = -75, Var = 81 });
-            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 3", BitLength = 8, StartByte = 2, UnitT = UnitType.Temp, b = -75, Var = 82 });
-            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 4", BitLength = 8, StartByte = 3, UnitT = UnitType.Temp, b = -75, Var = 83 });
-            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 5", BitLength = 8, StartByte = 4, UnitT = UnitType.Temp, b = -75, Var = 84 });
+            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType_t.Temp, b = -75, Var = 80 });
+            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Temp, b = -75, Var = 81 });
+            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 3", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Temp, b = -75, Var = 82 });
+            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 4", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Temp, b = -75, Var = 83 });
+            Pgns[26].parameters.Add(new() { Name = "Ночная уставка зоны 5", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Temp, b = -75, Var = 84 });
 
 
-            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType.Percent, Var = 90 });
-            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType.Percent, Var = 91 });
-            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 3", BitLength = 8, StartByte = 2, UnitT = UnitType.Percent, Var = 92 });
-            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 4", BitLength = 8, StartByte = 3, UnitT = UnitType.Percent, Var = 93 });
-            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 5", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent, Var = 94 });
+            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 1", BitLength = 8, StartByte = 0, UnitT = UnitType_t.Percent, Var = 90 });
+            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 2", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Percent, Var = 91 });
+            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 3", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Percent, Var = 92 });
+            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 4", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Percent, Var = 93 });
+            Pgns[27].parameters.Add(new() { Name = "Ручная уставка ШИМ зоны 5", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Percent, Var = 94 });
 
             Pgns[27].parameters.Add(new() { Name = "Зона 1 Ручной режим", BitLength = 2, StartByte = 5, StartBit = 0, Meanings = DefMeaningsOnOff, Var = 85 });
             Pgns[27].parameters.Add(new() { Name = "Зона 2 Ручной режим", BitLength = 2, StartByte = 5, StartBit = 2, Meanings = DefMeaningsOnOff, Var = 86 });
@@ -443,37 +444,37 @@ namespace OmniProtocol
             Pgns[27].parameters.Add(new() { Name = "Зона 4 Ручной режим", BitLength = 2, StartByte = 5, StartBit = 6, Meanings = DefMeaningsOnOff, Var = 88 });
             Pgns[27].parameters.Add(new() { Name = "Зона 5 Ручной режим", BitLength = 2, StartByte = 6, StartBit = 0, Meanings = DefMeaningsOnOff, Var = 89 });
 
-            Pgns[28].parameters.Add(new() { Name = "Общее время на всех режимах", BitLength = 32, StartByte = 0, UnitT = UnitType.Second });
-            Pgns[28].parameters.Add(new() { Name = "Общее время работы (кроме ожидания команды)", BitLength = 32, StartByte = 4, UnitT = UnitType.Second });
+            Pgns[28].parameters.Add(new() { Name = "Общее время на всех режимах", BitLength = 32, StartByte = 0, UnitT = UnitType_t.Second });
+            Pgns[28].parameters.Add(new() { Name = "Общее время работы (кроме ожидания команды)", BitLength = 32, StartByte = 4, UnitT = UnitType_t.Second });
 
-            Pgns[29].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 1, UnitT = UnitType.Pressure, PackNumber = 1 });
-            Pgns[29].parameters.Add(new() { Name = "Среднее максимальное значение давления", BitLength = 24, StartByte = 2, UnitT = UnitType.Pressure, a = 0.001, PackNumber = 1 });
-            Pgns[29].parameters.Add(new() { Name = "Среднее минимальное значение давления", BitLength = 24, StartByte = 4, UnitT = UnitType.Pressure, a = 0.001, PackNumber = 1 });
+            Pgns[29].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Pressure, PackNumber = 1 });
+            Pgns[29].parameters.Add(new() { Name = "Среднее максимальное значение давления", BitLength = 24, StartByte = 2, UnitT = UnitType_t.Pressure, a = 0.001, PackNumber = 1 });
+            Pgns[29].parameters.Add(new() { Name = "Среднее минимальное значение давления", BitLength = 24, StartByte = 4, UnitT = UnitType_t.Pressure, a = 0.001, PackNumber = 1 });
 
-            Pgns[29].parameters.Add(new() { Name = "Разница между max и min  значениями", BitLength = 16, StartByte = 1, a = 0.01, UnitT = UnitType.Pressure, PackNumber = 2 });
+            Pgns[29].parameters.Add(new() { Name = "Разница между max и min  значениями", BitLength = 16, StartByte = 1, a = 0.01, UnitT = UnitType_t.Pressure, PackNumber = 2 });
             Pgns[29].parameters.Add(new() { Name = "Флаг появления пламени по пульсации давления", BitLength = 2, StartByte = 3, Meanings = DefMeaningsYesNo, PackNumber = 2 });
-            Pgns[29].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 24, StartByte = 4, UnitT = UnitType.Pressure, a = 0.001, PackNumber = 2, Var = 60 });
+            Pgns[29].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 24, StartByte = 4, UnitT = UnitType_t.Pressure, a = 0.001, PackNumber = 2, Var = 60 });
 
-            Pgns[31].parameters.Add(new() { Name = "Время работы", BitLength = 32, StartByte = 0, UnitT = UnitType.Second, Var = 3 });
-            Pgns[31].parameters.Add(new() { Name = "Время работы на режиме", BitLength = 32, StartByte = 4, UnitT = UnitType.Second, Var = 4 });
+            Pgns[31].parameters.Add(new() { Name = "Время работы", BitLength = 32, StartByte = 0, UnitT = UnitType_t.Second, Var = 3 });
+            Pgns[31].parameters.Add(new() { Name = "Время работы на режиме", BitLength = 32, StartByte = 4, UnitT = UnitType_t.Second, Var = 4 });
 
-            Pgns[32].parameters.Add(new() { Name = "t_work_time_minutes", BitLength = 16, StartByte = 0, UnitT = UnitType.Minute });
+            Pgns[32].parameters.Add(new() { Name = "t_work_time_minutes", BitLength = 16, StartByte = 0, UnitT = UnitType_t.Minute });
             Pgns[32].parameters.Add(new() { Name = "t_heater_mode", BitLength = 4, StartByte = 2, Meanings = { { 0, "t_regular" }, { 1, "t_eco" }, { 2, "t_additional_heater" }, { 3, "t_heating" }, { 4, "t_heating_systems" } } });
 
-            Pgns[40].parameters.Add(new() { Name = "t_year", BitLength = 8, StartByte = 0, UnitT = UnitType.Year, Var = 118 });
-            Pgns[40].parameters.Add(new() { Name = "t_month", BitLength = 8, StartByte = 1, UnitT = UnitType.Month, Var = 117 });
-            Pgns[40].parameters.Add(new() { Name = "t_day", BitLength = 8, StartByte = 2, UnitT = UnitType.Day, Var = 116 });
-            Pgns[40].parameters.Add(new() { Name = "t_hour", BitLength = 8, StartByte = 3, UnitT = UnitType.Hour, Var = 115 });
-            Pgns[40].parameters.Add(new() { Name = "t_minute", BitLength = 8, StartByte = 4, UnitT = UnitType.Minute, Var = 114 });
-            Pgns[40].parameters.Add(new() { Name = "t_second", BitLength = 8, StartByte = 5, UnitT = UnitType.Second, Var = 113 });
+            Pgns[40].parameters.Add(new() { Name = "t_year", BitLength = 8, StartByte = 0, UnitT = UnitType_t.Year, Var = 118 });
+            Pgns[40].parameters.Add(new() { Name = "t_month", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Month, Var = 117 });
+            Pgns[40].parameters.Add(new() { Name = "t_day", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Day, Var = 116 });
+            Pgns[40].parameters.Add(new() { Name = "t_hour", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Hour, Var = 115 });
+            Pgns[40].parameters.Add(new() { Name = "t_minute", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Minute, Var = 114 });
+            Pgns[40].parameters.Add(new() { Name = "t_second", BitLength = 8, StartByte = 5, UnitT = UnitType_t.Second, Var = 113 });
 
-            Pgns[41].parameters.Add(new() { Name = "t_day_start_hour", BitLength = 8, StartByte = 0, UnitT = UnitType.Hour });
-            Pgns[41].parameters.Add(new() { Name = "t_day_start_minute", BitLength = 8, StartByte = 1, UnitT = UnitType.Minute });
-            Pgns[41].parameters.Add(new() { Name = "t_night_start_hour", BitLength = 8, StartByte = 2, UnitT = UnitType.Hour });
-            Pgns[41].parameters.Add(new() { Name = "t_hight_start_minute", BitLength = 8, StartByte = 3, UnitT = UnitType.Minute });
-            Pgns[41].parameters.Add(new() { Name = "t_daytime_backlight", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
-            Pgns[41].parameters.Add(new() { Name = "t_nighttime_backlight", BitLength = 8, StartByte = 5, UnitT = UnitType.Percent });
-            Pgns[41].parameters.Add(new() { Name = "t_display_sleep_time", BitLength = 16, StartByte = 6, UnitT = UnitType.Second });
+            Pgns[41].parameters.Add(new() { Name = "t_day_start_hour", BitLength = 8, StartByte = 0, UnitT = UnitType_t.Hour });
+            Pgns[41].parameters.Add(new() { Name = "t_day_start_minute", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Minute });
+            Pgns[41].parameters.Add(new() { Name = "t_night_start_hour", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Hour });
+            Pgns[41].parameters.Add(new() { Name = "t_hight_start_minute", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Minute });
+            Pgns[41].parameters.Add(new() { Name = "t_daytime_backlight", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Percent });
+            Pgns[41].parameters.Add(new() { Name = "t_nighttime_backlight", BitLength = 8, StartByte = 5, UnitT = UnitType_t.Percent });
+            Pgns[41].parameters.Add(new() { Name = "t_display_sleep_time", BitLength = 16, StartByte = 6, UnitT = UnitType_t.Second });
 
             Pgns[42].parameters.Add(new() { Name = "t_pump_heater_btn", BitLength = 8, StartByte = 0, Meanings = DefMeaningsOnOff });
             Pgns[42].parameters.Add(new() { Name = "t_pump_1_btn", BitLength = 8, StartByte = 1, Meanings = DefMeaningsOnOff });
@@ -493,10 +494,10 @@ namespace OmniProtocol
             Pgns[44].parameters.Add(new() { Name = "t_channel3_pwm_value", BitLength = 16, StartByte = 4 });
             Pgns[44].parameters.Add(new() { Name = "t_channel4_pwm_value", BitLength = 16, StartByte = 6 });
 
-            Pgns[45].parameters.Add(new() { Name = "t_channel1_temperature", BitLength = 16, StartByte = 0, a = 0.1, UnitT = UnitType.Temp, Signed = true });
-            Pgns[45].parameters.Add(new() { Name = "t_channel2_temperature", BitLength = 16, StartByte = 2, a = 0.1, UnitT = UnitType.Temp, Signed = true });
-            Pgns[45].parameters.Add(new() { Name = "t_channel3_temperature", BitLength = 16, StartByte = 4, a = 0.1, UnitT = UnitType.Temp, Signed = true });
-            Pgns[45].parameters.Add(new() { Name = "t_channel4_temperature", BitLength = 16, StartByte = 6, a = 0.1, UnitT = UnitType.Temp, Signed = true });
+            Pgns[45].parameters.Add(new() { Name = "t_channel1_temperature", BitLength = 16, StartByte = 0, a = 0.1, UnitT = UnitType_t.Temp, Signed = true });
+            Pgns[45].parameters.Add(new() { Name = "t_channel2_temperature", BitLength = 16, StartByte = 2, a = 0.1, UnitT = UnitType_t.Temp, Signed = true });
+            Pgns[45].parameters.Add(new() { Name = "t_channel3_temperature", BitLength = 16, StartByte = 4, a = 0.1, UnitT = UnitType_t.Temp, Signed = true });
+            Pgns[45].parameters.Add(new() { Name = "t_channel4_temperature", BitLength = 16, StartByte = 6, a = 0.1, UnitT = UnitType_t.Temp, Signed = true });
 
             Pgns[46].parameters.Add(new() { Name = "t_error_code1", BitLength = 8, StartByte = 0, GetMeaning = (x) => GetString($"e_{x}") });
             Pgns[46].parameters.Add(new() { Name = "t_error_code2", BitLength = 8, StartByte = 1, GetMeaning = (x) => GetString($"e_{x}") });
@@ -515,54 +516,54 @@ namespace OmniProtocol
             Pgns[47].parameters.Add(new() { Name = "t_blower_overriden", BitLength = 2, StartByte = 1, StartBit = 0, Meanings = DefMeaningsYesNo });
             Pgns[47].parameters.Add(new() { Name = "t_pump_state", BitLength = 2, StartByte = 2, StartBit = 0, Meanings = DefMeaningsOnOff });
             Pgns[47].parameters.Add(new() { Name = "t_relay_state", BitLength = 2, StartByte = 2, StartBit = 2, Meanings = DefMeaningsOnOff });
-            Pgns[47].parameters.Add(new() { Name = "t_overriden_blower_revs", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps });
-            Pgns[47].parameters.Add(new() { Name = "t_overriden_glow_plug_power", BitLength = 8, StartByte = 4, UnitT = UnitType.Percent });
-            Pgns[47].parameters.Add(new() { Name = "t_overriden_fuel_pump_frequency", BitLength = 16, StartByte = 5, a = 0.01, UnitT = UnitType.Frequency });
+            Pgns[47].parameters.Add(new() { Name = "t_overriden_blower_revs", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Rps });
+            Pgns[47].parameters.Add(new() { Name = "t_overriden_glow_plug_power", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Percent });
+            Pgns[47].parameters.Add(new() { Name = "t_overriden_fuel_pump_frequency", BitLength = 16, StartByte = 5, a = 0.01, UnitT = UnitType_t.Frequency });
 
             Pgns[50].parameters.Add(new() { Name = "t_compressor_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" } }, PackNumber = 1 });
-            Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, Var = 134, PackNumber = 1 });
-            Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, Var = 135, PackNumber = 1 });
-            Pgns[50].parameters.Add(new() { Name = "t_compressor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 146, PackNumber = 1 });
-            Pgns[50].parameters.Add(new() { Name = "t_compressor_power_set", BitLength = 16, StartByte = 6, UnitT = UnitType.Power, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Rps, Var = 134, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Rps, Var = 135, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType_t.Percent, Var = 146, PackNumber = 1 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_power_set", BitLength = 16, StartByte = 6, UnitT = UnitType_t.Power, PackNumber = 1 });
 
-            Pgns[50].parameters.Add(new() { Name = "t_compressor_current", BitLength = 16, StartByte = 1, UnitT = UnitType.Current, a = 0.01, Var = 138, PackNumber = 2 });
-            Pgns[50].parameters.Add(new() { Name = "t_condensor_current", BitLength = 16, StartByte = 3, UnitT = UnitType.Current, a = 0.01, Var = 139, PackNumber = 2 });
-            Pgns[50].parameters.Add(new() { Name = "t_mcu_temp", BitLength = 8, StartByte = 5, UnitT = UnitType.Temp, b = -75, Var = 59, PackNumber = 2 });
-            Pgns[50].parameters.Add(new() { Name = "t_pcb_temp", BitLength = 8, StartByte = 6, UnitT = UnitType.Temp, b = -75, Var = 145, PackNumber = 2 });
+            Pgns[50].parameters.Add(new() { Name = "t_compressor_current", BitLength = 16, StartByte = 1, UnitT = UnitType_t.Current, a = 0.01, Var = 138, PackNumber = 2 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_current", BitLength = 16, StartByte = 3, UnitT = UnitType_t.Current, a = 0.01, Var = 139, PackNumber = 2 });
+            Pgns[50].parameters.Add(new() { Name = "t_mcu_temp", BitLength = 8, StartByte = 5, UnitT = UnitType_t.Temp, b = -75, Var = 59, PackNumber = 2 });
+            Pgns[50].parameters.Add(new() { Name = "t_pcb_temp", BitLength = 8, StartByte = 6, UnitT = UnitType_t.Temp, b = -75, Var = 145, PackNumber = 2 });
 
-            Pgns[50].parameters.Add(new() { Name = "t_high_pressure", BitLength = 16, StartByte = 1, UnitT = UnitType.Pressure, PackNumber = 3, a = 0.01 ,Var = 141});
-            Pgns[50].parameters.Add(new() { Name = "t_low_pressure", BitLength = 16, StartByte = 3, UnitT = UnitType.Pressure, PackNumber = 3, a = 0.01 , Var=142 });
+            Pgns[50].parameters.Add(new() { Name = "t_high_pressure", BitLength = 16, StartByte = 1, UnitT = UnitType_t.Pressure, PackNumber = 3, a = 0.01 ,Var = 141});
+            Pgns[50].parameters.Add(new() { Name = "t_low_pressure", BitLength = 16, StartByte = 3, UnitT = UnitType_t.Pressure, PackNumber = 3, a = 0.01 , Var=142 });
             Pgns[50].parameters.Add(new() { Name = "t_ac_press_sensor", BitLength = 8, StartByte = 5, Meanings = DefMeaningsAllow, PackNumber = 3 });
 
             Pgns[50].parameters.Add(new() { Name = "t_condensor_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" } }, PackNumber = 4 });
-            Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, PackNumber = 4 });
-            Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, PackNumber = 4 });
-            Pgns[50].parameters.Add(new() { Name = "t_condensor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 136, PackNumber = 4 });
-            Pgns[50].parameters.Add(new() { Name = "t_condensor_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Power, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Rps, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Rps, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType_t.Percent, Var = 136, PackNumber = 4 });
+            Pgns[50].parameters.Add(new() { Name = "t_condensor_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType_t.Power, PackNumber = 4 });
 
             Pgns[51].parameters.Add(new() { Name = "t_ac_mode", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_off" }, { 1, "t_cool" }, { 2, "t_dry" }, { 3, "t_eco" }, { 4, "t_night" }, { 5, "t_power" }, { 6, "t_manual" } }, PackNumber = 1 });
-            Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType.Temp, Var = 143, PackNumber = 1 });
+            Pgns[51].parameters.Add(new() { Name = "t_ac_temp_setpoint", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType_t.Temp, Var = 143, PackNumber = 1 });
             Pgns[51].parameters.Add(new() { Name = "t_ac_fan_mode", BitLength = 8, StartByte = 3, Meanings = { { 0, "t_auto" }, { 1, "t_1st_speed" }, { 2, "t_2nd_speed" }, { 3, "t_3rd_speed" }, { 4, "t_4th_speed" }, { 5, "t_5th_speed" } }, PackNumber = 1 ,Var = 144});
-            Pgns[51].parameters.Add(new() { Name = "t_ac_panel_current", BitLength = 16, StartByte = 4, PackNumber = 1, Var = 140, a=0.01 ,UnitT=UnitType.Current});
+            Pgns[51].parameters.Add(new() { Name = "t_ac_panel_current", BitLength = 16, StartByte = 4, PackNumber = 1, Var = 140, a=0.01 ,UnitT=UnitType_t.Current});
 
             Pgns[51].parameters.Add(new() { Name = "t_evap_control_type", BitLength = 8, StartByte = 1, Meanings = { { 0, "t_pwm" }, { 1, "t_revolutions" }, { 2, "t_power" } }, PackNumber = 2 });
-            Pgns[51].parameters.Add(new() { Name = "t_evap_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType.Rps, PackNumber = 2 });
-            Pgns[51].parameters.Add(new() { Name = "t_evap_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType.Rps, PackNumber = 2 });
-            Pgns[51].parameters.Add(new() { Name = "t_evap_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType.Percent, Var = 137, PackNumber = 2 });
-            Pgns[51].parameters.Add(new() { Name = "t_evap_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType.Power, PackNumber = 2 });
+            Pgns[51].parameters.Add(new() { Name = "t_evap_rev_set", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Rps, PackNumber = 2 });
+            Pgns[51].parameters.Add(new() { Name = "t_evap_rev_measured", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Rps, PackNumber = 2 });
+            Pgns[51].parameters.Add(new() { Name = "t_evap_pwm_set", BitLength = 16, a = 0.01, StartByte = 4, UnitT = UnitType_t.Percent, Var = 137, PackNumber = 2 });
+            Pgns[51].parameters.Add(new() { Name = "t_evap_power_set", BitLength = 16, a = 0.01, StartByte = 6, UnitT = UnitType_t.Power, PackNumber = 2 });
 
-            Pgns[51].parameters.Add(new() { Name = "t_ac_cabin_air_t", BitLength = 16, StartByte = 1, UnitT = UnitType.Temp, PackNumber = 3 ,Var = 149, a=0.01,Signed=true});
-            Pgns[51].parameters.Add(new() { Name = "t_ac_evap_t", BitLength = 16, StartByte = 3,  UnitT = UnitType.Temp, PackNumber = 3 ,Var = 148, a = 0.01, Signed = true });
-            Pgns[51].parameters.Add(new() { Name = "t_ac_aux1_t", BitLength = 16, StartByte = 5,  UnitT = UnitType.Temp, PackNumber = 3, Var = 150, a = 0.01, Signed = true });
+            Pgns[51].parameters.Add(new() { Name = "t_ac_cabin_air_t", BitLength = 16, StartByte = 1, UnitT = UnitType_t.Temp, PackNumber = 3 ,Var = 149, a=0.01,Signed=true});
+            Pgns[51].parameters.Add(new() { Name = "t_ac_evap_t", BitLength = 16, StartByte = 3,  UnitT = UnitType_t.Temp, PackNumber = 3 ,Var = 148, a = 0.01, Signed = true });
+            Pgns[51].parameters.Add(new() { Name = "t_ac_aux1_t", BitLength = 16, StartByte = 5,  UnitT = UnitType_t.Temp, PackNumber = 3, Var = 150, a = 0.01, Signed = true });
             
-            Pgns[52].parameters.Add(new() { Name = "t_ac_man_evap_pwm_set", BitLength = 16, StartByte = 1, UnitT = UnitType.Percent, a = 0.01 });
-            Pgns[52].parameters.Add(new() { Name = "t_ac_man_cond_pwm_set", BitLength = 16, StartByte = 3, UnitT = UnitType.Percent, a = 0.01 });
-            Pgns[52].parameters.Add(new() { Name = "t_ac_man_comp_pwm_set", BitLength = 16, StartByte = 5, UnitT = UnitType.Percent, a = 0.01 });
+            Pgns[52].parameters.Add(new() { Name = "t_ac_man_evap_pwm_set", BitLength = 16, StartByte = 1, UnitT = UnitType_t.Percent, a = 0.01 });
+            Pgns[52].parameters.Add(new() { Name = "t_ac_man_cond_pwm_set", BitLength = 16, StartByte = 3, UnitT = UnitType_t.Percent, a = 0.01 });
+            Pgns[52].parameters.Add(new() { Name = "t_ac_man_comp_pwm_set", BitLength = 16, StartByte = 5, UnitT = UnitType_t.Percent, a = 0.01 });
 
-            Pgns[55].parameters.Add(new() { Name = "t_tank1_level", BitLength = 8, StartByte = 0, UnitT = UnitType.Percent });
-            Pgns[55].parameters.Add(new() { Name = "t_tank2_level", BitLength = 8, StartByte = 1, UnitT = UnitType.Percent });
-            Pgns[55].parameters.Add(new() { Name = "t_tank3_level", BitLength = 8, StartByte = 2, UnitT = UnitType.Percent });
-            Pgns[55].parameters.Add(new() { Name = "t_tank4_level", BitLength = 8, StartByte = 3, UnitT = UnitType.Percent });
+            Pgns[55].parameters.Add(new() { Name = "t_tank1_level", BitLength = 8, StartByte = 0, UnitT = UnitType_t.Percent });
+            Pgns[55].parameters.Add(new() { Name = "t_tank2_level", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Percent });
+            Pgns[55].parameters.Add(new() { Name = "t_tank3_level", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Percent });
+            Pgns[55].parameters.Add(new() { Name = "t_tank4_level", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Percent });
             Pgns[55].parameters.Add(new() { Name = "t_tank1_content", BitLength = 4, StartByte = 4, Meanings = { { 0, "t_off" }, { 1, "t_white_tank" }, { 2, "t_grey_tank" }, { 3, "t_black_tank" }, { 4, "t_fuel_tank" } } });
             Pgns[55].parameters.Add(new() { Name = "t_tank1_resistance", BitLength = 4, StartByte = 4, StartBit = 4, Meanings = { { 0, "t_0-190_ohm" }, { 1, "t_240-33_ohm" }, { 2, "t_short_full" }, { 3, "t_open_full" } } });
             Pgns[55].parameters.Add(new() { Name = "t_tank2_content", BitLength = 4, StartByte = 5, Meanings = { { 0, "t_off" }, { 1, "t_white_tank" }, { 2, "t_grey_tank" }, { 3, "t_black_tank" }, { 4, "t_fuel_tank" } } });
@@ -575,13 +576,13 @@ namespace OmniProtocol
             Pgns[49].parameters.Add(new() { Name = "t_load_channel1", BitLength = 2, StartByte = 0, StartBit = 0, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
             Pgns[49].parameters.Add(new() { Name = "t_load_channel2", BitLength = 2, StartByte = 0, StartBit = 2, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
             Pgns[49].parameters.Add(new() { Name = "t_load_channel3", BitLength = 2, StartByte = 0, StartBit = 4, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
-            Pgns[99].parameters.Add(new() { Name = "t_channel_pwm1", BitLength = 8, StartByte = 1, UnitT = UnitType.Percent });
-            Pgns[99].parameters.Add(new() { Name = "t_channel_pwm2", BitLength = 8, StartByte = 2, UnitT = UnitType.Percent });
-            Pgns[99].parameters.Add(new() { Name = "t_channel_pwm3", BitLength = 8, StartByte = 3, UnitT = UnitType.Percent });
+            Pgns[99].parameters.Add(new() { Name = "t_channel_pwm1", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Percent });
+            Pgns[99].parameters.Add(new() { Name = "t_channel_pwm2", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Percent });
+            Pgns[99].parameters.Add(new() { Name = "t_channel_pwm3", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Percent });
 
-            Pgns[99].parameters.Add(new() { Name = "t_temperature_1", BitLength = 16, Signed = true, StartByte = 1, UnitT = UnitType.Temp, PackNumber = 1, Var = 129 });
-            Pgns[99].parameters.Add(new() { Name = "t_temperature_2", BitLength = 16, Signed = true, StartByte = 3, UnitT = UnitType.Temp, PackNumber = 1, Var = 130 });
-            Pgns[99].parameters.Add(new() { Name = "t_pressure", BitLength = 24, StartByte = 5, a = 0.001, UnitT = UnitType.Pressure, Var = 131 });
+            Pgns[99].parameters.Add(new() { Name = "t_temperature_1", BitLength = 16, Signed = true, StartByte = 1, UnitT = UnitType_t.Temp, PackNumber = 1, Var = 129 });
+            Pgns[99].parameters.Add(new() { Name = "t_temperature_2", BitLength = 16, Signed = true, StartByte = 3, UnitT = UnitType_t.Temp, PackNumber = 1, Var = 130 });
+            Pgns[99].parameters.Add(new() { Name = "t_pressure", BitLength = 24, StartByte = 5, a = 0.001, UnitT = UnitType_t.Pressure, Var = 131 });
 
 
             Pgns[100].parameters.Add(new() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning = r => $"{GetString("t_starting_address")}: 0X{(r + 0x8000000):X}" });

@@ -59,7 +59,7 @@ namespace OmniProtocol
         internal double a = 1;         //коэффициент приведения
         internal double b = 0;         //смещение
 
-        public UnitType UnitT { get; set; } = UnitType.None;
+        public UnitType_t UnitT { get; set; } = UnitType_t.None;
 
         internal Dictionary<int, string> Meanings { set; get; } = new();
         internal Func<int, string> GetMeaning; //Принимает на вход сырое значение, возвращает строку с расшифровкой значения параметра
@@ -73,7 +73,7 @@ namespace OmniProtocol
         {
             get
             {
-                if (UnitT == UnitType.Temp && App.Settings.UseImperial)
+                if (UnitT == UnitType_t.Temp && App.Settings.UseImperial)
                     return "0.0"; // For correct farenheit display
                 else
                 {
@@ -95,22 +95,22 @@ namespace OmniProtocol
             {
                 switch (UnitT)
                 {
-                    case UnitType.None: return "";
-                    case UnitType.Temp:
+                    case UnitType_t.None: return "";
+                    case UnitType_t.Temp:
                         if (App.Settings.UseImperial)
                             return "°F";
                         else
                             return "°C";
-                    case UnitType.Volt: return GetString("u_voltage");
-                    case UnitType.Percent: return "%";
-                    case UnitType.Flow:
+                    case UnitType_t.Volt: return GetString("u_voltage");
+                    case UnitType_t.Percent: return "%";
+                    case UnitType_t.Flow:
                         if (App.Settings.UseImperial)
                             return GetString("u_hal_per_minute");
                         else
                             return GetString("u_litre_per_minute");
-                    case UnitType.Current: return GetString("u_ampere");
-                    case UnitType.Rpm: return GetString("u_rpm");
-                    case UnitType.Pressure:
+                    case UnitType_t.Current: return GetString("u_ampere");
+                    case UnitType_t.Rpm: return GetString("u_rpm");
+                    case UnitType_t.Pressure:
                         if (App.Settings.UseImperial)
                             return "PSI";
                         else
@@ -498,7 +498,7 @@ namespace OmniProtocol
     {
         public int Id;
         public string Name => GetString($"d_{Id}");
-        public DeviceType DevType { set; get; }
+        public DeviceType_t DevType { set; get; }
 
         public int MaxBlower { get; set; } = 130; //Максимальное значение скорости нагнетателя
         public double MaxFuelPump { get; set; } = 4; //Максимальное значение ТН

@@ -1,0 +1,40 @@
+﻿using CAN_Tool.ViewModels;
+using OmniProtocol;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Windows.Threading;
+
+namespace CAN_Tool.CustomControls
+{
+    /// <summary>
+    /// Логика взаимодействия для BootloaderControl.xaml
+    /// </summary>
+    public partial class ModemControl : UserControl
+    {
+
+        
+        public DeviceViewModel vm => (DeviceViewModel)DataContext;
+
+        
+
+        public ModemControl()
+        {
+            InitializeComponent();
+
+        }
+
+
+    }
+}

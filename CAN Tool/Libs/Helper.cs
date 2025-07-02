@@ -83,14 +83,14 @@ namespace CAN_Tool.Libs
             return Application.Current.TryFindResource(key) != null;
         }
 
-        public static double ImperialConverter(double val, UnitType type)
+        public static double ImperialConverter(double val, UnitType_t type)
         {
             if (!App.Settings.UseImperial) return val;
-            if (type == UnitType.Temp)
+            if (type == UnitType_t.Temp)
                 return val * 1.8 + 32;
-            if (type == UnitType.Pressure)
+            if (type == UnitType_t.Pressure)
                 return val * 0.14503773773;
-            if (type == UnitType.Flow)
+            if (type == UnitType_t.Flow)
                 return val / 4.5461;
 
             return val;

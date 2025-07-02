@@ -14,6 +14,7 @@
         <c:GenericLoadTrippleToVisible x:Key="OnlyForGenericLoadTripple" />
         <c:AcInverterToVisibleConveter x:Key="OnlyForAcInverter" />
         <c:AcPanelToVisibleConveter x:Key="OnlyForAcPanel" />
+        <c:ModemToVisibleConverter x:Key="OnlyForModem" />
         <c:StateToBorderBrushConverter x:Key="BoolToBrush" />
         <c:BoolToOpacity x:Key="BoolToOpacity" />
         <c:FarenheitConverter x:Key="ToFarenheit" />
@@ -145,6 +146,7 @@
                         <cc:GenericLoadTrippleControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForGenericLoadTripple}}" />
                         <cc:AcInverterControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForAcInverter}}" />
                         <cc:AcPanelControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForAcPanel}}" />
+                        <cc:ModemControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForModem}}" />
                     </DockPanel>
                 </TabItem>
                 <TabItem >
