@@ -618,7 +618,7 @@
 <v:String x:Key="var_144">Режим вентилятора кондиционера</v:String>
 <v:String x:Key="var_145">Темп.платы</v:String>
 <v:String x:Key="var_146">ШИМ компрессора</v:String>
-<v:String x:Key="var_147">ШИМ Вент.Испарителя</v:String>
+
 <v:String x:Key="var_148">Температура испарителя</v:String>
 <v:String x:Key="var_149">Температура кабины</v:String>
 <v:String x:Key="var_150">Доп датчик температуры 1</v:String>
@@ -790,7 +790,7 @@
 <v:String x:Key="vars_144">Реж.вент</v:String>
 <v:String x:Key="vars_145">Т платы</v:String>
 <v:String x:Key="vars_146">ШИМ компр</v:String>
-<v:String x:Key="vars_147">ШИМ испар</v:String>
+
 <v:String x:Key="vars_148">Т испар</v:String>
 <v:String x:Key="vars_149">Т кабины</v:String>
 <v:String x:Key="vars_150">Доп Т1</v:String>
@@ -910,10 +910,10 @@
 <v:String x:Key="d_21">14ТС-10</v:String>
 <v:String x:Key="d_22">30СП (впрысковый)</v:String>
 <v:String x:Key="d_23">Бинар Компакт Бензин</v:String>
-<v:String x:Key="d_43">Бинар Сплит B</v:String>
+<v:String x:Key="d_44">Бинар Сплит B</v:String>
 <v:String x:Key="d_25">35СП (впрысковый)</v:String>
 <v:String x:Key="d_27">Бинар Компакт Дизель</v:String>
-<v:String x:Key="d_44">Бинар Сплит D</v:String>
+<v:String x:Key="d_43">Бинар Сплит D</v:String>
 <v:String x:Key="d_29">Бинар 6Г Компакт</v:String>
 <v:String x:Key="d_31">14ТСГ Мини</v:String>
 <v:String x:Key="d_32">30СПГ</v:String>
