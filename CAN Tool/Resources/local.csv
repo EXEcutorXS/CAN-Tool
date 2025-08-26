@@ -327,6 +327,13 @@ par_130	Checking zone fans for faults	Проверка неисправност�
 par_131	Use pressure measurement for the fuel pump correction	Использовать измеренное давление для корректировки ТН: 0 - не использовать, 1 - использовать
 par_132	Set delay time to determine overvoltage error	Установить значение реакции на пониженное напряжение
 par_133	Set delay time to determine undervoltage error	Установить значение реакции на повышенное напряжение
+par_134	External tank sensor adaptation	Адаптация под внешной датчик бака
+		
+par_135	Extra pump for Zone 1	Дополнительная помпа для зоны 1
+par_136	Extra pump for Zone 2	Дополнительная помпа для зоны 2
+par_137	Extra pump for Zone 3	Дополнительная помпа для зоны 3
+par_138	Extra pump for Zone 4	Дополнительная помпа для зоны 4
+par_139	Extra pump for Zone 5	Дополнительная помпа для зоны 5
 		
 par_400	RV_LOAD_MODE_0	Режим работы доп. нагрузки 0
 par_401	RV_LOAD_MODE_1	Режим работы доп. нагрузки 1
@@ -420,7 +427,8 @@ par_559	PAR_ENGINE_PREHEAT_PUMP	Помпа предпускогого подог
 par_560	PAR_ENGINE_PREHEAT_TEMP_SENSOR	Датчик температуры предпускового подогрева
 par_561	CURRENT MEASURING COEFFICIENT	Калибровочное значения для измерения тока
 par_562	MIN_LIQUID_LEVEL	Минимальный уровень жидкости
-		
+par_563	Heater pump while engine preheat	Помпа подогревателя во время подогрева двигателя
+par_564	Max backlight brightness	Максимальная яркость подсветки
 		
 par_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C
 		

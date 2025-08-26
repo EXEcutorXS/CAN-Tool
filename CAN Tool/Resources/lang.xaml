@@ -327,6 +327,13 @@
 <v:String x:Key="par_131">Use pressure measurement for the fuel pump correction</v:String>
 <v:String x:Key="par_132">Set delay time to determine overvoltage error</v:String>
 <v:String x:Key="par_133">Set delay time to determine undervoltage error</v:String>
+<v:String x:Key="par_134">External tank sensor adaptation</v:String>
+
+<v:String x:Key="par_135">Extra pump for Zone 1</v:String>
+<v:String x:Key="par_136">Extra pump for Zone 2</v:String>
+<v:String x:Key="par_137">Extra pump for Zone 3</v:String>
+<v:String x:Key="par_138">Extra pump for Zone 4</v:String>
+<v:String x:Key="par_139">Extra pump for Zone 5</v:String>
 
 <v:String x:Key="par_400">RV_LOAD_MODE_0</v:String>
 <v:String x:Key="par_401">RV_LOAD_MODE_1</v:String>
@@ -420,7 +427,8 @@
 <v:String x:Key="par_560">PAR_ENGINE_PREHEAT_TEMP_SENSOR</v:String>
 <v:String x:Key="par_561">CURRENT MEASURING COEFFICIENT</v:String>
 <v:String x:Key="par_562">MIN_LIQUID_LEVEL</v:String>
-
+<v:String x:Key="par_563">Heater pump while engine preheat</v:String>
+<v:String x:Key="par_564">Max backlight brightness</v:String>
 
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
 
