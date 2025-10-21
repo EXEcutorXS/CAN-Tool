@@ -935,7 +935,8 @@ d_60	Pressure sensor	Датчик давления
 d_121	Modem	Модем
 d_123	Bootloader	Программный загрузчик
 d_124	AC control	Пульт кондиционера
-d_126	Control device	Устройство управления
+d_125	MBC Module	Модуль управления
+d_126	Generic panel	Пульт управления
 d_127	Everyone	Все
 		
 u_voltage	V	В

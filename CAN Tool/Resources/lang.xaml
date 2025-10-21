@@ -935,7 +935,8 @@
 <v:String x:Key="d_121">Modem</v:String>
 <v:String x:Key="d_123">Bootloader</v:String>
 <v:String x:Key="d_124">AC control</v:String>
-<v:String x:Key="d_126">Control device</v:String>
+<v:String x:Key="d_125">MBC Module</v:String>
+<v:String x:Key="d_126">Generic panel</v:String>
 <v:String x:Key="d_127">Everyone</v:String>
 
 <v:String x:Key="u_voltage">V</v:String>

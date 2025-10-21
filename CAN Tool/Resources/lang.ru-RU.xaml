@@ -935,7 +935,8 @@
 <v:String x:Key="d_121">Модем</v:String>
 <v:String x:Key="d_123">Программный загрузчик</v:String>
 <v:String x:Key="d_124">Пульт кондиционера</v:String>
-<v:String x:Key="d_126">Устройство управления</v:String>
+<v:String x:Key="d_125">Модуль управления</v:String>
+<v:String x:Key="d_126">Пульт управления</v:String>
 <v:String x:Key="d_127">Все</v:String>
 
 <v:String x:Key="u_voltage">В</v:String>

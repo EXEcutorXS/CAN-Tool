@@ -6,7 +6,7 @@ namespace OmniProtocol
 {
     public enum UnitType_t { None, Temp, Volt, Current, Pressure, Flow, Rpm, Rps, Percent, Second, Minute, Hour, Day, Month, Year, Frequency, Power }
 
-    public enum DeviceType_t { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter, AcPanel, Modem}
+    public enum DeviceType_t { Binar, Planar, Hcu, ValveControl, BootLoader, CookingPanel, ExtensionBoard, PressureSensor, GenericLoadSingle, GenericLoadTripple, AcInverter, AcPanel, Modem, Panel}
 
     public enum LoadMode_t { Off = 0, Toggle = 1, Pwm = 2 };
 
@@ -75,7 +75,8 @@ namespace OmniProtocol
             { 121, new() { Id = 121, DevType = DeviceType_t.Modem }},
             { 123, new() { Id = 123, DevType = DeviceType_t.BootLoader }} ,
             { 124, new() { Id = 124, DevType = DeviceType_t.AcPanel }},
-            { 126, new() { Id = 126, DevType = DeviceType_t.Hcu }},
+            { 125, new() { Id = 125, DevType = DeviceType_t.Hcu }},
+            { 126, new() { Id = 126, DevType = DeviceType_t.Panel }},
             { 255, new() { Id = 255 }}
         };
 
@@ -335,17 +336,17 @@ namespace OmniProtocol
             Pgns[19].parameters.Add(new() { Name = "Помпа подогревателя статус", BitLength = 2, StartByte = 7, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType_t.Temp, PackNumber = 1 });
             Pgns[19].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Temp, PackNumber = 1 });
-            Pgns[19].parameters.Add(new() { Name = "Помпа 1 статус", BitLength = 2, StartByte = 7, StartBit = 2, PackNumber = 1, Meanings = DefMeaningsOnOff });
-            Pgns[19].parameters.Add(new() { Name = "Помпа 2 статус", BitLength = 2, StartByte = 7, StartBit = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
-            Pgns[19].parameters.Add(new() { Name = "Помпа 3 статус", BitLength = 2, StartByte = 7, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
-            Pgns[19].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType_t.Temp, PackNumber = 1 });
-            Pgns[19].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Temp, PackNumber = 1 });
             Pgns[19].parameters.Add(new() { Name = "Сработал датчик бытовой воды", BitLength = 2, StartByte = 4, PackNumber = 1, Meanings = DefMeaningsYesNo, Var = 108 });
             Pgns[19].parameters.Add(new() { Name = "Доступен тёплый пол", BitLength = 2, StartByte = 5, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Доступен предпусковой подогрев", BitLength = 2, StartByte = 5, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Доп помпа 1 статус", BitLength = 2, StartByte = 6, StartBit = 0, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Доп помпа 2 статус", BitLength = 2, StartByte = 6, StartBit = 2, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Доп помпа 3 статус", BitLength = 2, StartByte = 6, StartBit = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
+            Pgns[19].parameters.Add(new() { Name = "Помпа 4 статус", BitLength = 2, StartByte = 6, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
+            Pgns[19].parameters.Add(new() { Name = "Помпа 1 статус", BitLength = 2, StartByte = 7, StartBit = 2, PackNumber = 1, Meanings = DefMeaningsOnOff });
+            Pgns[19].parameters.Add(new() { Name = "Помпа 2 статус", BitLength = 2, StartByte = 7, StartBit = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
+            Pgns[19].parameters.Add(new() { Name = "Помпа 3 статус", BitLength = 2, StartByte = 7, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
+            
 
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для перехода в ждущий.", BitLength = 8, StartByte = 1, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры жидкости подогревателя для выхода из ждущего.", BitLength = 8, StartByte = 2, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
@@ -353,18 +354,32 @@ namespace OmniProtocol
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для перехода в ждущий.", BitLength = 8, StartByte = 4, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего.", BitLength = 8, StartByte = 5, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего при разборе воды.", BitLength = 8, StartByte = 6, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
+            
 
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры для тёплого пола", BitLength = 8, StartByte = 1, b = -75, PackNumber = 3, UnitT = UnitType_t.Temp });
             Pgns[19].parameters.Add(new() { Name = "Гистерезис работы тёплого пола ", BitLength = 8, StartByte = 2, PackNumber = 3, UnitT = UnitType_t.Temp });
             Pgns[19].parameters.Add(new() { Name = "Уставка предпускового подогрева", BitLength = 8, StartByte = 3, b = -75, PackNumber = 3, UnitT = UnitType_t.Temp });
             Pgns[19].parameters.Add(new() { Name = "Ограничение работы по времени предпускового подогрева, мин", BitLength = 16, StartByte = 4, PackNumber = 3, UnitT = UnitType_t.Minute });
+            Pgns[19].parameters.Add(new() { Name = "Ограничение работы системы,часы", BitLength = 8, StartByte = 6, PackNumber = 3, UnitT = UnitType_t.Hour });
+            Pgns[19].parameters.Add(new() { Name = "Ограничение работы помп,минуты", BitLength = 8, StartByte = 7, PackNumber = 3, UnitT = UnitType_t.Minute });
 
             Pgns[19].parameters.Add(new() { Name = "Подключенная зона 1", BitLength = 8, StartByte = 1, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
             Pgns[19].parameters.Add(new() { Name = "Подключенная зона 2", BitLength = 8, StartByte = 2, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
             Pgns[19].parameters.Add(new() { Name = "Подключенная зона 3", BitLength = 8, StartByte = 3, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
             Pgns[19].parameters.Add(new() { Name = "Подключенная зона 4", BitLength = 8, StartByte = 4, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
             Pgns[19].parameters.Add(new() { Name = "Подключенная зона 5", BitLength = 8, StartByte = 5, PackNumber = 4, Meanings = { { 0, "Не подключена" }, { 1, "Зависимые отопители" }, { 2, "Защита от замерзания" }, { 3, "Пассивное отопление" } } });
+            
+            Pgns[19].parameters.Add(new() { Name = "Наработка ТЭНа,с", BitLength = 32, StartByte = 1, PackNumber = 5 ,UnitT = UnitType_t.Second});
+            Pgns[19].parameters.Add(new() { Name = "Статус тёплого пола", BitLength = 2, StartByte = 5, PackNumber = 5, Meanings=DefMeaningsOnOff });
+            Pgns[19].parameters.Add(new() { Name = "Статус предпускового подогрева", BitLength = 2, StartByte = 5, StartBit=2, PackNumber = 5, Meanings = DefMeaningsOnOff });
 
+            Pgns[19].parameters.Add(new() { Name = "Текущая температура пола", BitLength = 8, StartByte = 1, b = -75, PackNumber = 6, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Текущая температура двигателя", BitLength = 8, StartByte = 2, b = -75, PackNumber = 6, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Подстройка датчика зоны 1", BitLength = 8, StartByte = 3, b = -75, PackNumber = 6, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Подстройка датчика зоны 2", BitLength = 8, StartByte = 4, b = -75, PackNumber = 6, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Подстройка датчика зоны 3", BitLength = 8, StartByte = 5, b = -75, PackNumber = 6, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Подстройка датчика зоны 4", BitLength = 8, StartByte = 6, b = -75, PackNumber = 6, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "Подстройка датчика зоны 5", BitLength = 8, StartByte = 7, b = -75, PackNumber = 6, UnitT = UnitType_t.Temp });
 
             Pgns[20].parameters.Add(new() { Name = "Код неисправности", BitLength = 8, StartByte = 0 });
             Pgns[20].parameters.Add(new() { Name = "Количество морганий", BitLength = 8, StartByte = 1 });
