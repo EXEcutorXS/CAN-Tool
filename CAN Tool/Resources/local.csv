@@ -430,6 +430,17 @@ par_562	MIN_LIQUID_LEVEL	Минимальный уровень жидкости
 par_563	Heater pump while engine preheat	Помпа подогревателя во время подогрева двигателя
 par_564	Max backlight brightness	Максимальная яркость подсветки
 		
+par_565	Aux Heater off temperature	уставка температуры жидкости доп.подогревателя для перехода в ждущий
+par_566	Aux Heater on temperature	уставка температуры жидкости доп.подогревателя для выхода из ждущего
+par_567	Aux Heater on temperature(domestic water)	уставка температуры жидкости доп.подогревателя для выхода из ждущего при разборе воды при разборе воды
+		
+par_568	Aux Heater off by tank temperature	уставка температуры бака для перехода в ждущий доп.подогревателя
+par_569	Aux Heater on by tank temperature	уставка температуры бака для выхода из ждущего доп.подогревателя
+par_570	Aux Heater on by tank temperature(domestic water)	уставка температуры бака для выхода из ждущего доп.подогревателя при разборе воды при разборе воды 
+		
+par_571	Manual water heating mode	Ручной режим разбора воды
+par_572	The number of the zone  used as a backup switch	Номер датчика зоны для резервного выкл.
+		
 par_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C
 		
 bb_1	Start counter	счетчик запусков
@@ -918,10 +929,8 @@ d_20	Planar 6D	Планар6Д
 d_21	14TS-10	14ТС-10
 d_22	30SP (injector)	30СП (впрысковый)
 d_23	Binar Compact Gasoline	Бинар Компакт Бензин
-d_44	Binar Split B	Бинар Сплит B
 d_25	35SP (injector)	35СП (впрысковый)
 d_27	Binar Compact Diesel	Бинар Компакт Дизель
-d_43	Binar Split D	Бинар Сплит D
 d_29	Binar 6G Compact	Бинар 6Г Компакт
 d_31	14TSG Mini	14ТСГ Мини
 d_32	30SPG	30СПГ
@@ -930,6 +939,8 @@ d_35	Binar 10B	Бинар 10Б
 d_37	Extension board	Плата расширения
 d_41	Generic Load (Single)	Нагрузка одноканальная
 d_42	Generic Load(Tripple)	Нагрузка трёхканальная
+d_43	Binar Split D	Бинар Сплит D
+d_44	Binar Split B	Бинар Сплит B
 d_50	AD Driver	Инвертор кондиционера
 d_60	Pressure sensor	Датчик давления
 d_121	Modem	Модем

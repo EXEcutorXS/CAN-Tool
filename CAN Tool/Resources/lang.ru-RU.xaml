@@ -430,6 +430,17 @@
 <v:String x:Key="par_563">Помпа подогревателя во время подогрева двигателя</v:String>
 <v:String x:Key="par_564">Максимальная яркость подсветки</v:String>
 
+<v:String x:Key="par_565">уставка температуры жидкости доп.подогревателя для перехода в ждущий</v:String>
+<v:String x:Key="par_566">уставка температуры жидкости доп.подогревателя для выхода из ждущего</v:String>
+<v:String x:Key="par_567">уставка температуры жидкости доп.подогревателя для выхода из ждущего при разборе воды при разборе воды</v:String>
+
+<v:String x:Key="par_568">уставка температуры бака для перехода в ждущий доп.подогревателя</v:String>
+<v:String x:Key="par_569">уставка температуры бака для выхода из ждущего доп.подогревателя</v:String>
+<v:String x:Key="par_570">уставка температуры бака для выхода из ждущего доп.подогревателя при разборе воды при разборе воды </v:String>
+
+<v:String x:Key="par_571">Ручной режим разбора воды</v:String>
+<v:String x:Key="par_572">Номер датчика зоны для резервного выкл.</v:String>
+
 <v:String x:Key="par_600">номер устройства на шине CAN RV-C</v:String>
 
 <v:String x:Key="bb_1">счетчик запусков</v:String>
@@ -918,10 +929,8 @@
 <v:String x:Key="d_21">14ТС-10</v:String>
 <v:String x:Key="d_22">30СП (впрысковый)</v:String>
 <v:String x:Key="d_23">Бинар Компакт Бензин</v:String>
-<v:String x:Key="d_44">Бинар Сплит B</v:String>
 <v:String x:Key="d_25">35СП (впрысковый)</v:String>
 <v:String x:Key="d_27">Бинар Компакт Дизель</v:String>
-<v:String x:Key="d_43">Бинар Сплит D</v:String>
 <v:String x:Key="d_29">Бинар 6Г Компакт</v:String>
 <v:String x:Key="d_31">14ТСГ Мини</v:String>
 <v:String x:Key="d_32">30СПГ</v:String>
@@ -930,6 +939,8 @@
 <v:String x:Key="d_37">Плата расширения</v:String>
 <v:String x:Key="d_41">Нагрузка одноканальная</v:String>
 <v:String x:Key="d_42">Нагрузка трёхканальная</v:String>
+<v:String x:Key="d_43">Бинар Сплит D</v:String>
+<v:String x:Key="d_44">Бинар Сплит B</v:String>
 <v:String x:Key="d_50">Инвертор кондиционера</v:String>
 <v:String x:Key="d_60">Датчик давления</v:String>
 <v:String x:Key="d_121">Модем</v:String>

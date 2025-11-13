@@ -330,13 +330,14 @@ namespace OmniProtocol
             //Pgns[18].parameters.Add(new () { Name = "Год", BitLength = 8, StartByte = 7 });
 
             Pgns[19].parameters.Add(new() { Name = "Подогреватель", BitLength = 2, StartBit = 0, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
-            Pgns[19].parameters.Add(new() { Name = "Помпа", BitLength = 2, StartBit = 2, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
-            Pgns[19].parameters.Add(new() { Name = "Вода", BitLength = 2, StartBit = 4, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
+            Pgns[19].parameters.Add(new() { Name = "Запрос включения помпы", BitLength = 2, StartBit = 2, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
+            Pgns[19].parameters.Add(new() { Name = "Кнопка воды (для котла)", BitLength = 2, StartBit = 4, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Быстрый нагрев воды", BitLength = 2, StartBit = 6, StartByte = 1, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Помпа подогревателя статус", BitLength = 2, StartByte = 7, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Температура бака", BitLength = 8, StartByte = 2, b = -75, UnitT = UnitType_t.Temp, PackNumber = 1 });
             Pgns[19].parameters.Add(new() { Name = "Атмосферное давление", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Temp, PackNumber = 1 });
             Pgns[19].parameters.Add(new() { Name = "Сработал датчик бытовой воды", BitLength = 2, StartByte = 4, PackNumber = 1, Meanings = DefMeaningsYesNo, Var = 108 });
+            Pgns[19].parameters.Add(new() { Name = "Кнопка воды(для HCU)", BitLength = 2, StartBit = 2, StartByte = 4, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Доступен тёплый пол", BitLength = 2, StartByte = 5, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Доступен предпусковой подогрев", BitLength = 2, StartByte = 5, StartBit = 6, PackNumber = 1, Meanings = DefMeaningsOnOff });
             Pgns[19].parameters.Add(new() { Name = "Доп помпа 1 статус", BitLength = 2, StartByte = 6, StartBit = 0, PackNumber = 1, Meanings = DefMeaningsOnOff });

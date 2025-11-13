@@ -458,6 +458,10 @@ namespace OmniProtocol
 
         public bool IsSimiliarTo(OmniMessage m)
         {
+            if (ReceiverId.Address!=m.ReceiverId.Address) return false;
+            if (ReceiverId.Type != m.ReceiverId.Type) return false;
+            if (TransmitterId.Address!=m.TransmitterId.Address) return false;
+            if (TransmitterId.Type != m.TransmitterId.Type) return false;
             if (Pgn != m.Pgn)
                 return false;
             if (Pgn == 1 || Pgn == 2)

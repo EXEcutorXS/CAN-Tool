@@ -430,6 +430,17 @@
 <v:String x:Key="par_563">Heater pump while engine preheat</v:String>
 <v:String x:Key="par_564">Max backlight brightness</v:String>
 
+<v:String x:Key="par_565">Aux Heater off temperature</v:String>
+<v:String x:Key="par_566">Aux Heater on temperature</v:String>
+<v:String x:Key="par_567">Aux Heater on temperature(domestic water)</v:String>
+
+<v:String x:Key="par_568">Aux Heater off by tank temperature</v:String>
+<v:String x:Key="par_569">Aux Heater on by tank temperature</v:String>
+<v:String x:Key="par_570">Aux Heater on by tank temperature(domestic water)</v:String>
+
+<v:String x:Key="par_571">Manual water heating mode</v:String>
+<v:String x:Key="par_572">The number of the zone  used as a backup switch</v:String>
+
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
 
 <v:String x:Key="bb_1">Start counter</v:String>
@@ -918,10 +929,8 @@
 <v:String x:Key="d_21">14TS-10</v:String>
 <v:String x:Key="d_22">30SP (injector)</v:String>
 <v:String x:Key="d_23">Binar Compact Gasoline</v:String>
-<v:String x:Key="d_44">Binar Split B</v:String>
 <v:String x:Key="d_25">35SP (injector)</v:String>
 <v:String x:Key="d_27">Binar Compact Diesel</v:String>
-<v:String x:Key="d_43">Binar Split D</v:String>
 <v:String x:Key="d_29">Binar 6G Compact</v:String>
 <v:String x:Key="d_31">14TSG Mini</v:String>
 <v:String x:Key="d_32">30SPG</v:String>
@@ -930,6 +939,8 @@
 <v:String x:Key="d_37">Extension board</v:String>
 <v:String x:Key="d_41">Generic Load (Single)</v:String>
 <v:String x:Key="d_42">Generic Load(Tripple)</v:String>
+<v:String x:Key="d_43">Binar Split D</v:String>
+<v:String x:Key="d_44">Binar Split B</v:String>
 <v:String x:Key="d_50">AD Driver</v:String>
 <v:String x:Key="d_60">Pressure sensor</v:String>
 <v:String x:Key="d_121">Modem</v:String>
