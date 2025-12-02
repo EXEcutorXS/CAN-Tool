@@ -384,7 +384,7 @@
                                 </DockPanel>
                             </Expander>
                             <Grid DockPanel.Dock="Bottom">
-                                <WpfPlot MinHeight="600" VerticalAlignment="Stretch" Name="Chart"></WpfPlot>
+                                <WpfPlot MinHeight="200" VerticalAlignment="Stretch" Name="Chart"></WpfPlot>
                             </Grid>
                         </DockPanel>
 
