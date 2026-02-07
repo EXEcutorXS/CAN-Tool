@@ -173,12 +173,19 @@ namespace CAN_Tool
         VSCAN canWrapper = new();
 
         private Task MessageReceivingTask;
+        public enum AdapterType
+        {
+            VSCom,
+            Canable
+        }
 
+        [ObservableProperty] AdapterType type = AdapterType.VSCom;
         [ObservableProperty] bool portOpened = false;
         [ObservableProperty] string portName = "";
         [ObservableProperty] int speed = 5;
 
         public event EventHandler GotNewMessage;
+
 
         private void messageReceiver()
         {
