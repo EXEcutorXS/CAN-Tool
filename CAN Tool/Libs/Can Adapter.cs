@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using CAN_Tool.CustomControls;
 using CAN_Tool.Libs;
 using CommunityToolkit.Mvvm.ComponentModel;
-using ScottPlot.Drawing.Colormaps;
-using ScottPlot.Renderable;
 using VSCom.CanApi;
-using Windows.Devices.Input;
-using Windows.Networking;
+
 using static CAN_Tool.Libs.Helper;
 
 namespace CAN_Tool
@@ -34,6 +28,44 @@ namespace CAN_Tool
             Rtr = false;
             Fresh = true;
             updateTick = DateTime.Now.Ticks;
+        }
+
+        public CanMessage(string str)
+        {
+            switch (str[0])
+            {
+                case 't':
+                    Ide = false;
+                    Rtr = false;
+                    break;
+                case 'T':
+                    Ide = true;
+                    Rtr = false;
+                    break;
+                case 'r':
+                    Ide = false;
+                    Rtr = true;
+                    break;
+                case 'R':
+                    Ide = true;
+                    Rtr = true;
+                    break;
+                default:
+                    throw new FormatException("Can't parse. String must start with 't','T','r' or 'R' ");
+            }
+            if (Ide)
+                Dlc = (byte)int.Parse(str[9].ToString());
+            else
+                Dlc = (byte)int.Parse(str[4].ToString());
+            if (Dlc > 8)
+                throw new FormatException($"Can't parse. Message length cant be {Dlc}, max length is 8");
+
+            Id = Convert.ToInt32(Ide ? str.Substring(1, 8) : str.Substring(1, 3), 16);
+            Data = new byte[Dlc];
+
+            var shift = !Ide ? 5 : 10;
+            for (var i = 0; i < Dlc; i++)
+                Data[i] = Convert.ToByte(str.Substring(shift + i * 2, 2), 16);
         }
 
 
@@ -172,6 +204,10 @@ namespace CAN_Tool
     {
         VSCAN canWrapper = new();
 
+        SerialPort port = new(); //Used for Canable
+
+        private string currentBuf = "";
+
         private Task MessageReceivingTask;
         public enum AdapterType
         {
@@ -179,6 +215,7 @@ namespace CAN_Tool
             Canable
         }
 
+        public Array AdapterTypes => Enum.GetValues(typeof(AdapterType));
         [ObservableProperty] AdapterType type = AdapterType.VSCom;
         [ObservableProperty] bool portOpened = false;
         [ObservableProperty] string portName = "";
@@ -203,12 +240,23 @@ namespace CAN_Tool
             if (!PortOpened)
             {
                 PortOpened = true;
-                canWrapper.Open(portName, VSCAN.VSCAN_MODE_NORMAL);
-                canWrapper.SetSpeed(Speed);
-                canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
-                canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
+                if (Type == AdapterType.VSCom)
+                {
+                    canWrapper.Open(portName, VSCAN.VSCAN_MODE_NORMAL);
+                    canWrapper.SetSpeed(Speed);
+                    canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
+                    canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
 
-                MessageReceivingTask = Task.Run(messageReceiver);
+                    MessageReceivingTask = Task.Run(messageReceiver);
+                }
+                if (Type == AdapterType.Canable)
+                {
+                    port.PortName = portName;
+                    port.Open();
+                    port.Write("O\r");
+                    port.Write($"S{Speed}\r");
+                    port.DataReceived += DataReceivedHandler;
+                }
             }
             else
             {
@@ -221,12 +269,23 @@ namespace CAN_Tool
             if (!PortOpened)
             {
                 PortOpened = true;
-                canWrapper.Open(portName, VSCAN.VSCAN_MODE_SELF_RECEPTION);
-                canWrapper.SetSpeed(Speed);
-                canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
-                canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
+                if (Type == AdapterType.VSCom)
+                {
+                    canWrapper.Open(portName, VSCAN.VSCAN_MODE_SELF_RECEPTION);
+                    canWrapper.SetSpeed(Speed);
+                    canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
+                    canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
 
-                MessageReceivingTask = Task.Run(messageReceiver);
+                    MessageReceivingTask = Task.Run(messageReceiver);
+                }
+                if (Type == AdapterType.Canable)
+                {
+                    port.PortName = portName;
+                    port.Open();
+                    port.Write("Y\r");
+                    port.Write($"S{Speed}\r");
+                    port.DataReceived += DataReceivedHandler;
+                }
             }
             else
             {
@@ -239,12 +298,23 @@ namespace CAN_Tool
             if (!PortOpened)
             {
                 PortOpened = true;
-                canWrapper.Open(portName, VSCAN.VSCAN_MODE_LISTEN_ONLY);
-                canWrapper.SetSpeed(Speed);
-                canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
-                canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
+                if (Type == AdapterType.VSCom)
+                {
+                    canWrapper.Open(portName, VSCAN.VSCAN_MODE_LISTEN_ONLY);
+                    canWrapper.SetSpeed(Speed);
+                    canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
+                    canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
 
-                MessageReceivingTask = Task.Run(messageReceiver);
+                    MessageReceivingTask = Task.Run(messageReceiver);
+                }
+                if (Type == AdapterType.Canable)
+                {
+                    port.PortName = portName;
+                    port.Open();
+                    port.Write("L\r");
+                    port.Write($"S{Speed}\r");
+                    port.DataReceived += DataReceivedHandler;
+                }
             }
             else
             {
@@ -255,40 +325,149 @@ namespace CAN_Tool
 
 
         public void PortClose()
-            {
-            PortOpened = false;
-            canWrapper.Close();
-            
-            }
-
-        public void SetBitrate(int bitrate) => canWrapper.SetSpeed(bitrate);
-
-
-        public void Transmit(CanMessage message)
         {
-            VSCAN_MSG[] msg = new VSCAN_MSG[1];
-            msg[0].Data = message.Data;
-            if (message.Ide)
-                msg[0].Flags |= VSCAN.VSCAN_FLAGS_EXTENDED;
-            else
-                msg[0].Flags |= VSCAN.VSCAN_FLAGS_STANDARD;
-            if (message.Rtr)
-                msg[0].Flags |= VSCAN.VSCAN_FLAGS_REMOTE;
 
-            msg[0].Size = (byte)message.Dlc;
-            msg[0].Id = (uint)message.Id;
-            uint written = 0;
-            try
+            PortOpened = false;
+            if (Type == AdapterType.VSCom)
+                canWrapper.Close();
+            if (Type == AdapterType.Canable)
             {
-                canWrapper.Write(msg, 1, ref written);
-                canWrapper.Flush();
-            }
-            catch (Exception ex)
-            {
-                
+                port.DataReceived -= DataReceivedHandler;
+                Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit)); //close port in new thread to avoid hang
+                CloseDown.Start(); //close port in new thread to avoid hang
+
             }
         }
 
+        private void CloseSerialOnExit()
+        {
+            try
+            {
+                port.Close(); //close the serial port
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message); //catch any serial port closing error messages
+            }
+        }
+        public void SetBitrate(int bitrate)
+        {
+            if (Type == AdapterType.VSCom)
+                canWrapper.SetSpeed(bitrate);
+            if (Type == AdapterType.Canable)
+            {
+                if (PortOpened)
+                {
+                    port.Write($"S{bitrate}\r");
+                }
+            }
+        }
+
+
+        public async Task Transmit(CanMessage message)
+        {
+            if (Type == AdapterType.VSCom)
+            {
+                VSCAN_MSG[] msg = new VSCAN_MSG[1];
+                msg[0].Data = message.Data;
+                if (message.Ide)
+                    msg[0].Flags |= VSCAN.VSCAN_FLAGS_EXTENDED;
+                else
+                    msg[0].Flags |= VSCAN.VSCAN_FLAGS_STANDARD;
+                if (message.Rtr)
+                    msg[0].Flags |= VSCAN.VSCAN_FLAGS_REMOTE;
+
+                msg[0].Size = (byte)message.Dlc;
+                msg[0].Id = (uint)message.Id;
+                uint written = 0;
+                try
+                {
+                    canWrapper.Write(msg, 1, ref written);
+                    canWrapper.Flush();
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+            if (Type == AdapterType.Canable)
+            {
+                if (port.IsOpen == false)
+                    return;
+
+                await WaitForTxBufferEmpty();
+                StringBuilder str = new("");
+                if (message.Ide && message.Rtr) str.Append('R');
+                if (!message.Ide && message.Rtr) str.Append('r');
+                if (message.Ide && !message.Rtr) str.Append('T');
+                if (!message.Ide && !message.Rtr) str.Append('t');
+                str.Append(message.IdAsText);
+                str.Append(message.Dlc);
+                str.Append(message.GetDataInTextFormat());
+                str.Append("\r");
+
+                port.Write(str.ToString());
+                await WaitForTxBufferEmpty();
+            }
+        }
+
+        private async Task WaitForTxBufferEmpty(CancellationToken cancellationToken = default,
+                                       int timeoutMs = 1000)
+        {
+            int elapsed = 0;
+            int checkInterval = 10; // проверяем каждые 10 мс
+
+            while (port.BytesToWrite > 0 && elapsed < timeoutMs)
+            {
+                await Task.Delay(checkInterval, cancellationToken);
+                elapsed += checkInterval;
+            }
+
+            if (port.BytesToWrite > 0)
+            {
+                throw new TimeoutException("Таймаут ожидания отправки данных");
+            }
+
+            // Дополнительная небольшая задержка для надежности
+            await Task.Delay(10, cancellationToken);
+        }
+
+        //Ret value - More messages available in buffer
+        private void UartMessageProcess()
+        {
+            string[] splitted = currentBuf.Split('\r');
+            foreach (var line in splitted)
+            {
+                if (line.Length == 0) continue;
+                switch (line[0])
+                {
+                    case 'T':
+                    case 't':
+                    case 'r':
+                    case 'R':
+                        try
+                        {
+                            var m = new CanMessage(new string(currentBuf));
+                            GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+
+                        break;
+                    default:
+                        continue;
+                }
+            }
+            currentBuf = splitted[^1]; //If last messge is not completed it will be saved to buffer, otherwise it will be zero length string
+        }
+
+        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs args)
+        {
+            currentBuf += (port.ReadExisting());
+            UartMessageProcess();
+        }
         public void InjectMessage(CanMessage m)
         {
             GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });

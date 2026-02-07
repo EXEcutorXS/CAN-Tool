@@ -261,7 +261,6 @@ namespace OmniProtocol
 
         public bool flagCrcGetDone = false;
 
-        public bool flagDataGetDone = false;
 
         public int receivedDataLength = 0;
 

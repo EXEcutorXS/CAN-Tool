@@ -42,6 +42,7 @@ namespace CAN_Tool
                 MarkShapes[i] = MarkerShape.none;
                 LineStyles[i] = LineStyle.Solid;
             }
+            AdapterType = CanAdapter.AdapterType.VSCom;
         }
         public bool IsDark { get; set; }
         public int ThemeNumber { get; set; }
@@ -55,6 +56,8 @@ namespace CAN_Tool
         public MarkerShape[] MarkShapes { set; get; }
 
         public bool UseImperial { set; get; }
+
+        public CanAdapter.AdapterType AdapterType { get; set; }
 
 
 
@@ -79,6 +82,7 @@ namespace CAN_Tool
                     App.Settings.LineWidthes[b.Id] = (b.LineWidth);
                     App.Settings.MarkShapes[b.Id] = (b.MarkShape);
                 }
+            App.Settings.AdapterType = vm.CanAdapter.Type;
             string serialized = JsonSerializer.Serialize(App.Settings);
             StreamWriter sw = new("settings.json", false);
             sw.Write(serialized);
@@ -140,6 +144,7 @@ namespace CAN_Tool
             menuColor.SelectedIndex = App.Settings.ThemeNumber;
             DarkModeCheckBox.IsChecked = App.Settings.IsDark;
             ImperialUnits.IsChecked = App.Settings.UseImperial;
+            vm.CanAdapter.Type = App.Settings.AdapterType;
         }
 
         private void MessageHandler(object sender, EventArgs args)

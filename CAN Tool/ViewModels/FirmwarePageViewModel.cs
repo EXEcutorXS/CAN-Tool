@@ -66,18 +66,18 @@ namespace CAN_Tool.ViewModels
 
 
         [RelayCommand]
-        private void RequestBootLoaderVersion()
+        private async Task RequestBootLoaderVersion()
         {
             OmniMessage msg = new();
             msg.Pgn = 6;
             msg.ReceiverId.Type = 123;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
-            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
         [RelayCommand]
-        private void SwitchToMainProgram()
+        private async Task SwitchToMainProgram()
         {
             OmniMessage msg = new();
             msg.Pgn = 1;
@@ -85,7 +85,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 0;
             msg.Data[1] = 22;
             msg.Data[2] = 1;
-            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
         [RelayCommand]
@@ -99,7 +99,7 @@ namespace CAN_Tool.ViewModels
         }
 
         [RelayCommand]
-        private void GetVersion()
+        private async Task GetVersion()
         {
             if (Vm?.OmniInstance.SelectedConnectedDevice == null) return;
             OmniMessage msg = new();
@@ -108,27 +108,27 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverId.Type = Vm.OmniInstance.SelectedConnectedDevice.Id.Type;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
-            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
-        private void EraseFlash()
+        private async Task EraseFlash()
         {
             OmniMessage msg = new();
             msg.Pgn = 105;
             msg.ReceiverId.Type = 123;
             msg.Data[0] = 6;
             msg.Data[1] = 255;  //Стереть всю память
-            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
             Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone = false;
         }
 
-        private void StartFlashing()
+        private async Task StartFlashing()
         {
             OmniMessage msg = new();
             msg.Pgn = 105;
             msg.ReceiverId.Type = 123;
             msg.Data[0] = 4;
-            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
         public bool WaitForFlag(ref bool flag, int delay)
@@ -145,7 +145,7 @@ namespace CAN_Tool.ViewModels
             flag = false;
             return true;
         }
-        private void FlashFragment(CodeFragment f)
+        private async Task FlashFragment(CodeFragment f)
         {
             WriteFragmentToRam(f);
             for (var i = 0; i < 4; i++)
@@ -156,13 +156,13 @@ namespace CAN_Tool.ViewModels
                     Vm.OmniInstance.CurrentTask.OnFail("Can't flash memory");
                     return;
                 }
-                StartFlashing();
+                await StartFlashing();
                 if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone, 100))
                     break;
             }
         }
 
-        private bool CheckTransmittedData(int len, uint crc)
+        private  bool CheckTransmittedData(int len, uint crc)
         {
             OmniMessage msg = new()
             {
@@ -227,7 +227,7 @@ namespace CAN_Tool.ViewModels
                     break;
             }
         }
-        private void WriteFragmentToRam(CodeFragment f)
+        private async void WriteFragmentToRam(CodeFragment f)
         {
             OmniMessage msg = new()
             {
@@ -268,14 +268,14 @@ namespace CAN_Tool.ViewModels
                     msg.Data[5] = f.Data[i * 8 + 5];
                     msg.Data[6] = f.Data[i * 8 + 6];
                     msg.Data[7] = f.Data[i * 8 + 7];
-                    Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                    await Vm.CanAdapter.Transmit(msg.ToCanMessage());
 
                 }
                 if (CheckTransmittedData(len, crc)) break;
             }
         }
 
-        private void UpdateFirmware(List<CodeFragment> fragmentsArg)
+        private async void UpdateFirmware(List<CodeFragment> fragmentsArg)
         {
             if (fragmentsArg.Count == 0)
             {
@@ -288,7 +288,7 @@ namespace CAN_Tool.ViewModels
             for (var i = 0; i < 4; i++)
             {
                 if (i == 3) { Vm.OmniInstance.CurrentTask.OnFail("Can't erase memory"); return; }
-                EraseFlash();
+                await EraseFlash();
                 if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone, 5000)) break;
             }
 
@@ -299,7 +299,7 @@ namespace CAN_Tool.ViewModels
             var cnt = 0;
             foreach (var f in fragmentsArg)
             {
-                FlashFragment(f);
+                await FlashFragment(f);
                 Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragmentsArg.Count;
                 if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested) return;
             }

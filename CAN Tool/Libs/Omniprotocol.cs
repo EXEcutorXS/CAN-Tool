@@ -1450,7 +1450,7 @@ namespace OmniProtocol
                             senderDevice.receivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
                             senderDevice.receivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
                             Debug.WriteLine($"Data fragment len:{senderDevice.receivedFragmentLength},CRC:{senderDevice.receivedFragmentCrc:X}");
-                            senderDevice.flagDataGetDone = true;
+                            senderDevice.flagTransmissionCheck = true;
                         }
 
                         if (m.Data[0] == 5)
@@ -1483,15 +1483,6 @@ namespace OmniProtocol
 
         }
 
-        public void ProcessUartMessage(byte[] buf)
-        {
-
-        }
-
-        public void ProcessMessage(UInt16 pgn, byte[] data)
-        {
-
-        }
 
         public async void ReadBlackBoxData(DeviceId id)
         {
