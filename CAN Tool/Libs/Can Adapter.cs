@@ -395,7 +395,6 @@ namespace CAN_Tool
                 if (port.IsOpen == false)
                     return;
 
-                await WaitForTxBufferEmpty();
                 StringBuilder str = new("");
                 if (message.Ide && message.Rtr) str.Append('R');
                 if (!message.Ide && message.Rtr) str.Append('r');
@@ -407,29 +406,18 @@ namespace CAN_Tool
                 str.Append("\r");
 
                 port.Write(str.ToString());
-                await WaitForTxBufferEmpty();
+                Task.Delay(getDelay());
             }
         }
 
-        private async Task WaitForTxBufferEmpty(CancellationToken cancellationToken = default,
-                                       int timeoutMs = 1000)
+        int getDelay()
         {
-            int elapsed = 0;
-            int checkInterval = 10; // проверяем каждые 10 мс
-
-            while (port.BytesToWrite > 0 && elapsed < timeoutMs)
-            {
-                await Task.Delay(checkInterval, cancellationToken);
-                elapsed += checkInterval;
+            switch (Speed) { 
+                case 0: return 20;
+            case 1: return 8;
+            case 2: return 4;
+            default: return 2;
             }
-
-            if (port.BytesToWrite > 0)
-            {
-                throw new TimeoutException("Таймаут ожидания отправки данных");
-            }
-
-            // Дополнительная небольшая задержка для надежности
-            await Task.Delay(10, cancellationToken);
         }
 
         //Ret value - More messages available in buffer
@@ -447,15 +435,15 @@ namespace CAN_Tool
                     case 'R':
                         try
                         {
-                            var m = new CanMessage(new string(currentBuf));
+                            var m = new CanMessage(new string(line));
                             GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
                         }
                         catch
                         {
                             // ignored
                         }
-
                         break;
+                    
                     default:
                         continue;
                 }

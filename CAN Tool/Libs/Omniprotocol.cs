@@ -974,7 +974,14 @@ namespace OmniProtocol
 
         public void ProcessCanMessage(CanMessage m)
         {
-            ProcessOmniMessage(new OmniMessage(m));
+            try
+            {
+                ProcessOmniMessage(new OmniMessage(m));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
         }
 
@@ -1426,14 +1433,17 @@ namespace OmniProtocol
                     if (m.Data[0] == 1 && m.Data[1] == 1)
                     {
                         senderDevice.flagEraseDone = true;
+                        Debug.WriteLine("<<Память стёрта");
                     }
                     if (m.Data[0] == 2 && m.Data[1] == 1)
                     {
                         senderDevice.flagSetAdrDone = true;
+                        Debug.WriteLine("<<Адрес задан");
                     }
                     if (m.Data[0] == 3 && m.Data[1] == 1)
                     {
                         senderDevice.flagProgramDone = true;
+                        Debug.WriteLine("<<Программирование успешно");
                     }
                     break;
                 case 105:
@@ -1441,7 +1451,7 @@ namespace OmniProtocol
                         if (m.Data[0] == 1)
                         {
                             senderDevice.fragmentAddress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
-                            Debug.WriteLine($"Adress set to 0X{senderDevice.fragmentAddress:X}");
+                            Debug.WriteLine($"<<Адрес установлен 0X{senderDevice.fragmentAddress:X}");
                             senderDevice.flagSetAdrDone = true;
                         }
 
@@ -1449,7 +1459,7 @@ namespace OmniProtocol
                         {
                             senderDevice.receivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
                             senderDevice.receivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
-                            Debug.WriteLine($"Data fragment len:{senderDevice.receivedFragmentLength},CRC:{senderDevice.receivedFragmentCrc:X}");
+                            Debug.WriteLine($"<<Полученна длина:{senderDevice.receivedFragmentLength},CRC:{senderDevice.receivedFragmentCrc:X}");
                             senderDevice.flagTransmissionCheck = true;
                         }
 
@@ -1457,22 +1467,22 @@ namespace OmniProtocol
                         {
                             if (m.Data[1] == 0)
                             {
-                                Debug.WriteLine("Flash fragment successed");
+                                Debug.WriteLine("<<Прошивка успешна");
                                 senderDevice.flagProgramDone = true;
                             }
                             else
-                                Debug.WriteLine("Flash fragment failed");
+                                Debug.WriteLine("<<Прошика не удалась>>");
                         }
 
                         if (m.Data[0] == 7)
                         {
                             if (m.Data[1] == 0)
                             {
-                                Debug.WriteLine("Memory erase confirmed");
+                                Debug.WriteLine("<<Память стёрта");
                                 senderDevice.flagEraseDone = true;
                             }
                             else
-                                Debug.WriteLine("Memory erase fail");
+                                Debug.WriteLine("<<Ошибка стирания памяти");
                         }
 
                         break;

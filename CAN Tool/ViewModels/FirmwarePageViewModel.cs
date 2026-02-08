@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using static CAN_Tool.Libs.Helper;
+using System.Diagnostics;
 
 namespace CAN_Tool.ViewModels
 {
@@ -118,7 +119,8 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverId.Type = 123;
             msg.Data[0] = 6;
             msg.Data[1] = 255;  //Стереть всю память
-            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            Debug.WriteLine("Отправляем запрос на стирание");
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
             Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone = false;
         }
 
@@ -140,8 +142,11 @@ namespace CAN_Tool.ViewModels
                 Thread.Sleep(1);
             }
             if (!flag)
+            {
+                Debug.WriteLine("Флаг не получен");
                 return false;
-
+            }
+            Debug.WriteLine($"Флагпоучен через {wd} циклов");
             flag = false;
             return true;
         }
@@ -150,20 +155,28 @@ namespace CAN_Tool.ViewModels
             WriteFragmentToRam(f);
             for (var i = 0; i < 4; i++)
             {
+                Debug.WriteLine($"Попытка прошивки {i}");
                 Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone = false;
                 if (i == 3)
                 {
+                    Debug.WriteLine($"Не удаётся прошить flash память");
                     Vm.OmniInstance.CurrentTask.OnFail("Can't flash memory");
                     return;
                 }
-                await StartFlashing();
+                Debug.WriteLine($"Отправляем запрос на прошивку фрагмента");
+                StartFlashing();
+                Debug.WriteLine($"Ожидаем флага успешной прошивки");
                 if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone, 100))
+                {
+                    Debug.WriteLine($"Флаг успешной прошивки получен");
                     break;
+                }
             }
         }
 
-        private  bool CheckTransmittedData(int len, uint crc)
+        private bool CheckTransmittedData(int len, uint crc)
         {
+            Debug.WriteLine($"Начат процесс запроса КС");
             OmniMessage msg = new()
             {
                 Pgn = 105,
@@ -177,29 +190,37 @@ namespace CAN_Tool.ViewModels
 
             for (var i = 0; i < 6; i++)
             {
-                i++;
                 Vm.OmniInstance.SelectedConnectedDevice.flagTransmissionCheck = false;
                 if (i == 5)
                 {
                     Vm.OmniInstance.CurrentTask.OnFail("Can't check transmission result");
                     return false;
                 }
+                Debug.WriteLine($"Запрос КС №{i}");
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                Debug.WriteLine($"Ожидаем флаг прихода КС");
                 WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagTransmissionCheck, 100);
 
                 LogWriteLine($"Len:{Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentLength},CRC:0x{Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc:X08}");
                 if (crc == Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc && len == Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentLength)
+                {
+                    Debug.WriteLine($"КС совпала");
                     return true;
+                }
                 else
+                {
+                    Debug.WriteLine($"Ошибка CRC {crc:X08}!={Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc:X08}");
                     LogWriteLine("###Transmission failed!");
+                    return false;
+                }
 
             }
             return false;
         }
 
-        private void SetFragmentAdr(CodeFragment f)
+        private async Task SetFragmentAdr(CodeFragment f)
         {
-
+            Debug.WriteLine("Отправляем адрес");
             OmniMessage msg = new()
             {
                 Pgn = 105,
@@ -213,6 +234,8 @@ namespace CAN_Tool.ViewModels
                     [4] = (byte)(f.StartAddress >> 0)
                 }
             };
+            
+
             for (var i = 0; i < 4; i++)
             {
                 Vm.OmniInstance.SelectedConnectedDevice.flagSetAdrDone = false;
@@ -221,10 +244,15 @@ namespace CAN_Tool.ViewModels
                     Vm.OmniInstance.CurrentTask.OnFail("Can't set address");
                     return;
                 }
+                Debug.WriteLine($"Попытка установки адреса {i}");
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                Debug.WriteLine($"Ждём флага установки адреса");
                 if (!WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagSetAdrDone, 300)) continue;
                 if (Vm.OmniInstance.SelectedConnectedDevice.fragmentAddress == f.StartAddress)
+                {
+                    Debug.WriteLine($"Адрес установлен");
                     break;
+                }
             }
         }
         private async void WriteFragmentToRam(CodeFragment f)
@@ -234,7 +262,7 @@ namespace CAN_Tool.ViewModels
                 Pgn = 106,
                 ReceiverId = new(123, 0),
             };
-
+            Debug.WriteLine($"Начинаем передачу фрагмента {f.StartAddress:X08}");
             LogWrite($"Fragment {f.StartAddress:X08}...");
             for (var k = 0; k < 16; k++)
             {
@@ -243,9 +271,15 @@ namespace CAN_Tool.ViewModels
                 if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested)
                     return;
 
-                if (k == 15) { Vm.OmniInstance.CurrentTask.OnFail("Can't transmit data pack"); return; }
+                if (k == 15) { 
+                    Vm.OmniInstance.CurrentTask.OnFail("Can't transmit data pack");
+                    Debug.WriteLine($"Превышено число попыток передачи");
+                    return; }
                 if (k > 0)
+                {
                     LogWriteLine($"Try: {k + 1}");
+                    Debug.WriteLine($"Попытка {k}");
+                }
                 uint crc = 0;
                 var len = 0;
                 Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc = 0;
@@ -268,7 +302,9 @@ namespace CAN_Tool.ViewModels
                     msg.Data[5] = f.Data[i * 8 + 5];
                     msg.Data[6] = f.Data[i * 8 + 6];
                     msg.Data[7] = f.Data[i * 8 + 7];
-                    await Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                    Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                    Debug.WriteLine($"Отправлен пакет {i}");
+                    Task.Delay(30);
 
                 }
                 if (CheckTransmittedData(len, crc)) break;
@@ -277,34 +313,52 @@ namespace CAN_Tool.ViewModels
 
         private async void UpdateFirmware(List<CodeFragment> fragmentsArg)
         {
-            if (fragmentsArg.Count == 0)
+            try
             {
-                MessageBox.Show(GetString("t_load_hex_first"));
-                return;
+
+                if (fragmentsArg.Count == 0)
+                {
+                    MessageBox.Show(GetString("t_load_hex_first"));
+                    return;
+                }
+                LogWriteLine("Starting Firmware updating procedure");
+                Debug.WriteLine("Процесс обновления начат");
+                if (!Vm.OmniInstance.CurrentTask.Capture("Memory Erasing")) return;
+                LogWriteLine("Starting flash erasing");
+                Debug.WriteLine("Начат процесс стирания памяти");
+                for (var i = 0; i < 4; i++)
+                {
+                    Debug.WriteLine($"Попытка стирания {i}");
+                    if (i == 3)
+                    {
+                        Vm.OmniInstance.CurrentTask.OnFail("Can't erase memory");
+                        Debug.WriteLine("Попытки исчерпаны");
+                        return;
+                    }
+
+                    await EraseFlash();
+                    Debug.WriteLine("Ожидаем флага конца стирания");
+                    if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone, 5000)) break;
+                }
+
+                Vm.OmniInstance.CurrentTask.OnDone();
+
+                Vm.OmniInstance.CurrentTask.Capture("Programming");
+
+                var cnt = 0;
+                foreach (var f in fragmentsArg)
+                {
+                    FlashFragment(f);
+                    Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragmentsArg.Count;
+                    if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested) return;
+                }
+                LogWriteLine("Firmware updating success");
+                Vm.OmniInstance.CurrentTask.OnDone();
             }
-            LogWriteLine("Starting Firmware updating procedure");
-            if (!Vm.OmniInstance.CurrentTask.Capture("Memory Erasing")) return;
-            LogWriteLine("Starting flash erasing");
-            for (var i = 0; i < 4; i++)
+            catch(Exception ex)
             {
-                if (i == 3) { Vm.OmniInstance.CurrentTask.OnFail("Can't erase memory"); return; }
-                await EraseFlash();
-                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone, 5000)) break;
+                MessageBox.Show(ex.Message);
             }
-
-            Vm.OmniInstance.CurrentTask.OnDone();
-
-            Vm.OmniInstance.CurrentTask.Capture("Programming");
-
-            var cnt = 0;
-            foreach (var f in fragmentsArg)
-            {
-                await FlashFragment(f);
-                Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragmentsArg.Count;
-                if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested) return;
-            }
-            LogWriteLine("Firmware updating success");
-            Vm.OmniInstance.CurrentTask.OnDone();
 
         }
         #region oldVersionBootloader
