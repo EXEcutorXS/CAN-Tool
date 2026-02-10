@@ -477,7 +477,6 @@ namespace CAN_Tool
             {
                 PcanMessage msg = message.toPcanMsg();
                 var status = pcanWorker.Transmit(msg);
-                Task.Delay(getDelay());
             }
 
         }
@@ -488,7 +487,8 @@ namespace CAN_Tool
                 case 0: return 20;
             case 1: return 8;
             case 2: return 4;
-            default: return 2;
+            case 3: return 2;
+            default: return 1;
             }
         }
 
