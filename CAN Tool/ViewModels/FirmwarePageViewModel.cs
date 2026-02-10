@@ -74,7 +74,7 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverId.Type = 123;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
-            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
         [RelayCommand]
@@ -86,7 +86,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[0] = 0;
             msg.Data[1] = 22;
             msg.Data[2] = 1;
-            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
         [RelayCommand]
@@ -109,7 +109,7 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverId.Type = Vm.OmniInstance.SelectedConnectedDevice.Id.Type;
             msg.Data[0] = 0;
             msg.Data[1] = 18;
-            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
         private async Task EraseFlash()
@@ -130,7 +130,7 @@ namespace CAN_Tool.ViewModels
             msg.Pgn = 105;
             msg.ReceiverId.Type = 123;
             msg.Data[0] = 4;
-            await Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
         public bool WaitForFlag(ref bool flag, int delay)

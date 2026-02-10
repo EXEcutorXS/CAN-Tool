@@ -8,6 +8,7 @@ using System.Windows.Interop;
 using CAN_Tool.Libs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using VSCom.CanApi;
+using Peak.Can.Basic;
 
 using static CAN_Tool.Libs.Helper;
 
@@ -67,6 +68,24 @@ namespace CAN_Tool
             for (var i = 0; i < Dlc; i++)
                 Data[i] = Convert.ToByte(str.Substring(shift + i * 2, 2), 16);
         }
+
+        public CanMessage(PcanMessage srcMsg)
+        {
+            Id = (int)srcMsg.ID;
+            Ide = srcMsg.MsgType == MessageType.Extended;
+            Rtr = srcMsg.MsgType == MessageType.RemoteRequest;
+            Data = srcMsg.Data;
+            Dlc = srcMsg.DLC;
+        }
+
+        public PcanMessage toPcanMsg() => new PcanMessage()
+        {
+        DLC = (byte)this.Dlc,
+        Data = this.Data,
+        ID = (uint)Id,
+        MsgType = Ide?MessageType.Extended:MessageType.Standard,
+        };
+        
 
 
         [NotifyPropertyChangedFor(nameof(VerboseInfo), nameof(RvcCompatible), nameof(IdeAsString))]
@@ -206,13 +225,16 @@ namespace CAN_Tool
 
         SerialPort port = new(); //Used for Canable
 
+        Worker pcanWorker = new(PcanChannel.Usb01, Bitrate.Pcan250);
+
         private string currentBuf = "";
 
         private Task MessageReceivingTask;
         public enum AdapterType
         {
             VSCom,
-            Canable
+            Canable,
+            PCAN
         }
 
         public Array AdapterTypes => Enum.GetValues(typeof(AdapterType));
@@ -222,7 +244,33 @@ namespace CAN_Tool
         [ObservableProperty] int speed = 5;
 
         public event EventHandler GotNewMessage;
+        public long ReceivedMessagesCount { get; private set; } = 0;
+        public long FalseInteruptCount { get; private set; } = 0;
 
+
+        public CanAdapter()
+        {
+            //Api.Initialize(PcanChannel.Usb01, Bitrate.Pcan250);
+            pcanWorker.MessageAvailable += OnMessageAvailable;
+        }
+
+        private void OnMessageAvailable(object sender, MessageAvailableEventArgs e)
+        {
+            PcanMessage msg;
+            ulong timestamp;
+            while (pcanWorker.Dequeue(out msg, out timestamp))
+            {
+                try
+                {
+                    ReceivedMessagesCount++;
+                    GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = new CanMessage(msg) });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
 
         private void messageReceiver()
         {
@@ -256,6 +304,12 @@ namespace CAN_Tool
                     port.Write("O\r");
                     port.Write($"S{Speed}\r");
                     port.DataReceived += DataReceivedHandler;
+                }
+                if (Type == AdapterType.PCAN)
+                {
+                    pcanWorker.ListenOnly = false;
+                    pcanWorker.Start();
+
                 }
             }
             else
@@ -315,6 +369,12 @@ namespace CAN_Tool
                     port.Write($"S{Speed}\r");
                     port.DataReceived += DataReceivedHandler;
                 }
+                if (Type == AdapterType.PCAN)
+                {
+                    pcanWorker.ListenOnly = true;
+                    pcanWorker.Start();
+
+                }
             }
             else
             {
@@ -335,6 +395,11 @@ namespace CAN_Tool
                 port.DataReceived -= DataReceivedHandler;
                 Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit)); //close port in new thread to avoid hang
                 CloseDown.Start(); //close port in new thread to avoid hang
+
+            }
+            if (Type == AdapterType.PCAN)
+            {
+                pcanWorker.Stop();
 
             }
         }
@@ -364,7 +429,7 @@ namespace CAN_Tool
         }
 
 
-        public async Task Transmit(CanMessage message)
+        public void Transmit(CanMessage message)
         {
             if (Type == AdapterType.VSCom)
             {
@@ -408,6 +473,13 @@ namespace CAN_Tool
                 port.Write(str.ToString());
                 Task.Delay(getDelay());
             }
+            if (Type == AdapterType.PCAN)
+            {
+                PcanMessage msg = message.toPcanMsg();
+                var status = pcanWorker.Transmit(msg);
+                Task.Delay(getDelay());
+            }
+
         }
 
         int getDelay()
@@ -461,9 +533,6 @@ namespace CAN_Tool
             GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
         }
 
-        public CanAdapter()
-        {
 
-        }
     }
 }
