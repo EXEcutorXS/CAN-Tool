@@ -992,6 +992,8 @@ namespace OmniProtocol
 
             var senderDevice = ConnectedDevices.FirstOrDefault(d => d.Id.Equals(m.TransmitterId));
 
+            if (m.TransmitterId.Type == 126 && m.TransmitterId.Address == 6) return; //Защита от эхо CandleLight адаптера
+
             if (senderDevice == null)
             {
                 senderDevice = new DeviceViewModel(id);

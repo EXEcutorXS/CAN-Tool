@@ -80,7 +80,7 @@
                     <ComboBox x:Name="CanBitrateField" Margin="10" MinWidth="70" SelectedIndex="{Binding SelectedCanBitrate}">
                         <ComboBox.ItemsSource>
                             <col:ArrayList>
-                                <sys:Int32>0</sys:Int32>
+                                <sys:Int32>10</sys:Int32>
                                 <sys:Int32>20</sys:Int32>
                                 <sys:Int32>50</sys:Int32>
                                 <sys:Int32>100</sys:Int32>

@@ -150,6 +150,10 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>vs_can_api.dll</TargetPath>
 		</ContentWithTargetPath>
+		<ContentWithTargetPath Include="dll\Candle.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>Candle.dll</TargetPath>
+		</ContentWithTargetPath>
 	</ItemGroup>
 
 </Project>

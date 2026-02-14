@@ -9,6 +9,7 @@ using CAN_Tool.Libs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using VSCom.CanApi;
 using Peak.Can.Basic;
+using Candle;
 
 using static CAN_Tool.Libs.Helper;
 
@@ -78,14 +79,34 @@ namespace CAN_Tool
             Dlc = srcMsg.DLC;
         }
 
+        public CanMessage(Frame srcMsg)
+        {
+            Id = (int)(srcMsg.Identifier&0x1FFFFFFF);
+            Ide = srcMsg.Extended;
+            Rtr = srcMsg.RTR;
+            Data = srcMsg.Data;
+            Dlc = srcMsg.Data.Length;
+        }
+
         public PcanMessage toPcanMsg() => new PcanMessage()
         {
-        DLC = (byte)this.Dlc,
-        Data = this.Data,
-        ID = (uint)Id,
-        MsgType = Ide?MessageType.Extended:MessageType.Standard,
+            DLC = (byte)this.Dlc,
+            Data = this.Data,
+            ID = (uint)Id,
+            MsgType = Ide ? MessageType.Extended : MessageType.Standard,
         };
-        
+
+        public Frame toCandleMessage()
+        {
+            Frame frame = new();
+            frame.Data = new byte[Dlc];
+            Array.Copy(this.Data, frame.Data, Dlc);
+            frame.Extended = Ide;
+            frame.Identifier = (uint)Id;
+            frame.RTR = Rtr;
+            return frame;
+        }
+
 
 
         [NotifyPropertyChangedFor(nameof(VerboseInfo), nameof(RvcCompatible), nameof(IdeAsString))]
@@ -230,12 +251,16 @@ namespace CAN_Tool
         private string currentBuf = "";
 
         private Task MessageReceivingTask;
+
         public enum AdapterType
         {
             VSCom,
             Canable,
-            PCAN
+            PCAN,
+            CandleLight
         }
+
+        Device CandleLightDevice;
 
         public Array AdapterTypes => Enum.GetValues(typeof(AdapterType));
         [ObservableProperty] AdapterType type = AdapterType.VSCom;
@@ -283,11 +308,24 @@ namespace CAN_Tool
             }
         }
 
+        private void messageReceiverCandleLight()
+        {
+            
+            while (PortOpened)
+            {
+                var messages = CandleLightDevice.Channels[0].Receive();
+                foreach (var msg in messages) {
+                    GotNewMessage.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = new CanMessage(msg) }); 
+                }
+            }
+        }
+
+
         public void PortOpenNormal(string portName = VSCAN.VSCAN_FIRST_FOUND)
         {
             if (!PortOpened)
             {
-                PortOpened = true;
+
                 if (Type == AdapterType.VSCom)
                 {
                     canWrapper.Open(portName, VSCAN.VSCAN_MODE_NORMAL);
@@ -296,6 +334,7 @@ namespace CAN_Tool
                     canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
 
                     MessageReceivingTask = Task.Run(messageReceiver);
+                    PortOpened = true;
                 }
                 if (Type == AdapterType.Canable)
                 {
@@ -304,11 +343,39 @@ namespace CAN_Tool
                     port.Write("O\r");
                     port.Write($"S{Speed}\r");
                     port.DataReceived += DataReceivedHandler;
+                    PortOpened = true;
                 }
                 if (Type == AdapterType.PCAN)
                 {
                     pcanWorker.ListenOnly = false;
                     pcanWorker.Start();
+                    PortOpened = true;
+                }
+                if (Type == AdapterType.CandleLight)
+                {
+                    var devices = Device.ListDevices();
+                    if (devices.Count == 0)
+                    {
+                        MessageBox.Show("The CandleLight adapter was not found");
+                        return;
+                    }
+                    CandleLightDevice = devices[0];
+                    CandleLightDevice.Open();
+                    var channels = CandleLightDevice.Channels;
+                    switch (Speed)
+                    {
+                        case 0: channels[0].Start(10000); break;
+                        case 1: channels[0].Start(20000); break;
+                        case 2: channels[0].Start(50000); break;
+                        case 3: channels[0].Start(100000); break;
+                        case 4: channels[0].Start(125000); break;
+                        case 5: channels[0].Start(250000); break;
+                        case 6: channels[0].Start(500000); break;
+                        case 7: channels[0].Start(800000); break;
+                        case 8: channels[0].Start(1000000); break;
+                    }
+                    MessageReceivingTask = Task.Run(messageReceiverCandleLight);
+                    PortOpened = true;
 
                 }
             }
@@ -402,6 +469,13 @@ namespace CAN_Tool
                 pcanWorker.Stop();
 
             }
+            if (Type == AdapterType.CandleLight)
+            {
+                CandleLightDevice.Channels[0].Stop();   
+                CandleLightDevice.Close();
+                
+                
+            }
         }
 
         private void CloseSerialOnExit()
@@ -426,6 +500,43 @@ namespace CAN_Tool
                     port.Write($"S{bitrate}\r");
                 }
             }
+            if (Type != AdapterType.PCAN)
+            {
+                switch (bitrate)
+                {
+
+                    case 0: pcanWorker.BitrateCan = Bitrate.Pcan10; break;
+                    case 1: pcanWorker.BitrateCan = Bitrate.Pcan20; break;
+                    case 2: pcanWorker.BitrateCan = Bitrate.Pcan50; break;
+                    case 3: pcanWorker.BitrateCan = Bitrate.Pcan100; break;
+                    case 4: pcanWorker.BitrateCan = Bitrate.Pcan125; break;
+                    case 5: pcanWorker.BitrateCan = Bitrate.Pcan250; break;
+                    case 6: pcanWorker.BitrateCan = Bitrate.Pcan500; break;
+                    case 7: pcanWorker.BitrateCan = Bitrate.Pcan800; break;
+                    case 8: pcanWorker.BitrateCan = Bitrate.Pcan1000; break;
+                }
+            }
+
+            if (Type == AdapterType.CandleLight)
+            {
+                if (PortOpened)
+                {
+                    CandleLightDevice.Channels[0].Stop();
+                    switch (bitrate)
+                    {
+                        case 0: CandleLightDevice.Channels[0].Start(10000); break;
+                        case 1: CandleLightDevice.Channels[0].Start(20000); break;
+                        case 2: CandleLightDevice.Channels[0].Start(50000); break;
+                        case 3: CandleLightDevice.Channels[0].Start(100000); break;
+                        case 4: CandleLightDevice.Channels[0].Start(125000); break;
+                        case 5: CandleLightDevice.Channels[0].Start(250000); break;
+                        case 6: CandleLightDevice.Channels[0].Start(500000); break;
+                        case 7: CandleLightDevice.Channels[0].Start(800000); break;
+                        case 8: CandleLightDevice.Channels[0].Start(1000000); break;
+                    }
+                }
+            }
+
         }
 
 
@@ -479,16 +590,23 @@ namespace CAN_Tool
                 var status = pcanWorker.Transmit(msg);
             }
 
+            if (Type == AdapterType.CandleLight)
+            {
+                CandleLightDevice.Channels[0].Send(message.toCandleMessage(),true);
+                
+            }
+
         }
 
         int getDelay()
         {
-            switch (Speed) { 
+            switch (Speed)
+            {
                 case 0: return 20;
-            case 1: return 8;
-            case 2: return 4;
-            case 3: return 2;
-            default: return 1;
+                case 1: return 8;
+                case 2: return 4;
+                case 3: return 2;
+                default: return 1;
             }
         }
 
@@ -515,7 +633,7 @@ namespace CAN_Tool
                             // ignored
                         }
                         break;
-                    
+
                     default:
                         continue;
                 }

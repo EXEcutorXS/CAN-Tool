@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -89,6 +90,24 @@ namespace CAN_Tool
             sw.Flush();
             sw.Dispose();
 
+        }
+
+        protected override  void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            try
+            {
+                if (vm.CanAdapter.PortOpened)
+                    vm.CanAdapter.PortClose();
+                SaveSettings();
+            }
+            catch (Exception ex)
+            {
+                // Обработка ошибок
+                e.Cancel = true; // Отменяем закрытие при ошибке
+                MessageBox.Show($"Ошибка при сохранении: {ex.Message}");
+            }
         }
 
         private void TryToLoadSettings()
