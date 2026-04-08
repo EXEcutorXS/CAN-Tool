@@ -335,6 +335,10 @@
 <v:String x:Key="par_138">Extra pump for Zone 4</v:String>
 <v:String x:Key="par_139">Extra pump for Zone 5</v:String>
 
+<v:String x:Key="par_140">Primary Burner wake up night treshold</v:String>
+<v:String x:Key="par_141">Secondary Burner wake up night treshold</v:String>
+<v:String x:Key="par_142">Element disabling</v:String>
+
 <v:String x:Key="par_400">RV_LOAD_MODE_0</v:String>
 <v:String x:Key="par_401">RV_LOAD_MODE_1</v:String>
 <v:String x:Key="par_402">RV_LOAD_MODE_2</v:String>

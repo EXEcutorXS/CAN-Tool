@@ -335,6 +335,10 @@ par_137	Extra pump for Zone 3	Дополнительная помпа для з�
 par_138	Extra pump for Zone 4	Дополнительная помпа для зоны 4
 par_139	Extra pump for Zone 5	Дополнительная помпа для зоны 5
 		
+par_140	Primary Burner wake up night treshold	Порог ночного пробуждения основного подогревателя
+par_141	Secondary Burner wake up night treshold	Порог ночного пробуждения дополнительного подогревателя
+par_142	Element disabling	Отключение ТЭНа
+		
 par_400	RV_LOAD_MODE_0	Режим работы доп. нагрузки 0
 par_401	RV_LOAD_MODE_1	Режим работы доп. нагрузки 1
 par_402	RV_LOAD_MODE_2	Режим работы доп. нагрузки 2
