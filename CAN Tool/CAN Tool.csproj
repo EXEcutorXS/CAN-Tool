@@ -156,4 +156,19 @@
 		</ContentWithTargetPath>
 	</ItemGroup>
 
+	<PropertyGroup>
+		<!-- Генерировать файл с версией сборки -->
+		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+		<!-- Определяем пользовательское свойство с датой компиляции -->
+		<BuildDate>$([System.DateTime]::Now.ToString("yyyy-MM-dd HH:mm:ss"))</BuildDate>
+	</PropertyGroup>
+
+	<Target Name="SetBuildDate" BeforeTargets="CoreCompile">
+		<ItemGroup>
+			<AssemblyAttributes Include="System.Reflection.AssemblyMetadataAttribute">
+				<_Parameter1>BuildDate</_Parameter1>
+				<_Parameter2>$(BuildDate)</_Parameter2>
+			</AssemblyAttributes>
+		</ItemGroup>
+	</Target>
 </Project>

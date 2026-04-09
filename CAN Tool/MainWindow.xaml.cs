@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using MaterialDesignThemes.Wpf;
 using OmniProtocol;
 using ScottPlot;
+using ScottPlot.Palettes;
 using ScottPlot.Renderable;
 using System;
 using System.Collections.Generic;
@@ -130,6 +131,8 @@ namespace CAN_Tool
             vm = new();
             DataContext = vm;
             InitializeComponent();
+            
+            this.Title = $"CAN Tool (build {BuildInfo.BuildDate})";
 
             App.LanguageChanged += LanguageChanged;
 
