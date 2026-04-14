@@ -134,6 +134,8 @@ namespace OmniProtocol
             Pgns.Add(51, new() { id = 51, name = "t_ac_control", multiPack = true });
             Pgns.Add(52, new() { id = 52, name = "t_ac_manual_control", multiPack = true });
             Pgns.Add(55, new() { id = 55, name = "t_tank_levels" });
+            Pgns.Add(56, new() { id = 56, name = "t_furnace_control" });
+            Pgns.Add(57, new() { id = 57, name = "t_extra_heater_parameters" });
             Pgns.Add(99, new() { id = 99, name = "t_debug_pack" });
             Pgns.Add(100, new() { id = 100, name = "t_memory_control_old", multiPack = true });
             Pgns.Add(101, new() { id = 101, name = "t_buffer_data_transmitting_old" });
@@ -594,6 +596,8 @@ namespace OmniProtocol
             Pgns[55].parameters.Add(new() { Name = "t_tank4_content", BitLength = 4, StartByte = 7, Meanings = { { 0, "t_off" }, { 1, "t_white_tank" }, { 2, "t_grey_tank" }, { 3, "t_black_tank" }, { 4, "t_fuel_tank" } } });
             Pgns[55].parameters.Add(new() { Name = "t_tank4_resistance", BitLength = 4, StartByte = 7, StartBit = 4, Meanings = { { 0, "t_0-190_ohm" }, { 1, "t_240-33_ohm" }, { 2, "t_short_full" }, { 3, "t_open_full" } } });
 
+            Pgns[57].parameters.Add(new() { Name = "t_power_limiter", BitLength = 4, StartByte = 0, UnitT = UnitType_t.None });
+
             Pgns[49].parameters.Add(new() { Name = "t_load_channel1", BitLength = 2, StartByte = 0, StartBit = 0, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
             Pgns[49].parameters.Add(new() { Name = "t_load_channel2", BitLength = 2, StartByte = 0, StartBit = 2, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
             Pgns[49].parameters.Add(new() { Name = "t_load_channel3", BitLength = 2, StartByte = 0, StartBit = 4, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
@@ -604,7 +608,6 @@ namespace OmniProtocol
             Pgns[99].parameters.Add(new() { Name = "t_temperature_1", BitLength = 16, Signed = true, StartByte = 1, UnitT = UnitType_t.Temp, PackNumber = 1, Var = 129 });
             Pgns[99].parameters.Add(new() { Name = "t_temperature_2", BitLength = 16, Signed = true, StartByte = 3, UnitT = UnitType_t.Temp, PackNumber = 1, Var = 130 });
             Pgns[99].parameters.Add(new() { Name = "t_pressure", BitLength = 24, StartByte = 5, a = 0.001, UnitT = UnitType_t.Pressure, Var = 131 });
-
 
             Pgns[100].parameters.Add(new() { Name = "Начальный адрес", BitLength = 24, StartByte = 1, PackNumber = 2, GetMeaning = r => $"{GetString("t_starting_address")}: 0X{(r + 0x8000000):X}" });
             Pgns[100].parameters.Add(new() { Name = "Длина данных", BitLength = 32, StartByte = 4, PackNumber = 2 });
