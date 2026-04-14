@@ -338,6 +338,13 @@ par_139	Extra pump for Zone 5	Дополнительная помпа для з�
 par_140	Primary Burner wake up night treshold	Порог ночного пробуждения основного подогревателя
 par_141	Secondary Burner wake up night treshold	Порог ночного пробуждения дополнительного подогревателя
 par_142	Element disabling	Отключение ТЭНа
+par_143	Power limitation for heater 1	Ограничение мощности для подогревателя №1
+par_144	Power limitation for heater 2	Ограничение мощности для подогревателя №2
+par_145	Power limitation for heater 3	Ограничение мощности для подогревателя №3
+par_146	Power limitation for heater 4	Ограничение мощности для подогревателя №4
+par_147	Power limitation for heater 5	Ограничение мощности для подогревателя №5
+par_148	Power limitation for heater 6	Ограничение мощности для подогревателя №6
+par_149	Power limitation for heater 7	Ограничение мощности для подогревателя №7
 		
 par_400	RV_LOAD_MODE_0	Режим работы доп. нагрузки 0
 par_401	RV_LOAD_MODE_1	Режим работы доп. нагрузки 1

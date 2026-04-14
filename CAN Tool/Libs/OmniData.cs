@@ -359,6 +359,7 @@ namespace OmniProtocol
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для перехода в ждущий.", BitLength = 8, StartByte = 4, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего.", BitLength = 8, StartByte = 5, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры бака для выхода из ждущего при разборе воды.", BitLength = 8, StartByte = 6, b = -75, PackNumber = 2, UnitT = UnitType_t.Temp });
+            Pgns[19].parameters.Add(new() { Name = "t_power_limiter", BitLength = 4, StartByte = 7});
 
 
             Pgns[19].parameters.Add(new() { Name = "Уставка температуры для тёплого пола", BitLength = 8, StartByte = 1, b = -75, PackNumber = 3, UnitT = UnitType_t.Temp });
@@ -596,7 +597,7 @@ namespace OmniProtocol
             Pgns[55].parameters.Add(new() { Name = "t_tank4_content", BitLength = 4, StartByte = 7, Meanings = { { 0, "t_off" }, { 1, "t_white_tank" }, { 2, "t_grey_tank" }, { 3, "t_black_tank" }, { 4, "t_fuel_tank" } } });
             Pgns[55].parameters.Add(new() { Name = "t_tank4_resistance", BitLength = 4, StartByte = 7, StartBit = 4, Meanings = { { 0, "t_0-190_ohm" }, { 1, "t_240-33_ohm" }, { 2, "t_short_full" }, { 3, "t_open_full" } } });
 
-            Pgns[57].parameters.Add(new() { Name = "t_power_limiter", BitLength = 4, StartByte = 0, UnitT = UnitType_t.None });
+            Pgns[57].parameters.Add(new() { Name = "t_power_limiter", BitLength = 4, StartByte = 0});
 
             Pgns[49].parameters.Add(new() { Name = "t_load_channel1", BitLength = 2, StartByte = 0, StartBit = 0, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
             Pgns[49].parameters.Add(new() { Name = "t_load_channel2", BitLength = 2, StartByte = 0, StartBit = 2, Meanings = { { 0, "t_off" }, { 1, "t_toggle" }, { 2, "t_pwm" } } });
