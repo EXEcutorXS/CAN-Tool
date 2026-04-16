@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MaterialDesignThemes.Wpf;
 using OmniProtocol;
+using RVC;
 using ScottPlot;
 using ScottPlot.Palettes;
 using ScottPlot.Renderable;
@@ -218,6 +219,29 @@ namespace CAN_Tool
                     DragMove();
             }
             catch { }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CanMessage m = new();
+            Random r = new(DateTime.Now.Millisecond);
+            m.Ide = (r.Next(0, 255) % 2) == 0;
+            m.Rtr = (r.Next(0, 255) % 2) == 0;
+            if (m.Ide)
+                m.Id = r.Next(0, 0x1FFFFFFF);
+            else
+                m.Id = r.Next(0, 0x7FF);
+            m.Dlc = (byte)r.Next(1, 9);
+            for (int i = 0; i < m.Dlc; i++)
+                m.Data[i] = (byte)r.Next(0, 256);
+
+            vm.CanPage.MessageList.TryToAdd(m);
+        }
+
+        private void CanListDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (CanMessageList.SelectedItem != null)
+                vm.CanPage.ConstructedMessage.Update(CanMessageList.SelectedItem as CanMessage);
         }
 
         #region Command constructor
@@ -458,6 +482,99 @@ namespace CAN_Tool
         {
             if (DataSet.SelectedItem != null)
                 ColorPicker.Color = ((DataSet.SelectedItem as StatusVariable).ChartBrush as SolidColorBrush).Color;
+        }
+
+
+        private void RVCMessageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
+            try
+            {
+                vm.RvcPage.SelectedMessage = (RvcMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
+            }
+            catch { }
+
+        }
+
+        private void SetTimeButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.SetTime(DateTime.Now);
+        }
+
+        private void ToggleHeaterButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleHeater();
+        }
+
+        private void ToggleElementButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleElement();
+        }
+
+        private void ToggleWaterButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleWater();
+        }
+
+        private void ToggleZoneButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleZone();
+        }
+
+        private void TogglePumpButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.TogglePump();
+        }
+
+        private void ToggleFanManualModeButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleFanManualMode();
+        }
+
+        private void ToggleScheduleModeButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm.RvcPage.Timberline15.ToggleScheduleMode();
+        }
+
+        private void DaySetPointValueChanged(object sender, RoutedEventArgs e)
+        {
+            vm?.RvcPage.Timberline15.SetDaySetpoint((int)(sender as ScrollBar).Value);
+        }
+
+        private void NightSetPointValueChanged(object sender, RoutedEventArgs e)
+        {
+            vm?.RvcPage.Timberline15.SetNightSetpoint((int)(sender as ScrollBar).Value);
+        }
+
+        private void ManualFanSpeedValueChanged(object sender, RoutedEventArgs e)
+        {
+            vm?.RvcPage.Timberline15.SetFanManualSpeed((byte)(sender as ScrollBar).Value);
+        }
+
+        private void SystemDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.RvcPage.Timberline15.SetSystemDuration((int)(sender as ScrollBar).Value);
+        }
+
+        private void WaterDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            vm?.RvcPage.Timberline15.SetWaterDuration((int)(sender as ScrollBar).Value);
+        }
+
+        private void NightTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
+        {
+            vm?.RvcPage.Timberline15.SetNightStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
+        }
+
+
+        private void DayStartChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
+        {
+            vm?.RvcPage.Timberline15.SetDayStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
+        }
+
+        private void ClearErrorsButtonPressed(object sender, RoutedEventArgs e)
+        {
+            vm?.RvcPage.Timberline15.ClearErrors();
         }
 
 

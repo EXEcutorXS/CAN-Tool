@@ -31,17 +31,25 @@ using CommunityToolkit.Mvvm.Input;
 namespace CAN_Tool.ViewModels
 {
 
+    public enum WorkMode_t { Omni, Rvc, RegularCan }
+
     public partial class MainWindowViewModel : ObservableObject
     {
         private SynchronizationContext UIContext = SynchronizationContext.Current;
+
+        public WorkMode_t[] WorkModes => new WorkMode_t[] { WorkMode_t.Omni, WorkMode_t.Rvc, WorkMode_t.RegularCan };
 
         public string Title => "CAN Tool";
 
         [ObservableProperty] private List<SolidColorBrush> brushes = new();
         [ObservableProperty] public bool autoRedraw = true;
 
+        [ObservableProperty] private WorkMode_t mode;
+
         public FirmwarePageViewModel FirmwarePage { set; get; }
         public ManualPageViewModel ManualPage { set; get; }
+        public RvcPageViewModel RvcPage { set; get; }
+        public CanPageViewModel CanPage { set; get; }
 
 
         [ObservableProperty] private bool canAdapterSettings = false;
@@ -427,7 +435,7 @@ namespace CAN_Tool.ViewModels
                         v.ChartBrush = new SolidColorBrush(Colors.Yellow); break;
                     case 135:
                         v.Display = true;
-                        v.ChartBrush = new SolidColorBrush(Colors.White); 
+                        v.ChartBrush = new SolidColorBrush(Colors.White);
                         v.LineStyle = LineStyle.Dash; break;
                     case 136:
                         v.Display = true;
@@ -521,7 +529,14 @@ namespace CAN_Tool.ViewModels
 
         public void NewMessgeReceived(object sender, EventArgs e)
         {
-            UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotCanMessageEventArgs).receivedMessage), null);
+            switch (Mode)
+            {
+                case
+        WorkMode_t.Omni:
+                    UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+                case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+                case WorkMode_t.RegularCan: UIContext.Send(x => CanPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+            }
         }
 
         public MainWindowViewModel()
@@ -534,6 +549,8 @@ namespace CAN_Tool.ViewModels
             OmniInstance.plot = myChart;
             FirmwarePage = new(this);
             ManualPage = new(this);
+            CanPage = new(this);
+            RvcPage = new(this);
 
             CanAdapter.GotNewMessage += NewMessgeReceived;
 

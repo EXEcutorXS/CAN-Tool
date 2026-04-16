@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Linq;
 using System.ComponentModel;
+using RVC;
 
 
 namespace CAN_Tool.ViewModels.Converters
@@ -578,9 +579,59 @@ namespace CAN_Tool.ViewModels.Converters
             if (value == null || value.GetType() != typeof(OmniZoneHandler))
                 return false;
             OmniZoneHandler zone = (OmniZoneHandler)value;
-            if (zone.Connected!=zoneType_t.Furnace)
+            if (zone.Connected != OmniProtocol.zoneType_t.Furnace)
                 return false;
             return zone.ManualMode;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class RegularCanToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((WorkMode_t)value == WorkMode_t.RegularCan)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class OmniToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((WorkMode_t)value == WorkMode_t.Omni)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    public class RvcToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((WorkMode_t)value == WorkMode_t.Rvc)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
