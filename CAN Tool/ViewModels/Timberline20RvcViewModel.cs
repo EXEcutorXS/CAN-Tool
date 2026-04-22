@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Interop;
 using System.Windows.Markup;
 using System.Windows.Threading;
+using CommunityToolkit.Mvvm.Input;
 
 namespace CAN_Tool.ViewModels
 {
@@ -74,17 +75,7 @@ namespace CAN_Tool.ViewModels
         private int rvcTemperature = 30;
         public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
 
-        private byte saToRequest = 101;
-        public byte SaToRequest { set => Set(ref saToRequest, value); get => saToRequest; }
 
-        private int dgnToRequest = 0x1FECA;
-        public int DgnToRequest { set => Set(ref dgnToRequest, value); get => dgnToRequest; }
-
-        private byte instanceToRequest = 1;
-        public byte InstanceToRequest { set => Set(ref instanceToRequest, value); get => instanceToRequest; }
-
-        private byte subInstanceToRequest = 1;
-        public byte SubInstanceToRequest { set => Set(ref subInstanceToRequest, value); get => subInstanceToRequest; }
 
     }
 
@@ -239,6 +230,28 @@ namespace CAN_Tool.ViewModels
                         UnderfloorHysteresis = (D[6] / 10);
                         if (UnderfloorHysteresis < 2) UnderfloorHysteresis = 2;
                         if (UnderfloorHysteresis > 10) UnderfloorHysteresis = 10;
+                    }
+
+                    break;
+
+                case 0xECFF:
+                    if (D[0] != 0x20) break;
+                    MultipackInitiated = true;
+                    for (int i = 0; i < 256; i++)
+                        packReceivedFlags[i] = false;
+                        MultipackLength = D[1] + D[2] * 256;
+                        MultipackPacketCount = D[3];
+                        MultipackPacketDgn = D[5] + D[6] * 0x100 + D[7] * 0x10000;
+                    break;
+                case 0xEBFF:
+                    packReceivedFlags[D[0]] = true;
+                    for (int i = 0; i < 7; i++)
+                        multipackArray[D[0] * 7+i] = D[1+i];
+                    if (packReceivedFlags.Take(MultipackPacketCount).All(x => x))
+                    {
+                        string str = Encoding.ASCII.GetString(multipackArray, 0, MultipackLength);
+                        MultipackString = $"Last multipack: DGN:0x{multipackPacketDgn:X} {str} ";
+                        MultipackInitiated = false;
                     }
 
                     break;
@@ -662,10 +675,11 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
-        public void ClaimSourceAddress(int sa)
+        
+        public void ClaimSourceAddress()
         {
             RvcMessage msg = new();
-            msg.Dgn = 0xEA00 + sa;
+            msg.Dgn = 0xEA00 + SaToRequest;
             msg.SourceAdress = 254;
             msg.Priority = 6;
             msg.Data[0] = 0;
@@ -675,16 +689,17 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
-        public void RequestDgn(int dgn, byte sa,byte instance,byte secondInstance)
+        
+        public void RequestDgn()
         {
             RvcMessage msg = new();
-            msg.Dgn = 0xEA00+sa;
+            msg.Dgn = 0xEA00+SaToRequest;
             msg.Priority = 6;
-            msg.Data[0] = (byte)(dgn&0xFF);
-            msg.Data[1] = (byte)(dgn>>8 & 0xFF);
-            msg.Data[2] = (byte)(dgn>>16 & 0xFF);
-            msg.Data[3] = (instance);
-            msg.Data[4] = (secondInstance);
+            msg.Data[0] = (byte)(DgnToRequest&0xFF);
+            msg.Data[1] = (byte)(DgnToRequest>>8 & 0xFF);
+            msg.Data[2] = (byte)(DgnToRequest>>16 & 0xFF);
+            msg.Data[3] = (InstanceToRequest);
+            msg.Data[4] = (SubInstanceToRequest);
 
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
@@ -798,6 +813,37 @@ namespace CAN_Tool.ViewModels
         private int enginePreheatDuration;
         [AffectsTo(nameof(EngineDurationString))]
         public int EnginePreheatDuration { set => Set(ref enginePreheatDuration, value); get => enginePreheatDuration; }
+
+        private byte saToRequest = 101;
+        public byte SaToRequest { set => Set(ref saToRequest, value); get => saToRequest; }
+
+        private int dgnToRequest = 0xFEEB;
+        public int DgnToRequest { set => Set(ref dgnToRequest, value); get => dgnToRequest; }
+
+        private byte instanceToRequest = 1;
+        public byte InstanceToRequest { set => Set(ref instanceToRequest, value); get => instanceToRequest; }
+
+        private byte subInstanceToRequest = 1;
+        public byte SubInstanceToRequest { set => Set(ref subInstanceToRequest, value); get => subInstanceToRequest; }
+
+        private bool multipackInitiated = false;
+        public bool MultipackInitiated { set => Set(ref multipackInitiated, value); get => multipackInitiated; }
+
+        private int multipackLength = 0;
+        public int MultipackLength { set => Set(ref multipackLength, value); get => multipackLength; }
+
+        private int multipackPacketCount = 0;
+        public int MultipackPacketCount { set => Set(ref multipackPacketCount, value); get => multipackPacketCount; }
+
+        private int multipackPacketDgn = 0;
+        public int MultipackPacketDgn { set => Set(ref multipackPacketDgn, value); get => multipackPacketDgn; }
+
+        private string multipackString = "";
+        public string MultipackString { set => Set(ref multipackString, value); get => multipackString; }
+
+        private byte[] multipackArray = new byte[1792];
+
+        private bool[] packReceivedFlags = new bool[256];
 
         public string EngineDurationString
         {

@@ -3,6 +3,7 @@ using OmniProtocol;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 
 namespace CAN_Tool.Libs
@@ -35,34 +36,48 @@ namespace CAN_Tool.Libs
 
     public class UpdatableList<T> : BindingList<T> where T : IUpdatable<T>, IComparable
     {
+        private readonly object _syncRoot = new object();
+        private readonly SynchronizationContext _uiContext;
+
+        public UpdatableList()
+        {
+            // Захватываем UI контекст (должен вызываться из UI потока)
+            _uiContext = SynchronizationContext.Current ?? new SynchronizationContext();
+        }
+
         public bool TryToAdd(T item)
         {
-            var found = Items.FirstOrDefault(i => i.IsSimiliarTo(item));
-            if (found == null)
+            lock (_syncRoot)
             {
-                if (Count > 0)
+                var found = Items.FirstOrDefault(i => i.IsSimiliarTo(item));
+                if (found == null)
                 {
-                    for (var i = 0; i < Count; i++)
+                    if (Count > 0)
                     {
-                        if (item.CompareTo(Items[i]) <= 0)
+                        for (var i = 0; i < Count; i++)
                         {
-                            Insert(i, item);
-                            return true;
+                            if (item.CompareTo(Items[i]) <= 0)
+                            {
+                                // Добавление в UI потоке
+                                _uiContext.Post(_ => Insert(i, item), null);
+                                return true;
+                            }
                         }
+                        _uiContext.Post(_ => Add(item), null);
+                        return true;
                     }
-                    Add(item);
-                    return true;
+                    else
+                    {
+                        _uiContext.Post(_ => Add(item), null);
+                    }
                 }
                 else
                 {
-                    Add(item);
+                    // Update может также изменять коллекцию?
+                    _uiContext.Post(_ => found.Update(item), null);
                 }
+                return false;
             }
-            else
-            {
-                found.Update(item);
-            }
-            return false;
         }
     }
 

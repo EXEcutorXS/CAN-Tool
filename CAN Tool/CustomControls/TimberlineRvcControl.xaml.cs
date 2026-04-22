@@ -201,5 +201,16 @@ namespace CAN_Tool.CustomControls
         {
             vm?.SetTime(DateTime.Now);
         }
+
+
+        private void DgnRequestClick(object sender, RoutedEventArgs e)
+        {
+            vm.RequestDgn();
+        }
+
+        private void AddressClaimClick(object sender, RoutedEventArgs e)
+        {
+            vm.ClaimSourceAddress();
+        }
     }
 }

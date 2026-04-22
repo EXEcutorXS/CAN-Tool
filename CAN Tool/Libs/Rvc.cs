@@ -34,32 +34,22 @@ namespace RVC
         public string Name { set; get; }
         public int MaxBroadcastGap { set; get; } = 5000;
         public int MinBroadcastGap { set; get; } = 500;
-        public List<Parameter> Parameters { set; get; }
-        public bool HasInstance { set; get; } = false;
+        
         public string DisplayName => $"{Dgn:X05} {Name}";
-        public int idLength; //Describes how many bytes in data are id of packet
+        public int idLen; //Describes how many bytes in data are id of packet
         public bool MultiPack = false;
         public DGN(int idLen = 0)
         {
-            HasInstance = true;
-            Parameters = new List<Parameter>();
-
-            if (idLen > 0)
-            {
-                Parameters.Add(new Parameter { Name = "Instance", ShortName = "#", Type = paramTyp.instance, Size = 8, frstByte = 0, Id = true });
-                idLength = idLen;
-            }
+            this.idLen = idLen;
         }
 
         public string Decode(byte[] data)
         {
             var ret = Name + ": ;";
-            if (!MultiPack)
-                foreach (var p in Parameters)
-                    ret += p.ToString(data) + "; ";
-            else
-                foreach (var p in Parameters.Where(p => p.multipackNum == data[0]))
-                    ret += p.ToString(data) + "; ";
+                foreach (var p in RVC.Parameters)
+                    if (p.Dgn==Dgn && (MultiPack==false || data[0]==p.multipackNum))
+                        ret += p.ToString(data) + "; ";
+            
             return ret;
         }
 
@@ -68,6 +58,7 @@ namespace RVC
 
     public class Parameter
     {
+        public int Dgn;
         public string Name;
         public string ShortName;
         public byte Size = 8;
@@ -81,9 +72,9 @@ namespace RVC
         public bool Id = false;
         public byte multipackNum = 0;
 
-        public Parameter(string name)
+        public Parameter(int dgn)
         {
-            Name = name;
+            Dgn = dgn;
         }
 
         public Parameter()
@@ -281,8 +272,6 @@ namespace RVC
         }
 
 
-        public IEnumerable<Parameter> Parameters => (RVC.DGNs.ContainsKey(Dgn)) ? RVC.DGNs[Dgn].Parameters : null;
-
         public RvcMessage()
         {
             Priority = 6;
@@ -376,9 +365,11 @@ namespace RVC
         public bool IsSimiliarTo(RvcMessage item)
         {
             if (Dgn != item.Dgn) return false;
-            if (!RVC.DGNs.ContainsKey(Dgn)) return true;
-            for (var i = 0; i < RVC.DGNs[Dgn].idLength; i++)
-                if (Data[i] != item.Data[i]) return false;
+            if (!RVC.DGNs.ContainsKey(Dgn)) 
+                return true;
+            for (var i = 0; i < RVC.DGNs[Dgn].idLen; i++)
+                if (Data[i] != item.Data[i])
+                    return false;
             return true;
 
         }

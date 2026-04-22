@@ -20,6 +20,7 @@
         <c:FurnaceZoneTypeToVisible x:Key="OnlyFurnace" />
         <c:ConnectedZoneTypeToBool x:Key="ConnectedToBool" />
         <c:HeatingZoneTypeToBool x:Key="HetingZoneToBool" />
+        <c:HexStringToIntConverter x:Key="HexConverter" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -140,16 +141,17 @@
             </WrapPanel>
         </DockPanel>
         <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" Grid.ColumnSpan="2">
-            <TextBlock Margin="5" VerticalAlignment="Center">DGN:</TextBlock>
-            <TextBox Margin="5" VerticalAlignment="Center" ></TextBox>
+            <TextBlock Margin="5" VerticalAlignment="Center">DGN:0x</TextBlock>
+            <TextBox Margin="5" VerticalAlignment="Center" MinWidth="30"  Text="{Binding DgnToRequest,Converter = {StaticResource HexConverter}}"></TextBox>
             <TextBlock Margin="5" VerticalAlignment="Center">Instance:</TextBlock>
-            <TextBox Margin="5" VerticalAlignment="Center">111</TextBox>
+            <TextBox Margin="5" VerticalAlignment="Center" MinWidth="30" TextAlignment="Center" Text="{Binding InstanceToRequest}" d:Text="1"></TextBox>
             <TextBlock Margin="5" VerticalAlignment="Center">SubInstance:</TextBlock>
-            <TextBox Margin="5" VerticalAlignment="Center">111</TextBox>
-            <Button Margin="5" VerticalAlignment="Center">Request</Button>
+            <TextBox Margin="5" VerticalAlignment="Center" MinWidth="40" TextAlignment="Center" Text="{Binding SubInstanceToRequest}" d:Text="1"></TextBox>
+            <Button Margin="5" VerticalAlignment="Center" Click="DgnRequestClick">Request</Button>
             <TextBlock Margin="25 5 5 5" VerticalAlignment="Center">Source address:</TextBlock>
-            <TextBox Margin="5" VerticalAlignment="Center">111</TextBox>
-            <Button Margin="5" VerticalAlignment="Center">Claim</Button>
+            <TextBox Margin="5" VerticalAlignment="Center" MinWidth="40" Text="{Binding SaToRequest}"> </TextBox>
+            <Button Margin="5" VerticalAlignment="Center" Click="AddressClaimClick">Claim</Button>
+            <TextBlock Text="{Binding MultipackString}" TextAlignment="Center"></TextBlock>
 
         </StackPanel>
         <StackPanel Grid.Column="0" Grid.Row="2" DataContext="{Binding SelectedZone}" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center" d:Visibility="Visible"  Visibility="{Binding Connected,Converter={StaticResource OnlyHetingZones}}">
