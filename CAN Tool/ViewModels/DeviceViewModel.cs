@@ -14,6 +14,8 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using static CAN_Tool.Libs.Helper;
 
 namespace OmniProtocol
@@ -282,7 +284,17 @@ namespace OmniProtocol
 
         public DeviceTemplate DeviceReference { get; }
 
-        public string Img => $@"~\..\Images\{Id.Type}.jpg";
+        public ImageSource Img
+        {
+            get
+            {
+                var imagesDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
+                var path = Path.Combine(imagesDir, $"{Id.Type}.jpg");
+                if (!File.Exists(path))
+                    path = Path.Combine(imagesDir, "noimg.jpg");
+                return new BitmapImage(new Uri(path));
+            }
+        }
 
         public override string ToString() { return DeviceReference != null ? $"{DeviceReference.Name}({Id.Address})" : $"Device #<{Id.Type}>({Id.Address})"; }
 

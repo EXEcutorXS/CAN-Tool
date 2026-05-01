@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using CAN_Tool.Libs;
+using CAN_Tool.Libs.CanAdapters;
 using CommunityToolkit.Mvvm.ComponentModel;
 using VSCom.CanApi;
 using Peak.Can.Basic;
@@ -81,7 +82,7 @@ namespace CAN_Tool
 
         public CanMessage(Frame srcMsg)
         {
-            Id = (int)(srcMsg.Identifier&0x1FFFFFFF);
+            Id = (int)(srcMsg.Identifier & 0x1FFFFFFF);
             Ide = srcMsg.Extended;
             Rtr = srcMsg.RTR;
             Data = srcMsg.Data;
@@ -205,6 +206,7 @@ namespace CAN_Tool
             }
             return ret;
         }
+
         public void Update(CanMessage m)
         {
             if (m == null) return;
@@ -242,15 +244,7 @@ namespace CAN_Tool
 
     public partial class CanAdapter : ObservableObject
     {
-        VSCAN canWrapper = new();
-
-        SerialPort port = new(); //Used for Canable
-
-        Worker pcanWorker = new(PcanChannel.Usb01, Bitrate.Pcan250);
-
-        private string currentBuf = "";
-
-        private Task MessageReceivingTask;
+        private ICanAdapterDriver _driver;
 
         public enum AdapterType
         {
@@ -260,397 +254,94 @@ namespace CAN_Tool
             CandleLight
         }
 
-        Device CandleLightDevice;
-
         public Array AdapterTypes => Enum.GetValues(typeof(AdapterType));
-        [ObservableProperty] AdapterType type = AdapterType.VSCom;
-        [ObservableProperty] bool portOpened = false;
-        [ObservableProperty] string portName = "";
-        [ObservableProperty] int speed = 5;
+
+        [ObservableProperty] private AdapterType type = AdapterType.VSCom;
+        [ObservableProperty] private bool portOpened = false;
+        [ObservableProperty] private string portName = "";
+        [ObservableProperty] private int speed = 5;
 
         public event EventHandler GotNewMessage;
         public long ReceivedMessagesCount { get; private set; } = 0;
-        public long FalseInteruptCount { get; private set; } = 0;
 
+        partial void OnTypeChanged(AdapterType value) => _driver = CreateDriver(value);
 
         public CanAdapter()
         {
-            //Api.Initialize(PcanChannel.Usb01, Bitrate.Pcan250);
-            pcanWorker.MessageAvailable += OnMessageAvailable;
+            _driver = CreateDriver(Type);
         }
 
-        private void OnMessageAvailable(object sender, MessageAvailableEventArgs e)
+        private ICanAdapterDriver CreateDriver(AdapterType adapterType)
         {
-            PcanMessage msg;
-            ulong timestamp;
-            while (pcanWorker.Dequeue(out msg, out timestamp))
+            if (_driver != null)
+                _driver.MessageReceived -= OnDriverMessageReceived;
+
+            ICanAdapterDriver driver = adapterType switch
             {
-                try
-                {
-                    ReceivedMessagesCount++;
-                    GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = new CanMessage(msg) });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            }
+                AdapterType.VSCom => new VSComDriver(),
+                AdapterType.Canable => new CanableDriver(),
+                AdapterType.PCAN => new PcanDriver(),
+                AdapterType.CandleLight => new CandleLightDriver(),
+                _ => throw new ArgumentOutOfRangeException(nameof(adapterType))
+            };
+
+            driver.MessageReceived += OnDriverMessageReceived;
+            return driver;
         }
 
-        private void messageReceiver()
+        private void OnDriverMessageReceived(object sender, GotCanMessageEventArgs e)
         {
-            VSCAN_MSG[] msgs = new VSCAN_MSG[1];
-            uint readbytes = 0;
-            while (PortOpened)
-            {
-                canWrapper.Read(ref msgs, 1, ref readbytes);
-                GotNewMessage.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = new CanMessage(msgs[0]) });
-            }
+            ReceivedMessagesCount++;
+            GotNewMessage?.Invoke(this, e);
         }
-
-        private void messageReceiverCandleLight()
-        {
-            
-            while (PortOpened)
-            {
-                var messages = CandleLightDevice.Channels[0].Receive();
-                foreach (var msg in messages) {
-                    GotNewMessage.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = new CanMessage(msg) }); 
-                }
-            }
-        }
-
 
         public void PortOpenNormal(string portName = VSCAN.VSCAN_FIRST_FOUND)
         {
-            if (!PortOpened)
-            {
-
-                if (Type == AdapterType.VSCom)
-                {
-                    canWrapper.Open(portName, VSCAN.VSCAN_MODE_NORMAL);
-                    canWrapper.SetSpeed(Speed);
-                    canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
-                    canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
-
-                    MessageReceivingTask = Task.Run(messageReceiver);
-                    PortOpened = true;
-                }
-                if (Type == AdapterType.Canable)
-                {
-                    port.PortName = portName;
-                    port.Open();
-                    port.Write("O\r");
-                    port.Write($"S{Speed}\r");
-                    port.DataReceived += DataReceivedHandler;
-                    PortOpened = true;
-                }
-                if (Type == AdapterType.PCAN)
-                {
-                    pcanWorker.ListenOnly = false;
-                    pcanWorker.Start();
-                    PortOpened = true;
-                }
-                if (Type == AdapterType.CandleLight)
-                {
-                    var devices = Device.ListDevices();
-                    if (devices.Count == 0)
-                    {
-                        MessageBox.Show("The CandleLight adapter was not found");
-                        return;
-                    }
-                    CandleLightDevice = devices[0];
-                    CandleLightDevice.Open();
-                    var channels = CandleLightDevice.Channels;
-                    switch (Speed)
-                    {
-                        case 0: channels[0].Start(10000); break;
-                        case 1: channels[0].Start(20000); break;
-                        case 2: channels[0].Start(50000); break;
-                        case 3: channels[0].Start(100000); break;
-                        case 4: channels[0].Start(125000); break;
-                        case 5: channels[0].Start(250000); break;
-                        case 6: channels[0].Start(500000); break;
-                        case 7: channels[0].Start(800000); break;
-                        case 8: channels[0].Start(1000000); break;
-                    }
-                    MessageReceivingTask = Task.Run(messageReceiverCandleLight);
-                    PortOpened = true;
-
-                }
-            }
-            else
+            if (PortOpened)
             {
                 MessageBox.Show(GetString("t_port_already_opened"));
+                return;
             }
+            _driver.SetBitrate(Speed);
+            _driver.OpenNormal(portName);
+            PortOpened = true;
         }
 
         public void PortOpenSelfReception(string portName = VSCAN.VSCAN_FIRST_FOUND)
         {
-            if (!PortOpened)
-            {
-                PortOpened = true;
-                if (Type == AdapterType.VSCom)
-                {
-                    canWrapper.Open(portName, VSCAN.VSCAN_MODE_SELF_RECEPTION);
-                    canWrapper.SetSpeed(Speed);
-                    canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
-                    canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
-
-                    MessageReceivingTask = Task.Run(messageReceiver);
-                }
-                if (Type == AdapterType.Canable)
-                {
-                    port.PortName = portName;
-                    port.Open();
-                    port.Write("Y\r");
-                    port.Write($"S{Speed}\r");
-                    port.DataReceived += DataReceivedHandler;
-                }
-            }
-            else
+            if (PortOpened)
             {
                 MessageBox.Show(GetString("t_port_already_opened"));
+                return;
             }
+            _driver.SetBitrate(Speed);
+            _driver.OpenSelfReception(portName);
+            PortOpened = true;
         }
 
         public void PortOpenListenOnly(string portName = VSCAN.VSCAN_FIRST_FOUND)
         {
-            if (!PortOpened)
-            {
-                PortOpened = true;
-                if (Type == AdapterType.VSCom)
-                {
-                    canWrapper.Open(portName, VSCAN.VSCAN_MODE_LISTEN_ONLY);
-                    canWrapper.SetSpeed(Speed);
-                    canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
-                    canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
-
-                    MessageReceivingTask = Task.Run(messageReceiver);
-                }
-                if (Type == AdapterType.Canable)
-                {
-                    port.PortName = portName;
-                    port.Open();
-                    port.Write("L\r");
-                    port.Write($"S{Speed}\r");
-                    port.DataReceived += DataReceivedHandler;
-                }
-                if (Type == AdapterType.PCAN)
-                {
-                    pcanWorker.ListenOnly = true;
-                    pcanWorker.Start();
-
-                }
-            }
-            else
+            if (PortOpened)
             {
                 MessageBox.Show(GetString("t_port_already_opened"));
+                return;
             }
+            _driver.SetBitrate(Speed);
+            _driver.OpenListenOnly(portName);
+            PortOpened = true;
         }
-
-
 
         public void PortClose()
         {
-
             PortOpened = false;
-            if (Type == AdapterType.VSCom)
-                canWrapper.Close();
-            if (Type == AdapterType.Canable)
-            {
-                port.DataReceived -= DataReceivedHandler;
-                Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit)); //close port in new thread to avoid hang
-                CloseDown.Start(); //close port in new thread to avoid hang
-
-            }
-            if (Type == AdapterType.PCAN)
-            {
-                pcanWorker.Stop();
-
-            }
-            if (Type == AdapterType.CandleLight)
-            {
-                CandleLightDevice.Channels[0].Stop();   
-                CandleLightDevice.Close();
-                
-                
-            }
+            _driver.Close();
         }
 
-        private void CloseSerialOnExit()
-        {
-            try
-            {
-                port.Close(); //close the serial port
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message); //catch any serial port closing error messages
-            }
-        }
-        public void SetBitrate(int bitrate)
-        {
-            if (Type == AdapterType.VSCom)
-                canWrapper.SetSpeed(bitrate);
-            if (Type == AdapterType.Canable)
-            {
-                if (PortOpened)
-                {
-                    port.Write($"S{bitrate}\r");
-                }
-            }
-            if (Type != AdapterType.PCAN)
-            {
-                switch (bitrate)
-                {
+        public void SetBitrate(int bitrate) => _driver.SetBitrate(bitrate);
 
-                    case 0: pcanWorker.BitrateCan = Bitrate.Pcan10; break;
-                    case 1: pcanWorker.BitrateCan = Bitrate.Pcan20; break;
-                    case 2: pcanWorker.BitrateCan = Bitrate.Pcan50; break;
-                    case 3: pcanWorker.BitrateCan = Bitrate.Pcan100; break;
-                    case 4: pcanWorker.BitrateCan = Bitrate.Pcan125; break;
-                    case 5: pcanWorker.BitrateCan = Bitrate.Pcan250; break;
-                    case 6: pcanWorker.BitrateCan = Bitrate.Pcan500; break;
-                    case 7: pcanWorker.BitrateCan = Bitrate.Pcan800; break;
-                    case 8: pcanWorker.BitrateCan = Bitrate.Pcan1000; break;
-                }
-            }
+        public void Transmit(CanMessage message) => _driver.Transmit(message);
 
-            if (Type == AdapterType.CandleLight)
-            {
-                if (PortOpened)
-                {
-                    CandleLightDevice.Channels[0].Stop();
-                    switch (bitrate)
-                    {
-                        case 0: CandleLightDevice.Channels[0].Start(10000); break;
-                        case 1: CandleLightDevice.Channels[0].Start(20000); break;
-                        case 2: CandleLightDevice.Channels[0].Start(50000); break;
-                        case 3: CandleLightDevice.Channels[0].Start(100000); break;
-                        case 4: CandleLightDevice.Channels[0].Start(125000); break;
-                        case 5: CandleLightDevice.Channels[0].Start(250000); break;
-                        case 6: CandleLightDevice.Channels[0].Start(500000); break;
-                        case 7: CandleLightDevice.Channels[0].Start(800000); break;
-                        case 8: CandleLightDevice.Channels[0].Start(1000000); break;
-                    }
-                }
-            }
-
-        }
-
-
-        public void Transmit(CanMessage message)
-        {
-            if (Type == AdapterType.VSCom)
-            {
-                VSCAN_MSG[] msg = new VSCAN_MSG[1];
-                msg[0].Data = message.Data;
-                if (message.Ide)
-                    msg[0].Flags |= VSCAN.VSCAN_FLAGS_EXTENDED;
-                else
-                    msg[0].Flags |= VSCAN.VSCAN_FLAGS_STANDARD;
-                if (message.Rtr)
-                    msg[0].Flags |= VSCAN.VSCAN_FLAGS_REMOTE;
-
-                msg[0].Size = (byte)message.Dlc;
-                msg[0].Id = (uint)message.Id;
-                uint written = 0;
-                try
-                {
-                    canWrapper.Write(msg, 1, ref written);
-                    canWrapper.Flush();
-                }
-                catch (Exception ex)
-                {
-
-                }
-            }
-            if (Type == AdapterType.Canable)
-            {
-                if (port.IsOpen == false)
-                    return;
-
-                StringBuilder str = new("");
-                if (message.Ide && message.Rtr) str.Append('R');
-                if (!message.Ide && message.Rtr) str.Append('r');
-                if (message.Ide && !message.Rtr) str.Append('T');
-                if (!message.Ide && !message.Rtr) str.Append('t');
-                str.Append(message.IdAsText);
-                str.Append(message.Dlc);
-                str.Append(message.GetDataInTextFormat());
-                str.Append("\r");
-
-                port.Write(str.ToString());
-                Task.Delay(getDelay());
-            }
-            if (Type == AdapterType.PCAN)
-            {
-                PcanMessage msg = message.toPcanMsg();
-                var status = pcanWorker.Transmit(msg);
-            }
-
-            if (Type == AdapterType.CandleLight)
-            {
-                CandleLightDevice.Channels[0].Send(message.toCandleMessage(),true);
-                
-            }
-
-        }
-
-        int getDelay()
-        {
-            switch (Speed)
-            {
-                case 0: return 20;
-                case 1: return 8;
-                case 2: return 4;
-                case 3: return 2;
-                default: return 1;
-            }
-        }
-
-        //Ret value - More messages available in buffer
-        private void UartMessageProcess()
-        {
-            string[] splitted = currentBuf.Split('\r');
-            foreach (var line in splitted)
-            {
-                if (line.Length == 0) continue;
-                switch (line[0])
-                {
-                    case 'T':
-                    case 't':
-                    case 'r':
-                    case 'R':
-                        try
-                        {
-                            var m = new CanMessage(new string(line));
-                            GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
-                        }
-                        catch
-                        {
-                            // ignored
-                        }
-                        break;
-
-                    default:
-                        continue;
-                }
-            }
-            currentBuf = splitted[^1]; //If last messge is not completed it will be saved to buffer, otherwise it will be zero length string
-        }
-
-        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs args)
-        {
-            currentBuf += (port.ReadExisting());
-            UartMessageProcess();
-        }
-        public void InjectMessage(CanMessage m)
-        {
-            GotNewMessage?.Invoke(this, new GotCanMessageEventArgs() { receivedMessage = m });
-        }
-
-
+        public void InjectMessage(CanMessage m) =>
+            GotNewMessage?.Invoke(this, new GotCanMessageEventArgs { receivedMessage = m });
     }
 }

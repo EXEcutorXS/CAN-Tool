@@ -31,37 +31,6 @@
 
   <ItemGroup>
     <None Remove="dll\vs_can_api.dll" />
-    <None Remove="Images\1.jpg" />
-    <None Remove="Images\10.jpg" />
-    <None Remove="Images\11.jpg" />
-    <None Remove="Images\12.jpg" />
-    <None Remove="Images\121.jpg" />
-    <None Remove="Images\123.jpg" />
-    <None Remove="Images\124.jpg" />
-    <None Remove="Images\125.jpg" />
-    <None Remove="Images\126.jpg" />
-    <None Remove="Images\13.jpg" />
-    <None Remove="Images\15.jpg" />
-    <None Remove="Images\17.jpg" />
-    <None Remove="Images\18.jpg" />
-    <None Remove="Images\2.jpg" />
-    <None Remove="Images\21.jpg" />
-    <None Remove="Images\23.jpg" />
-    <None Remove="Images\25.jpg" />
-    <None Remove="Images\27.jpg" />
-    <None Remove="Images\29.jpg" />
-    <None Remove="Images\3.jpg" />
-    <None Remove="Images\34.jpg" />
-    <None Remove="Images\37.jpg" />
-    <None Remove="Images\40.jpg" />
-    <None Remove="Images\41.jpg" />
-    <None Remove="Images\42.jpg" />
-    <None Remove="Images\43.jpg" />
-    <None Remove="Images\44.jpg" />
-    <None Remove="Images\50.jpg" />
-    <None Remove="Images\6.jpg" />
-    <None Remove="Images\7.jpg" />
-    <None Remove="Images\9.jpg" />
     <None Remove="Images\CANTool.ico" />
   </ItemGroup>
 
@@ -86,37 +55,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Images\1.jpg" />
-    <Resource Include="Images\10.jpg" />
-    <Resource Include="Images\11.jpg" />
-    <Resource Include="Images\12.jpg" />
-    <Resource Include="Images\121.jpg" />
-    <Resource Include="Images\123.jpg" />
-    <Resource Include="Images\124.jpg" />
-    <Resource Include="Images\125.jpg" />
-    <Resource Include="Images\126.jpg" />
-    <Resource Include="Images\13.jpg" />
-    <Resource Include="Images\15.jpg" />
-    <Resource Include="Images\17.jpg" />
-    <Resource Include="Images\18.jpg" />
-    <Resource Include="Images\2.jpg" />
-    <Resource Include="Images\21.jpg" />
-    <Resource Include="Images\23.jpg" />
-    <Resource Include="Images\25.jpg" />
-    <Resource Include="Images\27.jpg" />
-    <Resource Include="Images\29.jpg" />
-    <Resource Include="Images\3.jpg" />
-    <Resource Include="Images\34.jpg" />
-    <Resource Include="Images\37.jpg" />
-    <Resource Include="Images\40.jpg" />
-    <Resource Include="Images\41.jpg" />
-    <Resource Include="Images\42.jpg" />
-    <Resource Include="Images\43.jpg" />
-    <Resource Include="Images\44.jpg" />
-    <Resource Include="Images\50.jpg" />
-    <Resource Include="Images\6.jpg" />
-    <Resource Include="Images\7.jpg" />
-    <Resource Include="Images\9.jpg" />
+    <None Include="Images\*.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Resource Include="Images\CANTool.ico" />
   </ItemGroup>
 
@@ -170,5 +111,10 @@
 				<_Parameter2>$(BuildDate)</_Parameter2>
 			</AssemblyAttributes>
 		</ItemGroup>
+	</Target>
+	<Target Name="GenerateLang" BeforeTargets="Build"
+			Inputs="Resources\local.csv"
+			Outputs="Resources\lang.xaml">
+		<Exec Command="&quot;$(ProjectDir)Resources\Localizator.exe&quot; &quot;$(ProjectDir)Resources\local.csv&quot; &quot;$(ProjectDir)Resources\&quot;" />
 	</Target>
 </Project>
