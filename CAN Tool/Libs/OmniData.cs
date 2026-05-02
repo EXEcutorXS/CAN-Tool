@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CAN_Tool.Libs;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 using static CAN_Tool.Libs.Helper;
 
@@ -20,11 +21,6 @@ namespace OmniProtocol
 
     public partial class Omni : ObservableObject
     {
-        private static readonly Dictionary<int, string> DefMeaningsYesNo = new() { { 0, "t_no" }, { 1, "t_yes" }, { 2, "t_no_data" }, { 3, "t_no_data" } };
-        private static readonly Dictionary<int, string> DefMeaningsOnOff = new() { { 0, "t_off" }, { 1, "t_on" }, { 2, "t_no_data" }, { 3, "t_no_data" } };
-        private static readonly Dictionary<int, string> DefMeaningsAllow = new() { { 0, "t_disabled" }, { 1, "t_enabled" }, { 2, "t_no_data" }, { 3, "t_no_data" } };
-        private static readonly Dictionary<int, string> Stages = new() { { 0, "STAGE_Z" }, { 1, "STAGE_P" }, { 2, "STAGE_H" }, { 3, "STAGE_W" }, { 4, "STAGE_F" }, { 5, "STAGE_T" }, { 6, "STAGE_M" } };
-
         public static Dictionary<int, DeviceTemplate> Devices { set; get; } = new();
         public static Dictionary<int, PgnClass> Pgns { get; } = new();
         public static List<OmniPgnParameter> Parameters { get; } = new();
@@ -34,54 +30,59 @@ namespace OmniProtocol
         {
 
             Devices = new Dictionary<int, DeviceTemplate>() {
-            { 0, new (){Id=0, }} ,
-            { 1, new() { Id = 1, DevType = DeviceType_t.Binar }} ,
-            { 2, new() { Id = 2, DevType = DeviceType_t.Planar }} ,
-            { 3, new() { Id = 3, DevType = DeviceType_t.Planar }} ,
-            { 4, new() { Id = 4, DevType = DeviceType_t.Binar }} ,
-            { 5, new() { Id = 5, DevType = DeviceType_t.Binar }} ,
-            { 6, new() { Id = 6, DevType = DeviceType_t.Binar, MaxBlower = 200 }} ,
-            { 7, new() { Id = 7, DevType = DeviceType_t.Planar }} ,
-            { 8, new() { Id = 8, DevType = DeviceType_t.Binar }} ,
-            { 9, new() { Id = 9, DevType = DeviceType_t.Planar }} ,
-            { 10, new() { Id = 10, DevType = DeviceType_t.Binar, MaxBlower = 200 }} ,
-            { 11, new() { Id = 11, DevType = DeviceType_t.Planar }} ,
-            { 12, new() { Id = 12, DevType = DeviceType_t.Planar }} ,
-            { 13, new() { Id = 13, DevType = DeviceType_t.Planar }} ,
-            { 14, new() { Id = 14, DevType = DeviceType_t.CookingPanel }} ,
-            { 15, new() { Id = 15, DevType = DeviceType_t.Planar }} ,
-            { 16, new() { Id = 16, DevType = DeviceType_t.Binar }} ,
-            { 17, new() { Id = 17, DevType = DeviceType_t.Binar }} ,
-            { 18, new() { Id = 18, DevType = DeviceType_t.Planar }} ,
-            { 19, new() { Id = 19, DevType = DeviceType_t.ValveControl }} ,
-            { 20, new() { Id = 20, DevType = DeviceType_t.Planar }} ,
-            { 21, new() { Id = 21, DevType = DeviceType_t.Binar }} ,
-            { 22, new() { Id = 22, DevType = DeviceType_t.Binar }} ,
-            { 23, new() { Id = 23, DevType = DeviceType_t.Binar, MaxBlower = 90, MaxFuelPump = 4.7 }} ,
-            { 25, new() { Id = 25, DevType = DeviceType_t.Binar }} ,
-            { 27, new() { Id = 27, DevType = DeviceType_t.Binar, MaxBlower = 90, MaxFuelPump = 4.3 } } ,
-            { 29, new() { Id = 29, DevType = DeviceType_t.Binar }} ,
-            { 31, new() { Id = 31, DevType = DeviceType_t.Binar }} ,
-            { 32, new() { Id = 32, DevType = DeviceType_t.Binar }} ,
-            { 34, new() { Id = 34, DevType = DeviceType_t.Binar, MaxFuelPump = 8, MaxBlower = 140 }} ,
-            { 35, new() { Id = 35, DevType = DeviceType_t.Binar, MaxFuelPump = 8, MaxBlower = 140 }} ,
-            { 37, new() { Id = 37, DevType = DeviceType_t.ExtensionBoard }} ,
-            { 39, new() { Id = 39, DevType = DeviceType_t.Planar }} ,
-            { 60, new() { Id = 60, DevType = DeviceType_t.PressureSensor }} ,
-            { 41, new() { Id = 41, DevType = DeviceType_t.GenericLoadSingle }} ,
-            { 42, new() { Id = 42, DevType = DeviceType_t.GenericLoadTripple }} ,
-            { 43, new() { Id = 43, DevType = DeviceType_t.Binar, MaxBlower = 90, MaxFuelPump = 4.3 }} ,
-            { 44, new() { Id = 44, DevType = DeviceType_t.Binar, MaxBlower = 90, MaxFuelPump = 4.7 } },
-            { 50, new() { Id = 50, DevType = DeviceType_t.AcInverter }} ,
-            { 121, new() { Id = 121, DevType = DeviceType_t.Modem }},
-            { 123, new() { Id = 123, DevType = DeviceType_t.BootLoader }} ,
-            { 124, new() { Id = 124, DevType = DeviceType_t.AcPanel }},
-            { 125, new() { Id = 125, DevType = DeviceType_t.Hcu }},
-            { 126, new() { Id = 126, DevType = DeviceType_t.Panel }},
+            { 0,   new() { Id = 0 }} ,
+            { 1,   new() { Id = 1,   DevType = DeviceType_t.Binar,         ImageName = "ts14_mini"     }} , // 14ТС-Мини
+            { 2,   new() { Id = 2,   DevType = DeviceType_t.Planar,        ImageName = "planar2"       }} , // Планар 2
+            { 3,   new() { Id = 3,   DevType = DeviceType_t.Planar,        ImageName = "planar44"      }} , // Планар 44Д
+            { 4,   new() { Id = 4,   DevType = DeviceType_t.Binar                                      }} , // 30ТСД
+            { 5,   new() { Id = 5,   DevType = DeviceType_t.Binar                                      }} , // 30ТСГ
+            { 6,   new() { Id = 6,   DevType = DeviceType_t.Binar,  MaxBlower = 200, ImageName = "binar5s"      }} , // Binar-5S бензин
+            { 7,   new() { Id = 7,   DevType = DeviceType_t.Planar,        ImageName = "planar8"       }} , // Планар 8Д
+            { 8,   new() { Id = 8,   DevType = DeviceType_t.Binar                                      }} , // OB-8
+            { 9,   new() { Id = 9,   DevType = DeviceType_t.Planar,        ImageName = "planar4"       }} , // Планар 4Д
+            { 10,  new() { Id = 10,  DevType = DeviceType_t.Binar,  MaxBlower = 200, ImageName = "binar5s"      }} , // Binar-5S дизель
+            { 11,  new() { Id = 11,  DevType = DeviceType_t.Planar,        ImageName = "planar9"       }} , // Планар-9Д, ОВ-8ДК
+            { 12,  new() { Id = 12,  DevType = DeviceType_t.Planar,        ImageName = "planar44"      }} , // Планар-44Б
+            { 13,  new() { Id = 13,  DevType = DeviceType_t.Planar,        ImageName = "planar4"       }} , // Планар-4Б
+            { 14,  new() { Id = 14,  DevType = DeviceType_t.CookingPanel                               }} , // Термикс
+            { 15,  new() { Id = 15,  DevType = DeviceType_t.Planar,        ImageName = "planar44"      }} , // Планар-44Г
+            { 16,  new() { Id = 16,  DevType = DeviceType_t.Binar                                      }} , // ОВ-4
+            { 17,  new() { Id = 17,  DevType = DeviceType_t.Binar,         ImageName = "ts14"          }} , // 14ТСД-10
+            { 18,  new() { Id = 18,  DevType = DeviceType_t.Planar,        ImageName = "planar2"       }} , // Планар 2Б
+            { 19,  new() { Id = 19,  DevType = DeviceType_t.ValveControl                               }} , // Блок управления клапанами
+            { 20,  new() { Id = 20,  DevType = DeviceType_t.Planar                                     }} , // Планар-6Д
+            { 21,  new() { Id = 21,  DevType = DeviceType_t.Binar,         ImageName = "ts14"          }} , // 14ТС-10
+            { 22,  new() { Id = 22,  DevType = DeviceType_t.Binar                                      }} , // 30SP впрысковый
+            { 23,  new() { Id = 23,  DevType = DeviceType_t.Binar,  MaxBlower = 90, MaxFuelPump = 4.7, ImageName = "binar5_compact" }} , // Бинар 5Б-Компакт
+            { 25,  new() { Id = 25,  DevType = DeviceType_t.Binar,         ImageName = "sp35"          }} , // 35SP впрысковый
+            { 27,  new() { Id = 27,  DevType = DeviceType_t.Binar,  MaxBlower = 90, MaxFuelPump = 4.3, ImageName = "binar5_compact" }} , // Бинар 5Д-Компакт
+            { 29,  new() { Id = 29,  DevType = DeviceType_t.Binar,         ImageName = "binar5_compact"}} , // Бинар 6Г-Компакт
+            { 31,  new() { Id = 31,  DevType = DeviceType_t.Binar                                      }} , // 14ТСГ-Мини
+            { 32,  new() { Id = 32,  DevType = DeviceType_t.Binar                                      }} , // 30SPG
+            { 34,  new() { Id = 34,  DevType = DeviceType_t.Binar,  MaxFuelPump = 8, MaxBlower = 140, ImageName = "binar10"       }} , // Binar-10Д
+            { 35,  new() { Id = 35,  DevType = DeviceType_t.Binar,  MaxFuelPump = 8, MaxBlower = 140, ImageName = "binar10"       }} , // Binar-10Б
+            { 37,  new() { Id = 37,  DevType = DeviceType_t.ExtensionBoard,  ImageName = "ext_board"   }} , // Плата расширения
+            { 39,  new() { Id = 39,  DevType = DeviceType_t.Planar                                     }} , // Военные изделия
+            { 40,  new() { Id = 40,  DevType = DeviceType_t.Binar,         ImageName = "ts15g"         }} , // 15ТСГ-ГАЗ
+            { 41,  new() { Id = 41,  DevType = DeviceType_t.GenericLoadSingle, ImageName = "ext_board"  }} , // Одноканальная плата нагрузки
+            { 42,  new() { Id = 42,  DevType = DeviceType_t.GenericLoadTripple, ImageName = "load3ch"  }} , // Трёхканальная плата нагрузки
+            { 43,  new() { Id = 43,  DevType = DeviceType_t.Binar,  MaxBlower = 90, MaxFuelPump = 4.3, ImageName = "binar_silent" }} , // Тихий бинар дизель
+            { 44,  new() { Id = 44,  DevType = DeviceType_t.Binar,  MaxBlower = 90, MaxFuelPump = 4.7, ImageName = "binar_silent" }} , // Тихий бинар бензин
+            { 50,  new() { Id = 50,  DevType = DeviceType_t.AcInverter,    ImageName = "ac_driver"     }} , // Драйвер компрессора
+            { 60,  new() { Id = 60,  DevType = DeviceType_t.PressureSensor, ImageName="pressure"       }} , // Датчик давления
+            { 121, new() { Id = 121, DevType = DeviceType_t.Modem,         ImageName = "modem"         }} , // CAN-Модем
+            { 123, new() { Id = 123, DevType = DeviceType_t.BootLoader,    ImageName = "bootloader"    }} , // Bootloader
+            { 124, new() { Id = 124, DevType = DeviceType_t.AcPanel,       ImageName = "ac_panel"      }} , // Плата управления кондиционером
+            { 125, new() { Id = 125, DevType = DeviceType_t.Hcu,           ImageName = "hcu"           }} , // HCU
+            { 126, new() { Id = 126, DevType = DeviceType_t.Panel,         ImageName = "hcu"           }} , // Устройство управления
             { 255, new() { Id = 255 }}
         };
 
-            Pgns.Add(0, new() { id = 0, name = "t_empty_command" });
+            OmniDataLoader.Load(Pgns, Parameters, Commands);
+        }
+    }
+}
+#if NEVER
             Pgns.Add(1, new() { id = 1, name = "t_control_command" });
             Pgns.Add(2, new() { id = 2, name = "t_received_command_ack" });
             Pgns.Add(3, new() { id = 3, name = "t_spn_request" });
@@ -609,3 +610,4 @@ namespace OmniProtocol
         }
     }
 }
+#endif

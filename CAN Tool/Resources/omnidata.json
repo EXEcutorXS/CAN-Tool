@@ -1,0 +1,577 @@
+{
+  "meaningPresets": {
+    "YesNo": { "0": "t_no",       "1": "t_yes",     "2": "t_no_data",  "3": "t_no_data"  },
+    "OnOff": { "0": "t_off",      "1": "t_on",      "2": "t_no_data",  "3": "t_no_data"  },
+    "Allow": { "0": "t_disabled", "1": "t_enabled", "2": "t_no_data",  "3": "t_no_data"  },
+    "Stages": { "0": "STAGE_Z", "1": "STAGE_P", "2": "STAGE_H", "3": "STAGE_W", "4": "STAGE_F", "5": "STAGE_T", "6": "STAGE_M" }
+  },
+
+  "pgns": [
+    { "id": 0,   "name": "t_empty_command" },
+    { "id": 1,   "name": "t_control_command" },
+    { "id": 2,   "name": "t_received_command_ack" },
+    { "id": 3,   "name": "t_spn_request" },
+    { "id": 4,   "name": "t_spn_answer" },
+    { "id": 5,   "name": "t_parameter_write" },
+    { "id": 6,   "name": "t_pgn_request" },
+    { "id": 7,   "name": "t_flash_conf_read_write" },
+    { "id": 8,   "name": "t_black_box_operation" },
+    { "id": 9,   "name": "t_pwm_data" },
+    { "id": 10,  "name": "t_stage_mode_failures" },
+    { "id": 11,  "name": "t_voltage_pressure_current" },
+    { "id": 12,  "name": "t_blower_fp_plug_relay" },
+    { "id": 13,  "name": "t_liquid_heater_temperatures" },
+    { "id": 14,  "name": "t_flame_process" },
+    { "id": 15,  "name": "t_adc0-3" },
+    { "id": 16,  "name": "t_adc4-7" },
+    { "id": 17,  "name": "t_adc8-11" },
+    { "id": 18,  "name": "t_firmware_version" },
+    { "id": 19,  "name": "t_hcu_Parameters",                  "multiPack": true },
+    { "id": 20,  "name": "t_failures" },
+    { "id": 21,  "name": "t_hcu_status" },
+    { "id": 22,  "name": "t_zone_control" },
+    { "id": 23,  "name": "t_fan_setpoints" },
+    { "id": 24,  "name": "t_fan_current_speed" },
+    { "id": 25,  "name": "t_daytime_setpoins" },
+    { "id": 26,  "name": "t_nighttime_setpoints" },
+    { "id": 27,  "name": "t_fan_manual_control" },
+    { "id": 28,  "name": "t_total_working_time" },
+    { "id": 29,  "name": "t_Параметры давления",              "multiPack": true },
+    { "id": 30,  "name": "t_remote_wire_engine_air_temp" },
+    { "id": 31,  "name": "t_working_time" },
+    { "id": 32,  "name": "t_liquid_heater_setup" },
+    { "id": 33,  "name": "t_serial_number",                   "multiPack": true },
+    { "id": 34,  "name": "t_read_flash_by_address_req" },
+    { "id": 35,  "name": "t_read_flash_by_address_ans" },
+    { "id": 36,  "name": "t_valves_status_probe_valve_failures" },
+    { "id": 37,  "name": "t_air_heater_temperatures",         "multiPack": true },
+    { "id": 38,  "name": "t_panel_temperature" },
+    { "id": 39,  "name": "t_drivers_status" },
+    { "id": 40,  "name": "t_date_time" },
+    { "id": 41,  "name": "t_day_night_backlight" },
+    { "id": 42,  "name": "t_pump_control" },
+    { "id": 43,  "name": "t_generic_board_pwm_command" },
+    { "id": 44,  "name": "t_generic_board_pwm_status" },
+    { "id": 45,  "name": "t_generic_board_temp" },
+    { "id": 46,  "name": "t_hcu_error_codes" },
+    { "id": 47,  "name": "t_actuator_override" },
+    { "id": 48,  "name": "t_test_report" },
+    { "id": 49,  "name": "t_generic_load_control" },
+    { "id": 50,  "name": "t_compressor_control",              "multiPack": true },
+    { "id": 51,  "name": "t_ac_control",                      "multiPack": true },
+    { "id": 52,  "name": "t_ac_manual_control",               "multiPack": true },
+    { "id": 55,  "name": "t_tank_levels" },
+    { "id": 56,  "name": "t_furnace_control" },
+    { "id": 57,  "name": "t_extra_heater_Parameters" },
+    { "id": 99,  "name": "t_debug_pack" },
+    { "id": 100, "name": "t_memory_control_old",              "multiPack": true },
+    { "id": 101, "name": "t_buffer_data_transmitting_old" },
+    { "id": 105, "name": "t_memory_control" },
+    { "id": 106, "name": "t_buffer_data_transmitting" }
+  ],
+
+  "commands": [
+    {
+      "id": 0,
+      "parameters": [
+        { "startByte": 2, "bitLength": 8, "getMeaning": "device_name", "answerOnly": true },
+        { "startByte": 3, "bitLength": 8, "meanings": { "0": "t_12 volts", "1": "t_24_volts" }, "answerOnly": true },
+        { "startByte": 4, "bitLength": 8, "name": "t_firmware",     "answerOnly": true },
+        { "startByte": 5, "bitLength": 8, "name": "t_modification", "answerOnly": true }
+      ]
+    },
+    {
+      "id": 1,
+      "parameters": [
+        { "startByte": 2, "bitLength": 16, "name": "t_working_time", "unitType": "Minute" }
+      ]
+    },
+    {
+      "id": 4,
+      "parameters": [
+        { "startByte": 2, "bitLength": 16, "name": "t_working_time", "unitType": "Minute" }
+      ]
+    },
+    {
+      "id": 6,
+      "parameters": [
+        { "startByte": 4, "bitLength": 4,  "name": "t_working_mode", "meanings": { "0": "t_regular", "1": "t_eco", "2": "t_additional_heater", "3": "t_preheater", "4": "t_heating_systems" } },
+        { "startByte": 4, "startBit": 4, "bitLength": 4, "name": "t_additional_heater_mode", "meanings": { "0": "t_off", "1": "t_auto", "2": "t_manual" } },
+        { "startByte": 5, "bitLength": 16, "name": "t_temp_setpoint", "unitType": "Temp" },
+        { "startByte": 7, "bitLength": 2,  "name": "t_pump_in_idle",            "meanings": "OnOff" },
+        { "startByte": 7, "startBit": 2, "bitLength": 2, "name": "t_pump_while_engine_running", "meanings": "OnOff" }
+      ]
+    },
+    {
+      "id": 7,
+      "parameters": [
+        { "startByte": 2, "bitLength": 8,  "name": "t_power_level" },
+        { "startByte": 3, "bitLength": 16, "name": "t_going_up_temperature",   "answerOnly": true },
+        { "startByte": 4, "bitLength": 16, "name": "t_going_down_temperature", "answerOnly": true }
+      ]
+    },
+    {
+      "id": 8,
+      "parameters": [
+        { "startByte": 2, "startBit": 0, "bitLength": 2, "name": "t_valve_1_state", "meanings": "OnOff" },
+        { "startByte": 2, "startBit": 2, "bitLength": 2, "name": "t_valve_2_state", "meanings": "OnOff" },
+        { "startByte": 2, "startBit": 4, "bitLength": 2, "name": "t_valve_3_state", "meanings": "OnOff" },
+        { "startByte": 2, "startBit": 6, "bitLength": 2, "name": "t_valve_4_state", "meanings": "OnOff" },
+        { "startByte": 3, "startBit": 0, "bitLength": 2, "name": "t_valve_5_state", "meanings": "OnOff" },
+        { "startByte": 3, "startBit": 2, "bitLength": 2, "name": "t_valve_6_state", "meanings": "OnOff" },
+        { "startByte": 3, "startBit": 4, "bitLength": 2, "name": "t_valve_7_state", "meanings": "OnOff" },
+        { "startByte": 3, "startBit": 6, "bitLength": 2, "name": "t_valve_8_state", "meanings": "OnOff" },
+        { "startByte": 4, "startBit": 0, "bitLength": 1, "meanings": { "0": "t_do_not_clear_codes", "1": "t_clear_error_codes" } }
+      ]
+    },
+    {
+      "id": 9,
+      "parameters": [
+        { "startByte": 2, "bitLength": 16, "name": "t_working_time", "unitType": "Minute" },
+        { "startByte": 4, "bitLength": 4,  "name": "t_working_mode", "meanings": { "0": "t_not_used", "1": "t_work_by_pcb_temp", "2": "t_work_by_panel_sensor_temp", "3": "t_work_by_external_sensor", "4": "t_work_by_power" } },
+        { "startByte": 4, "startBit": 4, "bitLength": 2, "name": "t_enable_idle_while_working_by_temp_sensor", "meanings": "Allow" },
+        { "startByte": 4, "startBit": 6, "bitLength": 2, "name": "t_enable_blower_while_idle", "meanings": "Allow" },
+        { "startByte": 5, "bitLength": 16, "name": "t_set_room_temperature", "unitType": "Temp" },
+        { "startByte": 7, "bitLength": 4,  "name": "t_power_setpoint" }
+      ]
+    },
+    {
+      "id": 10,
+      "parameters": [
+        { "startByte": 2, "bitLength": 16, "name": "t_working_time", "unitType": "Temp" }
+      ]
+    },
+    {
+      "id": 19,
+      "parameters": [
+        { "startByte": 2, "bitLength": 8, "name": "t_set_power_level" }
+      ]
+    },
+    {
+      "id": 20,
+      "parameters": [
+        { "startByte": 2, "bitLength": 16, "name": "t_1st_tcouple_cal", "answerOnly": true },
+        { "startByte": 4, "bitLength": 16, "name": "t_2nd_tcouple_cal", "answerOnly": true }
+      ]
+    },
+    {
+      "id": 21,
+      "parameters": [
+        { "startByte": 2, "bitLength": 8, "name": "t_prescaler" },
+        { "startByte": 3, "bitLength": 8, "name": "t_pwm_period" },
+        { "startByte": 5, "bitLength": 8, "name": "t_required_freq", "unitType": "Frequency" }
+      ]
+    },
+    {
+      "id": 22,
+      "parameters": [
+        { "startByte": 2, "startBit": 0, "bitLength": 8, "name": "t_action_after_reset", "meanings": { "0": "t_stay_in_boot", "1": "t_to_main_program_without_delay", "2": "t_5_sec_in_boot" } }
+      ]
+    },
+    {
+      "id": 45,
+      "parameters": [
+        { "startByte": 2, "startBit": 0, "bitLength": 2, "name": "t_mask_all",                "meanings": "YesNo" },
+        { "startByte": 2, "startBit": 2, "bitLength": 2, "name": "t_mask_fp_failures",         "meanings": "YesNo" },
+        { "startByte": 2, "startBit": 4, "bitLength": 2, "name": "t_mask_flamebreak_fails",    "meanings": "YesNo" },
+        { "startByte": 2, "startBit": 6, "bitLength": 2, "name": "t_mask_glow_plug_failures",  "meanings": "YesNo" },
+        { "startByte": 3, "startBit": 0, "bitLength": 2, "name": "t_mask_blower_failures",     "meanings": "YesNo" },
+        { "startByte": 3, "startBit": 2, "bitLength": 2, "name": "t_mask_sensors_failures",    "meanings": "YesNo" },
+        { "startByte": 3, "startBit": 4, "bitLength": 2, "name": "t_mask_pump_failures",       "meanings": "YesNo" },
+        { "startByte": 3, "startBit": 6, "bitLength": 2, "name": "t_mask_overheating_failures","meanings": "YesNo" }
+      ]
+    },
+    {
+      "id": 65,
+      "parameters": [
+        { "startByte": 2, "startBit": 0, "bitLength": 8, "name": "", "meanings": { "7": "t_liquid_temp", "10": "t_overheat_temp", "12": "t_flame_temperature", "13": "t_body_temp", "27": "t_air_temp" } },
+        { "startByte": 3, "bitLength": 16, "name": "t_temp_value", "unitType": "Temp" }
+      ]
+    },
+    {
+      "id": 67,
+      "parameters": [
+        { "startByte": 2, "startBit": 0, "bitLength": 2, "name": "", "meanings": { "0": "t_leave_m", "1": "t_ener_m" } },
+        { "startByte": 2, "startBit": 2, "bitLength": 2, "name": "", "meanings": { "0": "t_leave_t", "1": "t_enter_t" } }
+      ]
+    },
+    {
+      "id": 68,
+      "parameters": [
+        { "startByte": 2, "startBit": 0, "bitLength": 2,  "name": "t_pump_state",      "meanings": "OnOff" },
+        { "startByte": 3, "startBit": 0, "bitLength": 8,  "name": "t_blower_revs",     "unitType": "Rps" },
+        { "startByte": 4, "startBit": 0, "bitLength": 8,  "name": "t_glow_plug",       "unitType": "Percent" },
+        { "startByte": 5, "startBit": 0, "bitLength": 16, "name": "t_fuel_pump_freq",  "unitType": "Frequency", "a": 0.01 }
+      ]
+    },
+    {
+      "id": 69,
+      "parameters": [
+        { "startByte": 2, "startBit": 0, "bitLength": 8,  "name": "t_exec_dev_type", "meanings": { "0": "t_fpx10", "1": "t_relay01", "2": "t_glow_plug_perc", "3": "t_pump_perc", "4": "t_blower_perc", "23": "t_blower_revs_rps" } },
+        { "startByte": 3, "startBit": 0, "bitLength": 16, "name": "Значение" }
+      ]
+    },
+    {
+      "id": 70,
+      "parameters": [
+        { "startByte": 2, "startBit": 0, "bitLength": 2, "name": "t_fuel_pump_state", "meanings": "OnOff" },
+        { "startByte": 2, "startBit": 2, "bitLength": 2, "name": "t_relay_state",     "meanings": "OnOff" },
+        { "startByte": 2, "startBit": 4, "bitLength": 2, "name": "t_glow_plug_state", "meanings": "OnOff" },
+        { "startByte": 2, "startBit": 6, "bitLength": 2, "name": "t_pump_state",      "meanings": "OnOff" },
+        { "startByte": 3, "startBit": 0, "bitLength": 2, "name": "t_blower_state",    "meanings": "OnOff" }
+      ]
+    }
+  ],
+
+  "parameters": [
+    { "pgn": 3,  "name": "SPN",     "bitLength": 16, "startByte": 0 },
+
+    { "pgn": 4,  "name": "SPN",     "bitLength": 16, "startByte": 0 },
+    { "pgn": 4,  "name": "Значение","bitLength": 32, "startBit": 0, "startByte": 2 },
+
+    { "pgn": 5,  "name": "SPN",     "bitLength": 16, "startByte": 0 },
+    { "pgn": 5,  "name": "Значение","bitLength": 32, "startBit": 0, "startByte": 2 },
+
+    { "pgn": 6,  "name": "Pgn",     "bitLength": 16, "startByte": 0, "getMeaning": "pgn_name" },
+
+    { "pgn": 7,  "name": "Команда",           "bitLength": 8,  "startBit": 0, "startByte": 0, "meanings": { "0": "Стереть конфигурацию", "1": "Запись параметра в ОЗУ", "2": "Запись всех параметров во Flash", "3": "Чтение параметра по номеру", "4": "Успешный ответ на запрос", "5": "Невозможно выполнить" } },
+    { "pgn": 7,  "name": "Запрошенная команда","bitLength": 8, "startBit": 0, "startByte": 1, "meanings": { "0": "Стереть конфигурацию", "1": "Запись параметра в ОЗУ", "2": "Запись всех параметров во Flash", "3": "Чтение параметра по номеру", "255": "" } },
+    { "pgn": 7,  "name": "Параметр",           "bitLength": 16, "startBit": 0, "startByte": 2, "getMeaning": "param_name" },
+    { "pgn": 7,  "name": "Value",              "bitLength": 32, "startBit": 0, "startByte": 4, "answerOnly": true },
+
+    { "pgn": 8,  "name": "Команда", "bitLength": 4, "startBit": 0, "startByte": 0, "meanings": { "0": "Стереть ЧЯ", "3": "Чтение ЧЯ", "4": "Ответ", "6": "Чтение параметра (из paramsname.h)" } },
+    { "pgn": 8,  "name": "Тип:",    "bitLength": 2, "startBit": 4, "startByte": 0, "meanings": { "0": "Общие данные", "1": "Неисправности" } },
+    { "pgn": 8,  "name": "Номер пары",         "decoder": "bb_pair_number" },
+    { "pgn": 8,  "name": "Номер параметра",     "decoder": "bb_param_number_req" },
+    { "pgn": 8,  "name": "Число пар",           "decoder": "bb_pair_count" },
+    { "pgn": 8,  "name": "Номер параметра",     "decoder": "bb_param_number_ans" },
+    { "pgn": 8,  "name": "Значение параметра",  "decoder": "bb_param_value", "answerOnly": true },
+
+    { "pgn": 9,  "name": "Текущий ШИМ", "bitLength": 16, "a": 0.01, "unitType": "Percent", "var": 133 },
+
+    { "pgn": 10, "name": "Стадия",                    "bitLength": 8, "startByte": 0, "meanings": "Stages", "var": 1 },
+    { "pgn": 10, "name": "Режим",                     "bitLength": 8, "startByte": 1, "var": 2 },
+    { "pgn": 10, "name": "Код неисправности",          "bitLength": 8, "startByte": 2, "var": 24, "getMeaning": "error_code" },
+    { "pgn": 10, "name": "Помпа неисправна",           "bitLength": 2, "startByte": 3, "meanings": "YesNo" },
+    { "pgn": 10, "name": "Код предупреждения",         "bitLength": 8, "startByte": 4 },
+    { "pgn": 10, "name": "Количество морганий",        "bitLength": 8, "startByte": 5, "var": 25 },
+    { "pgn": 10, "name": "Желаемый режим мощности",   "bitLength": 8, "startByte": 6, "var": 132 },
+    { "pgn": 10, "name": "Вариант розжига",            "bitLength": 4, "startByte": 7 },
+    { "pgn": 10, "name": "Число срывов пламени",       "bitLength": 4, "startByte": 7, "startBit": 4 },
+
+    { "pgn": 11, "name": "Напряжение питания",                "bitLength": 16, "startByte": 0, "a": 0.1,   "unitType": "Volt",    "var": 5 },
+    { "pgn": 11, "name": "Атмосферное давление",              "bitLength": 8,  "startByte": 2, "unitType": "Pressure" },
+    { "pgn": 11, "name": "Ток двигателя, значения АЦП",       "bitLength": 16, "startByte": 3 },
+    { "pgn": 11, "name": "Ток двигателя, мА",                 "bitLength": 16, "startByte": 5, "unitType": "Current", "a": 0.001, "var": 128 },
+
+    { "pgn": 12, "name": "Заданные обороты нагнетателя",      "bitLength": 8,  "startByte": 0, "unitType": "Rps",       "var": 15 },
+    { "pgn": 12, "name": "Измеренные обороты нагнетателя",    "bitLength": 8,  "startByte": 1, "unitType": "Rps",       "var": 16 },
+    { "pgn": 12, "name": "Заданная частота ТН",               "bitLength": 16, "startByte": 2, "unitType": "Frequency", "a": 0.01, "var": 17 },
+    { "pgn": 12, "name": "Реализованная частота ТН",          "bitLength": 16, "startByte": 4, "unitType": "Frequency", "a": 0.01, "var": 18 },
+    { "pgn": 12, "name": "Мощность свечи",                    "bitLength": 8,  "startByte": 6, "unitType": "Percent",   "var": 21 },
+    { "pgn": 12, "name": "Состояние помпы",                   "bitLength": 2,  "startByte": 7, "meanings": "OnOff",     "var": 46 },
+    { "pgn": 12, "name": "Состояние реле печки кабины",       "bitLength": 2,  "startByte": 7, "startBit": 2, "meanings": "OnOff", "var": 45 },
+    { "pgn": 12, "name": "Состояние канала сигнализации",     "bitLength": 2,  "startByte": 7, "startBit": 4, "meanings": "OnOff", "var": 47 },
+
+    { "pgn": 13, "name": "Температура ИП",              "bitLength": 16, "startByte": 0, "unitType": "Temp", "signed": true, "var": 6 },
+    { "pgn": 13, "name": "Температура платы/процессора","bitLength": 8,  "startByte": 2, "unitType": "Temp", "b": -75, "var": 59 },
+    { "pgn": 13, "name": "Температура жидкости",        "bitLength": 8,  "startByte": 3, "unitType": "Temp", "b": -75, "var": 40 },
+    { "pgn": 13, "name": "Температура перегрева",       "bitLength": 8,  "startByte": 4, "unitType": "Temp", "b": -75, "var": 41 },
+
+    { "pgn": 14, "name": "Минимальная температура пламени перед розжигом", "bitLength": 16, "startByte": 0, "unitType": "Temp", "var": 36, "signed": true },
+    { "pgn": 14, "name": "Граница срыва пламени",                          "bitLength": 16, "startByte": 2, "unitType": "Temp", "var": 37, "signed": true },
+    { "pgn": 14, "name": "Граница срыва пламени на прогреве",              "bitLength": 16, "startByte": 4, "unitType": "Temp", "signed": true },
+    { "pgn": 14, "name": "Скорость изменения температуры ИП",              "bitLength": 16, "startByte": 6, "unitType": "Temp", "signed": true },
+
+    { "pgn": 15, "name": "0 канал АЦП", "bitLength": 16, "startByte": 0, "var": 49 },
+    { "pgn": 15, "name": "1 канал АЦП", "bitLength": 16, "startByte": 2, "var": 50 },
+    { "pgn": 15, "name": "2 канал АЦП", "bitLength": 16, "startByte": 4, "var": 51 },
+    { "pgn": 15, "name": "3 канал АЦП", "bitLength": 16, "startByte": 6, "var": 52 },
+
+    { "pgn": 16, "name": "4 канал АЦП", "bitLength": 16, "startByte": 0, "var": 53 },
+    { "pgn": 16, "name": "5 канал АЦП", "bitLength": 16, "startByte": 2, "var": 54 },
+    { "pgn": 16, "name": "6 канал АЦП", "bitLength": 16, "startByte": 4, "var": 55 },
+    { "pgn": 16, "name": "7 канал АЦП", "bitLength": 16, "startByte": 6, "var": 56 },
+
+    { "pgn": 17, "name": "8 канал АЦП",  "bitLength": 16, "startByte": 0, "var": 57 },
+    { "pgn": 17, "name": "9 канал АЦП",  "bitLength": 16, "startByte": 2, "var": 58 },
+    { "pgn": 17, "name": "10 канал АЦП", "bitLength": 16, "startByte": 4 },
+    { "pgn": 17, "name": "11 канал АЦП", "bitLength": 16, "startByte": 6 },
+
+    { "pgn": 18, "name": "Вид изделия", "bitLength": 8, "startByte": 0, "decoder": "firmware_version" },
+    { "pgn": 18, "name": "Дата релиза", "bitLength": 24, "startByte": 5, "getMeaning": "release_date" },
+
+    { "pgn": 19, "name": "Подогреватель",                  "bitLength": 2, "startBit": 0, "startByte": 1, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Запрос включения помпы",         "bitLength": 2, "startBit": 2, "startByte": 1, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Кнопка воды (для котла)",        "bitLength": 2, "startBit": 4, "startByte": 1, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Быстрый нагрев воды",            "bitLength": 2, "startBit": 6, "startByte": 1, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Помпа подогревателя статус",     "bitLength": 2, "startByte": 7, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Температура бака",               "bitLength": 8, "startByte": 2, "b": -75, "unitType": "Temp", "packNumber": 1 },
+    { "pgn": 19, "name": "Атмосферное давление",           "bitLength": 8, "startByte": 3, "unitType": "Temp", "packNumber": 1 },
+    { "pgn": 19, "name": "Сработал датчик бытовой воды",  "bitLength": 2, "startByte": 4, "packNumber": 1, "meanings": "YesNo", "var": 108 },
+    { "pgn": 19, "name": "Кнопка воды (для HCU)",          "bitLength": 2, "startBit": 2, "startByte": 4, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Доступен тёплый пол",            "bitLength": 2, "startByte": 5, "startBit": 6, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Доступен предпусковой подогрев", "bitLength": 2, "startByte": 5, "startBit": 6, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Доп помпа 1 статус",            "bitLength": 2, "startByte": 6, "startBit": 0, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Доп помпа 2 статус",            "bitLength": 2, "startByte": 6, "startBit": 2, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Доп помпа 3 статус",            "bitLength": 2, "startByte": 6, "startBit": 4, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Помпа 4 статус",                "bitLength": 2, "startByte": 6, "startBit": 6, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Помпа 1 статус",                "bitLength": 2, "startByte": 7, "startBit": 2, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Помпа 2 статус",                "bitLength": 2, "startByte": 7, "startBit": 4, "packNumber": 1, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Помпа 3 статус",                "bitLength": 2, "startByte": 7, "startBit": 6, "packNumber": 1, "meanings": "OnOff" },
+
+    { "pgn": 19, "name": "Уставка т-ры жидкости для перехода в ждущий",             "bitLength": 8, "startByte": 1, "b": -75, "packNumber": 2, "unitType": "Temp" },
+    { "pgn": 19, "name": "Уставка т-ры жидкости для выхода из ждущего",             "bitLength": 8, "startByte": 2, "b": -75, "packNumber": 2, "unitType": "Temp" },
+    { "pgn": 19, "name": "Уставка т-ры жидкости для выхода из ждущего при разборе", "bitLength": 8, "startByte": 3, "b": -75, "packNumber": 2, "unitType": "Temp" },
+    { "pgn": 19, "name": "Уставка т-ры бака для перехода в ждущий",                 "bitLength": 8, "startByte": 4, "b": -75, "packNumber": 2, "unitType": "Temp" },
+    { "pgn": 19, "name": "Уставка т-ры бака для выхода из ждущего",                 "bitLength": 8, "startByte": 5, "b": -75, "packNumber": 2, "unitType": "Temp" },
+    { "pgn": 19, "name": "Уставка т-ры бака для выхода из ждущего при разборе",     "bitLength": 8, "startByte": 6, "b": -75, "packNumber": 2, "unitType": "Temp" },
+    { "pgn": 19, "name": "t_power_limiter",                                          "bitLength": 4, "startByte": 7, "packNumber": 1 },
+
+    { "pgn": 19, "name": "Уставка т-ры для тёплого пола",                            "bitLength": 8,  "startByte": 1, "b": -75, "packNumber": 3, "unitType": "Temp" },
+    { "pgn": 19, "name": "Гистерезис работы тёплого пола",                           "bitLength": 8,  "startByte": 2, "packNumber": 3, "unitType": "Temp" },
+    { "pgn": 19, "name": "Уставка предпускового подогрева",                          "bitLength": 8,  "startByte": 3, "b": -75, "packNumber": 3, "unitType": "Temp" },
+    { "pgn": 19, "name": "Ограничение работы по времени предпускового подогрева",    "bitLength": 16, "startByte": 4, "packNumber": 3, "unitType": "Minute" },
+    { "pgn": 19, "name": "Ограничение работы системы, часы",                         "bitLength": 8,  "startByte": 6, "packNumber": 3, "unitType": "Hour" },
+    { "pgn": 19, "name": "Ограничение работы помп, минуты",                          "bitLength": 8,  "startByte": 7, "packNumber": 3, "unitType": "Minute" },
+
+    { "pgn": 19, "name": "Подключенная зона 1", "bitLength": 8, "startByte": 1, "packNumber": 4, "meanings": { "0": "Не подключена", "1": "Зависимые отопители", "2": "Защита от замерзания", "3": "Пассивное отопление" } },
+    { "pgn": 19, "name": "Подключенная зона 2", "bitLength": 8, "startByte": 2, "packNumber": 4, "meanings": { "0": "Не подключена", "1": "Зависимые отопители", "2": "Защита от замерзания", "3": "Пассивное отопление" } },
+    { "pgn": 19, "name": "Подключенная зона 3", "bitLength": 8, "startByte": 3, "packNumber": 4, "meanings": { "0": "Не подключена", "1": "Зависимые отопители", "2": "Защита от замерзания", "3": "Пассивное отопление" } },
+    { "pgn": 19, "name": "Подключенная зона 4", "bitLength": 8, "startByte": 4, "packNumber": 4, "meanings": { "0": "Не подключена", "1": "Зависимые отопители", "2": "Защита от замерзания", "3": "Пассивное отопление" } },
+    { "pgn": 19, "name": "Подключенная зона 5", "bitLength": 8, "startByte": 5, "packNumber": 4, "meanings": { "0": "Не подключена", "1": "Зависимые отопители", "2": "Защита от замерзания", "3": "Пассивное отопление" } },
+
+    { "pgn": 19, "name": "Наработка ТЭНа, с",               "bitLength": 32, "startByte": 1, "packNumber": 5, "unitType": "Second" },
+    { "pgn": 19, "name": "Статус тёплого пола",              "bitLength": 2,  "startByte": 5, "packNumber": 5, "meanings": "OnOff" },
+    { "pgn": 19, "name": "Статус предпускового подогрева",   "bitLength": 2,  "startByte": 5, "startBit": 2, "packNumber": 5, "meanings": "OnOff" },
+
+    { "pgn": 19, "name": "Текущая температура пола",         "bitLength": 8, "startByte": 1, "b": -75, "packNumber": 6, "unitType": "Temp" },
+    { "pgn": 19, "name": "Текущая температура двигателя",    "bitLength": 8, "startByte": 2, "b": -75, "packNumber": 6, "unitType": "Temp" },
+    { "pgn": 19, "name": "Подстройка датчика зоны 1",        "bitLength": 8, "startByte": 3, "b": -75, "packNumber": 6, "unitType": "Temp" },
+    { "pgn": 19, "name": "Подстройка датчика зоны 2",        "bitLength": 8, "startByte": 4, "b": -75, "packNumber": 6, "unitType": "Temp" },
+    { "pgn": 19, "name": "Подстройка датчика зоны 3",        "bitLength": 8, "startByte": 5, "b": -75, "packNumber": 6, "unitType": "Temp" },
+    { "pgn": 19, "name": "Подстройка датчика зоны 4",        "bitLength": 8, "startByte": 6, "b": -75, "packNumber": 6, "unitType": "Temp" },
+    { "pgn": 19, "name": "Подстройка датчика зоны 5",        "bitLength": 8, "startByte": 7, "b": -75, "packNumber": 6, "unitType": "Temp" },
+
+    { "pgn": 20, "name": "Код неисправности",   "bitLength": 8, "startByte": 0 },
+    { "pgn": 20, "name": "Количество морганий", "bitLength": 8, "startByte": 1 },
+    { "pgn": 20, "name": "Байт неисправностей 1","bitLength": 8,"startByte": 2 },
+    { "pgn": 20, "name": "Байт неисправностей 2","bitLength": 8,"startByte": 3 },
+    { "pgn": 20, "name": "Байт неисправностей 3","bitLength": 8,"startByte": 4 },
+    { "pgn": 20, "name": "Байт неисправностей 4","bitLength": 8,"startByte": 5 },
+    { "pgn": 20, "name": "Байт неисправностей 5","bitLength": 8,"startByte": 6 },
+    { "pgn": 20, "name": "Байт неисправностей 6","bitLength": 8,"startByte": 7 },
+
+    { "pgn": 21, "name": "Опорное напряжение процессора", "bitLength": 8, "startByte": 0, "unitType": "Volt",    "a": 0.1 },
+    { "pgn": 21, "name": "Температура процессора",        "bitLength": 8, "startByte": 1, "unitType": "Temp",    "b": -75 },
+    { "pgn": 21, "name": "Температура бака",              "bitLength": 8, "startByte": 2, "unitType": "Temp",    "b": -75, "var": 106 },
+    { "pgn": 21, "name": "Температура теплообменника",    "bitLength": 8, "startByte": 3, "unitType": "Temp",    "b": -75 },
+    { "pgn": 21, "name": "Температура наружного воздуха", "bitLength": 8, "startByte": 4, "unitType": "Temp",    "b": -75, "var": 107 },
+    { "pgn": 21, "name": "Иконка подогревателя",          "bitLength": 8, "startByte": 5, "meanings": { "0": "Ожидание", "1": "Продувка", "2": "Розжиг", "3": "Работа на мощности" } },
+    { "pgn": 21, "name": "Уровень жидкости в баке",       "bitLength": 8, "startByte": 6, "var": 105 },
+    { "pgn": 21, "name": "Режим хранения",                "bitLength": 2, "startByte": 7,              "meanings": "YesNo" },
+    { "pgn": 21, "name": "ТЭН активен",                   "bitLength": 2, "startByte": 7, "startBit": 2, "meanings": "YesNo" },
+    { "pgn": 21, "name": "ТЭН отключен",                  "bitLength": 2, "startByte": 7, "startBit": 4, "meanings": "YesNo" },
+
+    { "pgn": 22, "name": "Зона 1", "bitLength": 2, "startByte": 0, "startBit": 0, "meanings": "OnOff", "var": 65 },
+    { "pgn": 22, "name": "Зона 2", "bitLength": 2, "startByte": 0, "startBit": 2, "meanings": "OnOff", "var": 66 },
+    { "pgn": 22, "name": "Зона 3", "bitLength": 2, "startByte": 0, "startBit": 4, "meanings": "OnOff", "var": 67 },
+    { "pgn": 22, "name": "Зона 4", "bitLength": 2, "startByte": 0, "startBit": 6, "meanings": "OnOff", "var": 68 },
+    { "pgn": 22, "name": "Зона 5", "bitLength": 2, "startByte": 1, "startBit": 0, "meanings": "OnOff", "var": 69 },
+    { "pgn": 22, "name": "Температура зоны 1", "bitLength": 8, "startByte": 2, "unitType": "Temp", "b": -75, "var": 70 },
+    { "pgn": 22, "name": "Температура зоны 2", "bitLength": 8, "startByte": 3, "unitType": "Temp", "b": -75, "var": 71 },
+    { "pgn": 22, "name": "Температура зоны 3", "bitLength": 8, "startByte": 4, "unitType": "Temp", "b": -75, "var": 72 },
+    { "pgn": 22, "name": "Температура зоны 4", "bitLength": 8, "startByte": 5, "unitType": "Temp", "b": -75, "var": 73 },
+    { "pgn": 22, "name": "Температура зоны 5", "bitLength": 8, "startByte": 6, "unitType": "Temp", "b": -75, "var": 74 },
+    { "pgn": 22, "name": "Кнопка Подогреватель",         "bitLength": 2, "startByte": 7, "startBit": 0, "meanings": "OnOff", "var": 119 },
+    { "pgn": 22, "name": "Кнопка ТЭН",                   "bitLength": 2, "startByte": 7, "startBit": 2, "meanings": "OnOff", "var": 120 },
+    { "pgn": 22, "name": "Кнопка Тёплый пол",            "bitLength": 2, "startByte": 7, "startBit": 4, "meanings": "OnOff" },
+    { "pgn": 22, "name": "Кнопка Предпусковой подогрев", "bitLength": 2, "startByte": 7, "startBit": 5, "meanings": "OnOff" },
+
+    { "pgn": 23, "name": "Зад. ШИМ вентилятора зоны 1", "bitLength": 8, "startByte": 0, "unitType": "Percent", "var": 100 },
+    { "pgn": 23, "name": "Зад. ШИМ вентилятора зоны 2", "bitLength": 8, "startByte": 1, "unitType": "Percent", "var": 101 },
+    { "pgn": 23, "name": "Зад. ШИМ вентилятора зоны 3", "bitLength": 8, "startByte": 2, "unitType": "Percent", "var": 102 },
+    { "pgn": 23, "name": "Зад. ШИМ вентилятора зоны 4", "bitLength": 8, "startByte": 3, "unitType": "Percent", "var": 103 },
+    { "pgn": 23, "name": "Зад. ШИМ вентилятора зоны 5", "bitLength": 8, "startByte": 4, "unitType": "Percent", "var": 104 },
+
+    { "pgn": 24, "name": "Ступень вентилятора зоны 1",  "bitLength": 4, "startByte": 0 },
+    { "pgn": 24, "name": "Ступень вентилятора зоны 2",  "bitLength": 4, "startByte": 0, "startBit": 4 },
+    { "pgn": 24, "name": "Ступень вентилятора зоны 3",  "bitLength": 4, "startByte": 1 },
+    { "pgn": 24, "name": "Ступень вентилятора зоны 4",  "bitLength": 4, "startByte": 1, "startBit": 4 },
+    { "pgn": 24, "name": "Ступень вентилятора зоны 5",  "bitLength": 4, "startByte": 2 },
+    { "pgn": 24, "name": "Тек. ШИМ вентилятора зоны 1","bitLength": 8, "startByte": 3, "unitType": "Percent", "var": 95 },
+    { "pgn": 24, "name": "Тек. ШИМ вентилятора зоны 2","bitLength": 8, "startByte": 4, "unitType": "Percent", "var": 96 },
+    { "pgn": 24, "name": "Тек. ШИМ вентилятора зоны 3","bitLength": 8, "startByte": 5, "unitType": "Percent", "var": 97 },
+    { "pgn": 24, "name": "Тек. ШИМ вентилятора зоны 4","bitLength": 8, "startByte": 6, "unitType": "Percent", "var": 98 },
+    { "pgn": 24, "name": "Тек. ШИМ вентилятора зоны 5","bitLength": 8, "startByte": 7, "unitType": "Percent", "var": 99 },
+
+    { "pgn": 25, "name": "Дневная уставка зоны 1", "bitLength": 8, "startByte": 0, "unitType": "Temp", "b": -75, "var": 75 },
+    { "pgn": 25, "name": "Дневная уставка зоны 2", "bitLength": 8, "startByte": 1, "unitType": "Temp", "b": -75, "var": 76 },
+    { "pgn": 25, "name": "Дневная уставка зоны 3", "bitLength": 8, "startByte": 2, "unitType": "Temp", "b": -75, "var": 77 },
+    { "pgn": 25, "name": "Дневная уставка зоны 4", "bitLength": 8, "startByte": 3, "unitType": "Temp", "b": -75, "var": 78 },
+    { "pgn": 25, "name": "Дневная уставка зоны 5", "bitLength": 8, "startByte": 4, "unitType": "Temp", "b": -75, "var": 79 },
+
+    { "pgn": 26, "name": "Ночная уставка зоны 1",  "bitLength": 8, "startByte": 0, "unitType": "Temp", "b": -75, "var": 80 },
+    { "pgn": 26, "name": "Ночная уставка зоны 2",  "bitLength": 8, "startByte": 1, "unitType": "Temp", "b": -75, "var": 81 },
+    { "pgn": 26, "name": "Ночная уставка зоны 3",  "bitLength": 8, "startByte": 2, "unitType": "Temp", "b": -75, "var": 82 },
+    { "pgn": 26, "name": "Ночная уставка зоны 4",  "bitLength": 8, "startByte": 3, "unitType": "Temp", "b": -75, "var": 83 },
+    { "pgn": 26, "name": "Ночная уставка зоны 5",  "bitLength": 8, "startByte": 4, "unitType": "Temp", "b": -75, "var": 84 },
+
+    { "pgn": 27, "name": "Ручная уставка ШИМ зоны 1", "bitLength": 8, "startByte": 0, "unitType": "Percent", "var": 90 },
+    { "pgn": 27, "name": "Ручная уставка ШИМ зоны 2", "bitLength": 8, "startByte": 1, "unitType": "Percent", "var": 91 },
+    { "pgn": 27, "name": "Ручная уставка ШИМ зоны 3", "bitLength": 8, "startByte": 2, "unitType": "Percent", "var": 92 },
+    { "pgn": 27, "name": "Ручная уставка ШИМ зоны 4", "bitLength": 8, "startByte": 3, "unitType": "Percent", "var": 93 },
+    { "pgn": 27, "name": "Ручная уставка ШИМ зоны 5", "bitLength": 8, "startByte": 4, "unitType": "Percent", "var": 94 },
+    { "pgn": 27, "name": "Зона 1 Ручной режим", "bitLength": 2, "startByte": 5, "startBit": 0, "meanings": "OnOff", "var": 85 },
+    { "pgn": 27, "name": "Зона 2 Ручной режим", "bitLength": 2, "startByte": 5, "startBit": 2, "meanings": "OnOff", "var": 86 },
+    { "pgn": 27, "name": "Зона 3 Ручной режим", "bitLength": 2, "startByte": 5, "startBit": 4, "meanings": "OnOff", "var": 87 },
+    { "pgn": 27, "name": "Зона 4 Ручной режим", "bitLength": 2, "startByte": 5, "startBit": 6, "meanings": "OnOff", "var": 88 },
+    { "pgn": 27, "name": "Зона 5 Ручной режим", "bitLength": 2, "startByte": 6, "startBit": 0, "meanings": "OnOff", "var": 89 },
+
+    { "pgn": 28, "name": "Общее время на всех режимах",              "bitLength": 32, "startByte": 0, "unitType": "Second" },
+    { "pgn": 28, "name": "Общее время работы (кроме ожидания)",      "bitLength": 32, "startByte": 4, "unitType": "Second" },
+
+    { "pgn": 29, "name": "Атмосферное давление",                     "bitLength": 8,  "startByte": 1, "unitType": "Pressure", "packNumber": 1 },
+    { "pgn": 29, "name": "Среднее максимальное значение давления",    "bitLength": 24, "startByte": 2, "unitType": "Pressure", "a": 0.001, "packNumber": 1 },
+    { "pgn": 29, "name": "Среднее минимальное значение давления",     "bitLength": 24, "startByte": 4, "unitType": "Pressure", "a": 0.001, "packNumber": 1 },
+    { "pgn": 29, "name": "Разница между max и min значениями",        "bitLength": 16, "startByte": 1, "a": 0.01, "unitType": "Pressure", "packNumber": 2 },
+    { "pgn": 29, "name": "Флаг появления пламени по пульсации",      "bitLength": 2,  "startByte": 3, "meanings": "YesNo", "packNumber": 2 },
+    { "pgn": 29, "name": "Использовать датчик для определения горения","bitLength": 2, "startByte": 3, "meanings": "YesNo", "packNumber": 2, "startBit": 2 },
+    { "pgn": 29, "name": "Использовать датчик для топливной коррекции","bitLength": 2, "startByte": 3, "meanings": "YesNo", "packNumber": 2, "startBit": 4 },
+    { "pgn": 29, "name": "Атмосферное давление",                     "bitLength": 24, "startByte": 4, "unitType": "Pressure", "a": 0.001, "packNumber": 2, "var": 60 },
+
+    { "pgn": 31, "name": "Время работы",           "bitLength": 32, "startByte": 0, "unitType": "Second", "var": 3 },
+    { "pgn": 31, "name": "Время работы на режиме", "bitLength": 32, "startByte": 4, "unitType": "Second", "var": 4 },
+
+    { "pgn": 32, "name": "t_work_time_minutes", "bitLength": 16, "startByte": 0, "unitType": "Minute" },
+    { "pgn": 32, "name": "t_heater_mode",       "bitLength": 4,  "startByte": 2, "meanings": { "0": "t_regular", "1": "t_eco", "2": "t_additional_heater", "3": "t_heating", "4": "t_heating_systems" } },
+
+    { "pgn": 40, "name": "t_year",   "bitLength": 8, "startByte": 0, "unitType": "Year",   "var": 118 },
+    { "pgn": 40, "name": "t_month",  "bitLength": 8, "startByte": 1, "unitType": "Month",  "var": 117 },
+    { "pgn": 40, "name": "t_day",    "bitLength": 8, "startByte": 2, "unitType": "Day",    "var": 116 },
+    { "pgn": 40, "name": "t_hour",   "bitLength": 8, "startByte": 3, "unitType": "Hour",   "var": 115 },
+    { "pgn": 40, "name": "t_minute", "bitLength": 8, "startByte": 4, "unitType": "Minute", "var": 114 },
+    { "pgn": 40, "name": "t_second", "bitLength": 8, "startByte": 5, "unitType": "Second", "var": 113 },
+
+    { "pgn": 41, "name": "t_day_start_hour",      "bitLength": 8,  "startByte": 0, "unitType": "Hour" },
+    { "pgn": 41, "name": "t_day_start_minute",    "bitLength": 8,  "startByte": 1, "unitType": "Minute" },
+    { "pgn": 41, "name": "t_night_start_hour",    "bitLength": 8,  "startByte": 2, "unitType": "Hour" },
+    { "pgn": 41, "name": "t_hight_start_minute",  "bitLength": 8,  "startByte": 3, "unitType": "Minute" },
+    { "pgn": 41, "name": "t_daytime_backlight",   "bitLength": 8,  "startByte": 4, "unitType": "Percent" },
+    { "pgn": 41, "name": "t_nighttime_backlight", "bitLength": 8,  "startByte": 5, "unitType": "Percent" },
+    { "pgn": 41, "name": "t_display_sleep_time",  "bitLength": 16, "startByte": 6, "unitType": "Second" },
+
+    { "pgn": 42, "name": "t_pump_heater_btn", "bitLength": 8, "startByte": 0, "meanings": "OnOff" },
+    { "pgn": 42, "name": "t_pump_1_btn",      "bitLength": 8, "startByte": 1, "meanings": "OnOff" },
+    { "pgn": 42, "name": "t_pump_2_btn",      "bitLength": 8, "startByte": 2, "meanings": "OnOff" },
+    { "pgn": 42, "name": "t_pump_3_btn",      "bitLength": 8, "startByte": 3, "meanings": "OnOff" },
+    { "pgn": 42, "name": "t_pump_aux_1_btn",  "bitLength": 8, "startByte": 4, "meanings": "OnOff" },
+    { "pgn": 42, "name": "t_pump_aux_2_btn",  "bitLength": 8, "startByte": 5, "meanings": "OnOff" },
+    { "pgn": 42, "name": "t_pump_aux_3_btn",  "bitLength": 8, "startByte": 6, "meanings": "OnOff" },
+
+    { "pgn": 43, "name": "t_channel1_pwm_value", "bitLength": 16, "startByte": 0 },
+    { "pgn": 43, "name": "t_channel2_pwm_value", "bitLength": 16, "startByte": 2 },
+    { "pgn": 43, "name": "t_channel3_pwm_value", "bitLength": 16, "startByte": 4 },
+    { "pgn": 43, "name": "t_channel4_pwm_value", "bitLength": 16, "startByte": 6 },
+
+    { "pgn": 44, "name": "t_channel1_pwm_value", "bitLength": 16, "startByte": 0 },
+    { "pgn": 44, "name": "t_channel2_pwm_value", "bitLength": 16, "startByte": 2 },
+    { "pgn": 44, "name": "t_channel3_pwm_value", "bitLength": 16, "startByte": 4 },
+    { "pgn": 44, "name": "t_channel4_pwm_value", "bitLength": 16, "startByte": 6 },
+
+    { "pgn": 45, "name": "t_channel1_temperature", "bitLength": 16, "startByte": 0, "a": 0.1, "unitType": "Temp", "signed": true },
+    { "pgn": 45, "name": "t_channel2_temperature", "bitLength": 16, "startByte": 2, "a": 0.1, "unitType": "Temp", "signed": true },
+    { "pgn": 45, "name": "t_channel3_temperature", "bitLength": 16, "startByte": 4, "a": 0.1, "unitType": "Temp", "signed": true },
+    { "pgn": 45, "name": "t_channel4_temperature", "bitLength": 16, "startByte": 6, "a": 0.1, "unitType": "Temp", "signed": true },
+
+    { "pgn": 46, "name": "t_error_code1", "bitLength": 8, "startByte": 0, "getMeaning": "error_code" },
+    { "pgn": 46, "name": "t_error_code2", "bitLength": 8, "startByte": 1, "getMeaning": "error_code" },
+    { "pgn": 46, "name": "t_error_code3", "bitLength": 8, "startByte": 2, "getMeaning": "error_code" },
+    { "pgn": 46, "name": "t_error_code4", "bitLength": 8, "startByte": 3, "getMeaning": "error_code" },
+    { "pgn": 46, "name": "t_error_code5", "bitLength": 8, "startByte": 4, "getMeaning": "error_code" },
+    { "pgn": 46, "name": "t_error_code6", "bitLength": 8, "startByte": 5, "getMeaning": "error_code" },
+    { "pgn": 46, "name": "t_error_code7", "bitLength": 8, "startByte": 6, "getMeaning": "error_code" },
+    { "pgn": 46, "name": "t_error_code8", "bitLength": 8, "startByte": 7, "getMeaning": "error_code" },
+
+    { "pgn": 47, "name": "t_fuel_pump_overriden",       "bitLength": 2, "startByte": 0, "meanings": "YesNo" },
+    { "pgn": 47, "name": "t_relay_overriden",            "bitLength": 2, "startByte": 0, "startBit": 2, "meanings": "YesNo" },
+    { "pgn": 47, "name": "t_glow_plug_overriden",        "bitLength": 2, "startByte": 0, "startBit": 4, "meanings": "YesNo" },
+    { "pgn": 47, "name": "t_pump_overriden",             "bitLength": 2, "startByte": 0, "startBit": 6, "meanings": "YesNo" },
+    { "pgn": 47, "name": "t_blower_overriden",           "bitLength": 2, "startByte": 1, "startBit": 0, "meanings": "YesNo" },
+    { "pgn": 47, "name": "t_pump_state",                 "bitLength": 2, "startByte": 2, "startBit": 0, "meanings": "OnOff" },
+    { "pgn": 47, "name": "t_relay_state",                "bitLength": 2, "startByte": 2, "startBit": 2, "meanings": "OnOff" },
+    { "pgn": 47, "name": "t_overriden_blower_revs",      "bitLength": 8, "startByte": 3, "unitType": "Rps" },
+    { "pgn": 47, "name": "t_overriden_glow_plug_power",  "bitLength": 8, "startByte": 4, "unitType": "Percent" },
+    { "pgn": 47, "name": "t_overriden_fuel_pump_frequency","bitLength": 16,"startByte": 5, "a": 0.01, "unitType": "Frequency" },
+
+    { "pgn": 49, "name": "t_load_channel1", "bitLength": 2, "startByte": 0, "startBit": 0, "meanings": { "0": "t_off", "1": "t_toggle", "2": "t_pwm" } },
+    { "pgn": 49, "name": "t_load_channel2", "bitLength": 2, "startByte": 0, "startBit": 2, "meanings": { "0": "t_off", "1": "t_toggle", "2": "t_pwm" } },
+    { "pgn": 49, "name": "t_load_channel3", "bitLength": 2, "startByte": 0, "startBit": 4, "meanings": { "0": "t_off", "1": "t_toggle", "2": "t_pwm" } },
+
+    { "pgn": 50, "name": "t_compressor_control_type", "bitLength": 8,  "startByte": 1, "meanings": { "0": "t_pwm", "1": "t_revolutions", "2": "t_power" }, "packNumber": 1 },
+    { "pgn": 50, "name": "t_compressor_rev_set",      "bitLength": 8,  "startByte": 2, "unitType": "Rps",     "var": 134, "packNumber": 1 },
+    { "pgn": 50, "name": "t_compressor_rev_measured", "bitLength": 8,  "startByte": 3, "unitType": "Rps",     "var": 135, "packNumber": 1 },
+    { "pgn": 50, "name": "t_compressor_pwm_set",      "bitLength": 16, "startByte": 4, "a": 0.01, "unitType": "Percent", "var": 146, "packNumber": 1 },
+    { "pgn": 50, "name": "t_compressor_power_set",    "bitLength": 16, "startByte": 6, "unitType": "Power",   "packNumber": 1 },
+    { "pgn": 50, "name": "t_compressor_current",      "bitLength": 16, "startByte": 1, "unitType": "Current", "a": 0.01, "var": 138, "packNumber": 2 },
+    { "pgn": 50, "name": "t_condensor_current",       "bitLength": 16, "startByte": 3, "unitType": "Current", "a": 0.01, "var": 139, "packNumber": 2 },
+    { "pgn": 50, "name": "t_mcu_temp",                "bitLength": 8,  "startByte": 5, "unitType": "Temp", "b": -75, "var": 59,  "packNumber": 2 },
+    { "pgn": 50, "name": "t_pcb_temp",                "bitLength": 8,  "startByte": 6, "unitType": "Temp", "b": -75, "var": 145, "packNumber": 2 },
+    { "pgn": 50, "name": "t_high_pressure",           "bitLength": 16, "startByte": 1, "unitType": "Pressure", "packNumber": 3, "a": 0.01, "var": 141 },
+    { "pgn": 50, "name": "t_low_pressure",            "bitLength": 16, "startByte": 3, "unitType": "Pressure", "packNumber": 3, "a": 0.01, "var": 142 },
+    { "pgn": 50, "name": "t_ac_press_sensor",         "bitLength": 8,  "startByte": 5, "meanings": "Allow", "packNumber": 3 },
+    { "pgn": 50, "name": "t_condensor_control_type",  "bitLength": 8,  "startByte": 1, "meanings": { "0": "t_pwm", "1": "t_revolutions", "2": "t_power" }, "packNumber": 4 },
+    { "pgn": 50, "name": "t_condensor_rev_set",       "bitLength": 8,  "startByte": 2, "unitType": "Rps", "packNumber": 4 },
+    { "pgn": 50, "name": "t_condensor_rev_measured",  "bitLength": 8,  "startByte": 3, "unitType": "Rps", "packNumber": 4 },
+    { "pgn": 50, "name": "t_condensor_pwm_set",       "bitLength": 16, "startByte": 4, "a": 0.01, "unitType": "Percent", "var": 136, "packNumber": 4 },
+    { "pgn": 50, "name": "t_condensor_power_set",     "bitLength": 16, "startByte": 6, "a": 0.01, "unitType": "Power",   "packNumber": 4 },
+
+    { "pgn": 51, "name": "t_ac_mode",         "bitLength": 8, "startByte": 1, "meanings": { "0": "t_off", "1": "t_cool", "2": "t_dry", "3": "t_eco", "4": "t_night", "5": "t_power", "6": "t_manual" }, "packNumber": 1 },
+    { "pgn": 51, "name": "t_ac_temp_setpoint","bitLength": 8, "startByte": 2, "b": -75, "unitType": "Temp", "var": 143, "packNumber": 1 },
+    { "pgn": 51, "name": "t_ac_fan_mode",     "bitLength": 8, "startByte": 3, "meanings": { "0": "t_auto", "1": "t_1st_speed", "2": "t_2nd_speed", "3": "t_3rd_speed", "4": "t_4th_speed", "5": "t_5th_speed" }, "packNumber": 1, "var": 144 },
+    { "pgn": 51, "name": "t_ac_panel_current","bitLength": 16,"startByte": 4, "packNumber": 1, "var": 140, "a": 0.01, "unitType": "Current" },
+    { "pgn": 51, "name": "t_evap_control_type",  "bitLength": 8,  "startByte": 1, "meanings": { "0": "t_pwm", "1": "t_revolutions", "2": "t_power" }, "packNumber": 2 },
+    { "pgn": 51, "name": "t_evap_rev_set",        "bitLength": 8,  "startByte": 2, "unitType": "Rps", "packNumber": 2 },
+    { "pgn": 51, "name": "t_evap_rev_measured",   "bitLength": 8,  "startByte": 3, "unitType": "Rps", "packNumber": 2 },
+    { "pgn": 51, "name": "t_evap_pwm_set",        "bitLength": 16, "startByte": 4, "a": 0.01, "unitType": "Percent", "var": 137, "packNumber": 2 },
+    { "pgn": 51, "name": "t_evap_power_set",      "bitLength": 16, "startByte": 6, "a": 0.01, "unitType": "Power",   "packNumber": 2 },
+    { "pgn": 51, "name": "t_ac_cabin_air_t",      "bitLength": 16, "startByte": 1, "unitType": "Temp", "packNumber": 3, "var": 149, "a": 0.01, "signed": true },
+    { "pgn": 51, "name": "t_ac_evap_t",           "bitLength": 16, "startByte": 3, "unitType": "Temp", "packNumber": 3, "var": 148, "a": 0.01, "signed": true },
+    { "pgn": 51, "name": "t_ac_aux1_t",           "bitLength": 16, "startByte": 5, "unitType": "Temp", "packNumber": 3, "var": 150, "a": 0.01, "signed": true },
+
+    { "pgn": 52, "name": "t_ac_man_evap_pwm_set", "bitLength": 16, "startByte": 1, "unitType": "Percent", "a": 0.01 },
+    { "pgn": 52, "name": "t_ac_man_cond_pwm_set", "bitLength": 16, "startByte": 3, "unitType": "Percent", "a": 0.01 },
+    { "pgn": 52, "name": "t_ac_man_comp_pwm_set", "bitLength": 16, "startByte": 5, "unitType": "Percent", "a": 0.01 },
+
+    { "pgn": 55, "name": "t_tank1_level", "bitLength": 8, "startByte": 0, "unitType": "Percent" },
+    { "pgn": 55, "name": "t_tank2_level", "bitLength": 8, "startByte": 1, "unitType": "Percent" },
+    { "pgn": 55, "name": "t_tank3_level", "bitLength": 8, "startByte": 2, "unitType": "Percent" },
+    { "pgn": 55, "name": "t_tank4_level", "bitLength": 8, "startByte": 3, "unitType": "Percent" },
+    { "pgn": 55, "name": "t_tank1_content",    "bitLength": 4, "startByte": 4,             "meanings": { "0": "t_off", "1": "t_white_tank", "2": "t_grey_tank", "3": "t_black_tank", "4": "t_fuel_tank" } },
+    { "pgn": 55, "name": "t_tank1_resistance", "bitLength": 4, "startByte": 4, "startBit": 4, "meanings": { "0": "t_0-190_ohm", "1": "t_240-33_ohm", "2": "t_short_full", "3": "t_open_full" } },
+    { "pgn": 55, "name": "t_tank2_content",    "bitLength": 4, "startByte": 5,             "meanings": { "0": "t_off", "1": "t_white_tank", "2": "t_grey_tank", "3": "t_black_tank", "4": "t_fuel_tank" } },
+    { "pgn": 55, "name": "t_tank2_resistance", "bitLength": 4, "startByte": 5, "startBit": 4, "meanings": { "0": "t_0-190_ohm", "1": "t_240-33_ohm", "2": "t_short_full", "3": "t_open_full" } },
+    { "pgn": 55, "name": "t_tank3_content",    "bitLength": 4, "startByte": 6,             "meanings": { "0": "t_off", "1": "t_white_tank", "2": "t_grey_tank", "3": "t_black_tank", "4": "t_fuel_tank" } },
+    { "pgn": 55, "name": "t_tank3_resistance", "bitLength": 4, "startByte": 6, "startBit": 4, "meanings": { "0": "t_0-190_ohm", "1": "t_240-33_ohm", "2": "t_short_full", "3": "t_open_full" } },
+    { "pgn": 55, "name": "t_tank4_content",    "bitLength": 4, "startByte": 7,             "meanings": { "0": "t_off", "1": "t_white_tank", "2": "t_grey_tank", "3": "t_black_tank", "4": "t_fuel_tank" } },
+    { "pgn": 55, "name": "t_tank4_resistance", "bitLength": 4, "startByte": 7, "startBit": 4, "meanings": { "0": "t_0-190_ohm", "1": "t_240-33_ohm", "2": "t_short_full", "3": "t_open_full" } },
+
+    { "pgn": 57, "name": "t_power_limiter", "bitLength": 4, "startByte": 0 },
+
+    { "pgn": 99, "name": "t_channel_pwm1",  "bitLength": 8,  "startByte": 1, "unitType": "Percent" },
+    { "pgn": 99, "name": "t_channel_pwm2",  "bitLength": 8,  "startByte": 2, "unitType": "Percent" },
+    { "pgn": 99, "name": "t_channel_pwm3",  "bitLength": 8,  "startByte": 3, "unitType": "Percent" },
+    { "pgn": 99, "name": "t_temperature_1", "bitLength": 16, "signed": true, "startByte": 1, "unitType": "Temp", "packNumber": 1, "var": 129 },
+    { "pgn": 99, "name": "t_temperature_2", "bitLength": 16, "signed": true, "startByte": 3, "unitType": "Temp", "packNumber": 1, "var": 130 },
+    { "pgn": 99, "name": "t_pressure",      "bitLength": 24, "startByte": 5, "a": 0.001, "unitType": "Pressure", "var": 131 },
+
+    { "pgn": 100, "name": "Начальный адрес", "bitLength": 24, "startByte": 1, "packNumber": 2, "getMeaning": "hex_address" },
+    { "pgn": 100, "name": "Длина данных",    "bitLength": 32, "startByte": 4, "packNumber": 2 },
+    { "pgn": 100, "name": "Длина данных",    "bitLength": 24, "startByte": 1, "packNumber": 4 },
+    { "pgn": 100, "name": "CRC",             "bitLength": 32, "startByte": 4, "packNumber": 4, "getMeaning": "hex_crc" },
+    { "pgn": 100, "name": "Адрес фрагмента","bitLength": 32, "startByte": 2, "packNumber": 5, "getMeaning": "hex_fragment" },
+
+    { "pgn": 101, "name": "Первое слово",  "bitLength": 32, "startByte": 0, "getMeaning": "hex_value" },
+    { "pgn": 101, "name": "Второе слово",  "bitLength": 32, "startByte": 4, "getMeaning": "hex_value" }
+  ]
+}

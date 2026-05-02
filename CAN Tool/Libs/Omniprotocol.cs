@@ -502,6 +502,7 @@ namespace OmniProtocol
         public int Id;
         public string Name => GetString($"d_{Id}");
         public DeviceType_t DevType { set; get; }
+        public string ImageName { get; set; } = "";
 
         public int MaxBlower { get; set; } = 130; //Максимальное значение скорости нагнетателя
         public double MaxFuelPump { get; set; } = 4; //Максимальное значение ТН

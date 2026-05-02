@@ -295,19 +295,19 @@ namespace CAN_Tool
             GotNewMessage?.Invoke(this, e);
         }
 
-        public void PortOpenNormal(string portName = VSCAN.VSCAN_FIRST_FOUND)
+        public void PortOpenNormal(string portName)
         {
             if (PortOpened)
             {
                 MessageBox.Show(GetString("t_port_already_opened"));
                 return;
             }
-            _driver.SetBitrate(Speed);
+            //_driver.SetBitrate(Speed);
             _driver.OpenNormal(portName);
             PortOpened = true;
         }
 
-        public void PortOpenSelfReception(string portName = VSCAN.VSCAN_FIRST_FOUND)
+        public void PortOpenSelfReception(string portName)
         {
             if (PortOpened)
             {

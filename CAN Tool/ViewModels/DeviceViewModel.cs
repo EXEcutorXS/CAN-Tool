@@ -289,8 +289,11 @@ namespace OmniProtocol
             get
             {
                 var imagesDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
-                var path = Path.Combine(imagesDir, $"{Id.Type}.jpg");
-                if (!File.Exists(path))
+                var imageName = DeviceReference?.ImageName;
+                var path = !string.IsNullOrEmpty(imageName)
+                    ? Path.Combine(imagesDir, $"{imageName}.jpg")
+                    : null;
+                if (path == null || !File.Exists(path))
                     path = Path.Combine(imagesDir, "noimg.jpg");
                 return new BitmapImage(new Uri(path));
             }
