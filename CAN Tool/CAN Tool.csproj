@@ -115,9 +115,7 @@
 			</AssemblyAttributes>
 		</ItemGroup>
 	</Target>
-	<Target Name="GenerateLang" BeforeTargets="Build"
-			Inputs="Resources\local.csv"
-			Outputs="Resources\lang.xaml">
+	<Target Name="GenerateLang" BeforeTargets="Build" Inputs="Resources\local.csv" Outputs="Resources\lang.xaml">
 		<Exec Command="&quot;$(ProjectDir)Resources\Localizator.exe&quot; &quot;$(ProjectDir)Resources\local.csv&quot; &quot;$(ProjectDir)Resources\&quot;" />
 	</Target>
 </Project>

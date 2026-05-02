@@ -15,9 +15,6 @@ namespace OmniProtocol
 
     public enum zoneState_t { Off = 0, Heat = 1, Fan = 2 };
 
-    //public enum acMode_t { ac_off, ac_cool, ac_dry, ac_eco, ac_night, ac_max, ac_manual, ac_error };
-
-    //public enum acFanMode_t { fan_auto, fan_1, fan_2, fan_3, fan_4, fan_5};
 
     public partial class Omni : ObservableObject
     {

@@ -277,6 +277,7 @@ namespace CAN_Tool.ViewModels
         [RelayCommand]
         private void ChartDraw(object parameter)
         {
+            if (myChart == null) return;
             var plt = myChart.Plot;
 
             plt.Clear();

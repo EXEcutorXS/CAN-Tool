@@ -8,6 +8,8 @@ namespace CAN_Tool.Libs.CanAdapters
     {
         private readonly VSCAN _canWrapper = new();
         private int _speed;
+        private bool _isOpen;
+        Task _receiveTask;
 
         public event EventHandler<GotCanMessageEventArgs> MessageReceived;
 
@@ -31,18 +33,21 @@ namespace CAN_Tool.Libs.CanAdapters
 
         private void ConfigureAndStart()
         {
+            _isOpen = true;
             _canWrapper.SetSpeed(_speed);
             _canWrapper.SetTimestamp(VSCAN.VSCAN_TIMESTAMP_OFF);
             _canWrapper.SetBlockingRead(VSCAN.VSCAN_IOCTL_ON);
-            Task.Run(ReceiveLoop);
+            _receiveTask = Task.Run(ReceiveLoop);
         }
 
-        public void Close() => _canWrapper.Close();
+        public void Close() { _isOpen = false; _canWrapper.Close(); }
+        
 
         public void SetBitrate(int bitrate)
         {
             _speed = bitrate;
-            _canWrapper.SetSpeed(bitrate);
+            if (_isOpen)
+                _canWrapper.SetSpeed(bitrate);
         }
 
         public void Transmit(CanMessage message)

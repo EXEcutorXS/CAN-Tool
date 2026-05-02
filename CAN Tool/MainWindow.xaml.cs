@@ -61,6 +61,7 @@ namespace CAN_Tool
         public bool UseImperial { set; get; }
 
         public CanAdapter.AdapterType AdapterType { get; set; }
+        public int CanBitrateIndex { get; set; } = 5;
 
 
 
@@ -86,6 +87,7 @@ namespace CAN_Tool
                     App.Settings.MarkShapes[b.Id] = (b.MarkShape);
                 }
             App.Settings.AdapterType = vm.CanAdapter.Type;
+            App.Settings.CanBitrateIndex = vm.SelectedCanBitrate;
             string serialized = JsonSerializer.Serialize(App.Settings);
             StreamWriter sw = new("settings.json", false);
             sw.Write(serialized);
@@ -152,13 +154,6 @@ namespace CAN_Tool
                 menuLanguage.Items.Add(menuLang);
             }
 
-            vm.myChart = Chart;
-
-            Chart.Plot.AddAxis(Edge.Right, 2, color: System.Drawing.Color.LightGreen);
-
-
-            vm.CanAdapter.GotNewMessage += MessageHandler;
-
             vm.RefreshPortListCommand.Execute(null);
 
             TryToLoadSettings();
@@ -168,21 +163,8 @@ namespace CAN_Tool
             DarkModeCheckBox.IsChecked = App.Settings.IsDark;
             ImperialUnits.IsChecked = App.Settings.UseImperial;
             vm.CanAdapter.Type = App.Settings.AdapterType;
+            vm.SelectedCanBitrate = App.Settings.CanBitrateIndex;
         }
-
-        private void MessageHandler(object sender, EventArgs args)
-        {
-
-            UIcontext.Send(x =>
-            {
-                if (LogExpander.IsExpanded)
-                {
-                    OmniMessage m = new OmniMessage((args as GotCanMessageEventArgs).receivedMessage);
-                    LogField.AppendText(m.ToString());
-                }
-            }, null);
-        }
-
 
         private void LanguageChanged(Object sender, EventArgs e)
         {
@@ -213,171 +195,7 @@ namespace CAN_Tool
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            try
-            {
-                if (!GraphTab.IsSelected)     //Костыль, решает проблему неправильной интерпретации мыши графиком
-                    DragMove();
-            }
-            catch { }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            CanMessage m = new();
-            Random r = new(DateTime.Now.Millisecond);
-            m.Ide = (r.Next(0, 255) % 2) == 0;
-            m.Rtr = (r.Next(0, 255) % 2) == 0;
-            if (m.Ide)
-                m.Id = r.Next(0, 0x1FFFFFFF);
-            else
-                m.Id = r.Next(0, 0x7FF);
-            m.Dlc = (byte)r.Next(1, 9);
-            for (int i = 0; i < m.Dlc; i++)
-                m.Data[i] = (byte)r.Next(0, 256);
-
-            vm.CanPage.MessageList.TryToAdd(m);
-        }
-
-        private void CanListDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (CanMessageList.SelectedItem != null)
-                vm.CanPage.ConstructedMessage.Update(CanMessageList.SelectedItem as CanMessage);
-        }
-
-        #region Command constructor
-        // Заносим изменённое значение в массив и обновляем свойство Data для CustomMessage
-        private void UpdateCommand(object sender, EventArgs e)
-        {
-            double value = 0;
-            if (sender is ComboBox)
-                value = ((KeyValuePair<int, string>)((sender as ComboBox).SelectedItem)).Key;
-            if (sender is TextBox)
-                try
-                {
-                    value = Convert.ToDouble((sender as TextBox).Text);
-                }
-                catch
-                {
-                    value = 0;
-                }
-
-            vm.CommandParametersArray[Convert.ToInt32((sender as Control).Name.Substring(6))] = value;
-            OmniCommand cmd = ((KeyValuePair<int, OmniCommand>)CommandSelector.SelectedItem).Value;
-            ulong id = (ulong)cmd.Id;
-            ulong res = id << 48;
-            OmniPgnParameter[] pars = cmd.Parameters.Where(p => p.AnswerOnly == false).ToArray();
-            for (int i = 0; i < pars.Length; i++)
-            {
-                OmniPgnParameter p = pars[i];
-                ulong rawValue;
-                rawValue = (ulong)((vm.CommandParametersArray[i] - p.b) / p.a);
-                int shift = 0;
-                shift = (7 - p.StartByte) * 8;
-                shift -= ((p.BitLength + 7) / 8) * 8 - 8;
-                shift += p.StartBit;
-                rawValue <<= shift;
-                res |= rawValue;
-            }
-            byte[] data = new byte[8];
-            for (int i = 0; i < 8; i++)
-            {
-                data[i] = (byte)((res >> (7 - i) * 8) & 0xFF);
-            }
-            vm.CustomMessage.Data = data;
-        }
-
-        //Рисуем новые элементы управления и инициализируем в модели массив значений
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            MainWindowViewModel mainWindowViewModel = (MainWindowViewModel)DataContext;
-            ComboBox comboBox = sender as ComboBox;
-            OmniCommand cmd = ((KeyValuePair<int, OmniCommand>)comboBox.SelectedItem).Value;
-            CommandParameterPanel.Children.Clear();
-            mainWindowViewModel.CommandParametersArray = new double[cmd.Parameters.Count];
-            vm.CustomMessage.Pgn = 1;
-            vm.CustomMessage.Data[1] = (byte)cmd.Id;
-            if (vm.OmniInstance.SelectedConnectedDevice != null)
-            {
-                vm.CustomMessage.ReceiverId.Address = vm.OmniInstance.SelectedConnectedDevice.Id.Address;
-                vm.CustomMessage.ReceiverId.Type = vm.OmniInstance.SelectedConnectedDevice.Id.Type;
-            }
-
-            int counter = 0;
-            foreach (OmniPgnParameter p in cmd.Parameters.Where(p => p.AnswerOnly == false))
-            {
-                StackPanel panel = new();
-                panel.Orientation = System.Windows.Controls.Orientation.Horizontal;
-                System.Windows.Controls.Label label = new();
-                label.Content = GetString(p.Name);
-                label.Name = $"label_{counter}";
-                label.Margin = new Thickness(10);
-                label.VerticalAlignment = System.Windows.VerticalAlignment.Center;
-                panel.Children.Add(label);
-                if (p.Meanings != null && p.Meanings.Count > 0)
-                {
-                    ComboBox cb = new();
-                    cb.ItemsSource = p.Meanings.Select(s => new KeyValuePair<int, string>(s.Key, GetString(s.Value)));
-                    cb.DisplayMemberPath = "Value";
-                    cb.SelectionChanged += UpdateCommand;
-                    cb.Name = $"field_{counter}";
-                    cb.SelectedIndex = (int)p.DefaultValue;
-                    cb.Margin = new Thickness(10);
-                    cb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
-                    panel.Children.Add(cb);
-                }
-                else
-                {
-                    TextBox tb = new();
-                    tb.Name = $"field_{counter}";
-                    tb.Text = p.DefaultValue.ToString();
-                    tb.TextChanged += UpdateCommand;
-                    tb.Margin = new Thickness(10);
-                    tb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
-                    tb.Style = (System.Windows.Style)App.Current.TryFindResource("MaterialDesignOutlinedTextBox");
-                    panel.Children.Add(tb);
-                }
-                mainWindowViewModel.CommandParametersArray[counter++] = p.DefaultValue;
-                CommandParameterPanel.Children.Add(panel);
-
-            }
-        }
-        #endregion
-
-        private void AC2PmessagesField_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
-            try
-            {
-                vm.SelectedMessage = (OmniMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
-            }
-            catch { }
-        }
-
-        private void ColorPick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void ManualAirMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
-        {
-            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
-
-            vm.ManualPage.ChangeManualAirBlowerCommand.Execute((Math.Sign(e.Delta) * k).ToString());
-        }
-
-        private void ManualFuelMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
-        {
-
-            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 100 : 5;
-
-            vm.ManualPage.ChangeManualFuelPumpCommand.Execute((Math.Sign(e.Delta) * k).ToString());
-
-        }
-
-        private void ManualGlowPlugMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
-        {
-            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
-            vm.ManualPage.ChangeGlowPlugCommand.Execute((Math.Sign(e.Delta) * k).ToString());
+            try { DragMove(); } catch { }
         }
 
         private void DarkMode_Checked(object sender, RoutedEventArgs e)
@@ -466,116 +284,6 @@ namespace CAN_Tool
             catch { }
         }
 
-        private void ColorPicker_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
-                (DataSet.SelectedItem as StatusVariable).ChartBrush = new SolidColorBrush((sender as ColorPicker).Color);
-        }
-
-        private void ColorPicker_StylusUp(object sender, StylusEventArgs e)
-        {
-            if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
-                (DataSet.SelectedItem as StatusVariable).ChartBrush = new SolidColorBrush((sender as ColorPicker).Color);
-        }
-
-        private void DataSet_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (DataSet.SelectedItem != null)
-                ColorPicker.Color = ((DataSet.SelectedItem as StatusVariable).ChartBrush as SolidColorBrush).Color;
-        }
-
-
-        private void RVCMessageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            MainWindowViewModel vm = (MainWindowViewModel)DataContext;
-            try
-            {
-                vm.RvcPage.SelectedMessage = (RvcMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; //Мегакостыль фиксящий неизменение свойства SelectedItem DataGrid
-            }
-            catch { }
-
-        }
-
-        private void SetTimeButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.SetTime(DateTime.Now);
-        }
-
-        private void ToggleHeaterButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleHeater();
-        }
-
-        private void ToggleElementButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleElement();
-        }
-
-        private void ToggleWaterButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleWater();
-        }
-
-        private void ToggleZoneButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleZone();
-        }
-
-        private void TogglePumpButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.TogglePump();
-        }
-
-        private void ToggleFanManualModeButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleFanManualMode();
-        }
-
-        private void ToggleScheduleModeButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm.RvcPage.Timberline15.ToggleScheduleMode();
-        }
-
-        private void DaySetPointValueChanged(object sender, RoutedEventArgs e)
-        {
-            vm?.RvcPage.Timberline15.SetDaySetpoint((int)(sender as ScrollBar).Value);
-        }
-
-        private void NightSetPointValueChanged(object sender, RoutedEventArgs e)
-        {
-            vm?.RvcPage.Timberline15.SetNightSetpoint((int)(sender as ScrollBar).Value);
-        }
-
-        private void ManualFanSpeedValueChanged(object sender, RoutedEventArgs e)
-        {
-            vm?.RvcPage.Timberline15.SetFanManualSpeed((byte)(sender as ScrollBar).Value);
-        }
-
-        private void SystemDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            vm?.RvcPage.Timberline15.SetSystemDuration((int)(sender as ScrollBar).Value);
-        }
-
-        private void WaterDurationValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            vm?.RvcPage.Timberline15.SetWaterDuration((int)(sender as ScrollBar).Value);
-        }
-
-        private void NightTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
-        {
-            vm?.RvcPage.Timberline15.SetNightStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
-        }
-
-
-        private void DayStartChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
-        {
-            vm?.RvcPage.Timberline15.SetDayStart((sender as TimePicker).SelectedTime.Value.Hour, (sender as TimePicker).SelectedTime.Value.Minute);
-        }
-
-        private void ClearErrorsButtonPressed(object sender, RoutedEventArgs e)
-        {
-            vm?.RvcPage.Timberline15.ClearErrors();
-        }
 
 
 

@@ -14,6 +14,9 @@ using Candle;
 
 using static CAN_Tool.Libs.Helper;
 
+
+//TODO ���������� ��������� ��������, ������ ��� �� ��������� �� ������ � ��������.
+
 namespace CAN_Tool
 {
     public class GotCanMessageEventArgs : EventArgs
@@ -302,8 +305,9 @@ namespace CAN_Tool
                 MessageBox.Show(GetString("t_port_already_opened"));
                 return;
             }
-            //_driver.SetBitrate(Speed);
+            
             _driver.OpenNormal(portName);
+            _driver.SetBitrate(Speed);
             PortOpened = true;
         }
 
@@ -314,8 +318,9 @@ namespace CAN_Tool
                 MessageBox.Show(GetString("t_port_already_opened"));
                 return;
             }
-            _driver.SetBitrate(Speed);
+            
             _driver.OpenSelfReception(portName);
+            _driver.SetBitrate(Speed);
             PortOpened = true;
         }
 
@@ -337,7 +342,7 @@ namespace CAN_Tool
             _driver.Close();
         }
 
-        public void SetBitrate(int bitrate) => _driver.SetBitrate(bitrate);
+        public void SetBitrate(int bitrate) { Speed = bitrate; _driver.SetBitrate(bitrate); }
 
         public void Transmit(CanMessage message) => _driver.Transmit(message);
 
