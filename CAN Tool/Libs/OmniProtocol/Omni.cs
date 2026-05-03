@@ -228,7 +228,7 @@ public partial class Omni : ObservableObject
 
         if (senderDevice == null)
         {
-            senderDevice = new DeviceViewModel(id);
+            senderDevice = DeviceViewModel.Create(id);
             ConnectedDevices.Add(senderDevice);
             NewDeviceAcquired?.Invoke(this, null);
             if (senderDevice.Id.Type != 123)        //Requesting basic data, but not for bootloaders
