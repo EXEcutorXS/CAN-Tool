@@ -24,6 +24,11 @@ namespace CAN_Tool.Libs
             LoadPgns(root, pgns);
             LoadParameters(root, parameters, presets);
             LoadCommands(root, commands, presets);
+
+            // Link each parameter to its PGN's parameter list so ProcessOmniMessage can iterate them
+            foreach (var p in parameters)
+                if (pgns.TryGetValue(p.Pgn, out var pgn))
+                    pgn.parameters.Add(p);
         }
 
         private static Dictionary<string, Dictionary<int, string>> LoadMeaningPresets(JObject root)
