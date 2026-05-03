@@ -1,4 +1,4 @@
-namespace OmniProtocol
+﻿namespace OmniProtocol
 {
     public class AcPanelDeviceViewModel : DeviceViewModel
     {

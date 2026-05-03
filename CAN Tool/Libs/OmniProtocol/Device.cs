@@ -1,30 +1,7 @@
-﻿using CAN_Tool.Libs;
-using CAN_Tool.ViewModels;
-using CAN_Tool;
+﻿using System;
+using CAN_Tool.Libs;
 using CommunityToolkit.Mvvm.ComponentModel;
-using OmniProtocol;
-using ScottPlot;
-using System.Collections.Generic;
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Windows.Media;
 using static CAN_Tool.Libs.Helper;
-using System.Windows;
-using CommunityToolkit.Mvvm.Input;
-using System.IO;
-using Newtonsoft;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Specialized;
-using ScottPlot.WPF;
-using System.Collections.ObjectModel;
-using System.Windows.Markup;
 
 
 namespace OmniProtocol
@@ -36,9 +13,9 @@ namespace OmniProtocol
         public string Name => GetString($"d_{Id}");
         public DeviceType_t DevType { set; get; }
 
-        public int MaxBlower { get; set; } = 130; //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃРєРѕСЂРѕСЃС‚Рё РЅР°РіРЅРµС‚Р°С‚РµР»СЏ
-        public double MaxFuelPump { get; set; } = 4; //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РўРќ
-        public int BBErrorsLen { get; set; } = 512; //Р”Р»РёРЅР° Р§РЇ РґР»СЏ РѕС€РёР±РѕРє
+        public int MaxBlower { get; set; } = 130; //Максимальное значение скорости нагнетателя
+        public double MaxFuelPump { get; set; } = 4; //Максимальное значение ТН
+        public int BBErrorsLen { get; set; } = 512; //Длина ЧЯ для ошибок
         public string ImageName { get; set; } = string.Empty;
 
         public override string ToString() => Name;

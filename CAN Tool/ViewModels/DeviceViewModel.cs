@@ -1,4 +1,4 @@
-using CAN_Tool;
+﻿using CAN_Tool;
 using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;

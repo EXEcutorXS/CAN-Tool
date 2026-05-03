@@ -1,4 +1,4 @@
-using CAN_Tool.ViewModels;
+﻿using CAN_Tool.ViewModels;
 using MaterialDesignThemes.Wpf;
 using RVC;
 using System;

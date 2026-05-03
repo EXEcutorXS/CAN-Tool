@@ -1,4 +1,4 @@
-using CAN_Tool.ViewModels;
+﻿using CAN_Tool.ViewModels;
 using System;
 using System.Windows.Controls;
 using System.Windows.Input;

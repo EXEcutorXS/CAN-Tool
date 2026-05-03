@@ -1,30 +1,10 @@
-﻿using CAN_Tool.Libs;
-using CAN_Tool.ViewModels;
-using CAN_Tool;
-using CommunityToolkit.Mvvm.ComponentModel;
-using OmniProtocol;
-using ScottPlot;
-using System.Collections.Generic;
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Windows.Media;
+using CAN_Tool;
+using CAN_Tool.Libs;
+using CommunityToolkit.Mvvm.ComponentModel;
 using static CAN_Tool.Libs.Helper;
-using System.Windows;
-using CommunityToolkit.Mvvm.Input;
-using System.IO;
-using Newtonsoft;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Specialized;
-using ScottPlot.WPF;
-using System.Collections.ObjectModel;
-using System.Windows.Markup;
 
 
 namespace OmniProtocol
@@ -225,7 +205,7 @@ namespace OmniProtocol
             if (Pgn == 1 || Pgn == 2)
                 if (Data[1] != m.Data[1])
                     return false;
-            if (Omni.Pgns.ContainsKey(Pgn) && Omni.Pgns[Pgn].multiPack && Data[0] != m.Data[0]) //Р”СЂСѓРіРѕР№ РЅРѕРјРµСЂ РјСѓР»СЊС‚РёРїР°РєРµС‚Р°
+            if (Omni.Pgns.ContainsKey(Pgn) && Omni.Pgns[Pgn].multiPack && Data[0] != m.Data[0]) //Другой номер мультипакета
                 return false;
             return true;
         }

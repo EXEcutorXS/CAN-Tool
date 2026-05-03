@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file vs_can_api_wrapper.cs
  * @brief VS CAN API wrapper class 
  * @version 1.10.0

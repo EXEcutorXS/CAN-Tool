@@ -1,30 +1,10 @@
-﻿using CAN_Tool.Libs;
-using CAN_Tool.ViewModels;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text;
 using CAN_Tool;
 using CommunityToolkit.Mvvm.ComponentModel;
-using OmniProtocol;
-using ScottPlot;
-using System.Collections.Generic;
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Windows.Media;
 using static CAN_Tool.Libs.Helper;
-using System.Windows;
-using CommunityToolkit.Mvvm.Input;
-using System.IO;
-using Newtonsoft;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Specialized;
-using ScottPlot.WPF;
-using System.Collections.ObjectModel;
-using System.Windows.Markup;
 
 
 namespace OmniProtocol
@@ -51,23 +31,23 @@ namespace OmniProtocol
     public class OmniPgnParameter
     {
         public int Pgn { get; set; }  // PGN this parameter belongs to
-        internal int StartByte;   //РќР°С‡Р°Р»СЊРЅС‹Р№ Р±Р°Р№С‚ РІ РїР°РєРµС‚Рµ
-        internal int StartBit;    //РќР°С‡Р°Р»СЊРЅС‹Р№ Р±РёС‚ РІ Р±Р°Р№С‚Рµ
-        internal int BitLength;   //Р”Р»РёРЅР° РїР°СЂР°РјРµС‚СЂР° РІ Р±РёС‚Р°С…
-        internal bool Signed; //Р§РёСЃР»Рѕ СЃРѕ Р·РЅР°РєРѕРј
-        public string Name { set; get; }     //РРјСЏ РїР°СЂР°РјРµС‚СЂР°
-        internal double a = 1;         //РєРѕСЌС„С„РёС†РёРµРЅС‚ РїСЂРёРІРµРґРµРЅРёСЏ
-        internal double b = 0;         //СЃРјРµС‰РµРЅРёРµ
+        internal int StartByte;   //Начальный байт в пакете
+        internal int StartBit;    //Начальный бит в байте
+        internal int BitLength;   //Длина параметра в битах
+        internal bool Signed; //Число со знаком
+        public string Name { set; get; }     //Имя параметра
+        internal double a = 1;         //коэффициент приведения
+        internal double b = 0;         //смещение
 
         public UnitType_t UnitT { get; set; } = UnitType_t.None;
 
         internal Dictionary<int, string> Meanings { set; get; } = new();
-        internal Func<int, string> GetMeaning; //РџСЂРёРЅРёРјР°РµС‚ РЅР° РІС…РѕРґ СЃС‹СЂРѕРµ Р·РЅР°С‡РµРЅРёРµ, РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєСѓ СЃ СЂР°СЃС€РёС„СЂРѕРІРєРѕР№ Р·РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂР°
-        internal Func<byte[], string> CustomDecoder; //Р•СЃР»Рё РґР»СЏ РґРµРєРѕРґРёСЂРѕРІР°РЅРёСЏ РЅСѓР¶РµРЅ РІРµСЃСЊ РїР°РєРµС‚ РґР°РЅРЅС‹С…
-        internal int? PackNumber; //РќРѕРјРµСЂ РїР°РєРµС‚Р° РІ РјСѓР»СЊС‚РёРїР°РєРµС‚Рµ
-        internal int Var; //РЎРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰Р°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ РёР· paramsName.h
-        public double DefaultValue; //Р”Р»СЏ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° РєРѕРјРјР°РЅРґ
-        public bool AnswerOnly; //РџСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ С‚РѕР»СЊРєРѕ РІ РѕС‚РІРµС‚Рµ, РЅРµ Р·Р°РґР°С‘С‚СЃСЏ РІ РєРѕРјРјР°РЅРґРµ
+        internal Func<int, string> GetMeaning; //Принимает на вход сырое значение, возвращает строку с расшифровкой значения параметра
+        internal Func<byte[], string> CustomDecoder; //Если для декодирования нужен весь пакет данных
+        internal int? PackNumber; //Номер пакета в мультипакете
+        internal int Var; //Соответствующая переменная из paramsName.h
+        public double DefaultValue; //Для конструктора комманд
+        public bool AnswerOnly; //Присутствует только в ответе, не задаётся в комманде
 
         public string OutputFormat
         {

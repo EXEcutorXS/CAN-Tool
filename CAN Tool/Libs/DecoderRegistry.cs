@@ -1,4 +1,4 @@
-using OmniProtocol;
+﻿using OmniProtocol;
 using System;
 using System.Collections.Generic;
 using static CAN_Tool.Libs.Helper;

@@ -1,4 +1,4 @@
-using CAN_Tool.ViewModels;
+﻿using CAN_Tool.ViewModels;
 using OmniProtocol;
 using ScottPlot.WPF;
 using System.Collections.Generic;

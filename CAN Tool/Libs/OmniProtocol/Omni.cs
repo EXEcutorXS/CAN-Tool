@@ -1,30 +1,21 @@
-﻿using CAN_Tool.Libs;
-using CAN_Tool.ViewModels;
-using CAN_Tool;
-using CommunityToolkit.Mvvm.ComponentModel;
-using OmniProtocol;
-using ScottPlot;
+﻿using System;
 using System.Collections.Generic;
-using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Windows.Media;
-using static CAN_Tool.Libs.Helper;
-using System.Windows;
-using CommunityToolkit.Mvvm.Input;
 using System.IO;
-using Newtonsoft;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using CAN_Tool;
+using CAN_Tool.Libs;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Specialized;
-using ScottPlot.WPF;
-using System.Collections.ObjectModel;
-using System.Windows.Markup;
+using ScottPlot;
+using static CAN_Tool.Libs.Helper;
 
 
 namespace OmniProtocol

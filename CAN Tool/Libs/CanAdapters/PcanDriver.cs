@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Peak.Can.Basic;
 
 namespace CAN_Tool.Libs.CanAdapters
