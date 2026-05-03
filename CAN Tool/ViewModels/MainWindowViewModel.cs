@@ -1,6 +1,4 @@
 ﻿using OmniProtocol;
-using CAN_Tool.Infrastructure.Commands;
-using CAN_Tool.ViewModels.Base;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
@@ -10,7 +8,6 @@ using System.IO.Ports;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using System.Windows.Media;
 using Xceed.Words.NET;
 using Xceed.Document.NET;
@@ -26,6 +23,7 @@ using Microsoft.Win32;
 using System.Windows;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Reflection;
 
 namespace CAN_Tool.ViewModels
@@ -91,11 +89,11 @@ namespace CAN_Tool.ViewModels
 
 
 
-        public ICommand ToggleCanLogCommand { get; }
+        public RelayCommand ToggleCanLogCommand { get; }
 
         private FileStream canLogStream;
 
-        private void OnToggleCanLogCommandExecuted(object Parameter)
+        private void OnToggleCanLogCommandExecuted()
         {
             if (canLogging)
             {
@@ -115,14 +113,14 @@ namespace CAN_Tool.ViewModels
         }
 
 
-        private bool CanToggleCanLogCommandExecute(object Parameter) => CanAdapter.PortOpened;
+        private bool CanToggleCanLogCommandExecute() => CanAdapter.PortOpened;
 
 
-        public ICommand ToggleUartLogCommand { get; }
+        public RelayCommand ToggleUartLogCommand { get; }
 
         private FileStream uartLogStream;
 
-        private void OnToggleUartLogCommandExecuted(object Parameter)
+        private void OnToggleUartLogCommandExecuted()
         {
             if (uartLogging)
             {
@@ -141,36 +139,36 @@ namespace CAN_Tool.ViewModels
             }
         }
 
-        private bool CanToggleUartLogCommandExecute(object Parameter) => UartAdapter.SelectedPort.IsOpen;
+        private bool CanToggleUartLogCommandExecute() => UartAdapter.SelectedPort.IsOpen;
 
         [ObservableProperty] int messageDelay = 100;
 
-        public ICommand SetAdapterNormalModeCommand { get; }
+        public RelayCommand SetAdapterNormalModeCommand { get; }
 
-        private void OnSetAdapterNormalModeCommandExecuted(object Parameter) => CanAdapter.StartNormal();
-        private bool CanSetAdapterNormalModeCommandExecute(object Parameter) => CanAdapter.PortOpened;
+        private void OnSetAdapterNormalModeCommandExecuted() => CanAdapter.StartNormal();
+        private bool CanSetAdapterNormalModeCommandExecute() => CanAdapter.PortOpened;
 
-        public ICommand SetAdapterListedModeCommand { get; }
+        public RelayCommand SetAdapterListedModeCommand { get; }
 
-        private void OnSetAdapterListedModeCommandExecuted(object Parameter) => CanAdapter.StartListen();
-        private bool CanSetAdapterListedModeCommandExecute(object Parameter) => CanAdapter.PortOpened;
-
-
-        public ICommand SetAdapterSelfReceptionModeCommand { get; }
-
-        private void OnSetAdapterSelfReceptionModeCommandExecuted(object Parameter) => CanAdapter.StartSelfReception();
-        private bool CanSetAdapterSelfReceptionModeCommandExecute(object Parameter) => CanAdapter.PortOpened;
+        private void OnSetAdapterListedModeCommandExecuted() => CanAdapter.StartListen();
+        private bool CanSetAdapterListedModeCommandExecute() => CanAdapter.PortOpened;
 
 
-        public ICommand StopCanAdapterCommand { get; }
+        public RelayCommand SetAdapterSelfReceptionModeCommand { get; }
 
-        private void OnStopCanAdapterCommandExecuted(object Parameter) => CanAdapter.Stop();
-        private bool CanStopCanAdapterCommandExecute(object Parameter) => CanAdapter.PortOpened;
+        private void OnSetAdapterSelfReceptionModeCommandExecuted() => CanAdapter.StartSelfReception();
+        private bool CanSetAdapterSelfReceptionModeCommandExecute() => CanAdapter.PortOpened;
+
+
+        public RelayCommand StopCanAdapterCommand { get; }
+
+        private void OnStopCanAdapterCommandExecuted() => CanAdapter.Stop();
+        private bool CanStopCanAdapterCommandExecute() => CanAdapter.PortOpened;
 
 
 
-        public ICommand RefreshPortListCommand { get; }
-        private void OnRefreshPortsCommandExecuted(object Parameter)
+        public RelayCommand RefreshPortListCommand { get; }
+        private void OnRefreshPortsCommandExecuted()
         {
             PortList.Clear();
             foreach (var port in SerialPort.GetPortNames())
@@ -180,8 +178,8 @@ namespace CAN_Tool.ViewModels
         }
 
 
-        public ICommand TogglePortCommand { get; }
-        private void OnTogglePortCommandExecuted(object parameter)
+        public RelayCommand TogglePortCommand { get; }
+        private void OnTogglePortCommandExecuted()
         {
             try
             {
@@ -228,10 +226,10 @@ namespace CAN_Tool.ViewModels
                 MessageBox.Show(ex.Message);
             }
         }
-        private bool CanTogglePortCommandExecute(object parameter) => (PortName.StartsWith("COM") || CanAdapter.PortOpened || UartAdapter.SelectedPort.IsOpen);
+        private bool CanTogglePortCommandExecute() => (PortName.StartsWith("COM") || CanAdapter.PortOpened || UartAdapter.SelectedPort.IsOpen);
 
 
-        public ICommand LoadFromLogCommand { get; }
+        public RelayCommand LoadFromLogCommand { get; }
 
         private async Task loadLogAsync(string path)
         {
@@ -254,7 +252,7 @@ namespace CAN_Tool.ViewModels
             }
         }
 
-        private async void OnLoadFromLogCommandExecuted(object parameter)
+        private async void OnLoadFromLogCommandExecuted()
         {
             var dialog = new OpenFileDialog();
             dialog.DefaultExt = ".txt"; // Default file extension
@@ -272,7 +270,7 @@ namespace CAN_Tool.ViewModels
             }
         }
 
-        public ICommand SendFromLogCommand { get; }
+        public RelayCommand SendFromLogCommand { get; }
 
         private async Task sendLogAsync(string path)
         {
@@ -295,7 +293,7 @@ namespace CAN_Tool.ViewModels
             }
         }
 
-        private async void OnSendFromLogCommandExecuted(object parameter)
+        private async void OnSendFromLogCommandExecuted()
         {
             var dialog = new OpenFileDialog();
             dialog.DefaultExt = ".txt"; // Default file extension
@@ -333,26 +331,26 @@ namespace CAN_Tool.ViewModels
 
 
 
-        public ICommand LogStartCommand { get; }
-        private void OnLogStartCommandExecuted(object parameter)
+        public RelayCommand LogStartCommand { get; }
+        private void OnLogStartCommandExecuted()
         {
             OmniInstance.SelectedConnectedDevice.LogStart();
         }
-        private bool CanLogStartCommandExecute(object parameter) => (OmniInstance.SelectedConnectedDevice != null && CanAdapter.PortOpened);
+        private bool CanLogStartCommandExecute() => (OmniInstance.SelectedConnectedDevice != null && CanAdapter.PortOpened);
 
 
 
-        public ICommand LogStopCommand { get; }
-        private void OnLogStopCommandExecuted(object parameter)
+        public RelayCommand LogStopCommand { get; }
+        private void OnLogStopCommandExecuted()
         {
             OmniInstance.SelectedConnectedDevice.LogStop();
         }
-        private bool CanLogStopCommandExecute(object parameter) => (OmniInstance.SelectedConnectedDevice != null && CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice.IsLogWriting);
+        private bool CanLogStopCommandExecute() => (OmniInstance.SelectedConnectedDevice != null && CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice.IsLogWriting);
 
 
 
-        public ICommand ChartDrawCommand { get; }
-        private void OnChartDrawCommandExecuted(object parameter)
+        public RelayCommand ChartDrawCommand { get; }
+        private void OnChartDrawCommandExecuted()
         {
             var plt = myChart.Plot;
 
@@ -382,41 +380,41 @@ namespace CAN_Tool.ViewModels
             myChart.Refresh();
 
         }
-        private bool CanChartDrawCommandExecute(object parameter) => (OmniInstance.SelectedConnectedDevice != null && OmniInstance.SelectedConnectedDevice.LogCurrentPos > 0);
+        private bool CanChartDrawCommandExecute() => (OmniInstance.SelectedConnectedDevice != null && OmniInstance.SelectedConnectedDevice.LogCurrentPos > 0);
 
 
-        public ICommand CancelOperationCommand { get; }
-        private void OnCancelOperationCommandExecuted(object parameter)
+        public RelayCommand CancelOperationCommand { get; }
+        private void OnCancelOperationCommandExecuted()
         {
             OmniInstance.CurrentTask.OnCancel();
         }
-        private bool CanCancelOperationCommandExecute(object parameter) => (OmniInstance.CurrentTask.Occupied);
+        private bool CanCancelOperationCommandExecute() => (OmniInstance.CurrentTask.Occupied);
 
 
 
 
-        public ICommand ReadConfigCommand { get; }
-        private void OnReadConfigCommandExecuted(object parameter)
+        public RelayCommand ReadConfigCommand { get; }
+        private void OnReadConfigCommandExecuted()
         {
             OmniInstance.ReadAllParameters(OmniInstance.SelectedConnectedDevice.Id);
         }
 
-        public ICommand SaveConfigCommand { get; }
-        private void OnSaveConfigCommandExecuted(object parameter)
+        public RelayCommand SaveConfigCommand { get; }
+        private void OnSaveConfigCommandExecuted()
         {
             OmniInstance.SaveParameters(OmniInstance.SelectedConnectedDevice.Id);
         }
-        private bool CanSaveConfigCommandExecute(object parameter) =>
+        private bool CanSaveConfigCommandExecute() =>
             (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.ReadParameters.Count > 0 && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
-        public ICommand ResetConfigCommand { get; }
-        private void OnResetConfigCommandExecuted(object parameter)
+        public RelayCommand ResetConfigCommand { get; }
+        private void OnResetConfigCommandExecuted()
         {
             OmniInstance.ResetParameters(OmniInstance.SelectedConnectedDevice.Id);
         }
-        private bool CanResetConfigCommandExecute(object parameter) =>
+        private bool CanResetConfigCommandExecute() =>
             (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
@@ -424,113 +422,232 @@ namespace CAN_Tool.ViewModels
 
 
 
-        public ICommand ReadBlackBoxDataCommand { get; }
-        private void OnReadBlackBoxDataCommandExecuted(object parameter)
+        public RelayCommand ReadBlackBoxDataCommand { get; }
+        private void OnReadBlackBoxDataCommandExecuted()
         {
             OmniInstance.ReadBlackBoxData(OmniInstance.SelectedConnectedDevice.Id);
         }
-        private bool CanReadBlackBoxDataExecute(object parameter) =>
+        private bool CanReadBlackBoxDataExecute() =>
             (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
-        public ICommand ReadBlackBoxErrorsCommand { get; }
-        private void OnReadBlackBoxErrorsCommandExecuted(object parameter)
+        public RelayCommand ReadBlackBoxErrorsCommand { get; }
+        private void OnReadBlackBoxErrorsCommandExecuted()
         {
             Task.Run(() => OmniInstance.ReadErrorsBlackBox(OmniInstance.SelectedConnectedDevice.Id));
         }
-        private bool CanReadBlackBoxErrorsExecute(object parameter) =>
+        private bool CanReadBlackBoxErrorsExecute() =>
             (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
-        public ICommand EraseBlackBoxErrorsCommand { get; }
-        private void OnEraseBlackBoxErrorsCommandExecuted(object parameter)
+        public RelayCommand EraseBlackBoxErrorsCommand { get; }
+        private void OnEraseBlackBoxErrorsCommandExecuted()
         {
             Task.Run(() => OmniInstance.EraseErrorsBlackBox(OmniInstance.SelectedConnectedDevice.Id));
         }
-        private bool CanEraseBlackBoxErrorsExecute(object parameter) =>
+        private bool CanEraseBlackBoxErrorsExecute() =>
             (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
-        public ICommand EraseBlackBoxDataCommand { get; }
-        private void OnEraseBlackBoxDataCommandExecuted(object parameter)
+        public RelayCommand EraseBlackBoxDataCommand { get; }
+        private void OnEraseBlackBoxDataCommandExecuted()
         {
             Task.Run(() => OmniInstance.EraseCommonBlackBox(OmniInstance.SelectedConnectedDevice.Id));
         }
-        private bool CanEraseBlackBoxDataExecute(object parameter) =>
+        private bool CanEraseBlackBoxDataExecute() =>
             (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && !OmniInstance.CurrentTask.Occupied && OmniInstance.SelectedConnectedDevice.Parameters.Stage == 0);
 
 
 
-        public ICommand SaveReportCommand { get; }
-        private void OnSaveReportCommandExecuted(object parameter)
+        public RelayCommand SaveReportCommand { get; }
+        private void OnSaveReportCommandExecuted()
         {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + OmniInstance.SelectedConnectedDevice.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
-            var doc = DocX.Create(path);
-            var headParagraph = doc.InsertParagraph();
-            headParagraph.AppendLine(GetString("t_device_report") + ": ").Append(OmniInstance.SelectedConnectedDevice.Name).Bold();
-            headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(OmniInstance.SelectedConnectedDevice.Serial[0].ToString()+"."+ OmniInstance.SelectedConnectedDevice.Serial[1].ToString()+"."+ OmniInstance.SelectedConnectedDevice.Serial[2].ToString()).Bold();
-            headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(OmniInstance.SelectedConnectedDevice.ProductionDate.ToString()).Bold();
-            headParagraph.AppendLine(GetString("t_formed") + ": ").Append(DateTime.Now.ToLocalTime().ToString()).Bold();
-            headParagraph.AppendLine();
-            headParagraph.AppendLine(GetString("t_common_black_box_data") + ":").FontSize(18);
-            headParagraph.Alignment = Alignment.center;
-            var dataParagraph = doc.InsertParagraph();
-            foreach (var p in OmniInstance.SelectedConnectedDevice.BbValues)
+            var dev  = OmniInstance.SelectedConnectedDevice;
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' +
+                       dev.Name + " " + DateTime.Now.ToString("dd-MM-yyyy HH-mm") + ".docx";
+            var doc  = DocX.Create(path);
+
+            // ── Палитра ──────────────────────────────────────────────────────────
+            var cDarkSlate  = System.Drawing.Color.FromArgb( 30,  45,  60);   // почти чёрный синий — шапки
+            var cAccent     = System.Drawing.Color.FromArgb( 41,  98, 156);   // синий — заголовки секций
+            var cHeaderBg   = System.Drawing.Color.FromArgb( 52, 117, 182);   // синий — строка-шапка таблиц
+            var cRowOdd     = System.Drawing.Color.FromArgb(235, 240, 248);   // голубоватый — нечётные строки
+            var cRowEven    = System.Drawing.Color.FromArgb(255, 255, 255);   // белый — чётные строки
+            var cLabelBg    = System.Drawing.Color.FromArgb(225, 230, 238);   // серо-синий — колонка «параметр»
+            var cWhite      = System.Drawing.Color.White;
+            var cTextDark   = System.Drawing.Color.FromArgb( 30,  30,  30);
+            var cErrDark    = System.Drawing.Color.FromArgb(164,   0,   0);
+            var cErrHeader  = System.Drawing.Color.FromArgb(192,  40,  40);
+            var cErrRowOdd  = System.Drawing.Color.FromArgb(255, 240, 240);
+
+            // ── Вспомогательные методы ───────────────────────────────────────────
+            Paragraph SectionBanner(string text, System.Drawing.Color bg, System.Drawing.Color fg, double size = 13)
             {
-                dataParagraph.Append(GetString($"bb_{p.Id}") + ": ");
-                dataParagraph.Append(p.Value.ToString()).Bold();
-                dataParagraph.AppendLine();
+                var t = doc.AddTable(1, 1);
+                t.AutoFit = AutoFit.Window;
+                t.Design   = TableDesign.None;
+                var cell = t.Rows[0].Cells[0];
+                cell.FillColor = bg;
+                var p = cell.Paragraphs[0];
+                p.Append(text.ToUpper()).Bold().FontSize(size).Font("Calibri Light").Color(fg);
+                p.Alignment = Alignment.left;
+                doc.InsertTable(t);
+                return doc.InsertParagraph().SpacingAfter(2);
             }
-            dataParagraph.AppendLine();
 
-
-            if (OmniInstance.SelectedConnectedDevice.BbErrors.Count > 0)
+            void StyledHeaderCell(Cell cell, string text, System.Drawing.Color bg)
             {
-                var errorHeader = doc.InsertParagraph();
-                errorHeader.AppendLine($"{GetString("t_errors_found") + ": "} {OmniInstance.SelectedConnectedDevice.BbErrors.Count}").FontSize(17);
-                errorHeader.AppendLine();
-                errorHeader.Alignment = Alignment.center;
-                var errorParagraph = doc.InsertParagraph();
+                cell.FillColor = bg;
+                var p = cell.Paragraphs[0];
+                p.Append(text).Bold().FontSize(10).Font("Calibri").Color(cWhite);
+                p.Alignment = Alignment.center;
+            }
 
-                foreach (var e in OmniInstance.SelectedConnectedDevice.BbErrors)
+            void StyledDataCell(Cell cell, string text, System.Drawing.Color bg, bool bold = false)
+            {
+                cell.FillColor = bg;
+                var p = cell.Paragraphs[0];
+                var f = p.Append(text).FontSize(10).Font("Calibri").Color(cTextDark);
+                if (bold) f.Bold();
+            }
+
+            // ══ ТИТУЛЬНЫЙ БЛОК ═══════════════════════════════════════════════════
+            var titlePara = doc.InsertParagraph();
+            titlePara.Append(GetString("t_device_report").ToUpper())
+                     .Bold().FontSize(26).Font("Calibri Light").Color(cDarkSlate);
+            titlePara.Alignment = Alignment.center;
+            titlePara.SpacingAfter(2);
+
+            // Цветная полоса с именем устройства
+            var bannerT = doc.AddTable(1, 1);
+            bannerT.AutoFit = AutoFit.Window;
+            bannerT.Design = TableDesign.None;
+            var bannerCell = bannerT.Rows[0].Cells[0];
+            bannerCell.FillColor = cDarkSlate;
+            bannerCell.Paragraphs[0]
+                .Append(dev.Name).Bold().FontSize(16).Font("Calibri Light").Color(cWhite);
+            bannerCell.Paragraphs[0].Alignment = Alignment.center;
+            doc.InsertTable(bannerT);
+            doc.InsertParagraph().SpacingAfter(6);
+
+            // ══ ИНФОРМАЦИЯ ОБ УСТРОЙСТВЕ ══════════════════════════════════════════
+            var infoTable = doc.AddTable(4, 2);
+            infoTable.AutoFit = AutoFit.Window;
+            infoTable.Design  = TableDesign.TableGrid;
+
+            var serial = $"{dev.Serial[0]}.{dev.Serial[1]}.{dev.Serial[2]}";
+            (string label, string value)[] infoRows =
+            {
+                (GetString("t_device_report"),       dev.Name),
+                (GetString("t_serial_number"),        serial),
+                (GetString("t_manufacturing_date"),   dev.ProductionDate.ToString()),
+                (GetString("t_formed"),               DateTime.Now.ToString("dd.MM.yyyy  HH:mm:ss")),
+            };
+
+            for (var i = 0; i < infoRows.Length; i++)
+            {
+                var rowBg = i % 2 == 0 ? cRowEven : cRowOdd;
+                StyledDataCell(infoTable.Rows[i].Cells[0], infoRows[i].label, cLabelBg, bold: true);
+                StyledDataCell(infoTable.Rows[i].Cells[1], infoRows[i].value, rowBg);
+            }
+
+            doc.InsertTable(infoTable);
+            doc.InsertParagraph().SpacingAfter(10);
+
+            // ══ ДАННЫЕ ЧЁРНОГО ЯЩИКА ══════════════════════════════════════════════
+            if (dev.BbValues.Count > 0)
+            {
+                SectionBanner(GetString("t_common_black_box_data"), cAccent, cWhite);
+
+                var bbTable = doc.AddTable(dev.BbValues.Count + 1, 2);
+                bbTable.AutoFit = AutoFit.Window;
+                bbTable.Design  = TableDesign.TableGrid;
+
+                StyledHeaderCell(bbTable.Rows[0].Cells[0], GetString("t_parameter"), cHeaderBg);
+                StyledHeaderCell(bbTable.Rows[0].Cells[1], GetString("t_value"),     cHeaderBg);
+
+                for (var i = 0; i < dev.BbValues.Count; i++)
                 {
+                    var p   = dev.BbValues[i];
+                    var rowBg = i % 2 == 0 ? cRowEven : cRowOdd;
+                    StyledDataCell(bbTable.Rows[i + 1].Cells[0], GetString($"bb_{p.Id}"),  cLabelBg);
+                    StyledDataCell(bbTable.Rows[i + 1].Cells[1], p.Value.ToString(), rowBg, bold: true);
+                }
 
-                    errorParagraph.AppendLine(e.Name).Bold();
-                    errorParagraph.AppendLine();
-                    foreach (var v in e.Variables)
-                        errorParagraph.AppendLine('\t' + v.Name + ": ").Append(v.Value.ToString()).Bold();
-                    errorParagraph.AppendLine();
+                doc.InsertTable(bbTable);
+                doc.InsertParagraph().SpacingAfter(10);
+            }
+
+            // ══ ОШИБКИ ════════════════════════════════════════════════════════════
+            if (dev.BbErrors.Count > 0)
+            {
+                SectionBanner($"{GetString("t_errors_found")}: {dev.BbErrors.Count}",
+                              cErrDark, cWhite);
+
+                foreach (var e in dev.BbErrors)
+                {
+                    // Шапка ошибки — отдельная однострочная таблица-баннер
+                    var errBannerT = doc.AddTable(1, 1);
+                    errBannerT.AutoFit = AutoFit.Window;
+                    errBannerT.Design  = TableDesign.None;
+                    errBannerT.Rows[0].Cells[0].FillColor = cErrHeader;
+                    errBannerT.Rows[0].Cells[0].Paragraphs[0]
+                        .Append(e.Name).Bold().FontSize(11).Font("Calibri").Color(cWhite);
+                    doc.InsertTable(errBannerT);
+
+                    if (e.Variables.Count == 0)
+                    {
+                        doc.InsertParagraph().SpacingAfter(4);
+                        continue;
+                    }
+
+                    var errTable = doc.AddTable(e.Variables.Count + 1, 2);
+                    errTable.AutoFit = AutoFit.Window;
+                    errTable.Design  = TableDesign.TableGrid;
+
+                    StyledHeaderCell(errTable.Rows[0].Cells[0], GetString("t_parameter"), cErrHeader);
+                    StyledHeaderCell(errTable.Rows[0].Cells[1], GetString("t_value"),     cErrHeader);
+
+                    for (var i = 0; i < e.Variables.Count; i++)
+                    {
+                        var v     = e.Variables[i];
+                        var rowBg = i % 2 == 0 ? cRowEven : cErrRowOdd;
+                        StyledDataCell(errTable.Rows[i + 1].Cells[0], v.Name,             cLabelBg);
+                        StyledDataCell(errTable.Rows[i + 1].Cells[1], v.Value.ToString(), rowBg, bold: true);
+                    }
+
+                    doc.InsertTable(errTable);
+                    doc.InsertParagraph().SpacingAfter(8);
                 }
             }
 
             doc.Save();
-
         }
-        private bool CanSaveReportCommandExecute(object parameter) =>
+        private bool CanSaveReportCommandExecute() =>
         (OmniInstance.SelectedConnectedDevice != null && (OmniInstance.SelectedConnectedDevice.BbErrors.Count > 0 || OmniInstance.SelectedConnectedDevice.BbValues.Count > 0));
 
 
 
-        public ICommand SendCustomMessageCommand { get; }
-        private void OnSendCustomMessageCommandExecuted(object parameter)
+        public RelayCommand SendCustomMessageCommand { get; }
+        private void OnSendCustomMessageCommandExecuted()
         {
             CustomMessage.TransmitterId.Address = 6;
             CustomMessage.TransmitterId.Type = 126;
             OmniInstance.SendMessage(CustomMessage);
         }
-        private bool CanSendCustomMessageCommandExecute(object parameter)
+        private bool CanSendCustomMessageCommandExecute()
         {
             if (!CanAdapter.PortOpened) return false;
             return true;
         }
 
 
-        public ICommand SaveLogCommand { get; }
+        public RelayCommand SaveLogCommand { get; }
 
-        private void OnSaveLogCommandExecuted(object parameter)
+        private void OnSaveLogCommandExecuted()
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + OmniInstance.SelectedConnectedDevice.Id.Type + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
 
@@ -550,14 +667,14 @@ namespace CAN_Tool.ViewModels
             }
         }
 
-        private bool CanSaveLogCommandExecuted(object parameter)
+        private bool CanSaveLogCommandExecuted()
         {
             return OmniInstance.SelectedConnectedDevice != null && OmniInstance.SelectedConnectedDevice.LogCurrentPos > 0;
         }
 
-        public ICommand DefaultStyleCommand { get; }
+        public RelayCommand DefaultStyleCommand { get; }
 
-        private void OnDefaultStyleExecuted(object parameter)
+        private void OnDefaultStyleExecuted()
         {
             foreach (var v in OmniInstance.SelectedConnectedDevice.Status)
             {
@@ -623,12 +740,12 @@ namespace CAN_Tool.ViewModels
             }
 
             if (AutoRedraw)                                 //Перерисовка графиков
-                if (CanChartDrawCommandExecute(null))
+                if (OmniInstance.SelectedConnectedDevice != null && OmniInstance.SelectedConnectedDevice.LogCurrentPos > 0)
                 {
                     if (OmniInstance.SelectedConnectedDevice.LogCurrentPos < 600)
-                        OnChartDrawCommandExecuted(null);
+                        OnChartDrawCommandExecuted();
                     else if (DateTime.Now.Second % 10 == 0)
-                        OnChartDrawCommandExecuted(null);
+                        OnChartDrawCommandExecuted();
                 }
 
             foreach (var d in OmniInstance.ConnectedDevices.Where(d=>d.SecondMessages)) //Поддержание связи только для котлов
@@ -652,16 +769,16 @@ namespace CAN_Tool.ViewModels
         }
 
 
-        public bool portOpened(object parameter)
+        public bool portOpened()
         {
             return CanAdapter.PortOpened;
         }
-        public bool deviceSelected(object parameter)
+        public bool deviceSelected()
         {
             return CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null;
         }
 
-        public bool deviceInManualMode(object parameter)
+        public bool deviceInManualMode()
         {
             return (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && OmniInstance.SelectedConnectedDevice.ManualMode);
         }
@@ -727,33 +844,33 @@ namespace CAN_Tool.ViewModels
 
             OmniInstance.NewDeviceAcquired += NewDeviceHandler;
 
-            TogglePortCommand = new LambdaCommand(OnTogglePortCommandExecuted, CanTogglePortCommandExecute);
-            RefreshPortListCommand = new LambdaCommand(OnRefreshPortsCommandExecuted);
-            ReadConfigCommand = new LambdaCommand(OnReadConfigCommandExecuted, null);
-            ReadBlackBoxDataCommand = new LambdaCommand(OnReadBlackBoxDataCommandExecuted, CanReadBlackBoxDataExecute);
-            ReadBlackBoxErrorsCommand = new LambdaCommand(OnReadBlackBoxErrorsCommandExecuted, CanReadBlackBoxErrorsExecute);
-            EraseBlackBoxErrorsCommand = new LambdaCommand(OnEraseBlackBoxErrorsCommandExecuted, CanEraseBlackBoxErrorsExecute);
-            EraseBlackBoxDataCommand = new LambdaCommand(OnEraseBlackBoxDataCommandExecuted, CanEraseBlackBoxDataExecute);
-            SendCustomMessageCommand = new LambdaCommand(OnSendCustomMessageCommandExecuted, CanSendCustomMessageCommandExecute);
-            CancelOperationCommand = new LambdaCommand(OnCancelOperationCommandExecuted, CanCancelOperationCommandExecute);
-            SaveConfigCommand = new LambdaCommand(OnSaveConfigCommandExecuted, CanSaveConfigCommandExecute);
-            ResetConfigCommand = new LambdaCommand(OnResetConfigCommandExecuted, CanResetConfigCommandExecute);
-            SetAdapterNormalModeCommand = new LambdaCommand(OnSetAdapterNormalModeCommandExecuted, CanSetAdapterNormalModeCommandExecute);
-            SetAdapterListedModeCommand = new LambdaCommand(OnSetAdapterListedModeCommandExecuted, CanSetAdapterListedModeCommandExecute);
-            SetAdapterSelfReceptionModeCommand = new LambdaCommand(OnSetAdapterSelfReceptionModeCommandExecuted, CanSetAdapterSelfReceptionModeCommandExecute);
-            StopCanAdapterCommand = new LambdaCommand(OnStopCanAdapterCommandExecuted, CanStopCanAdapterCommandExecute);
+            TogglePortCommand = new RelayCommand(OnTogglePortCommandExecuted);
+            RefreshPortListCommand = new RelayCommand(OnRefreshPortsCommandExecuted);
+            ReadConfigCommand = new RelayCommand(OnReadConfigCommandExecuted);
+            ReadBlackBoxDataCommand = new RelayCommand(OnReadBlackBoxDataCommandExecuted);
+            ReadBlackBoxErrorsCommand = new RelayCommand(OnReadBlackBoxErrorsCommandExecuted);
+            EraseBlackBoxErrorsCommand = new RelayCommand(OnEraseBlackBoxErrorsCommandExecuted);
+            EraseBlackBoxDataCommand = new RelayCommand(OnEraseBlackBoxDataCommandExecuted);
+            SendCustomMessageCommand = new RelayCommand(OnSendCustomMessageCommandExecuted);
+            CancelOperationCommand = new RelayCommand(OnCancelOperationCommandExecuted);
+            SaveConfigCommand = new RelayCommand(OnSaveConfigCommandExecuted);
+            ResetConfigCommand = new RelayCommand(OnResetConfigCommandExecuted);
+            SetAdapterNormalModeCommand = new RelayCommand(OnSetAdapterNormalModeCommandExecuted);
+            SetAdapterListedModeCommand = new RelayCommand(OnSetAdapterListedModeCommandExecuted);
+            SetAdapterSelfReceptionModeCommand = new RelayCommand(OnSetAdapterSelfReceptionModeCommandExecuted);
+            StopCanAdapterCommand = new RelayCommand(OnStopCanAdapterCommandExecuted);
 
-            LogStartCommand = new LambdaCommand(OnLogStartCommandExecuted, CanLogStartCommandExecute);
-            LogStopCommand = new LambdaCommand(OnLogStopCommandExecuted, CanLogStopCommandExecute);
-            ChartDrawCommand = new LambdaCommand(OnChartDrawCommandExecuted, CanChartDrawCommandExecute);
-            LoadFromLogCommand = new LambdaCommand(OnLoadFromLogCommandExecuted, null);
-            SendFromLogCommand = new LambdaCommand(OnSendFromLogCommandExecuted, null);
+            LogStartCommand = new RelayCommand(OnLogStartCommandExecuted);
+            LogStopCommand = new RelayCommand(OnLogStopCommandExecuted);
+            ChartDrawCommand = new RelayCommand(OnChartDrawCommandExecuted);
+            LoadFromLogCommand = new RelayCommand(OnLoadFromLogCommandExecuted);
+            SendFromLogCommand = new RelayCommand(OnSendFromLogCommandExecuted);
 
-            SaveLogCommand = new LambdaCommand(OnSaveLogCommandExecuted, CanSaveLogCommandExecuted);
-            DefaultStyleCommand = new LambdaCommand(OnDefaultStyleExecuted, (x) => true);
-            SaveReportCommand = new LambdaCommand(OnSaveReportCommandExecuted, CanSaveReportCommandExecute);
+            SaveLogCommand = new RelayCommand(OnSaveLogCommandExecuted);
+            DefaultStyleCommand = new RelayCommand(OnDefaultStyleExecuted);
+            SaveReportCommand = new RelayCommand(OnSaveReportCommandExecuted);
 
-            ToggleCanLogCommand = new LambdaCommand(OnToggleCanLogCommandExecuted, CanToggleCanLogCommandExecute);
+            ToggleCanLogCommand = new RelayCommand(OnToggleCanLogCommandExecuted);
 
 
             CustomMessage.TransmitterId.Address = 6;

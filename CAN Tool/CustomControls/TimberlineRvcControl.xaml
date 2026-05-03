@@ -10,18 +10,7 @@
              xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d" d:DesignHeight="820" d:DesignWidth="1000" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontSize="15"
              
              >
-    <UserControl.Resources>
-        <c:BoolToOpacity x:Key="BoolToOpacity" />
-        <c:FarenheitConverter x:Key="ToFarenheit" />
-        <c:FarenheitRelativeConverter x:Key="ToFarenheitRelative" />
-        <c:ConnectedZoneTypeToVisible x:Key= "OnlyConnected" />
-        <c:HeatingZoneTypeToVisible x:Key="OnlyHetingZones" />
-        <c:DefrostingZoneTypeToVisible x:Key="OnlyDefrostZone" />
-        <c:FurnaceZoneTypeToVisible x:Key="OnlyFurnace" />
-        <c:ConnectedZoneTypeToBool x:Key="ConnectedToBool" />
-        <c:HeatingZoneTypeToBool x:Key="HetingZoneToBool" />
-    </UserControl.Resources>
-    <Grid>
+<Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="230"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>

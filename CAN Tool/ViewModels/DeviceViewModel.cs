@@ -1,8 +1,6 @@
 ﻿using CAN_Tool;
-using CAN_Tool.Infrastructure.Commands;
 using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
-using CAN_Tool.ViewModels.Base;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -12,7 +10,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Windows;
-using System.Windows.Input;
 using static CAN_Tool.Libs.Helper;
 
 namespace OmniProtocol
@@ -38,12 +35,12 @@ namespace OmniProtocol
         {
             LogInit();
             Id = newId;
-            StartHeaterCommand = new LambdaCommand(x => ExecuteCommand(1, 0xff, 0xff), NotInManual);
-            StopHeaterCommand = new LambdaCommand(x => ExecuteCommand(3), NotInManual);
-            StartPumpCommand = new LambdaCommand(x => ExecuteCommand(4, 0, 0), NotInManual);
-            StartVentCommand = new LambdaCommand(x => ExecuteCommand(10), NotInManual);
-            ClearErrorsCommand = new LambdaCommand(x => ExecuteCommand(5), NotInManual);
-            CalibrateTermocouplesCommand = new LambdaCommand(x => ExecuteCommand(20), NotInManual);
+            StartHeaterCommand = new RelayCommand(() => ExecuteCommand(1, 0xff, 0xff));
+            StopHeaterCommand = new RelayCommand(() => ExecuteCommand(3));
+            StartPumpCommand = new RelayCommand(() => ExecuteCommand(4, 0, 0));
+            StartVentCommand = new RelayCommand(() => ExecuteCommand(10));
+            ClearErrorsCommand = new RelayCommand(() => ExecuteCommand(5));
+            CalibrateTermocouplesCommand = new RelayCommand(() => ExecuteCommand(20));
 
             if (Omni.Devices.TryGetValue(Id.Type, out var device))
                 DeviceReference = device;
@@ -170,8 +167,6 @@ namespace OmniProtocol
             }
         }
 
-        public bool NotInManual(object parameter) => !ManualMode;
-
         public void ExecuteCommand(int cmdNum, params byte[] data)
         {
             OmniMessage msg = new();
@@ -204,17 +199,17 @@ namespace OmniProtocol
             TransmitStatic(msg.ToCanMessage());
         }
         
-        public ICommand StartHeaterCommand { get; }
+        public RelayCommand StartHeaterCommand { get; }
 
-        public ICommand StopHeaterCommand { get; }
+        public RelayCommand StopHeaterCommand { get; }
 
-        public ICommand StartPumpCommand { get; }
+        public RelayCommand StartPumpCommand { get; }
 
-        public ICommand ClearErrorsCommand { get; }
+        public RelayCommand ClearErrorsCommand { get; }
 
-        public ICommand StartVentCommand { get; }
+        public RelayCommand StartVentCommand { get; }
 
-        public ICommand CalibrateTermocouplesCommand { get; }
+        public RelayCommand CalibrateTermocouplesCommand { get; }
 
         public CommonParameters Parameters { get; set; } = new();
 

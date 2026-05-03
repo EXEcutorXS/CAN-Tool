@@ -1,6 +1,6 @@
 ﻿using OmniProtocol;
-using CAN_Tool.Infrastructure.Commands;
-using CAN_Tool.ViewModels.Base;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.ComponentModel;
 using RVC;
 using CAN_Tool.Libs;
@@ -26,7 +25,7 @@ namespace CAN_Tool.ViewModels
         public CanMessage msgToTransmit;
     }
 
-    public class RvcPageViewModel : ViewModel
+    public partial class RvcPageViewModel : ObservableObject
     {
 
         public Timberline20RvcViewModel Timberline20 { get; }
@@ -53,8 +52,8 @@ namespace CAN_Tool.ViewModels
         {
             this.vm = vm;
 
-            SaveRvcLogCommand = new LambdaCommand(OnSaveRvcLogCommandExecuted, x => true);
-            SendRvcMessageCommand = new LambdaCommand(OnSendRvcMessageCommandExecuted, x => true);
+            SaveRvcLogCommand = new RelayCommand(OnSaveRvcLogCommandExecuted);
+            SendRvcMessageCommand = new RelayCommand(OnSendRvcMessageCommandExecuted);
 
             RefreshTimer = new(250);
             RefreshTimer.Elapsed += RefreshTimerTick;
@@ -98,14 +97,14 @@ namespace CAN_Tool.ViewModels
         public bool SpamEnabled
         {
             get => spamEnabled;
-            set => Set(ref spamEnabled, value);
+            set => SetProperty(ref spamEnabled, value);
         }
 
         private RvcMessage selectedMessage;
         public RvcMessage SelectedMessage
         {
             get => selectedMessage;
-            set => Set(ref selectedMessage, value);
+            set => SetProperty(ref selectedMessage, value);
         }
 
         public void ProcessMessage(CanMessage m)
@@ -121,9 +120,9 @@ namespace CAN_Tool.ViewModels
             }
         }
 
-        public ICommand SaveRvcLogCommand { set; get; }
+        public RelayCommand SaveRvcLogCommand { set; get; }
 
-        private void OnSaveRvcLogCommandExecuted(object parameter)
+        private void OnSaveRvcLogCommandExecuted()
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\RVC_Log.txt";
             var log = "";
@@ -140,9 +139,9 @@ namespace CAN_Tool.ViewModels
                 spamTask = Task.Run(SpamFunction);
         }
 
-        public ICommand SendRvcMessageCommand { set; get; }
+        public RelayCommand SendRvcMessageCommand { set; get; }
 
-        private void OnSendRvcMessageCommandExecuted(object parameter)
+        private void OnSendRvcMessageCommandExecuted()
         {
             var msg = ConstructedMessage.ToCanMessage();
             vm.CanAdapter.Transmit(msg);

@@ -1,6 +1,4 @@
 ﻿using OmniProtocol;
-using CAN_Tool.Infrastructure.Commands;
-using CAN_Tool.ViewModels.Base;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;

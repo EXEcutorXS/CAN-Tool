@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs wc *)",
+      "Bash(grep -r \"^[[:space:]]*//\" /c/source/HCU-Timberline2/User/Main --include=\"*.cpp\" --include=\"*.c\" -c)",
+      "Bash(git -C /c/source/HCU-Timberline2 log --oneline)",
+      "Bash(git -C /c/source/HCU-Timberline2 log --all --pretty=format:\"%h %s\")",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(xargs grep *)",
+      "WebFetch(domain:docs.google.com)",
+      "WebFetch(domain:doc-08-90-docstext.googleusercontent.com)",
+      "WebFetch(domain:doc-0c-8g-sheets.googleusercontent.com)",
+      "Bash(python sync_to_sheets.py --local)",
+      "Bash(py --version)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\EXEcutor\\\\source\\\\repos\\\\EXEcutorXS\\\\CAN-Tool\\\\tools\"; powershell -ExecutionPolicy Bypass -File generate_csv.ps1)",
+      "Bash(dotnet build *)",
+      "Bash(cd /tmp)",
+      "Bash(cat)",
+      "Bash(dotnet script *)",
+      "Bash(dotnet-csc /tmp/CheckColorPicker.cs)",
+      "Bash(grep -v \"ReadParam\\\\|ReadedParam\\\\|GetParam\\\\|flagGet\\\\|BbParam\\\\|//\")",
+      "Bash(sed -i 's/DeviceViewModel Vm => \\(DeviceViewModel\\)DataContext;/HeaterDeviceViewModel Vm => \\(HeaterDeviceViewModel\\)DataContext;/' \"/c/Users/EXEcutor/source/repos/EXEcutorXS/CAN-Tool/CAN Tool/CustomControls/HeaterControl.xaml.cs\")",
+      "Bash(sed -i 's/public DeviceViewModel vm => \\(DeviceViewModel\\)DataContext;/public AcInverterDeviceViewModel vm => \\(AcInverterDeviceViewModel\\)DataContext;/' \"/c/Users/EXEcutor/source/repos/EXEcutorXS/CAN-Tool/CAN Tool/CustomControls/ACInverterControl.xaml.cs\")",
+      "Bash(sed -i 's/public DeviceViewModel vm => \\(DeviceViewModel\\)DataContext;/public AcPanelDeviceViewModel vm => \\(AcPanelDeviceViewModel\\)DataContext;/' \"/c/Users/EXEcutor/source/repos/EXEcutorXS/CAN-Tool/CAN Tool/CustomControls/ACPanelControl.xaml.cs\")",
+      "Bash(sed -i 's/public DeviceViewModel vm => \\(DeviceViewModel\\)DataContext;/public PressureSensorDeviceViewModel vm => \\(PressureSensorDeviceViewModel\\)DataContext;/' \"/c/Users/EXEcutor/source/repos/EXEcutorXS/CAN-Tool/CAN Tool/CustomControls/PressureSensorControl.xaml.cs\")",
+      "Bash(grep -v \"//\")",
+      "Bash(powershell -Command \"\\(Get-Content 'ViewModels\\\\Timberline20RvcViewModel.cs' -Raw\\) -replace 'SetProperty\\\\\\(ref\\(?=[a-z]\\)', 'SetProperty\\(ref ' | Set-Content 'ViewModels\\\\Timberline20RvcViewModel.cs' -Encoding UTF8\")",
+      "Bash(powershell -Command \"\\(Get-Content 'ViewModels\\\\RvcPageViewModel.cs' -Raw\\) -replace 'SetProperty\\\\\\(ref\\(?=[a-z]\\)', 'SetProperty\\(ref ' | Set-Content 'ViewModels\\\\RvcPageViewModel.cs' -Encoding UTF8\")",
+      "Bash(powershell -Command \"\\(Get-Content 'ViewModels\\\\Timberline15RvcViewModel.cs' -Raw\\) -replace 'Set\\\\\\(ref ', 'SetProperty\\(ref ' -replace 'SetProperty\\\\\\(ref\\(?=[a-z]\\)', 'SetProperty\\(ref ' | Set-Content 'ViewModels\\\\Timberline15RvcViewModel.cs' -Encoding UTF8\")",
+      "Bash(powershell -Command \"\\(Get-Content 'Libs\\\\Rvc.cs' -Raw\\) -replace 'Set\\\\\\(ref ', 'SetProperty\\(ref ' -replace 'SetProperty\\\\\\(ref\\(?=[a-z]\\)', 'SetProperty\\(ref ' | Set-Content 'Libs\\\\Rvc.cs' -Encoding UTF8\")",
+      "Bash(powershell -Command \"\\(Get-Content 'Controls\\\\CustomControls\\\\DataBox.cs' -Raw\\) -replace 'CAN_Tool\\\\.Controls\\\\.CustomControls', 'CAN_Tool.CustomControls' | Set-Content 'Controls\\\\CustomControls\\\\DataBox.cs' -Encoding UTF8\")",
+      "Bash(xargs ls *)",
+      "PowerShell(New-Item -ItemType Directory -Path \"C:\\\\Users\\\\EXEcutor\\\\source\\\\repos\\\\EXEcutorXS\\\\CAN-Tool\\\\.claude\\\\worktrees\\\\dreamy-khorana-904671\\\\CAN Tool\\\\Libs\\\\OmniProtocol\" -Force)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
