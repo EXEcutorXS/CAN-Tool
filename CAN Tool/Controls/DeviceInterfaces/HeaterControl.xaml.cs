@@ -50,8 +50,8 @@ namespace CAN_Tool.CustomControls
 
         private void FuelPumpMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            int newFrequency = Vm.OverrideState.FuelPumpOverridenFrequencyX100;
             if (Vm == null || !Vm.OverrideState.FuelPumpOverriden) return;
+            int newFrequency = Vm.OverrideState.FuelPumpOverridenFrequencyX100;
             int k = Keyboard.IsKeyDown(Key.LeftShift) ? 100 : 10;
             newFrequency += Math.Sign(e.Delta) * k;
             if (newFrequency < 0) newFrequency = 0;
@@ -73,8 +73,8 @@ namespace CAN_Tool.CustomControls
 
         private void GlowPlugMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            int newPower = Vm.OverrideState.GlowPlugOverridenPower;
             if (Vm == null || !Vm.OverrideState.GlowPlugOverriden) return;
+            int newPower = Vm.OverrideState.GlowPlugOverridenPower;
             int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
             newPower += Math.Sign(e.Delta) * k;
             if (newPower < 0) newPower = 0;
@@ -116,9 +116,8 @@ namespace CAN_Tool.CustomControls
 
         private void BlowerMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            int newRevs = Vm.OverrideState.BlowerOverridenRevs;
-
             if (Vm == null || !Vm.OverrideState.BlowerOverriden) return;
+            int newRevs = Vm.OverrideState.BlowerOverridenRevs;
             int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
             newRevs += Math.Sign(e.Delta) * k;
             SetBlowerOverrideVal(newRevs);

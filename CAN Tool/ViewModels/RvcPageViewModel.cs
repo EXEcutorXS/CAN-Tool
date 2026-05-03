@@ -133,8 +133,6 @@ namespace CAN_Tool.ViewModels
 
         private void RefreshTimerTick(object sender, EventArgs e)
         {
-            foreach (var m in MessageList)
-                m.FreshCheck();
             if (spamTask != null && spamTask.Status != TaskStatus.Running && spamTask.Status != TaskStatus.WaitingToRun && spamTask.Status != TaskStatus.Created)
                 spamTask = Task.Run(SpamFunction);
         }

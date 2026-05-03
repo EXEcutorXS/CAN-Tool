@@ -23,7 +23,7 @@ namespace OmniProtocol
 
 public partial class Omni : ObservableObject
 {
-
+    private readonly object _deviceListLock = new();
 
     public Omni(CanAdapter canAdapter)
     {
@@ -37,10 +37,9 @@ public partial class Omni : ObservableObject
             JArray serialised = (JArray)JsonConvert.DeserializeObject(str);
             AllPresets = serialised.ToObject<BindingList<ConfigPreset>>();
         }
-        catch
+        catch (Exception ex)
         {
-            Debug.WriteLine("Can't load preset list, empty list initiated");
-            //MessageBox.Show("Can't load preset list, empty list initiated");
+            Debug.WriteLine($"Can't load preset list, empty list initiated: {ex.Message}");
         }
 
         allPresets.ListChanged += PresetCollectionChanged;
@@ -107,7 +106,7 @@ public partial class Omni : ObservableObject
     [RelayCommand]
     void SavePreset()
     {
-        if (SelectedModel.Length < 3 || SelectedModel.Length < 3)
+        if (SelectedVendor.Length < 3 || SelectedModel.Length < 3)
         {
             MessageBox.Show("Model and vendor names must contain at least 3 characters");
             return;
@@ -215,12 +214,20 @@ public partial class Omni : ObservableObject
 
         var id = m.TransmitterId;
 
-        var senderDevice = ConnectedDevices.FirstOrDefault(d => d.Id.Equals(m.TransmitterId));
-
-        if (senderDevice == null)
+        DeviceViewModel senderDevice;
+        bool isNew = false;
+        lock (_deviceListLock)
         {
-            senderDevice = DeviceViewModel.Create(id);
-            ConnectedDevices.Add(senderDevice);
+            senderDevice = ConnectedDevices.FirstOrDefault(d => d.Id.Equals(m.TransmitterId));
+            if (senderDevice == null)
+            {
+                senderDevice = DeviceViewModel.Create(id);
+                ConnectedDevices.Add(senderDevice);
+                isNew = true;
+            }
+        }
+        if (isNew)
+        {
             NewDeviceAcquired?.Invoke(this, null);
             if (senderDevice.Id.Type != 123)        //Requesting basic data, but not for bootloaders
                 Task.Run(() => RequestSerial(id));
@@ -397,7 +404,7 @@ public partial class Omni : ObservableObject
                                     Id = m.Data[2] * 256 + m.Data[3],
                                     Value = m.Data[4] * 0x1000000 + m.Data[5] * 0x10000 + m.Data[6] * 0x100 + m.Data[7]
                                 };
-                                if (v.Id != 65535)
+                                if (v.Id != 65535 && senderDevice.BbErrors.Count > 0)
                                     senderDevice.BbErrors.Last().Variables.TryToAdd(v);
                             }
                         }
@@ -581,7 +588,7 @@ public partial class Omni : ObservableObject
                 if (((m.Data[2] >> 2) & 3) < 2 && senderDevice.OverrideState.RelayOverriden) senderDevice.OverrideState.RelayOverridenState = ((m.Data[2] >> 2) & 3) > 0;
                 if (m.Data[3] != 255 && senderDevice.OverrideState.BlowerOverriden) senderDevice.OverrideState.BlowerOverridenRevs = m.Data[3];
                 if (m.Data[4] != 255 && senderDevice.OverrideState.GlowPlugOverriden) senderDevice.OverrideState.GlowPlugOverridenPower = m.Data[4];
-                if (m.Data[5] != 255 || m.Data[6] != 255 && senderDevice.OverrideState.FuelPumpOverriden) senderDevice.OverrideState.FuelPumpOverridenFrequencyX100 = m.Data[5] * 256 + m.Data[6];
+                if ((m.Data[5] != 255 || m.Data[6] != 255) && senderDevice.OverrideState.FuelPumpOverriden) senderDevice.OverrideState.FuelPumpOverridenFrequencyX100 = m.Data[5] * 256 + m.Data[6];
                 break;
 
 

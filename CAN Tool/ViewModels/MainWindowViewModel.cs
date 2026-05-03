@@ -473,8 +473,6 @@ namespace CAN_Tool.ViewModels
 
         private void RefreshTimerTick(object sender, EventArgs e)
         {
-            foreach (var m in OmniInstance.Messages)
-                m.FreshCheck();
         }
 
         private void TimerTick(object sender, EventArgs e)

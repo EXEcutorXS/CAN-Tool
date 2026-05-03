@@ -47,7 +47,7 @@ public partial class StatusVariable : ObservableObject, IUpdatable<StatusVariabl
     [NotifyPropertyChangedFor(nameof(VerboseInfo), nameof(Value), nameof(FormattedValue))]
     [ObservableProperty] private long rawValue;
     [ObservableProperty] private bool display = false;
-    [ObservableProperty] private OmniPgnParameter assignedParameter;
+    [ObservableProperty] private OmniPgnParameter assignedParameter = new() { a = 1, b = 0, BitLength = 8, Name = "?" };
     [NotifyPropertyChangedFor(nameof(Color))]
     [ObservableProperty] private Brush chartBrush;
     [ObservableProperty] private int lineWidth;
@@ -199,7 +199,7 @@ public partial class DeviceId : ObservableObject
 
     public override string ToString() => Omni.Devices.ContainsKey(Type) ? $"{Type} - {Address} ({Omni.Devices[Type]})" : $"{Type} - {Address}";
 
-    public override int GetHashCode() => Type << 3 + Address;
+    public override int GetHashCode() => (Type << 3) + Address;
 
     public override bool Equals([NotNullWhen(true)] object obj)
     {

@@ -97,7 +97,8 @@ namespace OmniProtocol
             if (LogCurrentPos < LogData[0].Length)
             {
                 foreach (var sv in Status)
-                    LogData[sv.Id][LogCurrentPos] = sv.Value;
+                    if (sv.Id < LogData.Count)
+                        LogData[sv.Id][LogCurrentPos] = sv.Value;
                 LogCurrentPos++;
             }
             else
@@ -128,7 +129,7 @@ namespace OmniProtocol
         {
             LogCurrentPos = 0;
             LogData = new List<double[]>();
-            for (var i = 0; i < 200; i++)
+            for (var i = 0; i < 300; i++)
                 LogData.Add(new double[length]);
         }
 

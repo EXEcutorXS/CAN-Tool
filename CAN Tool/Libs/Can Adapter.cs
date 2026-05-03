@@ -32,8 +32,6 @@ namespace CAN_Tool
             Ide = true;
             Dlc = 8;
             Rtr = false;
-            Fresh = true;
-            updateTick = DateTime.Now.Ticks;
         }
 
         public CanMessage(string str)
@@ -154,10 +152,6 @@ namespace CAN_Tool
 
         public string IdAsText => Ide ? $"{Id:X08}" : $"{Id:X03}";
 
-        [ObservableProperty] private bool fresh;
-
-        private long updateTick;
-
         public override string ToString()
         {
             return $"L:{Dlc} IDE:{IdeAsString} RTR:{RtrAsString} ID:0x{IdAsText} Data:{GetDataInTextFormat(" ")}";
@@ -218,15 +212,6 @@ namespace CAN_Tool
             Rtr = m.Rtr;
             Id = m.Id;
             Dlc = m.Dlc;
-            Fresh = true;
-            updateTick = DateTime.Now.Ticks;
-        }
-
-
-        public void FreshCheck()
-        {
-            if (Fresh && (DateTime.Now.Ticks - updateTick > 3000000))
-                Fresh = false;
         }
 
         public virtual string VerboseInfo => ToString();

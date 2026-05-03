@@ -275,26 +275,12 @@ namespace RVC
             return sb.ToString();
         }
 
-        private bool fresh;
-        public bool Fresh { get => fresh; set => SetProperty(ref fresh, value); }
-
-        public long updatetick;
-
-        public void FreshCheck()
-        {
-            if (fresh && (DateTime.Now.Ticks - updatetick > 3000000))
-                Fresh = false;
-        }
-
-
         public RvcMessage()
         {
             Priority = 6;
             Dgn = 0x1FFFF;
             SourceAdress = 101;
             data = new byte[] { 255, 255, 255, 255, 255, 255, 255, 255 };
-            Fresh = true;
-
         }
 
         public RvcMessage(CanMessage msg) : base()
@@ -311,8 +297,6 @@ namespace RVC
             Dgn = msg.Id >> 8 & 0x1FFFF;
             SourceAdress = (byte)(msg.Id & 0xFF);
             Data = msg.Data;
-
-            Fresh = true;
         }
 
         public CanMessage ToCanMessage()
@@ -373,8 +357,6 @@ namespace RVC
             Data = item.Data;
             SourceAdress = item.SourceAdress;
             Priority = item.Priority;
-            Fresh = true;
-            updatetick = DateTime.Now.Ticks;
         }
 
         public bool IsSimiliarTo(RvcMessage item)

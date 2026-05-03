@@ -81,8 +81,6 @@ namespace CAN_Tool.ViewModels
             else
                 autoSendCounter += 20;
 
-            foreach (var m in MessageList)
-                m.FreshCheck();
         }
     }
 }

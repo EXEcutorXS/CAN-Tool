@@ -14,8 +14,6 @@ namespace OmniProtocol
     {
         public OmniMessage()
         {
-            Fresh = true;
-            updateTick = DateTime.Now.Ticks;
             TransmitterId = new(126, 6);
             ReceiverId = new(0, 0);
             Data = new byte[8];
@@ -34,10 +32,6 @@ namespace OmniProtocol
             TransmitterId.Address = m.Id & 0b111;
             return;
         }
-
-        public long updateTick;
-
-        [ObservableProperty] private bool fresh;
 
         [NotifyPropertyChangedFor(nameof(DataAsText), nameof(DataAsULong), nameof(VerboseInfo))]
         [ObservableProperty] private byte[] data = new byte[8];
@@ -84,11 +78,6 @@ namespace OmniProtocol
                 return sb.ToString();
             }
         }
-        public void FreshCheck()
-        {
-            if (Fresh && (DateTime.Now.Ticks - updateTick > 3000000))
-                Fresh = false;
-        }
 
         [NotifyPropertyChangedFor(nameof(VerboseInfo))]
         [ObservableProperty] private int pgn;
@@ -97,34 +86,27 @@ namespace OmniProtocol
 
         public static long GetRawValue(byte[] data, int bitLength, int startBit, int startByte, bool signed)
         {
-            long ret;
-            switch (bitLength)
-            {
-                case 0: ret = 0; break; //Usually used Custom decoder
-                case 1: ret = data[startByte] >> startBit & 0b1; break;
-                case 2: ret = data[startByte] >> startBit & 0b11; break;
-                case 3: ret = data[startByte] >> startBit & 0b111; break;
-                case 4: ret = data[startByte] >> startBit & 0b1111; break;
-                case 8: ret = data[startByte]; break;
-                case 16:
-                    if (!signed)
-                        ret = BitConverter.ToUInt16(new[] { data[startByte + 1], data[startByte] });
-                    else
-                        ret = BitConverter.ToInt16(new[] { data[startByte + 1], data[startByte] });
-                    break;
+            if (bitLength == 0) return 0; // Custom decoder
 
+            // Читаем нужные байты в big-endian порядке (старший байт первым)
+            int byteCount = (startBit + bitLength + 7) / 8;
+            ulong raw = 0;
+            for (int i = 0; i < byteCount; i++)
+                raw = (raw << 8) | data[startByte + i];
 
-                case 24: ret = data[startByte] * 65536 + data[startByte + 1] * 256 + data[startByte + 2]; break;
+            // Выравниваем и маскируем нужные биты
+            raw >>= startBit;
+            ulong mask = bitLength < 64 ? (1UL << bitLength) - 1 : ulong.MaxValue;
+            raw &= mask;
 
-                case 32:
-                    if (!signed)
-                        ret = BitConverter.ToUInt32(new[] { data[startByte + 3], data[startByte + 2], data[startByte + 1], data[startByte] });
-                    else
-                        ret = BitConverter.ToInt32(new[] { data[startByte + 3], data[startByte + 2], data[startByte + 1], data[startByte] });
-                    break;
-                default: throw new Exception("Bad parameter size");
-            }
-            return ret;
+            if (!signed) return (long)raw;
+
+            // Расширение знака
+            ulong signBit = 1UL << (bitLength - 1);
+            if ((raw & signBit) != 0)
+                raw |= ~mask;
+
+            return (long)raw;
         }
 
         public string PrintParameter(OmniPgnParameter p)
@@ -194,8 +176,6 @@ namespace OmniProtocol
             ReceiverId.Address = item.ReceiverId.Address;
             ReceiverId.Type = item.ReceiverId.Type;
             Data = item.Data;
-            Fresh = true;
-            updateTick = DateTime.Now.Ticks;
         }
 
         public bool IsSimiliarTo(OmniMessage m)

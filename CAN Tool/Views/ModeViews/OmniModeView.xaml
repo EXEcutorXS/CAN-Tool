@@ -118,13 +118,18 @@
                         <DataGrid x:Name="AC2PmessagesField" AutoGenerateColumns="False" Margin="5" FontFamily="Courier New" ItemsSource="{Binding OmniInstance.Messages}" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" SelectionChanged="AC2PmessagesField_SelectionChanged">
                             <DataGrid.RowStyle>
                                 <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="Transparent"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Fresh}" Value="true">
-                                            <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Fresh}" Value="false">
-                                            <Setter Property="Background" Value="{DynamicResource MaterialDesignCheckBoxDisabled}" />
-                                        </DataTrigger>
+                                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation
+                                                        Storyboard.TargetProperty="(DataGridRow.Background).(SolidColorBrush.Color)"
+                                                        From="#FF4CAF50" To="Transparent"
+                                                        Duration="0:0:0.6" FillBehavior="Stop"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </DataGrid.RowStyle>
@@ -134,7 +139,7 @@
                                 <DataGridTextColumn Binding="{Binding Path=TransmitterId.Address}" Header="ADR" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path=ReceiverId.Type}" Header="TO" IsReadOnly="True" />
                                 <DataGridTextColumn Binding="{Binding Path=ReceiverId.Address}" Header="ADR" IsReadOnly="True" />
-                                <DataGridTextColumn Binding="{Binding Path=DataAsText}" Header="DATA" IsReadOnly="True" />
+                                <DataGridTextColumn Binding="{Binding Path=DataAsText, NotifyOnTargetUpdated=True}" Header="DATA" IsReadOnly="True" />
                             </DataGrid.Columns>
                         </DataGrid>
                         <DockPanel DockPanel.Dock="Right">

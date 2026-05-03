@@ -32,13 +32,18 @@
         <DataGrid x:Name="CanMessageList" DockPanel.Dock="Top" ItemsSource="{Binding CanPage.MessageList,Mode=OneWay}" AutoGenerateColumns="false" Margin="15" MouseDoubleClick="CanListDoubleClick">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="Transparent"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Fresh}" Value="true">
-                            <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Fresh}" Value="false">
-                            <Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}" />
-                        </DataTrigger>
+                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation
+                                        Storyboard.TargetProperty="(DataGridRow.Background).(SolidColorBrush.Color)"
+                                        From="#FF4CAF50" To="Transparent"
+                                        Duration="0:0:0.6" FillBehavior="Stop"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
                     </Style.Triggers>
                 </Style>
             </DataGrid.RowStyle>
@@ -47,7 +52,7 @@
                 <DataGridCheckBoxColumn Header="IDE" Binding="{Binding Ide,Mode=OneWay}" />
                 <DataGridCheckBoxColumn Header="RTR" Binding="{Binding Rtr,Mode=OneWay}" />
                 <DataGridTextColumn Header="DLC" Binding="{Binding Dlc,Mode=OneWay}" />
-                <DataGridTextColumn Header="Data" Binding="{Binding DataAsText,Mode=OneWay}" />
+                <DataGridTextColumn Header="Data" Binding="{Binding DataAsText, Mode=OneWay, NotifyOnTargetUpdated=True}" />
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

@@ -149,13 +149,18 @@
                 <DataGrid x:Name="RVCMessageList" SelectedItem="{Binding SelectedMessage,Mode=OneWayToSource}" DockPanel.Dock="Left" Margin="10" ItemsSource="{Binding MessageList}" SelectionChanged="RVCMessageList_SelectionChanged" AutoGenerateColumns="False">
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="Transparent"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Fresh}" Value="true">
-                                    <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Fresh}" Value="false">
-                                    <Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}" />
-                                </DataTrigger>
+                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetProperty="(DataGridRow.Background).(SolidColorBrush.Color)"
+                                                From="#FF4CAF50" To="Transparent"
+                                                Duration="0:0:0.6" FillBehavior="Stop"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
                             </Style.Triggers>
                         </Style>
                     </DataGrid.RowStyle>
@@ -163,7 +168,7 @@
                         <DataGridTextColumn Binding="{Binding Dgn,Mode=OneWay,StringFormat=X05}" Header="DGN" />
                         <DataGridTextColumn Binding="{Binding Priority,Mode=OneWay}" Header="Priority" />
                         <DataGridTextColumn Binding="{Binding SourceAdress,Mode=OneWay}" Header="SA" />
-                        <DataGridTextColumn Binding="{Binding DataAsText,Mode=OneWay}" Header="Data" />
+                        <DataGridTextColumn Binding="{Binding DataAsText, Mode=OneWay, NotifyOnTargetUpdated=True}" Header="Data" />
                     </DataGrid.Columns>
                 </DataGrid>
                 <Border BorderBrush="{DynamicResource MaterialDesignCardBackground}" CornerRadius="10" BorderThickness="3" Margin="10">

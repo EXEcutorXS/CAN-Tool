@@ -14,7 +14,8 @@ namespace CAN_Tool.Libs
         public static void Load(
             Dictionary<int, PgnClass> pgns,
             List<OmniPgnParameter> parameters,
-            Dictionary<int, OmniCommand> commands)
+            Dictionary<int, OmniCommand> commands,
+            Dictionary<int, DeviceTemplate> devices)
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "omnidata.json");
             var json = File.ReadAllText(path);
@@ -24,11 +25,33 @@ namespace CAN_Tool.Libs
             LoadPgns(root, pgns);
             LoadParameters(root, parameters, presets);
             LoadCommands(root, commands, presets);
+            LoadDevices(root, devices);
 
             // Link each parameter to its PGN's parameter list so ProcessOmniMessage can iterate them
             foreach (var p in parameters)
                 if (pgns.TryGetValue(p.Pgn, out var pgn))
                     pgn.parameters.Add(p);
+        }
+
+        private static void LoadDevices(JObject root, Dictionary<int, DeviceTemplate> devices)
+        {
+            if (root["devices"] is not JArray devicesNode) return;
+
+            foreach (var item in devicesNode.Children<JObject>())
+            {
+                var id = item["id"]!.Value<int>();
+                devices[id] = new DeviceTemplate
+                {
+                    Id          = id,
+                    DevType     = item["devType"] != null
+                                    ? Enum.Parse<DeviceType_t>(item["devType"]!.Value<string>()!)
+                                    : DeviceType_t.None,
+                    ImageName   = item["imageName"]?.Value<string>() ?? string.Empty,
+                    MaxBlower   = item["maxBlower"]?.Value<int>() ?? 130,
+                    MaxFuelPump = item["maxFuelPump"]?.Value<double>() ?? 4,
+                    BBErrorsLen = item["bbErrorsLen"]?.Value<int>() ?? 512,
+                };
+            }
         }
 
         private static Dictionary<string, Dictionary<int, string>> LoadMeaningPresets(JObject root)
@@ -119,10 +142,12 @@ namespace CAN_Tool.Libs
             }
 
             if (node["getMeaning"]?.Value<string>() is string getMeaningKey)
-                p.GetMeaning = DecoderRegistry.GetMeaningHandlers[getMeaningKey];
+                if (!DecoderRegistry.GetMeaningHandlers.TryGetValue(getMeaningKey, out p.GetMeaning))
+                    throw new KeyNotFoundException($"GetMeaning handler '{getMeaningKey}' not found in DecoderRegistry");
 
             if (node["decoder"]?.Value<string>() is string decoderKey)
-                p.CustomDecoder = DecoderRegistry.CustomDecoders[decoderKey];
+                if (!DecoderRegistry.CustomDecoders.TryGetValue(decoderKey, out p.CustomDecoder))
+                    throw new KeyNotFoundException($"CustomDecoder '{decoderKey}' not found in DecoderRegistry");
 
             return p;
         }
