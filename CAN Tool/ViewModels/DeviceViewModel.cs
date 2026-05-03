@@ -83,15 +83,16 @@ namespace OmniProtocol
         }
 
         // ── Лог ────────────────────────────────────────────────────────
-        public ObservableCollection<CommonParameters> Log { get; } = new();
         public List<double[]> LogData = new();
         [ObservableProperty] private bool isLogWriting = true;
         [ObservableProperty] private int logCurrentPos;
 
         public void LogTick()
         {
-            Log.Insert(0, (CommonParameters)Parameters.Clone());
-            if (Log.Count > 120) Log.RemoveAt(120);
+            // Снимок истории раз в секунду для водопадной таблицы
+            foreach (var sv in Status)
+                sv.TakeHistorySnapshot();
+
             if (!IsLogWriting) return;
             if (LogCurrentPos < LogData[0].Length)
             {

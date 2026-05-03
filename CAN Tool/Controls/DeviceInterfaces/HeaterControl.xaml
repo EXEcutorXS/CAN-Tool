@@ -215,26 +215,21 @@
             </StackPanel>
 
         </Grid>
-        <DataGrid Name="LogDataGrid" DockPanel.Dock="Top" ItemsSource="{Binding Log}" AutoGenerateColumns="False" IsReadOnly="true" VerticalScrollBarVisibility="Auto" MaxHeight="500">
+        <!-- Водопад данных: строки = переменные, столбцы = последние N значений.
+             Колонки History[0..N-1] добавляются в code-behind. -->
+        <DataGrid x:Name="WaterfallGrid"
+                  DockPanel.Dock="Top"
+                  ItemsSource="{Binding Status}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  VerticalScrollBarVisibility="Auto"
+                  MaxHeight="500"
+                  CanUserSortColumns="False"
+                  CanUserReorderColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Path = Mode,Mode=OneTime}" Header="{DynamicResource b_list_mode}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = Stage,Mode=OneTime}" Header="{DynamicResource b_list_stage}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = StageTime,Mode=OneTime}" Header="{DynamicResource b_list_stagetime}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = WorkTime,Mode=OneTime}" Header="{DynamicResource b_list_worktime}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = Voltage,Mode=OneTime,StringFormat={}{0:F1}}" Header="{DynamicResource b_list_voltage}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = RevSet,Mode=OneTime}" Header="{DynamicResource b_list_rev_set}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = RevMeasured,Mode=OneTime}" Header="{DynamicResource b_list_rev_meas}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = FuelPumpMeasured,Mode=OneTime,StringFormat={}{0:F2}}" Header="{DynamicResource b_list_fuel}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = GlowPlug,Mode=OneTime}" Header="{DynamicResource b_list_glowplug}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = FlameSensor,Mode=OneTime}" Header="{DynamicResource b_list_flamesensor}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = BodyTemp,Mode=OneTime}" Header="{DynamicResource b_list_bodytemp}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = InletTemp,Mode=OneTime}" Header="{DynamicResource b_list_inlettemp}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = PanelTemp,Mode=OneTime}" Header="{DynamicResource b_list_paneltemp}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = LiquidTemp,Mode=OneTime}" Header="{DynamicResource b_list_liqtemp}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = OverheatTemp,Mode=OneTime}" Header="{DynamicResource b_list_overheattemp}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = Pressure,Mode=OneTime}" Header="{DynamicResource b_list_press_in}" IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding Path = ExPressure,Mode=OneTime}" Header="{DynamicResource b_list_press_ex}" IsReadOnly="True" />
-
+                <DataGridTextColumn Header="Параметр"
+                                    Binding="{Binding ShortName}"
+                                    Width="120" />
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

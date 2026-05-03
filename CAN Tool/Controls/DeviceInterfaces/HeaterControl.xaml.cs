@@ -28,6 +28,24 @@ namespace CAN_Tool.CustomControls
         public HeaterControl()
         {
             InitializeComponent();
+            BuildWaterfallColumns();
+        }
+
+        /// <summary>
+        /// Добавляет колонки History[0]..History[N-1] в WaterfallGrid.
+        /// Колонка 0 — самое свежее значение, N-1 — самое старое.
+        /// </summary>
+        private void BuildWaterfallColumns()
+        {
+            for (int i = 0; i < StatusVariable.HistorySize; i++)
+            {
+                WaterfallGrid.Columns.Add(new DataGridTextColumn
+                {
+                    Header  = i == 0 ? "▶" : i.ToString(),
+                    Binding = new System.Windows.Data.Binding($"History[{i}]"),
+                    Width   = new DataGridLength(50),
+                });
+            }
         }
 
         private void FuelPumpMouseWheel(object sender, MouseWheelEventArgs e)

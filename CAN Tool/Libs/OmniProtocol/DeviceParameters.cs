@@ -69,6 +69,36 @@ public partial class StatusVariable : ObservableObject, IUpdatable<StatusVariabl
     [ObservableProperty] private LineStyle lineStyle;
     [ObservableProperty] private MarkerShape markShape;
 
+    // ── История (кольцевой буфер последних HistorySize значений) ──────
+    public const int HistorySize = 30;
+    private readonly string[] _history = new string[HistorySize];
+    private int _historyHead = 0;   // указывает на следующую позицию для записи
+
+    /// <summary>
+    /// Делает снимок текущего значения в кольцевой буфер.
+    /// Должен вызываться раз в секунду (из DeviceViewModel.LogTick).
+    /// </summary>
+    public void TakeHistorySnapshot()
+    {
+        _history[_historyHead] = FormattedValue;
+        _historyHead = (_historyHead + 1) % HistorySize;
+        OnPropertyChanged(nameof(History));
+    }
+
+    /// <summary>
+    /// Последние HistorySize значений от новых к старым (History[0] — самое свежее).
+    /// </summary>
+    public IReadOnlyList<string> History
+    {
+        get
+        {
+            var result = new string[HistorySize];
+            for (int i = 0; i < HistorySize; i++)
+                result[i] = _history[(_historyHead - 1 - i + HistorySize) % HistorySize] ?? "";
+            return result;
+        }
+    }
+
     public string VerboseInfo => AssignedParameter.Decode(RawValue);
 
     public double Value => ImperialConverter(RawValue * AssignedParameter.a + AssignedParameter.b, AssignedParameter.UnitT);

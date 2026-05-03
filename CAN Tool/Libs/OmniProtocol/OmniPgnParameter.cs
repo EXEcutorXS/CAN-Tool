@@ -98,9 +98,9 @@ namespace OmniProtocol
                     case UnitType_t.None: return "";
                     case UnitType_t.Temp:
                         if (App.Settings.UseImperial)
-                            return "В°F";
+                            return "°F";
                         else
-                            return "В°C";
+                            return "°C";
                     case UnitType_t.Volt: return GetString("u_voltage");
                     case UnitType_t.Percent: return "%";
                     case UnitType_t.Flow:
