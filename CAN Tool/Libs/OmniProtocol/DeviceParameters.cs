@@ -1,4 +1,4 @@
-using CAN_Tool.Libs;
+﻿using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
 using CAN_Tool;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Media;
 using static CAN_Tool.Libs.Helper;
-using static Omni;
 using System.Windows;
 using CommunityToolkit.Mvvm.Input;
 using System.IO;
@@ -183,7 +182,7 @@ public partial class DeviceId : ObservableObject
     [ObservableProperty] private int type;
     [ObservableProperty] private int address;
 
-    public override string ToString() => Devices.ContainsKey(Type) ? $"{Type} - {Address} ({Devices[Type]})" : $"{Type} - {Address}";
+    public override string ToString() => Omni.Devices.ContainsKey(Type) ? $"{Type} - {Address} ({Omni.Devices[Type]})" : $"{Type} - {Address}";
 
     public override int GetHashCode() => Type << 3 + Address;
 

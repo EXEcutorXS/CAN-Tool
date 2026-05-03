@@ -1,9 +1,9 @@
-namespace OmniProtocol
+﻿namespace OmniProtocol
 {
     public class GenericLoadTrippleDeviceViewModel : DeviceViewModel
     {
         public GenericLoadTrippleDeviceViewModel(DeviceId id) : base(id) { }
 
-        public GenericLoadTrippleViewModel GenericLoadTripple { get; } = new();
+        public override GenericLoadTrippleViewModel GenericLoadTripple { get; } = new();
     }
 }

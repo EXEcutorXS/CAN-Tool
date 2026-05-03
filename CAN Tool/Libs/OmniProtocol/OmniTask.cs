@@ -1,4 +1,4 @@
-using CAN_Tool.Libs;
+﻿using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
 using CAN_Tool;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Media;
 using static CAN_Tool.Libs.Helper;
-using static Omni;
 using System.Windows;
 using CommunityToolkit.Mvvm.Input;
 using System.IO;

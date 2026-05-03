@@ -1,4 +1,4 @@
-using CAN_Tool.Libs;
+﻿using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
 using CAN_Tool;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Media;
 using static CAN_Tool.Libs.Helper;
-using static Omni;
 using System.Windows;
 using CommunityToolkit.Mvvm.Input;
 using System.IO;
@@ -178,21 +177,21 @@ namespace OmniProtocol
         public string GetVerboseInfo()
         {
             var retString = new StringBuilder();
-            if (!Pgns.ContainsKey(this.Pgn))
+            if (!Omni.Pgns.ContainsKey(this.Pgn))
                 return "Pgn not found";
 
-            var pgn = Pgns[Pgn];
-            var sender = Devices.ContainsKey(TransmitterId.Type) ? Devices[TransmitterId.Type].Name : $"({GetString("t_unknown_device")} №{TransmitterId.Type})";
-            var receiver = Devices.ContainsKey(ReceiverId.Type) ? Devices[ReceiverId.Type].Name : $"({GetString("t_unknown_device")} №{ReceiverId.Type})";
+            var pgn = Omni.Pgns[Pgn];
+            var sender = Omni.Devices.ContainsKey(TransmitterId.Type) ? Omni.Devices[TransmitterId.Type].Name : $"({GetString("t_unknown_device")} в„–{TransmitterId.Type})";
+            var receiver = Omni.Devices.ContainsKey(ReceiverId.Type) ? Omni.Devices[ReceiverId.Type].Name : $"({GetString("t_unknown_device")} в„–{ReceiverId.Type})";
             retString.Append($"{sender}({TransmitterId.Address})->{receiver}({ReceiverId.Address});;");
 
 
             retString.Append(GetString(pgn.name) + ";;");
             if (pgn.multiPack)
-                retString.Append($"{GetString("t_multipack")} №{Data[0]};");
-            if (Pgn == 1 && Commands.ContainsKey(Data[1] + Data[0] * 256))
+                retString.Append($"{GetString("t_multipack")} в„–{Data[0]};");
+            if (Pgn == 1 && Omni.Commands.ContainsKey(Data[1] + Data[0] * 256))
             {
-                var cmd = Commands[Data[1] + Data[0] * 256];
+                var cmd = Omni.Commands[Data[1] + Data[0] * 256];
                 retString.Append(GetString(cmd.Name) + ";");
                 if (cmd.Parameters != null)
                     foreach (var p in cmd.Parameters)
@@ -226,7 +225,7 @@ namespace OmniProtocol
             if (Pgn == 1 || Pgn == 2)
                 if (Data[1] != m.Data[1])
                     return false;
-            if (Pgns.ContainsKey(Pgn) && Pgns[Pgn].multiPack && Data[0] != m.Data[0]) //Другой номер мультипакета
+            if (Omni.Pgns.ContainsKey(Pgn) && Omni.Pgns[Pgn].multiPack && Data[0] != m.Data[0]) //Р”СЂСѓРіРѕР№ РЅРѕРјРµСЂ РјСѓР»СЊС‚РёРїР°РєРµС‚Р°
                 return false;
             return true;
         }

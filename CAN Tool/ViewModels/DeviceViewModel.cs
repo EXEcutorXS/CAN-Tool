@@ -62,6 +62,26 @@ namespace OmniProtocol
         public BindingList<BbError> BbErrors { get; } = new();
         public bool[] SupportedVariables { get; } = new bool[200];
 
+        // ── Специализированные данные (используются при обработке сообщений) ──
+        public virtual Timberline20OmniViewModel TimberlineParams { get; } = new();
+        public virtual ACInverterViewModel ACInverterParams { get; } = new();
+        public virtual GenericLoadTrippleViewModel GenericLoadTripple { get; } = new();
+        public virtual OverrideStateClass OverrideState { get; } = new();
+
+        public partial class OverrideStateClass : ObservableObject
+        {
+            [ObservableProperty] public bool blowerOverriden;
+            [ObservableProperty] public bool fuelPumpOverriden;
+            [ObservableProperty] public bool glowPlugOverriden;
+            [ObservableProperty] public bool relayOverriden;
+            [ObservableProperty] public bool pumpOverriden;
+            [ObservableProperty] public int blowerOverridenRevs;
+            [ObservableProperty] public int fuelPumpOverridenFrequencyX100;
+            [ObservableProperty] public int glowPlugOverridenPower;
+            [ObservableProperty] public bool relayOverridenState;
+            [ObservableProperty] public bool pumpOverridenState;
+        }
+
         // ── Лог ────────────────────────────────────────────────────────
         public ObservableCollection<CommonParameters> Log { get; } = new();
         public List<double[]> LogData = new();
@@ -120,6 +140,7 @@ namespace OmniProtocol
         public bool flagProgramDone = false;
         public bool flagTransmissionCheck = false;
         public bool flagCrcGetDone = false;
+        public bool flagDataGetDone = false;
         public int receivedDataLength = 0;
         public uint receiverDataCrc = 0;
         public bool flagGetParamDone = false;

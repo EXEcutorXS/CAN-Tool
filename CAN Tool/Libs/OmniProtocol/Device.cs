@@ -1,4 +1,4 @@
-using CAN_Tool.Libs;
+﻿using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
 using CAN_Tool;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Media;
 using static CAN_Tool.Libs.Helper;
-using static Omni;
 using System.Windows;
 using CommunityToolkit.Mvvm.Input;
 using System.IO;
@@ -31,15 +30,16 @@ using System.Windows.Markup;
 namespace OmniProtocol
 {
 
-    public class Device
+    public class DeviceTemplate
     {
         public int Id;
         public string Name => GetString($"d_{Id}");
-        public DeviceType DevType { set; get; }
+        public DeviceType_t DevType { set; get; }
 
-        public int MaxBlower { get; set; } = 130; //Максимальное значение скорости нагнетателя
-        public double MaxFuelPump { get; set; } = 4; //Максимальное значение ТН
-        public int BBErrorsLen { get; set; } = 512; //Длина ЧЯ для ошибок
+        public int MaxBlower { get; set; } = 130; //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃРєРѕСЂРѕСЃС‚Рё РЅР°РіРЅРµС‚Р°С‚РµР»СЏ
+        public double MaxFuelPump { get; set; } = 4; //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РўРќ
+        public int BBErrorsLen { get; set; } = 512; //Р”Р»РёРЅР° Р§РЇ РґР»СЏ РѕС€РёР±РѕРє
+        public string ImageName { get; set; } = string.Empty;
 
         public override string ToString() => Name;
     }

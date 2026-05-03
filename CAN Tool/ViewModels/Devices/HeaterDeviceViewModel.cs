@@ -1,25 +1,10 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace OmniProtocol
 {
     public partial class HeaterDeviceViewModel : DeviceViewModel
     {
-        public partial class OverrideStateClass : ObservableObject
-        {
-            [ObservableProperty] public bool blowerOverriden;
-            [ObservableProperty] public bool fuelPumpOverriden;
-            [ObservableProperty] public bool glowPlugOverriden;
-            [ObservableProperty] public bool relayOverriden;
-            [ObservableProperty] public bool pumpOverriden;
-
-            [ObservableProperty] public int blowerOverridenRevs;
-            [ObservableProperty] public int fuelPumpOverridenFrequencyX100;
-            [ObservableProperty] public int glowPlugOverridenPower;
-            [ObservableProperty] public bool relayOverridenState;
-            [ObservableProperty] public bool pumpOverridenState;
-        }
-
         public HeaterDeviceViewModel(DeviceId id) : base(id)
         {
             SecondMessages = (DeviceReference?.DevType == DeviceType_t.Binar ||
@@ -33,11 +18,11 @@ namespace OmniProtocol
             CalibrateTermocouplesCommand = new RelayCommand(() => ExecuteCommand(20));
         }
 
-        // ── Состояние ──────────────────────────────────────────────────
+        // в”Ђв”Ђ РЎРѕСЃС‚РѕСЏРЅРёРµ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
-        [ObservableProperty] private OverrideStateClass overrideState = new();
+        public override OverrideStateClass OverrideState { get; } = new();
 
-        // ── Команды управления нагревателем ────────────────────────────
+        // в”Ђв”Ђ РљРѕРјР°РЅРґС‹ СѓРїСЂР°РІР»РµРЅРёСЏ РЅР°РіСЂРµРІР°С‚РµР»РµРј в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
         public RelayCommand StartHeaterCommand { get; }
         public RelayCommand StopHeaterCommand { get; }
         public RelayCommand StartPumpCommand { get; }
