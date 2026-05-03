@@ -541,6 +541,10 @@ namespace CAN_Tool.ViewModels
 
             canAdapter = new();
 
+            // Try to refresh omnidata.json from Google Sheets before loading static data.
+            // Uses a built-in timeout; silently falls back to the local file on any failure.
+            CAN_Tool.Libs.GoogleSheetsUpdater.TryUpdateAsync().GetAwaiter().GetResult();
+
             OmniInstance = new Omni(CanAdapter);
 
             OmniInstance.plot = myChart;
