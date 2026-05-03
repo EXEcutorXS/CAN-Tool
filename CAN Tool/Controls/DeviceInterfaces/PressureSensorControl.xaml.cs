@@ -28,7 +28,7 @@ namespace CAN_Tool.CustomControls
 
         DispatcherTimer RenderTimer = new DispatcherTimer();
 
-        public DeviceViewModel vm => (DeviceViewModel)DataContext;
+        public PressureSensorDeviceViewModel vm => (PressureSensorDeviceViewModel)DataContext;
 
         double[] dataToShow = new double[2000];
 

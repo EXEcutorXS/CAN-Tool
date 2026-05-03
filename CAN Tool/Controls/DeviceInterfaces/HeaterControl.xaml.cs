@@ -23,7 +23,7 @@ namespace CAN_Tool.CustomControls
     /// </summary>
     public partial class HeaterControl : UserControl
     {
-        DeviceViewModel Vm => (DeviceViewModel)DataContext;
+        HeaterDeviceViewModel Vm => (HeaterDeviceViewModel)DataContext;
 
         public HeaterControl()
         {

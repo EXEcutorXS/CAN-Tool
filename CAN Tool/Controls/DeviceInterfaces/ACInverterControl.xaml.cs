@@ -24,7 +24,7 @@ namespace CAN_Tool.CustomControls
     public partial class AcInverterControl : UserControl
     {
        
-        public DeviceViewModel vm => (DeviceViewModel)DataContext;
+        public AcInverterDeviceViewModel vm => (AcInverterDeviceViewModel)DataContext;
 
         public AcInverterControl()
         {

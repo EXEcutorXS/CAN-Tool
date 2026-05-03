@@ -1,5 +1,4 @@
-﻿using CAN_Tool.Infrastructure.Commands;
-using CAN_Tool.ViewModels.Base;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using OmniProtocol;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CAN_Tool.Libs.Devices
 {
-    class ExtensionBoardViewModel:ViewModel
+    class ExtensionBoardViewModel : ObservableObject
     {
         DeviceViewModel parent;
         

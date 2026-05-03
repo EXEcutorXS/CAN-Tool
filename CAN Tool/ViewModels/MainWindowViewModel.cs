@@ -1,6 +1,4 @@
 ﻿using OmniProtocol;
-using CAN_Tool.Infrastructure.Commands;
-using CAN_Tool.ViewModels.Base;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
@@ -493,7 +491,7 @@ namespace CAN_Tool.ViewModels
                     ChartDraw(null);
 
 
-            foreach (var d in OmniInstance.ConnectedDevices.Where(d => d.SecondMessages)) //Поддержание связи только для котлов
+            foreach (var d in OmniInstance.ConnectedDevices.OfType<HeaterDeviceViewModel>().Where(d => d.SecondMessages)) //Поддержание связи только для котлов
             {
                 OmniMessage msg = new();
                 msg.TransmitterId.Address = 6;
@@ -525,7 +523,7 @@ namespace CAN_Tool.ViewModels
 
         public bool deviceInManualMode(object parameter)
         {
-            return (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice != null && OmniInstance.SelectedConnectedDevice.ManualMode);
+            return (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice is HeaterDeviceViewModel h && h.ManualMode);
         }
 
         public void NewMessgeReceived(object sender, EventArgs e)

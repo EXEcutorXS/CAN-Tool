@@ -1,4 +1,4 @@
-﻿using CAN_Tool.ViewModels.Base;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using RVC;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Windows.Threading;
 namespace CAN_Tool.ViewModels
 {
 
-    public class Timberline15RvcViewModel : ViewModel
+    public class Timberline15RvcViewModel : ObservableObject
     {
         private DispatcherTimer timer;
 
@@ -350,123 +350,133 @@ namespace CAN_Tool.ViewModels
         }
 
         private int tankTemperature;
-        public int TankTemperature { set => Set(ref tankTemperature, value); get => tankTemperature; }
+        public int TankTemperature { set => SetProperty(ref tankTemperature, value); get => tankTemperature; }
 
         private int heatExchangerTemperature;
-        public int HeatExchangerTemperature { set => Set(ref heatExchangerTemperature, value); get => heatExchangerTemperature; }
+        public int HeatExchangerTemperature { set => SetProperty(ref heatExchangerTemperature, value); get => heatExchangerTemperature; }
 
         private int heaterTemperature;
-        public int HeaterTemperature { set => Set(ref heaterTemperature, value); get => heaterTemperature; }
+        public int HeaterTemperature { set => SetProperty(ref heaterTemperature, value); get => heaterTemperature; }
 
         private pumpStatus_t waterPumpStatus;
-        public pumpStatus_t WaterPumpStatus { set => Set(ref waterPumpStatus, value); get => waterPumpStatus; }
+        public pumpStatus_t WaterPumpStatus { set => SetProperty(ref waterPumpStatus, value); get => waterPumpStatus; }
 
         private bool waterPumpOverride;
-        public bool WaterPumpOverride { set => Set(ref waterPumpOverride, value); get => waterPumpOverride; }
+        public bool WaterPumpOverride { set => SetProperty(ref waterPumpOverride, value); get => waterPumpOverride; }
 
         private bool solenoidStatus;
-        public bool SolenoidStatus { set => Set(ref solenoidStatus, value); get => solenoidStatus; }
+        public bool SolenoidStatus { set => SetProperty(ref solenoidStatus, value); get => solenoidStatus; }
 
         private bool heaterEnabled;
-        public bool HeaterEnabled { set => Set(ref heaterEnabled, value); get => heaterEnabled; }
+        public bool HeaterEnabled { set => SetProperty(ref heaterEnabled, value); get => heaterEnabled; }
 
         private bool elementEnabled;
-        public bool ElementEnabled { set => Set(ref elementEnabled, value); get => elementEnabled; }
+        public bool ElementEnabled { set => SetProperty(ref elementEnabled, value); get => elementEnabled; }
 
         private bool waterEnabled;
-        public bool WaterEnabled { set => Set(ref waterEnabled, value); get => waterEnabled; }
+        public bool WaterEnabled { set => SetProperty(ref waterEnabled, value); get => waterEnabled; }
 
         private bool zoneEnabled;
-        public bool ZoneEnabled { set => Set(ref zoneEnabled, value); get => zoneEnabled; }
+        public bool ZoneEnabled { set => SetProperty(ref zoneEnabled, value); get => zoneEnabled; }
 
 
         private int setpointDay;
-        public int SetpointDay { set => Set(ref setpointDay, value); get => setpointDay; }
+        public int SetpointDay { set => SetProperty(ref setpointDay, value); get => setpointDay; }
 
         private int setpointNight;
-        public int SetpointNight { set => Set(ref setpointNight, value); get => setpointNight; }
+        public int SetpointNight { set => SetProperty(ref setpointNight, value); get => setpointNight; }
 
         private int currentSetpoint;
-        public int CurrentSetpoint { set => Set(ref currentSetpoint, value); get => currentSetpoint; }
+        public int CurrentSetpoint { set => SetProperty(ref currentSetpoint, value); get => currentSetpoint; }
 
         private byte zoneManualFanSpeed;
-        public byte ZoneManualFanSpeed { set => Set(ref zoneManualFanSpeed, value); get => zoneManualFanSpeed; }
+        public byte ZoneManualFanSpeed { set => SetProperty(ref zoneManualFanSpeed, value); get => zoneManualFanSpeed; }
 
         private bool zoneManualFanMode;
-        public bool ZoneManualFanMode { set => Set(ref zoneManualFanMode, value); get => zoneManualFanMode; }
+        public bool ZoneManualFanMode { set => SetProperty(ref zoneManualFanMode, value); get => zoneManualFanMode; }
 
         private int zoneFanMeasuredSpeed;
-        public int ZoneFanMeasuredSpeed { set => Set(ref zoneFanMeasuredSpeed, value); get => zoneFanMeasuredSpeed; }
+        public int ZoneFanMeasuredSpeed { set => SetProperty(ref zoneFanMeasuredSpeed, value); get => zoneFanMeasuredSpeed; }
 
         private int systemLimitationTime;
-        public int SystemLimitationTime { set => Set(ref systemLimitationTime, value); get => systemLimitationTime; }
+        public int SystemLimitationTime { set => SetProperty(ref systemLimitationTime, value); get => systemLimitationTime; }
 
         private int waterLimitationTime;
-        public int WaterLimitationTime { set => Set(ref waterLimitationTime, value); get => waterLimitationTime; }
+        public int WaterLimitationTime { set => SetProperty(ref waterLimitationTime, value); get => waterLimitationTime; }
 
         private int systemEstimatedTime;
-        public int SystemEstimatedTime { set => Set(ref systemEstimatedTime, value); get => systemEstimatedTime; }
+        public int SystemEstimatedTime { set => SetProperty(ref systemEstimatedTime, value); get => systemEstimatedTime; }
 
         private int pumpEstimatedTime;
-        public int PumpEstimatedTime { set => Set(ref pumpEstimatedTime, value); get => pumpEstimatedTime; }
+        public int PumpEstimatedTime { set => SetProperty(ref pumpEstimatedTime, value); get => pumpEstimatedTime; }
 
         private int waterEstimatedTime;
-        public int WaterEstimatedTime { set => Set(ref waterEstimatedTime, value); get => waterEstimatedTime; }
+        public int WaterEstimatedTime { set => SetProperty(ref waterEstimatedTime, value); get => waterEstimatedTime; }
 
         private int panelTimeSinceStart;
-        public int PanelMinutesSinceStart { set => Set(ref panelTimeSinceStart, value); get => panelTimeSinceStart; }
+        public int PanelMinutesSinceStart { set => SetProperty(ref panelTimeSinceStart, value); get => panelTimeSinceStart; }
 
         private bool panelSensorOn;
-        public bool PanelSensorOn { set => Set(ref panelSensorOn, value); get => panelSensorOn; }
+        public bool PanelSensorOn { set => SetProperty(ref panelSensorOn, value); get => panelSensorOn; }
 
         private int zoneTemperature;
-        public int ZoneTemperature { set => Set(ref zoneTemperature, value); get => zoneTemperature; }
+        public int ZoneTemperature { set => SetProperty(ref zoneTemperature, value); get => zoneTemperature; }
 
         private int heaterTotalMinutes;
-        public int HeaterTotalMinutes { set => Set(ref heaterTotalMinutes, value); get => heaterTotalMinutes; }
+        public int HeaterTotalMinutes { set => SetProperty(ref heaterTotalMinutes, value); get => heaterTotalMinutes; }
 
         private int waterDuration;
-        public int WaterDuration { set => Set(ref waterDuration, value); get => waterDuration; }
+        public int WaterDuration { set => SetProperty(ref waterDuration, value); get => waterDuration; }
 
         private int systemDuration;
-        public int SystemDuration { set => Set(ref systemDuration, value); get => systemDuration; }
+        public int SystemDuration { set => SetProperty(ref systemDuration, value); get => systemDuration; }
 
         private bool broadcastTemperature;
-        public bool BroadcastTemperature { set => Set(ref broadcastTemperature, value); get => broadcastTemperature; }
+        public bool BroadcastTemperature { set => SetProperty(ref broadcastTemperature, value); get => broadcastTemperature; }
 
         private bool scheduleMode;
-        public bool ScheduleMode { set => Set(ref scheduleMode, value); get => scheduleMode; }
+        public bool ScheduleMode { set => SetProperty(ref scheduleMode, value); get => scheduleMode; }
 
         private int rvcTemperature = 30;
-        public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
+        public int RvcTemperature { set => SetProperty(ref rvcTemperature, value); get => rvcTemperature; }
 
         private DateTime? dayStart;
-        public DateTime? DayStart { set => Set(ref dayStart, value); get => dayStart; }
+        public DateTime? DayStart { set => SetProperty(ref dayStart, value); get => dayStart; }
 
         private DateTime? nightStart;
-        public DateTime? NightStart { set => Set(ref nightStart, value); get => nightStart; }
+        public DateTime? NightStart { set => SetProperty(ref nightStart, value); get => nightStart; }
 
 
         private byte[] heaterVersion;
-        [AffectsTo(nameof(HeaterVersionString))]
-        public byte[] HeaterVersion { set => Set(ref heaterVersion, value); get => heaterVersion; }
+        public byte[] HeaterVersion
+        {
+            get => heaterVersion;
+            set { if (SetProperty(ref heaterVersion, value)) OnPropertyChanged(nameof(HeaterVersionString)); }
+        }
 
         public string HeaterVersionString { get => $"{heaterVersion[0]:D03}.{heaterVersion[1]:D03}.{heaterVersion[2]:D03}.{heaterVersion[3]:D03}"; }
 
         private byte[] hcuVersion;
-        [AffectsTo(nameof(HcuVersionString))]
-        public byte[] HcuVersion { set => Set(ref hcuVersion, value); get => hcuVersion; }
+        public byte[] HcuVersion
+        {
+            get => hcuVersion;
+            set { if (SetProperty(ref hcuVersion, value)) OnPropertyChanged(nameof(HcuVersionString)); }
+        }
 
         public string HcuVersionString { get => $"{hcuVersion[0]:D03}.{hcuVersion[1]:D03}.{hcuVersion[2]:D03}.{hcuVersion[3]:D03}"; }
 
         private byte[] panelVersion;
-        [AffectsTo(nameof(PanelVersionString))]
-        public byte[] PanelVersion { set => Set(ref panelVersion, value); get => panelVersion; }
+        public byte[] PanelVersion
+        {
+            get => panelVersion;
+            set { if (SetProperty(ref panelVersion, value)) OnPropertyChanged(nameof(PanelVersionString)); }
+        }
 
         public string PanelVersionString { get => $"{panelVersion[0]:D03}.{panelVersion[1]:D03}.{panelVersion[2]:D03}.{panelVersion[3]:D03}"; }
 
         private bool selected;
-        public bool Selected { set => Set(ref selected, value); get => selected; }
+        public bool Selected { set => SetProperty(ref selected, value); get => selected; }
     }
 
 }
+

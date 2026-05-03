@@ -1,5 +1,5 @@
 ﻿using CAN_Tool.Libs;
-using CAN_Tool.ViewModels.Base;
+using CommunityToolkit.Mvvm.ComponentModel;
 using RVC;
 using ScottPlot.Drawing.Colormaps;
 using ScottPlot.MarkerShapes;
@@ -24,7 +24,7 @@ namespace CAN_Tool.ViewModels
 
     public enum zoneType_t { Disconnected, Furnace, Defrosting, Radiator }
 
-    public class ZoneHandler : ViewModel
+    public class ZoneHandler : ObservableObject
     {
         public ZoneHandler()
         {
@@ -40,47 +40,47 @@ namespace CAN_Tool.ViewModels
 
         public int ZoneNumber => zoneNumber;
         private int tempSetpointDay = 22;
-        public int TempSetpointDay { set => Set(ref tempSetpointDay, value); get => tempSetpointDay; }
+        public int TempSetpointDay { set => SetProperty(ref tempSetpointDay, value); get => tempSetpointDay; }
 
         private int tempSetpointNight = 20;
-        public int TempSetpointNight { set => Set(ref tempSetpointNight, value); get => tempSetpointNight; }
+        public int TempSetpointNight { set => SetProperty(ref tempSetpointNight, value); get => tempSetpointNight; }
 
         private int tempSetpointCurrent = 20;
-        public int TempSetpointCurrent { set => Set(ref tempSetpointCurrent, value); get => tempSetpointCurrent; }
+        public int TempSetpointCurrent { set => SetProperty(ref tempSetpointCurrent, value); get => tempSetpointCurrent; }
 
         private int currentTemperature = 0;
-        public int CurrentTemperature { set => Set(ref currentTemperature, value); get => currentTemperature; }
+        public int CurrentTemperature { set => SetProperty(ref currentTemperature, value); get => currentTemperature; }
 
         private zoneType_t connected = zoneType_t.Disconnected;
-        public zoneType_t Connected { set => Set(ref connected, value); get => connected; }
+        public zoneType_t Connected { set => SetProperty(ref connected, value); get => connected; }
 
         private zoneState_t state = zoneState_t.Off;
-        public zoneState_t State { set => Set(ref state, value); get => state; }
+        public zoneState_t State { set => SetProperty(ref state, value); get => state; }
 
         private bool manualMode = false;
-        public bool ManualMode { set => Set(ref manualMode, value); get => manualMode; }
+        public bool ManualMode { set => SetProperty(ref manualMode, value); get => manualMode; }
 
         private int manualPercent = 40;
-        public int ManualPercent { set => Set(ref manualPercent, value); get => manualPercent; }
+        public int ManualPercent { set => SetProperty(ref manualPercent, value); get => manualPercent; }
 
         private int currentPwm = 50;
-        public int CurrentPwm { set => Set(ref currentPwm, value); get => currentPwm; }
+        public int CurrentPwm { set => SetProperty(ref currentPwm, value); get => currentPwm; }
 
         private bool broadcastTemperature;
-        public bool BroadcastTemperature { set => Set(ref broadcastTemperature, value); get => broadcastTemperature; }
+        public bool BroadcastTemperature { set => SetProperty(ref broadcastTemperature, value); get => broadcastTemperature; }
 
         private bool selected;
-        public bool Selected { set => Set(ref selected, value); get => selected; }
+        public bool Selected { set => SetProperty(ref selected, value); get => selected; }
 
         private int rvcTemperature = 30;
-        public int RvcTemperature { set => Set(ref rvcTemperature, value); get => rvcTemperature; }
+        public int RvcTemperature { set => SetProperty(ref rvcTemperature, value); get => rvcTemperature; }
 
 
 
     }
 
 
-    public class Timberline20RvcViewModel : ViewModel
+    public class Timberline20RvcViewModel : ObservableObject
     {
         private DispatcherTimer timer;
 
@@ -717,64 +717,64 @@ namespace CAN_Tool.ViewModels
 
 
         private int tankTemperature;
-        public int TankTemperature { set => Set(ref tankTemperature, value); get => tankTemperature; }
+        public int TankTemperature { set => SetProperty(ref tankTemperature, value); get => tankTemperature; }
 
         private int heatExchangerTemperature;
-        public int HeatExchangerTemperature { set => Set(ref heatExchangerTemperature, value); get => heatExchangerTemperature; }
+        public int HeatExchangerTemperature { set => SetProperty(ref heatExchangerTemperature, value); get => heatExchangerTemperature; }
 
         private int heaterTemperature;
-        public int HeaterTemperature { set => Set(ref heaterTemperature, value); get => heaterTemperature; }
+        public int HeaterTemperature { set => SetProperty(ref heaterTemperature, value); get => heaterTemperature; }
 
         private int outsideTemperature;
-        public int OutsideTemperature { set => Set(ref outsideTemperature, value); get => outsideTemperature; }
+        public int OutsideTemperature { set => SetProperty(ref outsideTemperature, value); get => outsideTemperature; }
 
         private int liquidLevel;
-        public int LiquidLevel { set => Set(ref liquidLevel, value); get => liquidLevel; }
+        public int LiquidLevel { set => SetProperty(ref liquidLevel, value); get => liquidLevel; }
 
         private pumpStatus_t heaterPumpStatus;
-        public pumpStatus_t HeaterPumpStatus { set => Set(ref heaterPumpStatus, value); get => heaterPumpStatus; }
+        public pumpStatus_t HeaterPumpStatus { set => SetProperty(ref heaterPumpStatus, value); get => heaterPumpStatus; }
 
         private pumpStatus_t waterPump1Status;
-        public pumpStatus_t WaterPump1Status { set => Set(ref waterPump1Status, value); get => waterPump1Status; }
+        public pumpStatus_t WaterPump1Status { set => SetProperty(ref waterPump1Status, value); get => waterPump1Status; }
 
         private pumpStatus_t waterPump2Status;
-        public pumpStatus_t WaterPump2Status { set => Set(ref waterPump2Status, value); get => waterPump2Status; }
+        public pumpStatus_t WaterPump2Status { set => SetProperty(ref waterPump2Status, value); get => waterPump2Status; }
 
         private BindingList<Trackable<pumpStatus_t>> auxPumpStatus = new();
         public BindingList<Trackable<pumpStatus_t>> AuxPumpStatus => auxPumpStatus;
 
         private bool heaterPumpOverride;
-        public bool HeaterPumpOverride { set => Set(ref heaterPumpOverride, value); get => heaterPumpOverride; }
+        public bool HeaterPumpOverride { set => SetProperty(ref heaterPumpOverride, value); get => heaterPumpOverride; }
 
         private bool pump1Override;
-        public bool Pump1Override { set => Set(ref pump1Override, value); get => pump1Override; }
+        public bool Pump1Override { set => SetProperty(ref pump1Override, value); get => pump1Override; }
 
         private bool pump2Override;
-        public bool Pump2Override { set => Set(ref pump2Override, value); get => pump2Override; }
+        public bool Pump2Override { set => SetProperty(ref pump2Override, value); get => pump2Override; }
 
         private bool heaterEnabled;
-        public bool HeaterEnabled { set => Set(ref heaterEnabled, value); get => heaterEnabled; }
+        public bool HeaterEnabled { set => SetProperty(ref heaterEnabled, value); get => heaterEnabled; }
 
         private bool elementEnabled;
-        public bool ElementEnabled { set => Set(ref elementEnabled, value); get => elementEnabled; }
+        public bool ElementEnabled { set => SetProperty(ref elementEnabled, value); get => elementEnabled; }
 
         private bool underfloorHeatingEnabled;
-        public bool UnderfloorHeatingEnabled { set => Set(ref underfloorHeatingEnabled, value); get => underfloorHeatingEnabled; }
+        public bool UnderfloorHeatingEnabled { set => SetProperty(ref underfloorHeatingEnabled, value); get => underfloorHeatingEnabled; }
 
         private bool enginePreheatEnabled;
-        public bool EnginePreheatEnabled { set => Set(ref enginePreheatEnabled, value); get => enginePreheatEnabled; }
+        public bool EnginePreheatEnabled { set => SetProperty(ref enginePreheatEnabled, value); get => enginePreheatEnabled; }
 
         private bool domesticWater;
-        public bool DomesticWater { set => Set(ref domesticWater, value); get => domesticWater; }
+        public bool DomesticWater { set => SetProperty(ref domesticWater, value); get => domesticWater; }
 
         private BindingList<ZoneHandler> zones = new();
         public BindingList<ZoneHandler> Zones => zones;
 
         private ZoneHandler selectedZone = null;
-        public ZoneHandler SelectedZone { set => Set(ref selectedZone, value); get => selectedZone; }
+        public ZoneHandler SelectedZone { set => SetProperty(ref selectedZone, value); get => selectedZone; }
 
         private int selectedZoneNumber;
-        public int SelectedZoneNumber { set => Set(ref selectedZoneNumber, value); get => selectedZoneNumber; }
+        public int SelectedZoneNumber { set => SetProperty(ref selectedZoneNumber, value); get => selectedZoneNumber; }
 
         BindingList<Trackable<float>> auxTemp = new();
         public BindingList<Trackable<float>> AuxTemp => auxTemp;
@@ -786,60 +786,66 @@ namespace CAN_Tool.ViewModels
         public BindingList<Trackable<int>> AuxPumpEstimatedTime => auxPumpEstimatedTime;
 
         private int systemEstimatedTime;
-        public int SystemEstimatedTime { set => Set(ref systemEstimatedTime, value); get => systemEstimatedTime; }
+        public int SystemEstimatedTime { set => SetProperty(ref systemEstimatedTime, value); get => systemEstimatedTime; }
 
         private int heaterPumpEstimatedTime;
-        public int HeaterPumpEstimatedTime { set => Set(ref heaterPumpEstimatedTime, value); get => heaterPumpEstimatedTime; }
+        public int HeaterPumpEstimatedTime { set => SetProperty(ref heaterPumpEstimatedTime, value); get => heaterPumpEstimatedTime; }
 
         private int pump1EstimatedTime;
-        public int Pump1EstimatedTime { set => Set(ref pump1EstimatedTime, value); get => pump1EstimatedTime; }
+        public int Pump1EstimatedTime { set => SetProperty(ref pump1EstimatedTime, value); get => pump1EstimatedTime; }
 
         private int pump2EstimatedTime;
-        public int Pump2EstimatedTime { set => Set(ref pump2EstimatedTime, value); get => pump2EstimatedTime; }
+        public int Pump2EstimatedTime { set => SetProperty(ref pump2EstimatedTime, value); get => pump2EstimatedTime; }
 
         private int heaterTotalMinutes;
-        public int HeaterTotalMinutes { set => Set(ref heaterTotalMinutes, value); get => heaterTotalMinutes; }
+        public int HeaterTotalMinutes { set => SetProperty(ref heaterTotalMinutes, value); get => heaterTotalMinutes; }
 
         private int waterDuration;
-        public int WaterDuration { set => Set(ref waterDuration, value); get => waterDuration; }
+        public int WaterDuration { set => SetProperty(ref waterDuration, value); get => waterDuration; }
 
         private int systemDuration;
-        [AffectsTo(nameof(SystemDurationString))]
-        public int SystemDuration { set => Set(ref systemDuration, value); get => systemDuration; }
+        public int SystemDuration
+        {
+            get => systemDuration;
+            set { if (SetProperty(ref systemDuration, value)) OnPropertyChanged(nameof(SystemDurationString)); }
+        }
 
         private int enginePreheatSetpoint;
-        public int EnginePreheatSetpoint { set => Set(ref enginePreheatSetpoint, value); get => enginePreheatSetpoint; }
+        public int EnginePreheatSetpoint { set => SetProperty(ref enginePreheatSetpoint, value); get => enginePreheatSetpoint; }
 
         private int enginePreheatDuration;
-        [AffectsTo(nameof(EngineDurationString))]
-        public int EnginePreheatDuration { set => Set(ref enginePreheatDuration, value); get => enginePreheatDuration; }
+        public int EnginePreheatDuration
+        {
+            get => enginePreheatDuration;
+            set { if (SetProperty(ref enginePreheatDuration, value)) OnPropertyChanged(nameof(EngineDurationString)); }
+        }
 
         private byte saToRequest = 101;
-        public byte SaToRequest { set => Set(ref saToRequest, value); get => saToRequest; }
+        public byte SaToRequest { set => SetProperty(ref saToRequest, value); get => saToRequest; }
 
         private int dgnToRequest = 0xFEEB;
-        public int DgnToRequest { set => Set(ref dgnToRequest, value); get => dgnToRequest; }
+        public int DgnToRequest { set => SetProperty(ref dgnToRequest, value); get => dgnToRequest; }
 
         private byte instanceToRequest = 1;
-        public byte InstanceToRequest { set => Set(ref instanceToRequest, value); get => instanceToRequest; }
+        public byte InstanceToRequest { set => SetProperty(ref instanceToRequest, value); get => instanceToRequest; }
 
         private byte subInstanceToRequest = 1;
-        public byte SubInstanceToRequest { set => Set(ref subInstanceToRequest, value); get => subInstanceToRequest; }
+        public byte SubInstanceToRequest { set => SetProperty(ref subInstanceToRequest, value); get => subInstanceToRequest; }
 
         private bool multipackInitiated = false;
-        public bool MultipackInitiated { set => Set(ref multipackInitiated, value); get => multipackInitiated; }
+        public bool MultipackInitiated { set => SetProperty(ref multipackInitiated, value); get => multipackInitiated; }
 
         private int multipackLength = 0;
-        public int MultipackLength { set => Set(ref multipackLength, value); get => multipackLength; }
+        public int MultipackLength { set => SetProperty(ref multipackLength, value); get => multipackLength; }
 
         private int multipackPacketCount = 0;
-        public int MultipackPacketCount { set => Set(ref multipackPacketCount, value); get => multipackPacketCount; }
+        public int MultipackPacketCount { set => SetProperty(ref multipackPacketCount, value); get => multipackPacketCount; }
 
         private int multipackPacketDgn = 0;
-        public int MultipackPacketDgn { set => Set(ref multipackPacketDgn, value); get => multipackPacketDgn; }
+        public int MultipackPacketDgn { set => SetProperty(ref multipackPacketDgn, value); get => multipackPacketDgn; }
 
         private string multipackString = "";
-        public string MultipackString { set => Set(ref multipackString, value); get => multipackString; }
+        public string MultipackString { set => SetProperty(ref multipackString, value); get => multipackString; }
 
         private byte[] multipackArray = new byte[1792];
 
@@ -859,22 +865,22 @@ namespace CAN_Tool.ViewModels
         }
 
         private float underfloorCurrentTemp;
-        public float UnderfloorCurrentTemp { set => Set(ref underfloorCurrentTemp, value); get => underfloorCurrentTemp; }
+        public float UnderfloorCurrentTemp { set => SetProperty(ref underfloorCurrentTemp, value); get => underfloorCurrentTemp; }
 
         private int underfloorSetpoint;
-        public int UnderfloorSetpoint { set => Set(ref underfloorSetpoint, value); get => underfloorSetpoint; }
+        public int UnderfloorSetpoint { set => SetProperty(ref underfloorSetpoint, value); get => underfloorSetpoint; }
 
         private int underfloorHysteresis;
-        public int UnderfloorHysteresis { set => Set(ref underfloorHysteresis, value); get => underfloorHysteresis; }
+        public int UnderfloorHysteresis { set => SetProperty(ref underfloorHysteresis, value); get => underfloorHysteresis; }
 
         private bool underfloorPumpState;
-        public bool UnderfloorPumpState { set => Set(ref underfloorPumpState, value); get => underfloorPumpState; }
+        public bool UnderfloorPumpState { set => SetProperty(ref underfloorPumpState, value); get => underfloorPumpState; }
 
         private bool liquidLevelWarning;
-        public bool LiquidLevelWarning { set => Set(ref liquidLevelWarning, value); get => liquidLevelWarning; }
+        public bool LiquidLevelWarning { set => SetProperty(ref liquidLevelWarning, value); get => liquidLevelWarning; }
 
         private bool hotWaterPriority;
-        public bool HotWaterPriority { set => Set(ref hotWaterPriority, value); get => hotWaterPriority; }
+        public bool HotWaterPriority { set => SetProperty(ref hotWaterPriority, value); get => hotWaterPriority; }
 
         public string SystemDurationString
         {
@@ -892,18 +898,24 @@ namespace CAN_Tool.ViewModels
         }
 
         private int pumpDuration;
-        public int PumpDuration { set => Set(ref pumpDuration, value); get => pumpDuration; }
+        public int PumpDuration { set => SetProperty(ref pumpDuration, value); get => pumpDuration; }
 
         private int enginePreheatEstiamtedTime;
-        public int EnginePreheatEstiamtedTime { set => Set(ref enginePreheatEstiamtedTime, value); get => enginePreheatEstiamtedTime; }
+        public int EnginePreheatEstiamtedTime { set => SetProperty(ref enginePreheatEstiamtedTime, value); get => enginePreheatEstiamtedTime; }
 
         private int dayStartMinutes;
-        [AffectsTo(nameof(DayStartString))]
-        public int DayStartMinutes { set => Set(ref dayStartMinutes, value); get => dayStartMinutes; }
+        public int DayStartMinutes
+        {
+            get => dayStartMinutes;
+            set { if (SetProperty(ref dayStartMinutes, value)) OnPropertyChanged(nameof(DayStartString)); }
+        }
 
         private int nightStartMinutes;
-        [AffectsTo(nameof(NightStartString))]
-        public int NightStartMinutes { set => Set(ref nightStartMinutes, value); get => nightStartMinutes; }
+        public int NightStartMinutes
+        {
+            get => nightStartMinutes;
+            set { if (SetProperty(ref nightStartMinutes, value)) OnPropertyChanged(nameof(NightStartString)); }
+        }
 
         public string DayStartString
         {
@@ -938,20 +950,29 @@ namespace CAN_Tool.ViewModels
         }
 
         private byte[] heaterVersion;
-        [AffectsTo(nameof(HeaterVersionString))]
-        public byte[] HeaterVersion { set => Set(ref heaterVersion, value); get => heaterVersion; }
+        public byte[] HeaterVersion
+        {
+            get => heaterVersion;
+            set { if (SetProperty(ref heaterVersion, value)) OnPropertyChanged(nameof(HeaterVersionString)); }
+        }
 
         public string HeaterVersionString { get => $"{heaterVersion[0]:D03}.{heaterVersion[1]:D03}.{heaterVersion[2]:D03}.{heaterVersion[3]:D03}"; }
 
         private byte[] hcuVersion;
-        [AffectsTo(nameof(HcuVersionString))]
-        public byte[] HcuVersion { set => Set(ref hcuVersion, value); get => hcuVersion; }
+        public byte[] HcuVersion
+        {
+            get => hcuVersion;
+            set { if (SetProperty(ref hcuVersion, value)) OnPropertyChanged(nameof(HcuVersionString)); }
+        }
 
         public string HcuVersionString { get => $"{hcuVersion[0]:D03}.{hcuVersion[1]:D03}.{hcuVersion[2]:D03}.{hcuVersion[3]:D03}"; }
 
         private byte[] panelVersion;
-        [AffectsTo(nameof(PanelVersionString))]
-        public byte[] PanelVersion { set => Set(ref panelVersion, value); get => panelVersion; }
+        public byte[] PanelVersion
+        {
+            get => panelVersion;
+            set { if (SetProperty(ref panelVersion, value)) OnPropertyChanged(nameof(PanelVersionString)); }
+        }
 
 
 
@@ -960,12 +981,13 @@ namespace CAN_Tool.ViewModels
         private int zoneToOverride = 0;
 
         heaterIcon heaterIconCode = 0;
-        public heaterIcon HeaterIconCode { set => Set(ref heaterIconCode, value); get => heaterIconCode; }
+        public heaterIcon HeaterIconCode { set => SetProperty(ref heaterIconCode, value); get => heaterIconCode; }
 
         private bool selected;
-        public bool Selected { set => Set(ref selected, value); get => selected; }
+        public bool Selected { set => SetProperty(ref selected, value); get => selected; }
 
     }
 
 }
+
 

@@ -10,6 +10,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:sctplt="clr-namespace:ScottPlot;assembly=ScottPlot"
              xmlns:cc="clr-namespace:CAN_Tool.CustomControls"
+             xmlns:op="clr-namespace:OmniProtocol"
              xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators"
              mc:Ignorable="d"
              Loaded="OmniModeView_Loaded"
@@ -35,16 +36,35 @@
                 <TabItem.Header>
                     <fa:ImageAwesome ToolTip="{DynamicResource b_common}" Icon="Solid_IdCardAlt" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" />
                 </TabItem.Header>
-                <DockPanel Visibility="{Binding OmniInstance.SelectedConnectedDevice,Converter={StaticResource NullToVisibleConverter}}">
-                    <cc:HcuOmniControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForHcu}}" />
-                    <cc:HeaterControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}" />
-                    <cc:PressureSensorControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForPressureSensors}}" />
-                    <cc:BootloaderControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForBootloaders}}" />
-                    <cc:GenericLoadTrippleControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForGenericLoadTripple}}" />
-                    <cc:AcInverterControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForAcInverter}}" />
-                    <cc:AcPanelControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForAcPanel}}" />
-                    <cc:ModemControl DockPanel.Dock="Top" DataContext="{Binding OmniInstance.SelectedConnectedDevice}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForModem}}" />
-                </DockPanel>
+                <ContentControl Content="{Binding OmniInstance.SelectedConnectedDevice}"
+                                Visibility="{Binding OmniInstance.SelectedConnectedDevice, Converter={StaticResource NullToVisibleConverter}}">
+                    <ContentControl.Resources>
+                        <DataTemplate DataType="{x:Type op:HeaterDeviceViewModel}">
+                            <cc:HeaterControl />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type op:HcuDeviceViewModel}">
+                            <cc:HcuOmniControl />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type op:PressureSensorDeviceViewModel}">
+                            <cc:PressureSensorControl />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type op:BootloaderDeviceViewModel}">
+                            <cc:BootloaderControl />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type op:GenericLoadTrippleDeviceViewModel}">
+                            <cc:GenericLoadTrippleControl />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type op:AcInverterDeviceViewModel}">
+                            <cc:AcInverterControl />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type op:AcPanelDeviceViewModel}">
+                            <cc:AcPanelControl />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type op:ModemDeviceViewModel}">
+                            <cc:ModemControl />
+                        </DataTemplate>
+                    </ContentControl.Resources>
+                </ContentControl>
             </TabItem>
             <TabItem>
                 <TabItem.Header>

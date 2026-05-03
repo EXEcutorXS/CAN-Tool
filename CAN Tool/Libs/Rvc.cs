@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CAN_Tool.ViewModels.Base;
+using CommunityToolkit.Mvvm.ComponentModel;
 using OmniProtocol;
 using CAN_Tool.Libs;
 using static CAN_Tool.Libs.Helper;
@@ -204,32 +204,47 @@ namespace RVC
             return retString;
         }
     }
-    public sealed class RvcMessage : ViewModel, IComparable, IUpdatable<RvcMessage>
+    public sealed class RvcMessage : ObservableObject, IComparable, IUpdatable<RvcMessage>
     {
 
         private byte priority;
-
-        [AffectsTo(nameof(VerboseInfo))]
-        public byte Priority { set => Set(ref priority, value); get => priority; }
+        public byte Priority
+        {
+            get => priority;
+            set { if (SetProperty(ref priority, value)) OnPropertyChanged(nameof(VerboseInfo)); }
+        }
 
         private int dgn;
-        [AffectsTo(nameof(VerboseInfo))]
-        public int Dgn { set => Set(ref dgn, value); get => dgn; }
+        public int Dgn
+        {
+            get => dgn;
+            set { if (SetProperty(ref dgn, value)) OnPropertyChanged(nameof(VerboseInfo)); }
+        }
 
         private byte sourceAdress;
-        [AffectsTo(nameof(VerboseInfo))]
-        public byte SourceAdress { set => Set(ref sourceAdress, value); get => sourceAdress; }
+        public byte SourceAdress
+        {
+            get => sourceAdress;
+            set { if (SetProperty(ref sourceAdress, value)) OnPropertyChanged(nameof(VerboseInfo)); }
+        }
+
         private byte[] data;
-        [AffectsTo(nameof(VerboseInfo), nameof(Instance), nameof(DataAsText))]
 
         public byte Instance => Data[0];
 
-        [AffectsTo(nameof(VerboseInfo), nameof(DataAsText), nameof(DataAsULong))]
         public byte[] Data
         {
             get => data;
-
-            set => Set(ref data, value);
+            set
+            {
+                if (SetProperty(ref data, value))
+                {
+                    OnPropertyChanged(nameof(VerboseInfo));
+                    OnPropertyChanged(nameof(DataAsText));
+                    OnPropertyChanged(nameof(DataAsULong));
+                    OnPropertyChanged(nameof(Instance));
+                }
+            }
         }
 
         public ulong DataAsULong
@@ -261,7 +276,7 @@ namespace RVC
         }
 
         private bool fresh;
-        public bool Fresh { set => Set(ref fresh, value); get => fresh; }
+        public bool Fresh { get => fresh; set => SetProperty(ref fresh, value); }
 
         public long updatetick;
 
@@ -375,3 +390,4 @@ namespace RVC
         }
     }
 }
+

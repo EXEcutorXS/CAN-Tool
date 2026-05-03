@@ -10,7 +10,7 @@ namespace CAN_Tool.CustomControls
     public partial class AcPanelControl : UserControl
     {
        
-        public DeviceViewModel vm => (DeviceViewModel)DataContext;
+        public AcPanelDeviceViewModel vm => (AcPanelDeviceViewModel)DataContext;
 
         public AcPanelControl()
         {

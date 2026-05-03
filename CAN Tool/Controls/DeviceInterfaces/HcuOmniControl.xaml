@@ -1,27 +1,4 @@
 ﻿<UserControl x:Class="CAN_Tool.CustomControls.HcuOmniControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:op="clr-namespace:OmniProtocol" xmlns:local="clr-namespace:CAN_Tool.CustomControls" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200" d:DataContext="{d:DesignInstance Type=op:DeviceViewModel}">
-    <UserControl.Resources>
-        <c:DataToStringConverter x:Key="DataConverter" />
-        <c:FuelPumpIndicatorConverter x:Key="FuelPumpConverter" />
-        <c:BoolToVisibleConverter x:Key="BoolToVisibileConverter" />
-        <c:IntToVisibleConverter x:Key="IntToVisibileConverter" />
-        <c:HeaterToVisibleConverter x:Key="OnlyForHeaters" />
-        <c:BinarToVisibleConverter x:Key="OnlyForBinars" />
-        <c:PlanarToVisibleConverter x:Key="OnlyForPlanars" />
-        <c:HcuToVisibleConverter x:Key="OnlyForHcu" />
-        <c:StateToBorderBrushConverter x:Key="BoolToBrush" />
-        <c:BoolToOpacity x:Key="BoolToOpacity" />
-        <c:FarenheitConverter x:Key="ToFarenheit" />
-        <c:TimeSpanConverter x:Key="ToTimeSpan" />
-        <c:HexStringToIntConverter x:Key="HexConverter" />
-        <c:HexStringToUlongConverter x:Key="HexToUlongConverter" />
-        <c:ConnectedZoneTypeToVisible x:Key="OnlyConnected" />
-        <c:HeatingZoneTypeToVisible x:Key="OnlyHetingZones" />
-        <c:DefrostingZoneTypeToVisible x:Key="OnlyDefrostZone" />
-        <c:FurnaceZoneTypeToVisible x:Key="OnlyFurnace" />
-        <c:ConnectedZoneTypeToBool x:Key="ConnectedToBool" />
-        <c:HeatingZoneTypeToBool x:Key="HetingZoneToBool" />
-        <c:ManualEnableConverter x:Key="ManualSliderEnabled" />
-    </UserControl.Resources>
 
     <Grid>
         <StackPanel Orientation="Vertical">

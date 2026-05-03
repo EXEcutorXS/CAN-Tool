@@ -58,29 +58,30 @@
     <None Include="Images\*.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\omnidata.json">
+    <Content Include="Resources\omnidata.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+      <TargetPath>omnidata.json</TargetPath>
+    </Content>
     <Resource Include="Images\CANTool.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="CustomControls\ACPanelControl.xaml.cs">
+    <Compile Update="Controls\DeviceInterfaces\ACPanelControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="CustomControls\ACInverterControl.xaml.cs">
+    <Compile Update="Controls\DeviceInterfaces\ACInverterControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="CustomControls\ModemControl.xaml.cs">
+    <Compile Update="Controls\DeviceInterfaces\ModemControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="CustomControls\GenerocLoadTrippleControl.xaml.cs">
+    <Compile Update="Controls\DeviceInterfaces\GenerocLoadTrippleControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="CustomControls\AcInverterControl.xaml">
+    <Page Update="Controls\DeviceInterfaces\ACInverterControl.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Resources\lang.ru-RU.xaml">

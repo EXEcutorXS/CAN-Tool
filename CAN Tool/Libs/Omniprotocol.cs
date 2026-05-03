@@ -996,12 +996,19 @@ namespace OmniProtocol
 
             if (senderDevice == null)
             {
-                senderDevice = new DeviceViewModel(id);
+                senderDevice = DeviceViewModel.Create(id);
                 ConnectedDevices.Add(senderDevice);
                 NewDeviceAcquired?.Invoke(this, null);
                 if (senderDevice.Id.Type != 123)        //Requesting basic data, but not for bootloaders
                     Task.Run(() => RequestSerial(id));
             }
+
+            var heaterDevice   = senderDevice as HeaterDeviceViewModel;
+            var hcuDevice      = senderDevice as HcuDeviceViewModel;
+            var acInverter     = senderDevice as AcInverterDeviceViewModel;
+            var acPanel        = senderDevice as AcPanelDeviceViewModel;
+            var genericLoad    = senderDevice as GenericLoadTrippleDeviceViewModel;
+            var pressureSensor = senderDevice as PressureSensorDeviceViewModel;
 
 
             foreach (var p in Parameters.Where(p => p.Pgn == m.Pgn))
@@ -1048,8 +1055,8 @@ namespace OmniProtocol
                         break;
                     case 15:
                         senderDevice.Parameters.RevSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
-                        if (!senderDevice.OverrideState.BlowerOverriden)
-                            senderDevice.OverrideState.BlowerOverridenRevs = senderDevice.Parameters.RevSet;
+                        if (heaterDevice != null && !heaterDevice.OverrideState.BlowerOverriden)
+                            heaterDevice.OverrideState.BlowerOverridenRevs = senderDevice.Parameters.RevSet;
                         break;
                     case 16:
                         senderDevice.Parameters.RevMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
@@ -1074,8 +1081,8 @@ namespace OmniProtocol
                         break;
                     case 60:
                         senderDevice.Parameters.Pressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
-                        if (senderDevice.PressureLogWriting)
-                            senderDevice.PressureLog[senderDevice.PressureLogPointer++] = senderDevice.Parameters.Pressure;
+                        if (pressureSensor != null && pressureSensor.PressureLogWriting)
+                            pressureSensor.PressureLog[pressureSensor.PressureLogPointer++] = senderDevice.Parameters.Pressure;
                         break;
                     case 131:
                         senderDevice.Parameters.ExPressure = (float)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
@@ -1084,19 +1091,19 @@ namespace OmniProtocol
                         senderDevice.Parameters.SetPowerLevel = (int)ImperialConverter(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b, sv.AssignedParameter.UnitT);
                         break;
                     case 134:
-                        senderDevice.ACInverterParams.CompressorRevsSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        if (acInverter != null) acInverter.ACInverterParams.CompressorRevsSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                         break;
                     case 135:
-                        senderDevice.ACInverterParams.CompressorRevsMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        if (acInverter != null) acInverter.ACInverterParams.CompressorRevsMeasured = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                         break;
                     case 136:
-                        senderDevice.ACInverterParams.CondensorPwmSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        if (acInverter != null) acInverter.ACInverterParams.CondensorPwmSet = (int)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                         break;
                     case 138:
-                        senderDevice.ACInverterParams.CompressorCurrent = (float)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        if (acInverter != null) acInverter.ACInverterParams.CompressorCurrent = (float)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                         break;
                     case 139:
-                        senderDevice.ACInverterParams.CondensorCurrent = (float)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
+                        if (acInverter != null) acInverter.ACInverterParams.CondensorCurrent = (float)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
                         break;
                     case 145:
                         senderDevice.Parameters.PcbTemp = (float)(rawValue * sv.AssignedParameter.a + sv.AssignedParameter.b);
@@ -1116,7 +1123,7 @@ namespace OmniProtocol
                             senderDevice.Firmware[3] = m.Data[5];
                             break;
                         case 67:
-                            senderDevice.ManualMode = m.Data[2] == 1;
+                            if (heaterDevice != null) heaterDevice.ManualMode = m.Data[2] == 1;
                             break;
                     }
 
@@ -1206,13 +1213,13 @@ namespace OmniProtocol
 
                 case 19:
                     {
-                        if (m.Data[0] == 4)
+                        if (m.Data[0] == 4 && hcuDevice != null)
                         {
-                            if (m.Data[1] < 4) senderDevice.TimberlineParams.Zones[0].Connected = (zoneType_t)m.Data[1];
-                            if (m.Data[2] < 4) senderDevice.TimberlineParams.Zones[1].Connected = (zoneType_t)m.Data[2];
-                            if (m.Data[3] < 4) senderDevice.TimberlineParams.Zones[2].Connected = (zoneType_t)m.Data[3];
-                            if (m.Data[4] < 4) senderDevice.TimberlineParams.Zones[3].Connected = (zoneType_t)m.Data[4];
-                            if (m.Data[5] < 4) senderDevice.TimberlineParams.Zones[4].Connected = (zoneType_t)m.Data[5];
+                            if (m.Data[1] < 4) hcuDevice.TimberlineParams.Zones[0].Connected = (zoneType_t)m.Data[1];
+                            if (m.Data[2] < 4) hcuDevice.TimberlineParams.Zones[1].Connected = (zoneType_t)m.Data[2];
+                            if (m.Data[3] < 4) hcuDevice.TimberlineParams.Zones[2].Connected = (zoneType_t)m.Data[3];
+                            if (m.Data[4] < 4) hcuDevice.TimberlineParams.Zones[3].Connected = (zoneType_t)m.Data[4];
+                            if (m.Data[5] < 4) hcuDevice.TimberlineParams.Zones[4].Connected = (zoneType_t)m.Data[5];
                         }
 
                         break;
@@ -1225,113 +1232,116 @@ namespace OmniProtocol
                         break;
                     }
                 case 21:
+                    if (hcuDevice != null)
                     {
-                        if (m.Data[2] != 255) senderDevice.TimberlineParams.TankTemperature = m.Data[2] - 75;
-                        if (m.Data[4] != 255) senderDevice.TimberlineParams.OutsideTemperature = m.Data[4] - 75;
-                        if (m.Data[6] != 255) senderDevice.TimberlineParams.LiquidLevel = m.Data[6];
-                        if ((m.Data[7] & 3) != 3) senderDevice.TimberlineParams.DomesticWaterFlow = (m.Data[7] & 3) != 0;
-                        break;
+                        if (m.Data[2] != 255) hcuDevice.TimberlineParams.TankTemperature = m.Data[2] - 75;
+                        if (m.Data[4] != 255) hcuDevice.TimberlineParams.OutsideTemperature = m.Data[4] - 75;
+                        if (m.Data[6] != 255) hcuDevice.TimberlineParams.LiquidLevel = m.Data[6];
+                        if ((m.Data[7] & 3) != 3) hcuDevice.TimberlineParams.DomesticWaterFlow = (m.Data[7] & 3) != 0;
                     }
+                    break;
                 case 22:
+                    if (hcuDevice != null)
                     {
                         if ((m.Data[0] & 3) != 3)
                         {
-                            if ((m.Data[0] & 3) == 0) senderDevice.TimberlineParams.Zones[0].State = zoneState_t.Off;
-                            if ((m.Data[0] & 3) == 1) senderDevice.TimberlineParams.Zones[0].State = zoneState_t.Heat;
-                            if ((m.Data[0] & 3) == 2) senderDevice.TimberlineParams.Zones[0].State = zoneState_t.Fan;
+                            if ((m.Data[0] & 3) == 0) hcuDevice.TimberlineParams.Zones[0].State = zoneState_t.Off;
+                            if ((m.Data[0] & 3) == 1) hcuDevice.TimberlineParams.Zones[0].State = zoneState_t.Heat;
+                            if ((m.Data[0] & 3) == 2) hcuDevice.TimberlineParams.Zones[0].State = zoneState_t.Fan;
                         }
-
                         if (((m.Data[0] >> 2) & 3) != 3)
                         {
-                            if (((m.Data[0] >> 2) & 3) == 0) senderDevice.TimberlineParams.Zones[1].State = zoneState_t.Off;
-                            if (((m.Data[0] >> 2) & 3) == 1) senderDevice.TimberlineParams.Zones[1].State = zoneState_t.Heat;
-                            if (((m.Data[0] >> 2) & 3) == 2) senderDevice.TimberlineParams.Zones[1].State = zoneState_t.Fan;
+                            if (((m.Data[0] >> 2) & 3) == 0) hcuDevice.TimberlineParams.Zones[1].State = zoneState_t.Off;
+                            if (((m.Data[0] >> 2) & 3) == 1) hcuDevice.TimberlineParams.Zones[1].State = zoneState_t.Heat;
+                            if (((m.Data[0] >> 2) & 3) == 2) hcuDevice.TimberlineParams.Zones[1].State = zoneState_t.Fan;
                         }
-
                         if (((m.Data[0] >> 4) & 3) != 3)
                         {
-                            if (((m.Data[0] >> 4) & 3) == 0) senderDevice.TimberlineParams.Zones[2].State = zoneState_t.Off;
-                            if (((m.Data[0] >> 4) & 3) == 1) senderDevice.TimberlineParams.Zones[2].State = zoneState_t.Heat;
-                            if (((m.Data[0] >> 4) & 3) == 2) senderDevice.TimberlineParams.Zones[2].State = zoneState_t.Fan;
+                            if (((m.Data[0] >> 4) & 3) == 0) hcuDevice.TimberlineParams.Zones[2].State = zoneState_t.Off;
+                            if (((m.Data[0] >> 4) & 3) == 1) hcuDevice.TimberlineParams.Zones[2].State = zoneState_t.Heat;
+                            if (((m.Data[0] >> 4) & 3) == 2) hcuDevice.TimberlineParams.Zones[2].State = zoneState_t.Fan;
                         }
                         if (((m.Data[0] >> 6) & 3) != 3)
                         {
-                            if (((m.Data[0] >> 6) & 3) == 0) senderDevice.TimberlineParams.Zones[3].State = zoneState_t.Off;
-                            if (((m.Data[0] >> 6) & 3) == 1) senderDevice.TimberlineParams.Zones[3].State = zoneState_t.Heat;
-                            if (((m.Data[0] >> 6) & 3) == 2) senderDevice.TimberlineParams.Zones[3].State = zoneState_t.Fan;
+                            if (((m.Data[0] >> 6) & 3) == 0) hcuDevice.TimberlineParams.Zones[3].State = zoneState_t.Off;
+                            if (((m.Data[0] >> 6) & 3) == 1) hcuDevice.TimberlineParams.Zones[3].State = zoneState_t.Heat;
+                            if (((m.Data[0] >> 6) & 3) == 2) hcuDevice.TimberlineParams.Zones[3].State = zoneState_t.Fan;
                         }
                         if ((m.Data[1] & 3) != 3)
                         {
-                            if ((m.Data[1] & 3) == 0) senderDevice.TimberlineParams.Zones[4].State = zoneState_t.Off;
-                            if ((m.Data[1] & 3) == 1) senderDevice.TimberlineParams.Zones[4].State = zoneState_t.Heat;
-                            if ((m.Data[1] & 3) == 2) senderDevice.TimberlineParams.Zones[4].State = zoneState_t.Fan;
+                            if ((m.Data[1] & 3) == 0) hcuDevice.TimberlineParams.Zones[4].State = zoneState_t.Off;
+                            if ((m.Data[1] & 3) == 1) hcuDevice.TimberlineParams.Zones[4].State = zoneState_t.Heat;
+                            if ((m.Data[1] & 3) == 2) hcuDevice.TimberlineParams.Zones[4].State = zoneState_t.Fan;
                         }
-
-                        if (m.Data[2] != 255) senderDevice.TimberlineParams.Zones[0].CurrentTemperature = m.Data[2] - 75;
-                        if (m.Data[3] != 255) senderDevice.TimberlineParams.Zones[1].CurrentTemperature = m.Data[3] - 75;
-                        if (m.Data[4] != 255) senderDevice.TimberlineParams.Zones[2].CurrentTemperature = m.Data[4] - 75;
-                        if (m.Data[5] != 255) senderDevice.TimberlineParams.Zones[3].CurrentTemperature = m.Data[5] - 75;
-                        if (m.Data[6] != 255) senderDevice.TimberlineParams.Zones[4].CurrentTemperature = m.Data[6] - 75;
-
-                        if ((m.Data[7] & 3) != 3) senderDevice.TimberlineParams.HeaterEnabled = (m.Data[7] & 3) != 0;
-                        if (((m.Data[7] >> 2) & 3) != 3) senderDevice.TimberlineParams.ElementEnabled = ((m.Data[7] >> 2) & 3) != 0;
-                        break;
+                        if (m.Data[2] != 255) hcuDevice.TimberlineParams.Zones[0].CurrentTemperature = m.Data[2] - 75;
+                        if (m.Data[3] != 255) hcuDevice.TimberlineParams.Zones[1].CurrentTemperature = m.Data[3] - 75;
+                        if (m.Data[4] != 255) hcuDevice.TimberlineParams.Zones[2].CurrentTemperature = m.Data[4] - 75;
+                        if (m.Data[5] != 255) hcuDevice.TimberlineParams.Zones[3].CurrentTemperature = m.Data[5] - 75;
+                        if (m.Data[6] != 255) hcuDevice.TimberlineParams.Zones[4].CurrentTemperature = m.Data[6] - 75;
+                        if ((m.Data[7] & 3) != 3) hcuDevice.TimberlineParams.HeaterEnabled = (m.Data[7] & 3) != 0;
+                        if (((m.Data[7] >> 2) & 3) != 3) hcuDevice.TimberlineParams.ElementEnabled = ((m.Data[7] >> 2) & 3) != 0;
                     }
+                    break;
                 case 23:
+                    if (hcuDevice != null)
                     {
-                        if (m.Data[0] != 255) senderDevice.TimberlineParams.Zones[0].SetPwmPercent = m.Data[0];
-                        if (m.Data[1] != 255) senderDevice.TimberlineParams.Zones[1].SetPwmPercent = m.Data[1];
-                        if (m.Data[2] != 255) senderDevice.TimberlineParams.Zones[2].SetPwmPercent = m.Data[2];
-                        if (m.Data[3] != 255) senderDevice.TimberlineParams.Zones[3].SetPwmPercent = m.Data[3];
-                        if (m.Data[4] != 255) senderDevice.TimberlineParams.Zones[4].SetPwmPercent = m.Data[4];
-                        break;
+                        if (m.Data[0] != 255) hcuDevice.TimberlineParams.Zones[0].SetPwmPercent = m.Data[0];
+                        if (m.Data[1] != 255) hcuDevice.TimberlineParams.Zones[1].SetPwmPercent = m.Data[1];
+                        if (m.Data[2] != 255) hcuDevice.TimberlineParams.Zones[2].SetPwmPercent = m.Data[2];
+                        if (m.Data[3] != 255) hcuDevice.TimberlineParams.Zones[3].SetPwmPercent = m.Data[3];
+                        if (m.Data[4] != 255) hcuDevice.TimberlineParams.Zones[4].SetPwmPercent = m.Data[4];
                     }
+                    break;
                 case 24:
+                    if (hcuDevice != null)
                     {
-                        if ((m.Data[0] & 15) != 15) senderDevice.TimberlineParams.Zones[0].FanStage = m.Data[0] & 15;
-                        if (((m.Data[0] >> 4) & 15) != 15) senderDevice.TimberlineParams.Zones[1].FanStage = (m.Data[0] >> 4) & 15;
-                        if ((m.Data[1] & 15) != 15) senderDevice.TimberlineParams.Zones[2].FanStage = m.Data[1] & 15;
-                        if (((m.Data[1] >> 4) & 15) != 15) senderDevice.TimberlineParams.Zones[3].FanStage = (m.Data[0] >> 4) & 15;
-                        if ((m.Data[2] & 15) != 15) senderDevice.TimberlineParams.Zones[4].FanStage = m.Data[2] & 15;
-                        if (m.Data[3] != 255) senderDevice.TimberlineParams.Zones[0].CurrentPwm = m.Data[3];
-                        if (m.Data[4] != 255) senderDevice.TimberlineParams.Zones[1].CurrentPwm = m.Data[4];
-                        if (m.Data[5] != 255) senderDevice.TimberlineParams.Zones[2].CurrentPwm = m.Data[5];
-                        if (m.Data[6] != 255) senderDevice.TimberlineParams.Zones[3].CurrentPwm = m.Data[6];
-                        if (m.Data[7] != 255) senderDevice.TimberlineParams.Zones[4].CurrentPwm = m.Data[7];
-                        break;
+                        if ((m.Data[0] & 15) != 15) hcuDevice.TimberlineParams.Zones[0].FanStage = m.Data[0] & 15;
+                        if (((m.Data[0] >> 4) & 15) != 15) hcuDevice.TimberlineParams.Zones[1].FanStage = (m.Data[0] >> 4) & 15;
+                        if ((m.Data[1] & 15) != 15) hcuDevice.TimberlineParams.Zones[2].FanStage = m.Data[1] & 15;
+                        if (((m.Data[1] >> 4) & 15) != 15) hcuDevice.TimberlineParams.Zones[3].FanStage = (m.Data[0] >> 4) & 15;
+                        if ((m.Data[2] & 15) != 15) hcuDevice.TimberlineParams.Zones[4].FanStage = m.Data[2] & 15;
+                        if (m.Data[3] != 255) hcuDevice.TimberlineParams.Zones[0].CurrentPwm = m.Data[3];
+                        if (m.Data[4] != 255) hcuDevice.TimberlineParams.Zones[1].CurrentPwm = m.Data[4];
+                        if (m.Data[5] != 255) hcuDevice.TimberlineParams.Zones[2].CurrentPwm = m.Data[5];
+                        if (m.Data[6] != 255) hcuDevice.TimberlineParams.Zones[3].CurrentPwm = m.Data[6];
+                        if (m.Data[7] != 255) hcuDevice.TimberlineParams.Zones[4].CurrentPwm = m.Data[7];
                     }
+                    break;
                 case 25:
+                    if (hcuDevice != null)
                     {
-                        if (m.Data[0] != 255) senderDevice.TimberlineParams.Zones[0].TempSetPointDay = m.Data[0] - 75;
-                        if (m.Data[1] != 255) senderDevice.TimberlineParams.Zones[1].TempSetPointDay = m.Data[1] - 75;
-                        if (m.Data[2] != 255) senderDevice.TimberlineParams.Zones[2].TempSetPointDay = m.Data[2] - 75;
-                        if (m.Data[3] != 255) senderDevice.TimberlineParams.Zones[3].TempSetPointDay = m.Data[3] - 75;
-                        if (m.Data[4] != 255) senderDevice.TimberlineParams.Zones[4].TempSetPointDay = m.Data[4] - 75;
-                        break;
+                        if (m.Data[0] != 255) hcuDevice.TimberlineParams.Zones[0].TempSetPointDay = m.Data[0] - 75;
+                        if (m.Data[1] != 255) hcuDevice.TimberlineParams.Zones[1].TempSetPointDay = m.Data[1] - 75;
+                        if (m.Data[2] != 255) hcuDevice.TimberlineParams.Zones[2].TempSetPointDay = m.Data[2] - 75;
+                        if (m.Data[3] != 255) hcuDevice.TimberlineParams.Zones[3].TempSetPointDay = m.Data[3] - 75;
+                        if (m.Data[4] != 255) hcuDevice.TimberlineParams.Zones[4].TempSetPointDay = m.Data[4] - 75;
                     }
+                    break;
                 case 26:
+                    if (hcuDevice != null)
                     {
-                        if (m.Data[0] != 255) senderDevice.TimberlineParams.Zones[0].TempSetPointNight = m.Data[0] - 75;
-                        if (m.Data[1] != 255) senderDevice.TimberlineParams.Zones[1].TempSetPointNight = m.Data[1] - 75;
-                        if (m.Data[2] != 255) senderDevice.TimberlineParams.Zones[2].TempSetPointNight = m.Data[2] - 75;
-                        if (m.Data[3] != 255) senderDevice.TimberlineParams.Zones[3].TempSetPointNight = m.Data[3] - 75;
-                        if (m.Data[4] != 255) senderDevice.TimberlineParams.Zones[4].TempSetPointNight = m.Data[4] - 75;
-                        break;
+                        if (m.Data[0] != 255) hcuDevice.TimberlineParams.Zones[0].TempSetPointNight = m.Data[0] - 75;
+                        if (m.Data[1] != 255) hcuDevice.TimberlineParams.Zones[1].TempSetPointNight = m.Data[1] - 75;
+                        if (m.Data[2] != 255) hcuDevice.TimberlineParams.Zones[2].TempSetPointNight = m.Data[2] - 75;
+                        if (m.Data[3] != 255) hcuDevice.TimberlineParams.Zones[3].TempSetPointNight = m.Data[3] - 75;
+                        if (m.Data[4] != 255) hcuDevice.TimberlineParams.Zones[4].TempSetPointNight = m.Data[4] - 75;
                     }
+                    break;
                 case 27:
+                    if (hcuDevice != null)
                     {
-                        if (m.Data[0] != 255) senderDevice.TimberlineParams.Zones[0].ManualPercent = m.Data[0];
-                        if (m.Data[1] != 255) senderDevice.TimberlineParams.Zones[1].ManualPercent = m.Data[1];
-                        if (m.Data[2] != 255) senderDevice.TimberlineParams.Zones[2].ManualPercent = m.Data[2];
-                        if (m.Data[3] != 255) senderDevice.TimberlineParams.Zones[3].ManualPercent = m.Data[3];
-                        if (m.Data[4] != 255) senderDevice.TimberlineParams.Zones[4].ManualPercent = m.Data[4];
-                        if ((m.Data[5] & 3) != 3) senderDevice.TimberlineParams.Zones[0].ManualMode = (m.Data[5] & 3) != 0;
-                        if (((m.Data[5] >> 2) & 3) != 3) senderDevice.TimberlineParams.Zones[1].ManualMode = ((m.Data[5] >> 2) & 3) != 0;
-                        if (((m.Data[5] >> 4) & 3) != 3) senderDevice.TimberlineParams.Zones[2].ManualMode = ((m.Data[5] >> 4) & 3) != 0;
-                        if (((m.Data[5] >> 6) & 3) != 3) senderDevice.TimberlineParams.Zones[3].ManualMode = ((m.Data[5] >> 6) & 3) != 0;
-                        if ((m.Data[6] & 3) != 3) senderDevice.TimberlineParams.Zones[4].ManualMode = (m.Data[6] & 3) != 0;
-                        break;
+                        if (m.Data[0] != 255) hcuDevice.TimberlineParams.Zones[0].ManualPercent = m.Data[0];
+                        if (m.Data[1] != 255) hcuDevice.TimberlineParams.Zones[1].ManualPercent = m.Data[1];
+                        if (m.Data[2] != 255) hcuDevice.TimberlineParams.Zones[2].ManualPercent = m.Data[2];
+                        if (m.Data[3] != 255) hcuDevice.TimberlineParams.Zones[3].ManualPercent = m.Data[3];
+                        if (m.Data[4] != 255) hcuDevice.TimberlineParams.Zones[4].ManualPercent = m.Data[4];
+                        if ((m.Data[5] & 3) != 3) hcuDevice.TimberlineParams.Zones[0].ManualMode = (m.Data[5] & 3) != 0;
+                        if (((m.Data[5] >> 2) & 3) != 3) hcuDevice.TimberlineParams.Zones[1].ManualMode = ((m.Data[5] >> 2) & 3) != 0;
+                        if (((m.Data[5] >> 4) & 3) != 3) hcuDevice.TimberlineParams.Zones[2].ManualMode = ((m.Data[5] >> 4) & 3) != 0;
+                        if (((m.Data[5] >> 6) & 3) != 3) hcuDevice.TimberlineParams.Zones[3].ManualMode = ((m.Data[5] >> 6) & 3) != 0;
+                        if ((m.Data[6] & 3) != 3) hcuDevice.TimberlineParams.Zones[4].ManualMode = (m.Data[6] & 3) != 0;
                     }
+                    break;
                 case 33:
                     switch (m.Data[0])
                     {
@@ -1350,34 +1360,31 @@ namespace OmniProtocol
 
                     break;
                 case 47:
-                    if ((m.Data[0] & 3) < 2) senderDevice.OverrideState.FuelPumpOverriden = (m.Data[0] & 3) > 0;
-                    if (((m.Data[0] >> 2) & 3) < 2) senderDevice.OverrideState.RelayOverriden = ((m.Data[0] >> 2) & 3) > 0;
-                    if (((m.Data[0] >> 4) & 3) < 2) senderDevice.OverrideState.GlowPlugOverriden = ((m.Data[0] >> 4) & 3) > 0;
-                    if (((m.Data[0] >> 6) & 3) < 2) senderDevice.OverrideState.PumpOverriden = ((m.Data[0] >> 6) & 3) > 0;
-                    if ((m.Data[1] & 3) < 2) senderDevice.OverrideState.BlowerOverriden = (m.Data[1] & 3) > 0;
-
-                    if ((m.Data[2] & 3) < 2 && senderDevice.OverrideState.PumpOverriden) senderDevice.OverrideState.PumpOverridenState = (m.Data[1] & 3) > 0;
-                    if (((m.Data[2] >> 2) & 3) < 2 && senderDevice.OverrideState.RelayOverriden) senderDevice.OverrideState.RelayOverridenState = ((m.Data[2] >> 2) & 3) > 0;
-                    if (m.Data[3] != 255 && senderDevice.OverrideState.BlowerOverriden) senderDevice.OverrideState.BlowerOverridenRevs = m.Data[3];
-                    if (m.Data[4] != 255 && senderDevice.OverrideState.GlowPlugOverriden) senderDevice.OverrideState.GlowPlugOverridenPower = m.Data[4];
-                    if (m.Data[5] != 255 || m.Data[6] != 255 && senderDevice.OverrideState.FuelPumpOverriden) senderDevice.OverrideState.FuelPumpOverridenFrequencyX100 = m.Data[5] * 256 + m.Data[6];
+                    if (heaterDevice != null)
+                    {
+                        if ((m.Data[0] & 3) < 2) heaterDevice.OverrideState.FuelPumpOverriden = (m.Data[0] & 3) > 0;
+                        if (((m.Data[0] >> 2) & 3) < 2) heaterDevice.OverrideState.RelayOverriden = ((m.Data[0] >> 2) & 3) > 0;
+                        if (((m.Data[0] >> 4) & 3) < 2) heaterDevice.OverrideState.GlowPlugOverriden = ((m.Data[0] >> 4) & 3) > 0;
+                        if (((m.Data[0] >> 6) & 3) < 2) heaterDevice.OverrideState.PumpOverriden = ((m.Data[0] >> 6) & 3) > 0;
+                        if ((m.Data[1] & 3) < 2) heaterDevice.OverrideState.BlowerOverriden = (m.Data[1] & 3) > 0;
+                        if ((m.Data[2] & 3) < 2 && heaterDevice.OverrideState.PumpOverriden) heaterDevice.OverrideState.PumpOverridenState = (m.Data[1] & 3) > 0;
+                        if (((m.Data[2] >> 2) & 3) < 2 && heaterDevice.OverrideState.RelayOverriden) heaterDevice.OverrideState.RelayOverridenState = ((m.Data[2] >> 2) & 3) > 0;
+                        if (m.Data[3] != 255 && heaterDevice.OverrideState.BlowerOverriden) heaterDevice.OverrideState.BlowerOverridenRevs = m.Data[3];
+                        if (m.Data[4] != 255 && heaterDevice.OverrideState.GlowPlugOverriden) heaterDevice.OverrideState.GlowPlugOverridenPower = m.Data[4];
+                        if ((m.Data[5] != 255 || m.Data[6] != 255) && heaterDevice.OverrideState.FuelPumpOverriden) heaterDevice.OverrideState.FuelPumpOverridenFrequencyX100 = m.Data[5] * 256 + m.Data[6];
+                    }
                     break;
 
-
                 case 49:
-                    if ((m.Data[0] & 3) < 3)
-                        senderDevice.GenericLoadTripple.LoadMode1 = (LoadMode_t)(m.Data[0] & 3);
-                    if (((m.Data[0] >> 2) & 3) < 3)
-                        senderDevice.GenericLoadTripple.LoadMode2 = (LoadMode_t)((m.Data[0] >> 2) & 3);
-                    if (((m.Data[0] >> 4) & 3) < 3)
-                        senderDevice.GenericLoadTripple.LoadMode3 = (LoadMode_t)((m.Data[0] >> 4) & 3);
-
-                    if (m.Data[1] <= 100)
-                        senderDevice.GenericLoadTripple.PwmLevel1 = m.Data[1];
-                    if (m.Data[2] <= 100)
-                        senderDevice.GenericLoadTripple.PwmLevel2 = m.Data[2];
-                    if (m.Data[3] <= 100)
-                        senderDevice.GenericLoadTripple.PwmLevel3 = m.Data[3];
+                    if (genericLoad != null)
+                    {
+                        if ((m.Data[0] & 3) < 3) genericLoad.GenericLoadTripple.LoadMode1 = (LoadMode_t)(m.Data[0] & 3);
+                        if (((m.Data[0] >> 2) & 3) < 3) genericLoad.GenericLoadTripple.LoadMode2 = (LoadMode_t)((m.Data[0] >> 2) & 3);
+                        if (((m.Data[0] >> 4) & 3) < 3) genericLoad.GenericLoadTripple.LoadMode3 = (LoadMode_t)((m.Data[0] >> 4) & 3);
+                        if (m.Data[1] <= 100) genericLoad.GenericLoadTripple.PwmLevel1 = m.Data[1];
+                        if (m.Data[2] <= 100) genericLoad.GenericLoadTripple.PwmLevel2 = m.Data[2];
+                        if (m.Data[3] <= 100) genericLoad.GenericLoadTripple.PwmLevel3 = m.Data[3];
+                    }
                     break;
 
                 case 50:
@@ -1386,49 +1393,43 @@ namespace OmniProtocol
                         case 1:
                             if (m.Data[4] != 255 || m.Data[5] != 255)
                             {
-                                senderDevice.ACInverterParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
-                                senderDevice.ACPanelParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                                if (acInverter != null) acInverter.ACInverterParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                                if (acPanel != null) acPanel.ACPanelParams.CompressorPwmsSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
                             }
                             break;
                         case 2:
                             if (m.Data[1] != 255 || m.Data[2] != 255)
                             {
-                                senderDevice.ACInverterParams.CompressorCurrent = (m.Data[1] * 256 + m.Data[2]) * 10;
-                                senderDevice.ACPanelParams.CompressorCurrent = (m.Data[1] * 256 + m.Data[2]) * 10;
+                                if (acInverter != null) acInverter.ACInverterParams.CompressorCurrent = (m.Data[1] * 256 + m.Data[2]) * 10;
+                                if (acPanel != null) acPanel.ACPanelParams.CompressorCurrent = (m.Data[1] * 256 + m.Data[2]) * 10;
                             }
                             if (m.Data[3] != 255 || m.Data[4] != 255)
-                                senderDevice.ACInverterParams.CondensorCurrent = (m.Data[3] * 256 + m.Data[4]) * 10;
+                                if (acInverter != null) acInverter.ACInverterParams.CondensorCurrent = (m.Data[3] * 256 + m.Data[4]) * 10;
                             break;
                         case 4:
                             if (m.Data[4] != 255 || m.Data[5] != 255)
                             {
-                                senderDevice.ACInverterParams.CondensorPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
-                                senderDevice.ACPanelParams.CondensorPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                                if (acInverter != null) acInverter.ACInverterParams.CondensorPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                                if (acPanel != null) acPanel.ACPanelParams.CondensorPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
                             }
                             break;
-
                     }
                     break;
 
-
                 case 51:
-                    switch (m.Data[0])
-                    {
-                        case 1:
-                            if (m.Data[1] < 8)
-                                senderDevice.ACPanelParams.AcMode = m.Data[1];
-                            if (m.Data[2] - 75 >= 16 && m.Data[2] - 75 <= 30)
-                                senderDevice.ACPanelParams.Setpoint = (byte)(m.Data[2] - 75);
-                            if (m.Data[3] < 6)
-                                senderDevice.ACPanelParams.AcFanMode = m.Data[3];
-                            break;
-                        case 2:
-                            if (m.Data[4] != 255 || m.Data[5] != 255)
-                            {
-                                senderDevice.ACPanelParams.EvapoPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
-                            }
-                            break;
-                    }
+                    if (acPanel != null)
+                        switch (m.Data[0])
+                        {
+                            case 1:
+                                if (m.Data[1] < 8) acPanel.ACPanelParams.AcMode = m.Data[1];
+                                if (m.Data[2] - 75 >= 16 && m.Data[2] - 75 <= 30) acPanel.ACPanelParams.Setpoint = (byte)(m.Data[2] - 75);
+                                if (m.Data[3] < 6) acPanel.ACPanelParams.AcFanMode = m.Data[3];
+                                break;
+                            case 2:
+                                if (m.Data[4] != 255 || m.Data[5] != 255)
+                                    acPanel.ACPanelParams.EvapoPwmSet = (m.Data[4] * 256 + m.Data[5]) / 100.0;
+                                break;
+                        }
                     break;
 
                 case 100:

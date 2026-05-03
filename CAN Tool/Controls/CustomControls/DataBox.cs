@@ -105,7 +105,8 @@ namespace CAN_Tool.CustomControls
         // Проверка, является ли символ допустимым шестнадцатеричным символом
         private bool IsHexChar(char c)
         {
-            return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
+            return c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f';
         }
     }
 }
+

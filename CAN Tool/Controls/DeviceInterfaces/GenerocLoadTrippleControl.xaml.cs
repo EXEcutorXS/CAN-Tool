@@ -25,7 +25,7 @@ namespace CAN_Tool.CustomControls
     {
 
         
-        public DeviceViewModel vm => (DeviceViewModel)DataContext;
+        public GenericLoadTrippleDeviceViewModel vm => (GenericLoadTrippleDeviceViewModel)DataContext;
 
         
 

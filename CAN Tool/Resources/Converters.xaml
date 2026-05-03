@@ -27,4 +27,12 @@
     <c:RegularCanToVisibleConverter x:Key="RegularCanToVisible" />
     <c:OmniToVisibleConverter x:Key="OmniToVisible" />
     <c:RvcToVisibleConverter x:Key="RvcToVisible" />
+    <c:FarenheitRelativeConverter x:Key="ToFarenheitRelative" />
+    <c:ConnectedZoneTypeToVisible x:Key="OnlyConnected" />
+    <c:HeatingZoneTypeToVisible x:Key="OnlyHetingZones" />
+    <c:DefrostingZoneTypeToVisible x:Key="OnlyDefrostZone" />
+    <c:FurnaceZoneTypeToVisible x:Key="OnlyFurnace" />
+    <c:ConnectedZoneTypeToBool x:Key="ConnectedToBool" />
+    <c:HeatingZoneTypeToBool x:Key="HetingZoneToBool" />
+    <c:ManualEnableConverter x:Key="ManualSliderEnabled" />
 </ResourceDictionary>

@@ -17,7 +17,7 @@ namespace CAN_Tool.CustomControls
 
         DispatcherTimer SliderUpdateTimer = new();
 
-        DeviceViewModel vm => (DeviceViewModel)DataContext;
+        HcuDeviceViewModel vm => (HcuDeviceViewModel)DataContext;
 
         public HcuOmniControl()
         {

@@ -1,19 +1,13 @@
-﻿using CAN_Tool;
-using CAN_Tool.Infrastructure.Commands;
+using CAN_Tool;
 using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
-using CAN_Tool.ViewModels.Base;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using static CAN_Tool.Libs.Helper;
@@ -22,125 +16,120 @@ namespace OmniProtocol
 {
     public partial class DeviceViewModel : ObservableObject
     {
-        public partial class OverrideStateClass : ObservableObject
-        {
-            [ObservableProperty] public bool blowerOverriden;
-            [ObservableProperty] public bool fuelPumpOverriden;
-            [ObservableProperty] public bool glowPlugOverriden;
-            [ObservableProperty] public bool relayOverriden;
-            [ObservableProperty] public bool pumpOverriden;
-
-            [ObservableProperty] public int blowerOverridenRevs;
-            [ObservableProperty] public int fuelPumpOverridenFrequencyX100;
-            [ObservableProperty] public int glowPlugOverridenPower;
-            [ObservableProperty] public bool relayOverridenState;
-            [ObservableProperty] public bool pumpOverridenState;
-        }
-
         public DeviceViewModel(DeviceId newId)
         {
             LogInit();
             Id = newId;
-            StartHeaterCommand = new LambdaCommand(x => ExecuteCommand(1, 0xff, 0xff), NotInManual);
-            StopHeaterCommand = new LambdaCommand(x => ExecuteCommand(3), NotInManual);
-            StartPumpCommand = new LambdaCommand(x => ExecuteCommand(4, 0, 0), NotInManual);
-            StartVentCommand = new LambdaCommand(x => ExecuteCommand(10), NotInManual);
-            ClearErrorsCommand = new LambdaCommand(x => ExecuteCommand(5), NotInManual);
-            CalibrateTermocouplesCommand = new LambdaCommand(x => ExecuteCommand(20), NotInManual);
 
             if (Omni.Devices.TryGetValue(Id.Type, out var device))
                 DeviceReference = device;
-
-            if (DeviceReference?.DevType == DeviceType_t.Binar || DeviceReference?.DevType == DeviceType_t.Planar)
-                SecondMessages = true;
         }
 
-        [RelayCommand]
-        public void IncPowerLevel(object parameter)
+        // ── Идентификация ──────────────────────────────────────────────
+        [ObservableProperty] private DeviceId id;
+        [ObservableProperty] private bool manualMode;
+        [ObservableProperty] private bool secondMessages;
+        public DeviceTemplate DeviceReference { get; }
+
+        public string Name => ToString();
+
+        public ImageSource Img
         {
-
-            byte powerLevel = (byte)(Parameters.SetPowerLevel);
-            if (powerLevel == 254) return;
-            if (powerLevel > 8) powerLevel = 254;
-            else powerLevel++;
-            byte[] data = { 0, 19, powerLevel, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-            OmniMessage msg = new() { Pgn = 1, ReceiverId = Id, Data = data };
-            Transmit(msg.ToCanMessage());
+            get
+            {
+                var imagesDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
+                var imageName = DeviceReference?.ImageName;
+                var path = !string.IsNullOrEmpty(imageName)
+                    ? Path.Combine(imagesDir, $"{imageName}.jpg")
+                    : null;
+                if (path == null || !File.Exists(path))
+                    path = Path.Combine(imagesDir, "noimg.jpg");
+                return new BitmapImage(new Uri(path));
+            }
         }
 
-        [RelayCommand]
-        public void DecPowerLevel(object parameter)
+        // ── Версии ─────────────────────────────────────────────────────
+        [ObservableProperty] private DateOnly productionDate;
+        [ObservableProperty] public BindingList<int> serial = new() { 0, 0, 0 };
+        [ObservableProperty] public BindingList<int> firmware = new() { 0, 0, 0, 0 };
+        [ObservableProperty] public BindingList<int> bootFirmware = new() { 0, 0, 0, 0 };
+
+        // ── Данные устройства ──────────────────────────────────────────
+        public CommonParameters Parameters { get; set; } = new();
+        public UpdatableList<StatusVariable> Status { get; } = new();
+        public UpdatableList<ReadedParameter> ReadParameters { get; } = new();
+        public UpdatableList<ReadedBlackBoxValue> BbValues { get; } = new();
+        public BindingList<BbError> BbErrors { get; } = new();
+        public bool[] SupportedVariables { get; } = new bool[200];
+
+        // ── Лог ────────────────────────────────────────────────────────
+        public ObservableCollection<CommonParameters> Log { get; } = new();
+        public List<double[]> LogData = new();
+        [ObservableProperty] private bool isLogWriting = true;
+        [ObservableProperty] private int logCurrentPos;
+
+        public void LogTick()
         {
-
-            byte powerLevel = (byte)(Parameters.SetPowerLevel);
-            if (powerLevel == 0) return;
-            if (powerLevel == 254) powerLevel = 9;
-            else powerLevel--;
-            byte[] data = { 0, 19, powerLevel, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-            OmniMessage msg = new() { Pgn = 1, ReceiverId = Id, Data = data };
-            Transmit(msg.ToCanMessage());
+            Log.Insert(0, (CommonParameters)Parameters.Clone());
+            if (Log.Count > 120) Log.RemoveAt(120);
+            if (!IsLogWriting) return;
+            if (LogCurrentPos < LogData[0].Length)
+            {
+                foreach (var sv in Status)
+                    LogData[sv.Id][LogCurrentPos] = sv.Value;
+                LogCurrentPos++;
+            }
+            else
+            {
+                saveLog();
+                LogStart();
+            }
         }
 
-        [RelayCommand]
-        public void updateOverrideStatus()
+        public void saveLog()
         {
-            byte overrideByte1 = 0;
-            byte overrideByte2 = 0;
-            byte overrideStatesByte = 0;
-            if (OverrideState.FuelPumpOverriden) overrideByte1 |= 1;
-            if (OverrideState.RelayOverriden) overrideByte1 |= 1<<2;
-            if (OverrideState.GlowPlugOverriden) overrideByte1 |= 1<<4;
-            if (OverrideState.PumpOverriden) overrideByte1 |= 1<<6;
-            if (OverrideState.BlowerOverriden) overrideByte2 |= 1;
-            if (OverrideState.PumpOverridenState) overrideStatesByte |= 1;
-            if (OverrideState.RelayOverridenState) overrideStatesByte |= 4;
-            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)OverrideState.BlowerOverridenRevs, (byte)OverrideState.GlowPlugOverridenPower, (byte)(OverrideState.FuelPumpOverridenFrequencyX100 / 256), (byte)(OverrideState.FuelPumpOverridenFrequencyX100 / 256), 0xFF };
-            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
-            Transmit(msg.ToCanMessage());
-
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" +
+                       DeviceReference.Name + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
+            using var sw = new StreamWriter(path);
+            foreach (var v in Status)
+                sw.Write(GetString($"vars_{v.Id}") + ";");
+            sw.WriteLine();
+            for (var i = 0; i < LogCurrentPos; i++)
+            {
+                foreach (var v in Status)
+                    sw.Write(LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
+                sw.WriteLine();
+            }
+            sw.Flush();
         }
-        [RelayCommand]
-        public void updateOverrideFuelPumpFreq()
+
+        public void LogInit(int length = 86400)
         {
-            byte[] data = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, (byte)(OverrideState.FuelPumpOverridenFrequencyX100/256), (byte)(OverrideState.FuelPumpOverridenFrequencyX100 / 256) ,0xFF};
-            OmniMessage msg = new() {Pgn=47,ReceiverId = Id, Data = data};
-            Transmit(msg.ToCanMessage());
+            LogCurrentPos = 0;
+            LogData = new List<double[]>();
+            for (var i = 0; i < 200; i++)
+                LogData.Add(new double[length]);
         }
 
-        [RelayCommand]
-        public void updateOverrideBlower()
-        {
-            byte[] data = { 0xFF, 0xFF, 0xFF, (byte)OverrideState.BlowerOverridenRevs, 0xFF, 0xFF, 0xFF, 0xFF };
-            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
-            Transmit(msg.ToCanMessage());
-        }
+        public void LogStart() { LogInit(); IsLogWriting = true; }
+        public void LogStop() { IsLogWriting = false; }
 
-        [RelayCommand]
-        public void updateOverrideGlowPlug()
-        {
-            byte[] data = { 0xFF, 0xFF, 0xFF, 0xFF, (byte)OverrideState.GlowPlugOverridenPower, 0xFF, 0xFF, 0xFF};
-            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
-            Transmit(msg.ToCanMessage());
-        }
+        // ── Флаги прошивки (используются FirmwarePageViewModel) ────────
+        public bool flagEraseDone = false;
+        public bool flagSetAdrDone = false;
+        public bool flagProgramDone = false;
+        public bool flagTransmissionCheck = false;
+        public bool flagCrcGetDone = false;
+        public int receivedDataLength = 0;
+        public uint receiverDataCrc = 0;
+        public bool flagGetParamDone = false;
+        public bool flagGetBbDone = false;
+        public bool waitForBb = false;
+        public uint fragmentAddress = 0;
+        public int receivedFragmentLength = 0;
+        public uint receivedFragmentCrc = 0;
 
-        [RelayCommand]
-        public void updateOverrideGlowPlugFlag()
-        {
-            byte flag = (byte)(OverrideState.GlowPlugOverriden ? 0b11011111 : 0b11001111);
-            byte[] data = { flag, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
-            Transmit(msg.ToCanMessage());
-        }
-
-        [RelayCommand]
-        public void updateOverrideFuelPumpFlag()
-        {
-            byte flag = (byte)(OverrideState.FuelPumpOverriden ? 0b11011111 : 0b11001111);
-            byte[] data = { flag, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-            OmniMessage msg = new() { Pgn = 47, ReceiverId = Id, Data = data };
-            Transmit(msg.ToCanMessage());
-        }
-
+        // ── Транспорт ──────────────────────────────────────────────────
         public void Transmit(CanMessage msg)
         {
             if (Application.Current.MainWindow != null)
@@ -152,28 +141,6 @@ namespace OmniProtocol
             if (Application.Current.MainWindow != null)
                 ((MainWindowViewModel)Application.Current.MainWindow.DataContext).CanAdapter.Transmit(msg);
         }
-
-        public bool WaitForFlag(ref bool flag, int delay)
-        {
-            var wd = 0;
-            while (!flag && wd < delay)
-            {
-                wd++;
-                Thread.Sleep(1);
-            }
-            if (!flag)
-            {
-                flag = false;
-                return false;
-            }
-            else
-            {
-                flag = false;
-                return true;
-            }
-        }
-
-        public bool NotInManual(object parameter) => !ManualMode;
 
         public void ExecuteCommand(int cmdNum, params byte[] data)
         {
@@ -206,184 +173,48 @@ namespace OmniProtocol
                 msg.Data[i + 2] = arg.Item3[i];
             TransmitStatic(msg.ToCanMessage());
         }
-        
-        public ICommand StartHeaterCommand { get; }
 
-        public ICommand StopHeaterCommand { get; }
-
-        public ICommand StartPumpCommand { get; }
-
-        public ICommand ClearErrorsCommand { get; }
-
-        public ICommand StartVentCommand { get; }
-
-        public ICommand CalibrateTermocouplesCommand { get; }
-
-        public CommonParameters Parameters { get; set; } = new();
-
-        [ObservableProperty] private DeviceId id;
-
-        [ObservableProperty] private DateOnly productionDate;
-
-        [ObservableProperty] private bool secondMessages = false;
-
-        [ObservableProperty] public BindingList<int> serial  = new() { 0, 0, 0 };
-        [ObservableProperty] public BindingList<int> firmware = new() { 0, 0, 0 ,0};
-        [ObservableProperty] public BindingList<int> bootFirmware = new() { 0, 0, 0, 0 };
-
-        public UpdatableList<StatusVariable> Status { get; } = new();
-
-        public UpdatableList<ReadedParameter> ReadParameters { get; } = new();
-
-        public UpdatableList<ReadedBlackBoxValue> BbValues { get; } = new();
-
-        public BindingList<BbError> BbErrors { get; } = new();
-
-        public ObservableCollection<CommonParameters> Log { get; } = new();
-
-        public Timberline20OmniViewModel TimberlineParams { set; get; } = new();
-
-        public ACInverterViewModel ACInverterParams { set; get; } = new();
-        
-        public ACPanelViewModel ACPanelParams { set; get; } = new();
-
-        public GenericLoadTrippleViewModel GenericLoadTripple { set; get; } = new();
-
-        [ObservableProperty] public bool manualMode;
-
-        [ObservableProperty] OverrideStateClass overrideState = new();
-
-        public bool flagEraseDone = false;
-
-        public bool flagSetAdrDone = false;
-
-        public bool flagProgramDone = false;
-
-        public bool flagTransmissionCheck = false;
-
-        public bool flagCrcGetDone = false;
-
-
-        public int receivedDataLength = 0;
-
-        public uint receiverDataCrc = 0;
-
-        public bool flagGetParamDone = false;
-
-        public bool flagGetBbDone = false;
-
-        public bool waitForBb = false;
-
-        public uint fragmentAddress = 0;
-
-        public int receivedFragmentLength = 0;
-
-        public uint receivedFragmentCrc = 0;
-
-        public string Name => ToString();
-
-        public DeviceTemplate DeviceReference { get; }
-
-        public ImageSource Img
+        public bool WaitForFlag(ref bool flag, int delay)
         {
-            get
-            {
-                var imagesDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
-                var imageName = DeviceReference?.ImageName;
-                var path = !string.IsNullOrEmpty(imageName)
-                    ? Path.Combine(imagesDir, $"{imageName}.jpg")
-                    : null;
-                if (path == null || !File.Exists(path))
-                    path = Path.Combine(imagesDir, "noimg.jpg");
-                return new BitmapImage(new Uri(path));
-            }
+            var wd = 0;
+            while (!flag && wd < delay) { wd++; System.Threading.Thread.Sleep(1); }
+            if (!flag) { flag = false; return false; }
+            flag = false;
+            return true;
         }
 
-        public override string ToString() { return DeviceReference != null ? $"{DeviceReference.Name}({Id.Address})" : $"Device #<{Id.Type}>({Id.Address})"; }
+        // ── Фабрика ────────────────────────────────────────────────────
+        public static DeviceViewModel Create(DeviceId id)
+        {
+            if (!Omni.Devices.TryGetValue(id.Type, out var template))
+                return new DeviceViewModel(id);
+
+            return template.DevType switch
+            {
+                DeviceType_t.Binar or DeviceType_t.Planar => new HeaterDeviceViewModel(id),
+                DeviceType_t.Hcu                          => new HcuDeviceViewModel(id),
+                DeviceType_t.AcInverter                   => new AcInverterDeviceViewModel(id),
+                DeviceType_t.AcPanel                      => new AcPanelDeviceViewModel(id),
+                DeviceType_t.GenericLoadTripple            => new GenericLoadTrippleDeviceViewModel(id),
+                DeviceType_t.PressureSensor               => new PressureSensorDeviceViewModel(id),
+                DeviceType_t.BootLoader                   => new BootloaderDeviceViewModel(id),
+                DeviceType_t.Modem                        => new ModemDeviceViewModel(id),
+                _                                         => new DeviceViewModel(id),
+            };
+        }
+
+        // ── Переопределения ────────────────────────────────────────────
+        public override string ToString() =>
+            DeviceReference != null
+                ? $"{DeviceReference.Name}({Id.Address})"
+                : $"Device #<{Id.Type}>({Id.Address})";
 
         public override bool Equals(object obj)
         {
-            if (obj == null || obj.GetType()!=typeof(DeviceViewModel)) return false;
+            if (obj == null || obj.GetType() != typeof(DeviceViewModel)) return false;
             return Id.Equals((obj as DeviceViewModel).Id);
         }
 
-        public override int GetHashCode() { return Id.GetHashCode(); }
-
-        [ObservableProperty] private bool isLogWriting = true;
-
-        public List<double[]> LogData = new();
-
-        public double[] PressureLog = new double[720000];
-
-        [ObservableProperty] public int pressureLogPointer = 0;
-        public bool PressureLogWriting = false;
-
-        [ObservableProperty] private int logCurrentPos;
-       
-
-        public void LogTick()
-        {
-            Log.Insert(0,((CommonParameters)Parameters.Clone()));
-            if (Log.Count > 120) Log.RemoveAt(120);
-            if (!IsLogWriting)
-                return;
-
-            if (LogCurrentPos < LogData[0].Length)
-            {
-                foreach (var sv in Status)
-                    LogData[sv.Id][LogCurrentPos] = sv.Value;
-                LogCurrentPos++;
-            }
-            else
-            {
-                saveLog();
-                LogStart();
-            }
-              
-        }
-
-        public void saveLog()
-        {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DeviceReference.Name + "_" + DateTime.Now.ToString("HH-mm-ss_dd-MM-yy") + ".csv";
-
-            using (var sw = new StreamWriter(path))
-            {
-                foreach (var v in Status)
-                    sw.Write(GetString($"vars_{v.Id}") + ";");
-                sw.WriteLine();
-                for (var i = 0; i < LogCurrentPos; i++)
-                {
-                    foreach (var v in Status)
-                        sw.Write(LogData[v.Id][i].ToString(v.AssignedParameter.OutputFormat) + ";");
-                    sw.WriteLine();
-                }
-                sw.Flush();
-                sw.Close();
-            }
-        }
-
-        public void LogInit(int length = 86400)
-        {
-            LogCurrentPos = 0;
-            LogData = new List<double[]>();
-            for (var i = 0; i < 200; i++) //Переменных в paramsname.h пока намного меньше, но поставим пока 200
-            {
-                LogData.Add(new double[length]);
-            }
-        }
-
-        public bool[] SupportedVariables { get; } = new bool[200];
-
-        public void LogStart()
-        {
-            LogInit();
-            IsLogWriting = true;
-        }
-
-        public void LogStop()
-        {
-            IsLogWriting = false;
-        }
-
+        public override int GetHashCode() => Id.GetHashCode();
     }
 }
