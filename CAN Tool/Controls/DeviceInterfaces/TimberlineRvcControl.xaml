@@ -118,7 +118,7 @@
                 </StackPanel>
                 <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
                     <TextBlock Margin="5" VerticalAlignment="Center" Width="120">Floor setpoint</TextBlock>
-                    <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="FloorSetpointSlider" Margin="5" VerticalAlignment="Center" Minimum="3" Maximum="50"  LargeChange="10" SmallChange="1" Width="200" ValueChanged="FloorSetpointChanged"></local:SilentSlider>
+                    <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="FloorSetpointSlider" Margin="5" VerticalAlignment="Center" Minimum="3" Maximum="32"  LargeChange="10" SmallChange="1" Width="200" ValueChanged="FloorSetpointChanged"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding UnderfloorSetpoint,StringFormat={}{0:F0}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
                 </StackPanel>
                 <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
@@ -138,6 +138,7 @@
             <Button Margin="5" VerticalAlignment="Center" Click="DgnRequestClick">Request</Button>
             <TextBlock Margin="25 5 5 5" VerticalAlignment="Center">Source address:</TextBlock>
             <TextBox Margin="5" VerticalAlignment="Center" MinWidth="40" Text="{Binding SaToRequest}"> </TextBox>
+            <Button Margin="5" VerticalAlignment="Center" Click="AddressRequestClick">Request</Button>
             <Button Margin="5" VerticalAlignment="Center" Click="AddressClaimClick">Claim</Button>
             <TextBlock Text="{Binding MultipackString}" TextAlignment="Center"></TextBlock>
 

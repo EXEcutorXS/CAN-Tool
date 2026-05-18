@@ -1,4 +1,7 @@
-﻿using OmniProtocol;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
+using OmniProtocol;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
@@ -8,23 +11,12 @@ using System.IO.Ports;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows.Media;
-using Xceed.Words.NET;
-using Xceed.Document.NET;
-using Alignment = Xceed.Document.NET.Alignment;
-using CAN_Tool.Libs;
-using static CAN_Tool.Libs.Helper;
-using System.Windows.Markup;
-using System.Security.AccessControl;
-using System.Drawing.Text;
-using System.Windows.Threading;
-using Microsoft.Win32;
 using System.Windows;
-using System.Text;
-using CommunityToolkit.Mvvm.ComponentModel;
-using System.Reflection;
-using CommunityToolkit.Mvvm.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
+using Xceed.Words.NET;
+using static CAN_Tool.Libs.Helper;
+using Alignment = Xceed.Document.NET.Alignment;
 
 namespace CAN_Tool.ViewModels
 {

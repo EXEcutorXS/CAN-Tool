@@ -679,6 +679,24 @@ namespace CAN_Tool.ViewModels
         public void ClaimSourceAddress()
         {
             RvcMessage msg = new();
+            msg.Dgn = 0xEE00;
+            msg.SourceAdress = SaToRequest;
+            msg.Priority = 6;
+            msg.Data[0] = 0;//No serial
+            msg.Data[1] = 0;//No serial
+            msg.Data[2] = 0;//No serial
+            msg.Data[3] = 111; //Random manufacturers code
+            msg.Data[4] = 0;
+            msg.Data[5] = 0;
+            msg.Data[6] = 0;
+            msg.Data[7] = 0x80; //Dynamic address
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
+        }
+
+        public void RequestSourceAddress()
+        {
+            RvcMessage msg = new();
             msg.Dgn = 0xEA00 + SaToRequest;
             msg.SourceAdress = 254;
             msg.Priority = 6;
@@ -689,7 +707,7 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
-        
+
         public void RequestDgn()
         {
             RvcMessage msg = new();

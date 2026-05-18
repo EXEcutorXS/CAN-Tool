@@ -212,5 +212,9 @@ namespace CAN_Tool.CustomControls
         {
             vm.ClaimSourceAddress();
         }
+        private void AddressRequestClick(object sender, RoutedEventArgs e)
+        {
+            vm.ClaimSourceAddress();
+        }
     }
 }
