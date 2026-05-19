@@ -17,6 +17,8 @@ namespace CAN_Tool.CustomControls
 
         public OmniModeView() => InitializeComponent();
 
+        private bool _updatingSliders;
+
         private void OmniModeView_Loaded(object sender, RoutedEventArgs e)
         {
             Vm.myChart = Chart;
@@ -28,6 +30,34 @@ namespace CAN_Tool.CustomControls
             if (Vm == null) return;
             Vm.CanAdapter.GotNewMessage -= MessageHandler;
             Vm.myChart = null;
+        }
+
+        private void ColorSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_updatingSliders) return;
+            var color = Color.FromRgb((byte)SliderR.Value, (byte)SliderG.Value, (byte)SliderB.Value);
+            UpdateColorPreview(color);
+            if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
+                (DataSet.SelectedItem as StatusVariable).ChartBrush = new SolidColorBrush(color);
+        }
+
+        private void UpdateColorPreview(Color color)
+        {
+            ColorPreview.Background = new SolidColorBrush(color);
+            LabelR.Text = color.R.ToString();
+            LabelG.Text = color.G.ToString();
+            LabelB.Text = color.B.ToString();
+            HexLabel.Text = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+
+        private void SetPickerColor(Color color)
+        {
+            _updatingSliders = true;
+            SliderR.Value = color.R;
+            SliderG.Value = color.G;
+            SliderB.Value = color.B;
+            _updatingSliders = false;
+            UpdateColorPreview(color);
         }
 
         private void MessageHandler(object sender, System.EventArgs args)
@@ -48,24 +78,10 @@ namespace CAN_Tool.CustomControls
             catch { }
         }
 
-        private void ColorPick(object sender, MouseButtonEventArgs e) { }
-
         private void DataSet_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DataSet.SelectedItem != null)
-                ColorPicker.Color = ((DataSet.SelectedItem as StatusVariable).ChartBrush as SolidColorBrush).Color;
-        }
-
-        private void ColorPicker_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
-                (DataSet.SelectedItem as StatusVariable).ChartBrush = new SolidColorBrush((sender as MaterialDesignThemes.Wpf.ColorPicker).Color);
-        }
-
-        private void ColorPicker_StylusUp(object sender, StylusEventArgs e)
-        {
-            if (DataSet.SelectedItem != null && DataSet.SelectedItems.Count == 1)
-                (DataSet.SelectedItem as StatusVariable).ChartBrush = new SolidColorBrush((sender as MaterialDesignThemes.Wpf.ColorPicker).Color);
+                SetPickerColor(((DataSet.SelectedItem as StatusVariable).ChartBrush as SolidColorBrush).Color);
         }
 
         private void ManualAirMouseWheelEventHandler(object sender, MouseWheelEventArgs e)

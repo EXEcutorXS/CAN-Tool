@@ -204,8 +204,9 @@ namespace CAN_Tool
             var resources = Application.Current.Resources.MergedDictionaries;
 
             var existingResourceDictionary = Application.Current.Resources.MergedDictionaries
-                                            .FirstOrDefault(rd => rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" ||
-                                            rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml");
+                                            .FirstOrDefault(rd => rd.Source != null &&
+                                            (rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" ||
+                                            rd.Source.ToString() == "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml"));
 
 
             var source = App.Settings.IsDark ? "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" : "pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml";
@@ -227,7 +228,7 @@ namespace CAN_Tool
             var resources = Application.Current.Resources.MergedDictionaries;
 
             var existingResourceDictionary = Application.Current.Resources.MergedDictionaries
-                                            .FirstOrDefault(rd => rd.Source.ToString().Contains("component/Themes/Recommended/Primary"));
+                                            .FirstOrDefault(rd => rd.Source != null && rd.Source.ToString().Contains("component/Themes/Recommended/Primary"));
 
             string source = "pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.LightGreen.xaml";
 

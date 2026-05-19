@@ -1,50 +1,103 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using OmniProtocol;
+﻿using OmniProtocol;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace CAN_Tool.CustomControls
 {
-    /// <summary>
-    /// Логика взаимодействия для HeaterControl.xaml
-    /// </summary>
     public partial class HeaterControl : UserControl
     {
-        HeaterDeviceViewModel Vm => (HeaterDeviceViewModel)DataContext;
+        HeaterDeviceViewModel Vm => DataContext as HeaterDeviceViewModel;
+
+        private DataTable _waterfallTable;
+        private readonly DispatcherTimer _refreshTimer;
 
         public HeaterControl()
         {
             InitializeComponent();
-            BuildWaterfallColumns();
+            DataContextChanged += OnDataContextChanged;
+
+            _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _refreshTimer.Tick += (_, _) => RefreshWaterfallRows();
+            _refreshTimer.Start();
         }
 
-        /// <summary>
-        /// Добавляет колонки History[0]..History[N-1] в WaterfallGrid.
-        /// Колонка 0 — самое свежее значение, N-1 — самое старое.
-        /// </summary>
-        private void BuildWaterfallColumns()
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            for (int i = 0; i < StatusVariable.HistorySize; i++)
+            if (e.OldValue is HeaterDeviceViewModel oldVm)
+                oldVm.Status.ListChanged -= OnStatusListChanged;
+
+            if (e.NewValue is HeaterDeviceViewModel newVm)
             {
+                newVm.Status.ListChanged += OnStatusListChanged;
+                BuildWaterfallTable();
+            }
+        }
+
+        private void OnStatusListChanged(object sender, ListChangedEventArgs e)
+        {
+            if (e.ListChangedType is ListChangedType.ItemAdded
+                                  or ListChangedType.ItemDeleted
+                                  or ListChangedType.Reset)
+                BuildWaterfallTable();
+        }
+
+        private void BuildWaterfallTable()
+        {
+            WaterfallGrid.ItemsSource = null;
+            WaterfallGrid.Columns.Clear();
+
+            if (Vm?.Status == null || Vm.Status.Count == 0)
+            {
+                _waterfallTable = null;
+                return;
+            }
+
+            _waterfallTable = new DataTable();
+
+            // Safe internal column names (C0, C1, ...) avoid any ShortName special chars.
+            // ShortName is used only as the visible header.
+            foreach (var sv in Vm.Status)
+            {
+                string colId = $"C{sv.Id}";
+                _waterfallTable.Columns.Add(colId, typeof(string));
                 WaterfallGrid.Columns.Add(new DataGridTextColumn
                 {
-                    Header  = i == 0 ? "▶" : i.ToString(),
-                    Binding = new System.Windows.Data.Binding($"History[{i}]"),
-                    Width   = new DataGridLength(50),
+                    Header  = sv.ShortName,
+                    Binding = new System.Windows.Data.Binding(colId),
+                    Width   = DataGridLength.Auto,
                 });
+            }
+
+            // Row 0 = newest (History[0]), last row = oldest (History[HistorySize-1])
+            for (int t = 0; t < StatusVariable.HistorySize; t++)
+            {
+                var row = _waterfallTable.NewRow();
+                int col = 0;
+                foreach (var sv in Vm.Status)
+                    row[col++] = sv.History[t];
+                _waterfallTable.Rows.Add(row);
+            }
+
+            WaterfallGrid.ItemsSource = _waterfallTable.DefaultView;
+        }
+
+        private void RefreshWaterfallRows()
+        {
+            if (_waterfallTable == null || Vm?.Status == null) return;
+            if (_waterfallTable.Columns.Count != Vm.Status.Count) { BuildWaterfallTable(); return; }
+
+            // Row t = History[t]: row 0 = newest, last row = oldest
+            for (int t = 0; t < StatusVariable.HistorySize; t++)
+            {
+                var row = _waterfallTable.Rows[t];
+                int col = 0;
+                foreach (var sv in Vm.Status)
+                    row[col++] = sv.History[t];
             }
         }
 

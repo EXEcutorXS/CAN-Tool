@@ -32,6 +32,11 @@
   <ItemGroup>
     <None Remove="dll\vs_can_api.dll" />
     <None Remove="Images\CANTool.ico" />
+    <None Remove="Resources\local.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\local.csv" />
   </ItemGroup>
 
   <ItemGroup>
@@ -116,7 +121,89 @@
 			</AssemblyAttributes>
 		</ItemGroup>
 	</Target>
-	<Target Name="GenerateLang" BeforeTargets="Build" Inputs="Resources\local.csv" Outputs="Resources\lang.xaml">
-		<Exec Command="&quot;$(ProjectDir)Resources\Localizator.exe&quot; &quot;$(ProjectDir)Resources\local.csv&quot; &quot;$(ProjectDir)Resources\&quot;" />
-	</Target>
+
+  <!--
+    Inline MSBuild task: converts local.csv → lang.xaml + lang.<culture>.xaml
+    No external exe required. Runs before each build only when local.csv changes.
+  -->
+  <UsingTask TaskName="CsvToLangXaml"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <CsvPath      ParameterType="System.String" Required="true" />
+      <OutputDir    ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text" />
+      <Using Namespace="System.Collections.Generic" />
+      <Code Type="Fragment" Language="cs">
+      <![CDATA[
+        string[] lines = File.ReadAllLines(CsvPath, Encoding.UTF8);
+        if (lines.Length == 0) return true;
+
+        // Header: Key | en-En | ru-Ru | de-De | …
+        string[] headers = lines[0].Split('\t');
+        var cultures = new List<string>();
+        for (int col = 1; col < headers.Length; col++)
+            if (!string.IsNullOrWhiteSpace(headers[col]))
+                cultures.Add(headers[col].Trim());
+
+        // Collect data rows whose column count matches the header
+        var items = new List<string[]>();
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string[] parts = lines[i].Split('\t');
+            if (parts.Length == cultures.Count + 1)
+                items.Add(parts);
+            else
+                items.Add(null); // keep blank separator rows
+        }
+
+        string xmlHeader =
+            "<ResourceDictionary" +
+            " xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"" +
+            " xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"" +
+            " xmlns:v=\"clr-namespace:System;assembly=mscorlib\">";
+
+        for (int i = 0; i < cultures.Count; i++)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(xmlHeader);
+            foreach (string[] row in items)
+            {
+                if (row == null) { sb.AppendLine(); continue; }
+                if (row[0].Length > 2)
+                {
+                    string val = row[1 + i]
+                        .Replace("&", "&amp;")
+                        .Replace("<", "&lt;")
+                        .Replace(">", "&gt;");
+                    sb.AppendLine("<v:String x:Key=\"" + row[0] + "\">" + val + "</v:String>");
+                }
+                else
+                    sb.AppendLine();
+            }
+            sb.AppendLine("</ResourceDictionary>");
+
+            // First culture column → lang.xaml (default / English)
+            // Others → lang.<culture>.xaml  (e.g. lang.ru-Ru.xaml)
+            string fileName = (i == 0) ? "lang.xaml" : "lang." + cultures[i] + ".xaml";
+            File.WriteAllText(Path.Combine(OutputDir, fileName), sb.ToString(), Encoding.UTF8);
+        }
+        return true;
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <!-- Runs before every build; skipped automatically when local.csv is unchanged -->
+  <Target Name="GenerateLang" BeforeTargets="BeforeBuild"
+          Inputs="$(ProjectDir)Resources\local.csv"
+          Outputs="$(ProjectDir)Resources\lang.xaml">
+    <CsvToLangXaml CsvPath="$(ProjectDir)Resources\local.csv"
+                   OutputDir="$(ProjectDir)Resources\" />
+    <Message Text="LocalizationLoader: lang.xaml regenerated from local.csv" Importance="high" />
+  </Target>
+
 </Project>

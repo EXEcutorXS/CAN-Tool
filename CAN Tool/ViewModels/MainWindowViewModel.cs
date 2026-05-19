@@ -271,32 +271,43 @@ namespace CAN_Tool.ViewModels
             var plt = myChart.Plot;
 
             plt.Clear();
-            if (OmniInstance == null) return;
-            if (OmniInstance.SelectedConnectedDevice == null) return;
 
-            foreach (var v in OmniInstance.SelectedConnectedDevice.Status)
-                if (v.Display)
+            var device = OmniInstance?.SelectedConnectedDevice;
+            if (device == null || device.LogData.Count == 0) return;
+
+            int logLen = device.LogCurrentPos;
+            bool hasRightAxis = false;
+            foreach (var v in device.Status)
+            {
+                if (!v.Display || v.Id >= device.LogData.Count) continue;
+
+                var sig = plt.AddSignalConst(
+                    device.LogData[v.Id].Take(logLen).ToArray(),
+                    color: v.Color, label: v.Name);
+                sig.UseParallel = false;
+                sig.LineWidth   = v.LineWidth;
+                sig.LineStyle   = v.LineStyle;
+                sig.MarkerShape = v.MarkShape;
+
+                if (v.Id == 17 || v.Id == 18)
                 {
-                    var sig = plt.AddSignalConst(OmniInstance.SelectedConnectedDevice.LogData[v.Id].Take(OmniInstance.SelectedConnectedDevice.LogCurrentPos).ToArray(), color: v.Color, label: v.Name);
-                    sig.UseParallel = false;
-                    sig.LineWidth = v.LineWidth;
-                    sig.LineStyle = v.LineStyle;
-                    sig.MarkerShape = v.MarkShape;
-
-                    if (v.Id == 17 || v.Id == 18) //ТН проецируется на правую ось
-                        sig.YAxisIndex = 2;
-                    plt.Grid(color: System.Drawing.Color.FromArgb(50, 200, 200, 200));
-                    plt.Grid(lineStyle: LineStyle.Dot);
-                    if (App.Settings.IsDark)
-                        plt.Style(dataBackground: System.Drawing.Color.FromArgb(255, 40, 40, 40), figureBackground: System.Drawing.Color.DimGray);
-                    else
-                        plt.Style(dataBackground: System.Drawing.Color.WhiteSmoke, figureBackground: System.Drawing.Color.White);
-                    plt.Legend(true, ScottPlot.Alignment.UpperLeft);
-
-
+                    sig.YAxisIndex = 1;
+                    hasRightAxis = true;
                 }
-            myChart.Refresh();
+            }
 
+            plt.YAxis2.Ticks(hasRightAxis);
+            plt.YAxis2.AutomaticTickPositions();
+
+            plt.Grid(color: System.Drawing.Color.FromArgb(50, 200, 200, 200));
+            plt.Grid(lineStyle: LineStyle.Dot);
+            if (App.Settings.IsDark)
+                plt.Style(dataBackground: System.Drawing.Color.FromArgb(255, 40, 40, 40), figureBackground: System.Drawing.Color.DimGray);
+            else
+                plt.Style(dataBackground: System.Drawing.Color.WhiteSmoke, figureBackground: System.Drawing.Color.White);
+            plt.Legend(true, ScottPlot.Alignment.UpperLeft);
+
+            myChart.Refresh();
         }
 
         [RelayCommand]
@@ -563,25 +574,25 @@ namespace CAN_Tool.ViewModels
             CustomMessage.TransmitterId.Address = 6;
             CustomMessage.TransmitterId.Type = 126;
 
-            brushes.Add(new SolidColorBrush(Colors.PowderBlue));
-            brushes.Add(new SolidColorBrush(Colors.LightSkyBlue));
-            brushes.Add(new SolidColorBrush(Colors.Cyan));
-            brushes.Add(new SolidColorBrush(Colors.Teal));
-            brushes.Add(new SolidColorBrush(Colors.Green));
-            brushes.Add(new SolidColorBrush(Colors.LightGreen));
-            brushes.Add(new SolidColorBrush(Colors.YellowGreen));
-            brushes.Add(new SolidColorBrush(Colors.Yellow));
-            brushes.Add(new SolidColorBrush(Colors.Gold));
-            brushes.Add(new SolidColorBrush(Colors.Orange));
-            brushes.Add(new SolidColorBrush(Colors.OrangeRed));
-            brushes.Add(new SolidColorBrush(Colors.Peru));
-            brushes.Add(new SolidColorBrush(Colors.Gray));
-            brushes.Add(new SolidColorBrush(Colors.SlateGray));
-            brushes.Add(new SolidColorBrush(Colors.Red));
-            brushes.Add(new SolidColorBrush(Colors.DeepPink));
-            brushes.Add(new SolidColorBrush(Colors.MediumPurple));
-            brushes.Add(new SolidColorBrush(Colors.BlueViolet));
-            brushes.Add(new SolidColorBrush(Colors.DarkSlateBlue));
+            brushes.Add(new SolidColorBrush(Color.FromRgb(63,  81,  181))); // Indigo
+            brushes.Add(new SolidColorBrush(Color.FromRgb(33,  150, 243))); // Blue
+            brushes.Add(new SolidColorBrush(Color.FromRgb(3,   169, 244))); // LightBlue
+            brushes.Add(new SolidColorBrush(Colors.Cyan));                   // Cyan
+            brushes.Add(new SolidColorBrush(Colors.Teal));                   // Teal
+            brushes.Add(new SolidColorBrush(Colors.Green));                  // Green
+            brushes.Add(new SolidColorBrush(Colors.LightGreen));             // LightGreen
+            brushes.Add(new SolidColorBrush(Colors.Lime));                   // Lime
+            brushes.Add(new SolidColorBrush(Colors.Yellow));                 // Yellow
+            brushes.Add(new SolidColorBrush(Color.FromRgb(255, 193, 7)));   // Amber
+            brushes.Add(new SolidColorBrush(Colors.Orange));                 // Orange
+            brushes.Add(new SolidColorBrush(Colors.OrangeRed));              // DeepOrange
+            brushes.Add(new SolidColorBrush(Colors.SaddleBrown));            // Brown
+            brushes.Add(new SolidColorBrush(Colors.Gray));                   // Grey
+            brushes.Add(new SolidColorBrush(Colors.SlateGray));              // BlueGrey
+            brushes.Add(new SolidColorBrush(Colors.Red));                    // Red
+            brushes.Add(new SolidColorBrush(Colors.HotPink));                // Pink
+            brushes.Add(new SolidColorBrush(Colors.Purple));                 // Purple
+            brushes.Add(new SolidColorBrush(Color.FromRgb(103, 58,  183))); // DeepPurple
         }
     }
 }

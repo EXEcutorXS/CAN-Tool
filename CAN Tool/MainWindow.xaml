@@ -24,7 +24,7 @@
 
             <StatusBarItem HorizontalAlignment="Right">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="20" Text="" Margin="10"></TextBlock>
+                    <TextBlock x:Name="AdapterStatus" Foreground="{DynamicResource MaterialDesignBodyLight}" FontSize="20" Text="{Binding CanAdapter.Status}" Margin="10"></TextBlock>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>

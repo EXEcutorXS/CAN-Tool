@@ -251,12 +251,29 @@ namespace CAN_Tool
 
         public event EventHandler GotNewMessage;
         public long ReceivedMessagesCount { get; private set; } = 0;
+        public long TransmittedMessagesCount { get; private set; } = 0;
+        [ObservableProperty] private string status = "RX: 0  TX: 0";
+
+        private long _lastRxCount = 0;
+        private long _lastTxCount = 0;
 
         partial void OnTypeChanged(AdapterType value) => _driver = CreateDriver(value);
 
         public CanAdapter()
         {
             _driver = CreateDriver(Type);
+
+            var statsTimer = new System.Windows.Threading.DispatcherTimer();
+            statsTimer.Interval = TimeSpan.FromSeconds(1);
+            statsTimer.Tick += (_, _) =>
+            {
+                long rx = ReceivedMessagesCount - _lastRxCount;
+                long tx = TransmittedMessagesCount - _lastTxCount;
+                _lastRxCount = ReceivedMessagesCount;
+                _lastTxCount = TransmittedMessagesCount;
+                Status = $"RX: {rx}  TX: {tx}";
+            };
+            statsTimer.Start();
         }
 
         private ICanAdapterDriver CreateDriver(AdapterType adapterType)
@@ -329,7 +346,7 @@ namespace CAN_Tool
 
         public void SetBitrate(int bitrate) { Speed = bitrate; _driver.SetBitrate(bitrate); }
 
-        public void Transmit(CanMessage message) => _driver.Transmit(message);
+        public void Transmit(CanMessage message) { TransmittedMessagesCount++; _driver.Transmit(message); }
 
         public void InjectMessage(CanMessage m) =>
             GotNewMessage?.Invoke(this, new GotCanMessageEventArgs { receivedMessage = m });

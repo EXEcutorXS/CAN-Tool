@@ -1,24 +1,51 @@
 ﻿using System.Collections.Generic;
 using System;
-using System.Configuration;
-using System.Data;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Threading;
+using CAN_Tool.Libs;
 
 namespace CAN_Tool
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         public App()
         {
+            // Build language list from the CSV columns so adding a new language
+            // to local.csv automatically makes it available — no code change needed.
+            // CSV culture headers like "en-En", "ru-Ru", "de-De" are mapped to
+            // canonical CultureInfo names by taking the first two chars as the
+            // language code (e.g. "ru" → "ru-RU").
+            LocalizationLoader.Initialize();
+
             m_Languages.Clear();
-            m_Languages.Add(new CultureInfo("en-US")); //Нейтральная культура для этого проекта
-            m_Languages.Add(new CultureInfo("ru-RU"));
+            foreach (string csvCulture in LocalizationLoader.Cultures)
+            {
+                try
+                {
+                    // "en-En" → "en", look up a canonical culture
+                    string lang = csvCulture.Length >= 2 ? csvCulture.Substring(0, 2) : csvCulture;
+                    var ci = CultureInfo.GetCultureInfoByIetfLanguageTag(lang);
+                    m_Languages.Add(ci);
+                }
+                catch
+                {
+                    // Unrecognised tag — add as-is so we don't lose the column
+                    try { m_Languages.Add(new CultureInfo(csvCulture)); } catch { /* ignore */ }
+                }
+            }
+
+            // Fallback: at least English
+            if (m_Languages.Count == 0)
+                m_Languages.Add(new CultureInfo("en-US"));
+        }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            // Replace the static lang.xaml entry (from App.xaml) with the
+            // in-memory English dictionary built from local.csv.
+            LocalizationLoader.Apply("en-US");
+            base.OnStartup(e);
         }
 
         private static List<CultureInfo> m_Languages = new List<CultureInfo>();
@@ -29,49 +56,19 @@ namespace CAN_Tool
 
         public static CultureInfo Language
         {
-            get
-            {
-                return Thread.CurrentThread.CurrentUICulture;
-            }
+            get => Thread.CurrentThread.CurrentUICulture;
             set
             {
-                if (value == null) throw new ArgumentNullException("value");
+                if (value == null) throw new ArgumentNullException(nameof(value));
                 if (value == Thread.CurrentThread.CurrentUICulture) return;
 
-                //1. Меняем язык приложения:
                 Thread.CurrentThread.CurrentUICulture = value;
 
-                //2. Создаём ResourceDictionary для новой культуры
-                var dict = new ResourceDictionary();
-                switch (value.Name)
-                {
-                    case "ru-RU":
-                        dict.Source = new Uri(String.Format("Resources/lang.{0}.xaml", value.Name), UriKind.Relative);
-                        break;
-                    default:
-                        dict.Source = new Uri("Resources/lang.xaml", UriKind.Relative);
-                        break;
-                }
+                // Swap the in-memory ResourceDictionary for the requested culture.
+                LocalizationLoader.Apply(value.Name);
 
-                //3. Находим старую ResourceDictionary и удаляем его и добавляем новую ResourceDictionary
-                var oldDict = (from d in Application.Current.Resources.MergedDictionaries
-                               where d.Source != null && d.Source.OriginalString.StartsWith("Resources/lang.")
-                               select d).FirstOrDefault();
-                if (oldDict != null)
-                {
-                    var ind = Application.Current.Resources.MergedDictionaries.IndexOf(oldDict);
-                    Application.Current.Resources.MergedDictionaries.Remove(oldDict);
-                    Application.Current.Resources.MergedDictionaries.Insert(ind, dict);
-                }
-                else
-                {
-                    Application.Current.Resources.MergedDictionaries.Add(dict);
-                }
-
-                //4. Вызываем евент для оповещения всех окон.
-                LanguageChanged(Application.Current, new EventArgs());
+                LanguageChanged?.Invoke(Application.Current, EventArgs.Empty);
             }
         }
     }
-
 }

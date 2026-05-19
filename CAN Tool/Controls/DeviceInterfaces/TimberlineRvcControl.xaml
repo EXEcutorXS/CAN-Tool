@@ -24,17 +24,17 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.ColumnSpan="2">
         <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Margin="5">
-            <Button Margin="3" Opacity="{Binding HeaterEnabled,Converter={StaticResource BoolToOpacity}}" Click="ToggleHeaterClick">Heater</Button>
-            <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}" Click="ElementToggleButtonClick">Element</Button>
-            <Button Margin="3" Opacity="{Binding UnderfloorHeatingEnabled,Converter={StaticResource BoolToOpacity}}" Click="FloorButtonClick">Floor</Button>
-            <Button Margin="3" Opacity="{Binding EnginePreheatEnabled,Converter={StaticResource BoolToOpacity}}" Click="Button_Click_1">Engine</Button>
-            <Button Margin="3" Opacity="{Binding HeaterPumpOverride,Converter={StaticResource BoolToOpacity}}" Click="HeaterPumpButtonClick">Heater Pump</Button>
-            <Button Margin="3" Opacity="{Binding Pump1Override,Converter={StaticResource BoolToOpacity}}" Click="Pump1ButtonClick">Pump 1</Button>
-            <Button Margin="3" Opacity="{Binding Pump2Override,Converter={StaticResource BoolToOpacity}}" Click="Pump2ButtonClick">Pump 2</Button>
-            <Button Margin="3" Opacity="{Binding AuxPumpOverride[0].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump1ButtonClick">AUX pump 1</Button>
-            <Button Margin="3" Opacity="{Binding AuxPumpOverride[1].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump2ButtonClick">AUX pump 2</Button>
-            <Button Margin="3" Opacity="{Binding AuxPumpOverride[2].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump3ButtonClick">AUX pump 3</Button>
-            <Button Margin="3" Click="SyncTimeClick">Sync time</Button>
+            <Button Margin="3" Opacity="{Binding HeaterEnabled,Converter={StaticResource BoolToOpacity}}" Click="ToggleHeaterClick" Content="{DynamicResource b_heater}"/>
+            <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}" Click="ElementToggleButtonClick" Content="{DynamicResource b_element}"/>
+            <Button Margin="3" Opacity="{Binding UnderfloorHeatingEnabled,Converter={StaticResource BoolToOpacity}}" Click="FloorButtonClick" Content="{DynamicResource b_floor}"/>
+            <Button Margin="3" Opacity="{Binding EnginePreheatEnabled,Converter={StaticResource BoolToOpacity}}" Click="Button_Click_1" Content="{DynamicResource b_engine_preheat}"/>
+            <Button Margin="3" Opacity="{Binding HeaterPumpOverride,Converter={StaticResource BoolToOpacity}}" Click="HeaterPumpButtonClick" Content="{DynamicResource b_heater_pump}"/>
+            <Button Margin="3" Opacity="{Binding Pump1Override,Converter={StaticResource BoolToOpacity}}" Click="Pump1ButtonClick" Content="{DynamicResource b_pump1}"/>
+            <Button Margin="3" Opacity="{Binding Pump2Override,Converter={StaticResource BoolToOpacity}}" Click="Pump2ButtonClick" Content="{DynamicResource b_pump2}"/>
+            <Button Margin="3" Opacity="{Binding AuxPumpOverride[0].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump1ButtonClick" Content="{DynamicResource b_aux_pump1}"/>
+            <Button Margin="3" Opacity="{Binding AuxPumpOverride[1].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump2ButtonClick" Content="{DynamicResource b_aux_pump2}"/>
+            <Button Margin="3" Opacity="{Binding AuxPumpOverride[2].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump3ButtonClick" Content="{DynamicResource b_aux_pump3}"/>
+            <Button Margin="3" Click="SyncTimeClick" Content="{DynamicResource b_sync_time}"/>
         </StackPanel>
 
             <WrapPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="10">
@@ -85,42 +85,42 @@
             </WrapPanel>
             <WrapPanel  Orientation="Vertical" DockPanel.Dock="Left" Margin="10">
                 <StackPanel Margin="5" Orientation="Horizontal">
-                    <TextBlock Margin="5" Width="120" VerticalAlignment="Center"> Day start at:</TextBlock>
+                    <TextBlock Margin="5" Width="120" VerticalAlignment="Center" Text="{DynamicResource t_day_start_at}"/>
                     <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="DayStartSlider"  Margin="5" VerticalAlignment="Center" Minimum="0" Maximum="1430"  LargeChange="10"  SmallChange="10" Width="200" ValueChanged="DayStartChanged" TickFrequency="10" IsSnapToTickEnabled="True"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding DayStartString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Margin="5" Width="120" VerticalAlignment="Center"> Night start at:</TextBlock>
+                    <TextBlock Margin="5" Width="120" VerticalAlignment="Center" Text="{DynamicResource t_night_start_at}"/>
                     <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="NightStartSlider" Margin="5" VerticalAlignment="Center" Minimum="0" Maximum="1430" LargeChange="10" SmallChange="10" Width="200" ValueChanged="NightStartChanged" TickFrequency="10" IsSnapToTickEnabled="True"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding NightStartString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120">System time limit</TextBlock>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120" Text="{DynamicResource t_system_time_limit}"/>
                     <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="SystemLimitSlider" Margin="5" VerticalAlignment="Center" Minimum="1" Maximum="100"  LargeChange="1" SmallChange="1" Width="200" ValueChanged="SystemLimitChanged"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center"  Text="{Binding SystemDurationString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120">Pump duration</TextBlock>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120" Text="{DynamicResource t_pump_duration}"/>
                     <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="PumpLimitSlider" Margin="5" VerticalAlignment="Center" Minimum="2" Maximum="60"  LargeChange="1" SmallChange="1" Width="200" ValueChanged="PumpDurationChanged"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center"  Text="{Binding PumpDuration,StringFormat={}{0} M}"></TextBlock>
                 </StackPanel>
                 <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120">Engine setpoint</TextBlock>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120" Text="{DynamicResource t_engine_setpoint}"/>
                     <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="EngineSetpointSlider" Margin="5" VerticalAlignment="Center" Minimum="0" Maximum="80"  LargeChange="10"  SmallChange="1" Width="200" ValueChanged="EngineSetpointChanged"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center"  Text="{Binding EnginePreheatSetpoint,StringFormat={}{0:F0} °,Converter={StaticResource ToFarenheit}}"></TextBlock>
                 </StackPanel>
                 <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120">Engine duration</TextBlock>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120" Text="{DynamicResource t_engine_duration}"/>
                     <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="EngineDurationSlider" Margin="5" VerticalAlignment="Center" Minimum="10" Maximum="1450"  LargeChange="10" SmallChange="1" Width="200" ValueChanged="EngineDurationChanged"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding EngineDurationString}"></TextBlock>
                 </StackPanel>
                 <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120">Floor setpoint</TextBlock>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120" Text="{DynamicResource t_floor_setpoint}"/>
                     <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="FloorSetpointSlider" Margin="5" VerticalAlignment="Center" Minimum="3" Maximum="32"  LargeChange="10" SmallChange="1" Width="200" ValueChanged="FloorSetpointChanged"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding UnderfloorSetpoint,StringFormat={}{0:F0}°,Converter={StaticResource ToFarenheit}}"></TextBlock>
                 </StackPanel>
                 <StackPanel Margin="5" VerticalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120">Floor hysteresis</TextBlock>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Width="120" Text="{DynamicResource t_floor_hysteresis}"/>
                     <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="FloorHysteresisSlider" Margin="5" VerticalAlignment="Center" Minimum="2" Maximum="10" LargeChange="2" SmallChange="1" Width="200" ValueChanged="FloorHysteresisCHanged"></local:SilentSlider>
                     <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding UnderfloorHysteresis,StringFormat={}{0:F0}°,Converter={StaticResource ToFarenheitRelative}}"></TextBlock>
                 </StackPanel>
@@ -129,29 +129,29 @@
         <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Vertical" Grid.ColumnSpan="2">
             <StackPanel Orientation="Horizontal" Margin="2">
                 <!-- DGN request -->
-                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">DGN:</TextBlock>
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13" Text="{DynamicResource t_dgn_label}"/>
                 <TextBox Margin="2" VerticalAlignment="Center" Width="58" FontSize="13"
-                         Text="{Binding DgnToRequest, Converter={StaticResource HexConverter}}" ToolTip="DGN hex"/>
-                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">Inst:</TextBlock>
+                         Text="{Binding DgnToRequest, Converter={StaticResource HexConverter}}" ToolTip="{DynamicResource t_dgn_hex_tooltip}"/>
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13" Text="{DynamicResource t_inst_label}"/>
                 <TextBox Margin="2" VerticalAlignment="Center" Width="28" TextAlignment="Center" FontSize="13"
                          Text="{Binding InstanceToRequest}" d:Text="1"/>
-                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">Sub:</TextBlock>
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13" Text="{DynamicResource t_sub_label}"/>
                 <TextBox Margin="2" VerticalAlignment="Center" Width="28" TextAlignment="Center" FontSize="13"
                          Text="{Binding SubInstanceToRequest}" d:Text="1"/>
-                <Button Margin="4 2" Padding="6 2" VerticalAlignment="Center" Click="DgnRequestClick">Request</Button>
+                <Button Margin="4 2" Padding="6 2" VerticalAlignment="Center" Click="DgnRequestClick" Content="{DynamicResource b_request_dgn}"/>
                 <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
                 <!-- Address claiming -->
-                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">SA:</TextBlock>
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13" Text="{DynamicResource t_sa_label}"/>
                 <TextBox Margin="2" VerticalAlignment="Center" Width="38" TextAlignment="Center" FontSize="13"
                          Text="{Binding SaToRequest,UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Margin="4 2" Padding="6 2" VerticalAlignment="Center" Click="AddressRequestClick">Req addr</Button>
-                <Button Margin="2 2" Padding="6 2" VerticalAlignment="Center" Click="AddressClaimClick">Claim</Button>
+                <Button Margin="4 2" Padding="6 2" VerticalAlignment="Center" Click="AddressRequestClick" Content="{DynamicResource b_req_addr}"/>
+                <Button Margin="2 2" Padding="6 2" VerticalAlignment="Center" Click="AddressClaimClick" Content="{DynamicResource b_claim_addr}"/>
                 <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
                 <!-- Simulator -->
-                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">Sim:</TextBlock>
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13" Text="{DynamicResource t_sim_label}"/>
                 <TextBox Margin="2" VerticalAlignment="Center" MinWidth="120" FontSize="13"
                          Text="{Binding OccupiedAddressesText, UpdateSourceTrigger=LostFocus}"
-                         ToolTip="Comma-separated addresses the simulator will defend"/>
+                         ToolTip="{DynamicResource t_sim_tooltip}"/>
                 <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
                 <!-- Multipack -->
                 <TextBlock Margin="4 0" VerticalAlignment="Center" FontSize="11"
@@ -166,26 +166,26 @@
             </ScrollViewer>
         </StackPanel>
         <StackPanel Grid.Column="0" Grid.Row="2" DataContext="{Binding SelectedZone}" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center" d:Visibility="Visible"  Visibility="{Binding Connected,Converter={StaticResource OnlyHetingZones}}">
-            <TextBlock Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}">Mode:</TextBlock>
+            <TextBlock Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{DynamicResource t_mode_label}"/>
             <Button Margin="6" Content="{Binding State}" Click="ToggleSelectedZone" />
         </StackPanel>
         <StackPanel Grid.Column="0" Grid.Row="3" Orientation="Horizontal" DataContext="{Binding SelectedZone}" HorizontalAlignment="Center" d:Visibility="Visible"  Visibility="{Binding Connected,Converter={StaticResource OnlyFurnace}}">
-            <TextBlock Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}">Fan maual:</TextBlock>
+            <TextBlock Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Text="{DynamicResource t_fan_manual_label}"/>
             <Button Margin="6" Content="{Binding ManualMode,StringFormat=Manual:{0}}" Click="ToggleFanAuto" />
         </StackPanel>
         <StackPanel DataContext="{Binding SelectedZone}" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Visibility="{Binding Connected,Converter={StaticResource OnlyHetingZones}}" d:Visibility="Visible">
             <fa:SvgAwesome Icon="Regular_Sun" Foreground="{DynamicResource MaterialDesignBody}" Margin="6"></fa:SvgAwesome>
-            <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="DaySetpointSlider" VerticalAlignment="Center" Width="250" Minimum="10" Maximum="32" SmallChange="1"  LargeChange="5" ValueChanged="DaySetpointChanged" ToolTip="Daytime setpoint"></local:SilentSlider>
+            <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="DaySetpointSlider" VerticalAlignment="Center" Width="250" Minimum="10" Maximum="32" SmallChange="1"  LargeChange="5" ValueChanged="DaySetpointChanged" ToolTip="{DynamicResource t_daytime_setpoint_tt}"/>
             <TextBlock Text="{Binding TempSetpointDay,StringFormat={}{0:D}°,Mode=OneWay,Converter={StaticResource ToFarenheit}}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
-            <CheckBox Margin="10" Style="{StaticResource MaterialDesignLightCheckBox}" IsChecked="{Binding BroadcastTemperature}" ToolTip="Temperature override">
+            <CheckBox Margin="10" Style="{StaticResource MaterialDesignLightCheckBox}" IsChecked="{Binding BroadcastTemperature}" ToolTip="{DynamicResource t_temp_override_tt}">
                 <fa:SvgAwesome Icon="Solid_TemperatureLow" Foreground="{DynamicResource MaterialDesignBody}" Margin="6"></fa:SvgAwesome>
             </CheckBox>
-            <Slider x:Name="RvcTempSlider" Margin="10" Minimum="-40" Maximum="60" SmallChange="1" LargeChange="5"  Value="{Binding RvcTemperature}" VerticalAlignment="Center" Width="250" ToolTip="Temperature to override"></Slider>
+            <Slider x:Name="RvcTempSlider" Margin="10" Minimum="-40" Maximum="60" SmallChange="1" LargeChange="5"  Value="{Binding RvcTemperature}" VerticalAlignment="Center" Width="250" ToolTip="{DynamicResource t_temp_to_override_tt}"/>
             <TextBlock Text="{Binding RvcTemperature,StringFormat={}{0:D}°,Converter={StaticResource ToFarenheit}}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
         </StackPanel>
         <StackPanel DataContext="{Binding SelectedZone}" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" Visibility="{Binding Connected,Converter={StaticResource OnlyHetingZones}}" d:Visibility="Visible">
             <fa:SvgAwesome Icon="Regular_Moon" Foreground="{DynamicResource MaterialDesignBody}" Margin="10"></fa:SvgAwesome>
-            <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="NightSetpointSlider" VerticalAlignment="Center" Width="250" Minimum="10" Maximum="32" SmallChange="1"  LargeChange="5" ValueChanged="NightSetpointChanged" ToolTip="Nighttime setpoint"></local:SilentSlider>
+            <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="NightSetpointSlider" VerticalAlignment="Center" Width="250" Minimum="10" Maximum="32" SmallChange="1"  LargeChange="5" ValueChanged="NightSetpointChanged" ToolTip="{DynamicResource t_nighttime_setpoint_tt}"/>
             <TextBlock Text="{Binding TempSetpointNight,StringFormat={}{0:D}°,Mode=OneWay,Converter={StaticResource ToFarenheit}}" Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}"></TextBlock>
             <fa:SvgAwesome Icon="Solid_Fan" Foreground="{DynamicResource MaterialDesignBody}" Margin="25 10" Opacity ="{Binding ManualMode,Converter={StaticResource BoolToOpacity}}" d:Visibility="Visible"  Visibility="{Binding Connected,Converter={StaticResource OnlyFurnace}}"></fa:SvgAwesome>
             <local:SilentSlider Style="{DynamicResource MaterialDesignDiscreteHorizontalSlider}" x:Name="ManualSlider" VerticalAlignment="Center" Width="250" Minimum="10" Maximum="100" SmallChange="1" LargeChange="5" IsEnabled="{Binding ManualMode}" ValueChanged="ManualPercentChanged" d:Visibility="Visible"  Visibility="{Binding Connected,Converter={StaticResource OnlyFurnace}}"></local:SilentSlider>
@@ -211,7 +211,7 @@
                         <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Visibility="{Binding Connected,Converter={StaticResource OnlyConnected}}" d:Visibility="Visible"  VerticalAlignment="Center" FontSize="30" Text="{Binding CurrentTemperature,Mode=OneWay,StringFormat={}{0:f1}°,Converter={StaticResource ToFarenheit}}" />
                                 <ProgressBar Margin="5" Height="10" Orientation="Vertical" Maximum="100" Value="{Binding CurrentPwm}" d:Visibility="Visible"  Visibility="{Binding Connected,Converter={StaticResource OnlyFurnace}}"/>
-                                <TextBlock VerticalAlignment="Center" FontSize="30" Text="{Binding CurrentPwm,Mode=OneWay,StringFormat={}{0:d2}%}" ToolTip="Current Fan PWM" d:Visibility="Visible"  Visibility="{Binding Connected,Converter={StaticResource OnlyFurnace}}"/>
+                                <TextBlock VerticalAlignment="Center" FontSize="30" Text="{Binding CurrentPwm,Mode=OneWay,StringFormat={}{0:d2}%}" ToolTip="{DynamicResource t_current_fan_pwm_tt}" d:Visibility="Visible"  Visibility="{Binding Connected,Converter={StaticResource OnlyFurnace}}"/>
                         </StackPanel>
                         </StackPanel>
                     </Border>

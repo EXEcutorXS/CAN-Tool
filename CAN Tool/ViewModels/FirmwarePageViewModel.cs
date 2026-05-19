@@ -89,13 +89,16 @@ namespace CAN_Tool.ViewModels
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
+        private string lastHexFilePath = "";
+
         [RelayCommand]
         private void LoadHex()
         {
             OpenFileDialog dialog = new();
             dialog.Filter = "Hex Files|*.hex";
             if (!(bool)dialog.ShowDialog()) return;
-            fragments = ParseHexFile(dialog.FileName, FragmentSize);
+            lastHexFilePath = dialog.FileName;
+            fragments = ParseHexFile(lastHexFilePath, FragmentSize);
             LogWriteLine($"Hex is loaded, contains {fragments.Count} fragments.");
         }
 
@@ -153,7 +156,7 @@ namespace CAN_Tool.ViewModels
                 Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone = false;
                 if (i == 3)
                 {
-                    Vm.OmniInstance.CurrentTask.OnFail("Can't flash memory");
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_flash_memory"));
                     return;
                 }
                 StartFlashing();
@@ -179,7 +182,7 @@ namespace CAN_Tool.ViewModels
                 Vm.OmniInstance.SelectedConnectedDevice.flagDataGetDone = false;
                 if (i == 5)
                 {
-                    Vm.OmniInstance.CurrentTask.OnFail("Can't check transmission result");
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_check_transmission"));
                     return false;
                 }
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
@@ -190,7 +193,7 @@ namespace CAN_Tool.ViewModels
                     return true;
 
                 Debug.WriteLine($"CRC mismatch: expected {crc:X08}, got {Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc:X08}");
-                LogWriteLine("###Transmission failed!");
+                LogWriteLine(GetString("t_transmission_failed"));
                 return false;
             }
             return false;
@@ -217,7 +220,7 @@ namespace CAN_Tool.ViewModels
                 Vm.OmniInstance.SelectedConnectedDevice.flagSetAdrDone = false;
                 if (i == 3)
                 {
-                    Vm.OmniInstance.CurrentTask.OnFail("Can't set address");
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_set_address"));
                     return;
                 }
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
@@ -242,7 +245,7 @@ namespace CAN_Tool.ViewModels
                     return;
 
                 if (k == 15) { 
-                    Vm.OmniInstance.CurrentTask.OnFail("Can't transmit data pack");
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_transmit_data"));
                     Debug.WriteLine($"Превышено число попыток передачи");
                     return; }
                 if (k > 0)
@@ -282,20 +285,30 @@ namespace CAN_Tool.ViewModels
         {
             try
             {
+                // Block new protocol on old bootloader (≤ v4): BootFirmware = {123, 0, 0, 4}
+                var dev = Vm.OmniInstance.SelectedConnectedDevice;
+                if (dev != null && dev.BootFirmware[0] == 123 && dev.BootFirmware[3] <= 4)
+                {
+                    MessageBox.Show(
+                        GetString("t_old_bootloader_warning"),
+                        GetString("t_old_bootloader_title"),
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
                 if (fragmentsArg.Count == 0)
                 {
                     MessageBox.Show(GetString("t_load_hex_first"));
                     return;
                 }
-                LogWriteLine("Starting Firmware updating procedure");
+                LogWriteLine(GetString("t_starting_firmware_update"));
                 if (!Vm.OmniInstance.CurrentTask.Capture("Memory Erasing")) return;
-                LogWriteLine("Starting flash erasing");
+                LogWriteLine(GetString("t_starting_flash_erase"));
                 for (var i = 0; i < 4; i++)
                 {
                     if (i == 3)
                     {
-                        Vm.OmniInstance.CurrentTask.OnFail("Can't erase memory");
+                        Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_erase_memory"));
                         return;
                     }
 
@@ -314,7 +327,7 @@ namespace CAN_Tool.ViewModels
                     Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragmentsArg.Count;
                     if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested) return;
                 }
-                LogWriteLine("Firmware updating success");
+                LogWriteLine(GetString("t_firmware_update_success"));
                 Vm.OmniInstance.CurrentTask.OnDone();
             }
             catch(Exception ex)
@@ -325,82 +338,55 @@ namespace CAN_Tool.ViewModels
         }
         #region oldVersionBootloader
 
-        private void flashFragmentOld(CodeFragment f)
+        // Old bootloader flash command: PGN 100, Data[0]=3
+        // (StartFlashing() uses PGN 105 which old bootloader does not understand)
+        private void StartFlashingOld()
         {
-            writeFragmentToRamOld(f);
-            for (int i = 0; i < 4; i++)
-            {
-                if (i == 3) { Vm.OmniInstance.CurrentTask.OnFail("Can't flash memory"); return; }
-                StartFlashing();
-                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone, 20)) break;
-            }
-        }
-
-        private void bootloaderSetAdrLen(uint adress, int len)
-        {
-            LogWriteLine($"Setting adress to 0X{adress:X}");
             OmniMessage msg = new();
             msg.Pgn = 100;
             msg.ReceiverId.Type = 123;
-            msg.Data[0] = 5;
-            msg.Data[1] = 0xFF;
-            msg.Data[2] = (byte)((adress >> 24) & 0xFF);
-            msg.Data[3] = (byte)((adress >> 16) & 0xFF);
-            msg.Data[4] = (byte)((adress >> 8) & 0xFF);
-            msg.Data[5] = (byte)((adress >> 0) & 0xFF);
-            msg.Data[6] = 0xff;
-            msg.Data[7] = 0xff;
-
-            for (int i = 0; i < 6; i++)
-            {
-                if (i == 5) { Vm.OmniInstance.CurrentTask.OnFail("Can't set start adress"); return; }
-                Vm.CanAdapter.Transmit(msg.ToCanMessage());
-                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagSetAdrDone, 100)) break;
-            }
+            msg.Data[0] = 3;
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
+
+        private void flashFragmentOld(CodeFragment f)
+        {
+            writeFragmentToRamOld(f);
+            StartFlashingOld();
+            Thread.Sleep(15); // STM32 programs 512 bytes in ~8ms; 15ms leaves margin
+        }
+
         private void initAnddressOld()
         {
+            // Case 2: bootloader resets mMemDataCnt=0 and mMemAddr=MAIN_PROGRAM_START_ADDRESS.
+            // The address we pass is stored but ignored — bootloader always starts at its fixed constant.
             OmniMessage msg = new()
             {
                 Pgn = 100,
                 TransmitterId = new DeviceId(126, 6),
                 ReceiverId = new DeviceId(123, 0)
             };
-            msg.Data[0] = 1;
-
+            msg.Data[0] = 2;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
-            Thread.Sleep(10);
+            Thread.Sleep(20);
         }
 
         private void writeFragmentToRamOld(CodeFragment f)
         {
-            int len = 0;
             OmniMessage msg = new()
             {
                 Pgn = 101,
                 TransmitterId = new DeviceId(126, 6),
                 ReceiverId = new DeviceId(123, 0)
             };
-            LogWriteLine($"Starting {f.StartAddress:X} fragment transmission");
+            LogWriteLine($"Fragment 0x{f.StartAddress:X08} ({f.Length} bytes)");
             for (int i = 0; i < (f.Length + 7) / 8; i++)
             {
                 for (int j = 0; j < 8; j++)
-                {
                     msg.Data[j] = f.Data[i * 8 + j];
-                    len++;
-                }
-                msg.Data[0] = f.Data[i * 8];
-                msg.Data[1] = f.Data[i * 8 + 1];
-                msg.Data[2] = f.Data[i * 8 + 2];
-                msg.Data[3] = f.Data[i * 8 + 3];
-                msg.Data[4] = f.Data[i * 8 + 4];
-                msg.Data[5] = f.Data[i * 8 + 5];
-                msg.Data[6] = f.Data[i * 8 + 6];
-                msg.Data[7] = f.Data[i * 8 + 7];
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
-                Thread.Sleep(20);
+                Thread.Sleep(2); // Enough for bootloader to process one 8-byte CAN frame
             }
-
         }
 
         private void EraseFlashOld()
@@ -408,41 +394,103 @@ namespace CAN_Tool.ViewModels
             OmniMessage msg = new();
             msg.Pgn = 100;
             msg.ReceiverId.Type = 123;
-            msg.Data[0] = 1; //Flash erase
-            msg.Data[1] = 255;  //Стереть всю память
+            msg.Data[0] = 1;
+            msg.Data[1] = 255;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
-            Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone = false;
         }
 
-        private void UpdateFirmwareOld(List<CodeFragment> fragments)
+        // Parses hex file including ALL bytes (even 0xFF).
+        // Required for old bootloader: its write pointer advances for every received byte,
+        // so skipping reserved 0xFF blocks would misalign subsequent data in flash.
+        private List<CodeFragment> ParseHexFileRaw(string path, int maxFragmentSize)
         {
-            LogWriteLine("Starting Firmware updating procedure");
-            Vm.OmniInstance.CurrentTask.Capture("Memory Erasing");
-            LogWriteLine("Starting flash erasing");
-            for (int i = 0; i < 4; i++)
+            var result = new List<CodeFragment>();
+            CodeFragment current = new(maxFragmentSize);
+            uint pageAddress = 0;
+            uint lastLineAddress = 0;
+
+            if (string.IsNullOrEmpty(path)) return result;
+            using StreamReader sr = new(path);
+            while (!sr.EndOfStream)
             {
-                if (i == 3) { Vm.OmniInstance.CurrentTask.OnFail("Can't erase memory"); return; }
-                EraseFlashOld();
-                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone, 5000)) break;
+                var line = sr.ReadLine()?[1..];
+                var bytes = new byte[60];
+                for (var i = 0; i < line?.Length / 2; i++)
+                    bytes[i] = Convert.ToByte(line.Substring(i * 2, 2), 16);
+
+                int recordLen = bytes[0];
+                switch (bytes[3])
+                {
+                    case 0:
+                        var localAddr = (uint)(bytes[1] * 256 + bytes[2]);
+                        uint absAddr = pageAddress + localAddr;
+                        if (lastLineAddress != 0 && absAddr != lastLineAddress + (uint)recordLen)
+                        {
+                            if (current.Length > 0) { result.Add(current); current = new(maxFragmentSize); }
+                        }
+                        if (current.StartAddress == 0)
+                            current.StartAddress = absAddr;
+                        lastLineAddress = absAddr;
+                        for (var i = 0; i < recordLen; i++)
+                        {
+                            current.Data[current.Length++] = bytes[i + 4];
+                            if (current.Length == maxFragmentSize)
+                            { result.Add(current); current = new(maxFragmentSize); }
+                        }
+                        break;
+                    case 4:
+                        if (current.Length > 0) { result.Add(current); current = new(maxFragmentSize); }
+                        pageAddress = (uint)(bytes[4] * 256 + bytes[5]) << 16;
+                        lastLineAddress = 0;
+                        break;
+                    case 1:
+                        if (current.Length > 0) result.Add(current);
+                        return result;
+                }
+            }
+            return result;
+        }
+
+        private void UpdateFirmwareOld(List<CodeFragment> _)
+        {
+            if (string.IsNullOrEmpty(lastHexFilePath))
+            {
+                MessageBox.Show(GetString("t_load_hex_first"));
+                return;
             }
 
+            // Re-parse hex including all 0xFF bytes so the bootloader's
+            // sequential write pointer stays aligned with flash addresses.
+            var rawFragments = ParseHexFileRaw(lastHexFilePath, FragmentSize);
+            if (rawFragments.Count == 0)
+            {
+                MessageBox.Show(GetString("t_load_hex_first"));
+                return;
+            }
+
+            LogWriteLine(string.Format(GetString("t_starting_old_boot_prog"), rawFragments.Count));
+            if (!Vm.OmniInstance.CurrentTask.Capture("Memory Erasing")) return;
+
+            LogWriteLine(GetString("t_starting_flash_erase"));
+            EraseFlashOld();
+            Thread.Sleep(5000); // Old bootloader sends no erase confirmation; fixed wait
+
             Vm.OmniInstance.CurrentTask.OnDone();
-
             Vm.OmniInstance.CurrentTask.Capture("Programming...");
-
-            int cnt = 0;
 
             initAnddressOld();
             Thread.Sleep(20);
-            foreach (var f in fragments)
+
+            int cnt = 0;
+            foreach (var f in rawFragments)
             {
                 flashFragmentOld(f);
-                Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragments.Count;
+                Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / rawFragments.Count;
                 if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested) return;
             }
-            LogWriteLine("Firmware updating success");
-            Vm.OmniInstance.CurrentTask.OnDone();
 
+            LogWriteLine(GetString("t_firmware_update_success"));
+            Vm.OmniInstance.CurrentTask.OnDone();
         }
 
         #endregion
