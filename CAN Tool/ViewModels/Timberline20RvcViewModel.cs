@@ -126,6 +126,99 @@ namespace CAN_Tool.ViewModels
         public void ProcessMesage(RvcMessage msg)
         {
             var D = msg.Data;
+
+            // Proprietary DGN: low byte of DGN encodes the device SA
+            if (msg.Dgn == (uint)(0x1EF00 + SaToRequest))
+            {
+                switch (D[0])
+                {
+                    case 0xA0:
+                        if (D[1] != 0xFF) TankTemperature = D[1] - 40;
+                        if (D[2] != 0xFF) HeaterTemperature = D[2] - 40;
+                        if (D[3] != 0xFF) Zones[0].ManualPercent = (byte)(D[3] / 2);
+                        if (D[4] != 0xFF) Zones[1].ManualPercent = (byte)(D[4] / 2);
+                        if (D[5] != 0xFF) Zones[2].ManualPercent = (byte)(D[5] / 2);
+                        if (D[6] != 0xFF) Zones[3].ManualPercent = (byte)(D[6] / 2);
+                        if (D[7] != 0xFF) Zones[4].ManualPercent = (byte)(D[7] / 2);
+                        break;
+                    case 0xA1:
+                        if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) SystemEstimatedTime = D[1] + D[2] * 256 + D[3] * 65536;
+                        break;
+                    case 0xA2:
+                        if (D[1] != 0xFF || D[2] != 0xFF) Pump1EstimatedTime = D[1] + D[2] * 256;
+                        if (D[3] != 0xFF || D[4] != 0xFF) Pump2EstimatedTime = D[3] + D[4] * 256;
+                        if (D[5] != 0xFF || D[6] != 0xFF) HeaterPumpEstimatedTime = D[5] + D[6] * 256;
+                        break;
+                    case 0xA3:
+                        if (D[1] != 0xFF || D[2] != 0xFF) AuxPumpEstimatedTime[0].Value = D[1] + D[2] * 256;
+                        if (D[3] != 0xFF || D[4] != 0xFF) AuxPumpEstimatedTime[1].Value = D[3] + D[4] * 256;
+                        if (D[5] != 0xFF || D[6] != 0xFF) AuxPumpEstimatedTime[2].Value = D[5] + D[6] * 256;
+                        break;
+                    case 0xA4:
+                        if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) HeaterTotalMinutes = D[1] + D[2] * 256 + D[3] * 65536;
+                        HeaterVersion = new byte[] { D[4], D[5], D[6], D[7] };
+                        break;
+                    case 0xA5:
+                        PanelVersion = new byte[] { D[4], D[5], D[6], D[7] };
+                        break;
+                    case 0xA6:
+                        HcuVersion = new byte[] { D[4], D[5], D[6], D[7] };
+                        break;
+                    case 0xA8:
+                        if (D[1] != 0xFF)
+                        {
+                            if (D[1] < 1) SystemDuration = 1;
+                            if (D[1] > 100) SystemDuration = 100;
+                            SystemDuration = D[1];
+                        }
+                        if (D[2] != 0xFF)
+                        {
+                            if (D[2] < 2) PumpDuration = 2;
+                            if (D[2] > 60) SystemDuration = 60;
+                            PumpDuration = D[2];
+                        }
+                        if (D[3] != 0xFF)
+                        {
+                            EnginePreheatSetpoint = D[3] - 40;
+                            if (EnginePreheatSetpoint < 0)  EnginePreheatSetpoint = 0;
+                            if (EnginePreheatSetpoint > 80) EnginePreheatSetpoint = 80;
+                        }
+                        if (D[4] != 0xFF || D[5] != 255)
+                        {
+                            EnginePreheatDuration = D[4] + D[5] * 256;
+                            if (EnginePreheatDuration < 10)   EnginePreheatDuration = 10;
+                            if (EnginePreheatDuration > 1450) EnginePreheatDuration = 1450;
+                        }
+                        break;
+                    case 0xA9:
+                        if ((D[1] & 3) != 3) DomesticWater = (D[1] & 3) != 0;
+                        if (D[2] != 255) HeaterIconCode = (heaterIcon)D[1];
+                        if (D[3] != 255) LiquidLevel = D[3];
+                        if (D[4] + D[5] * 0x100 + D[6] * 0x10000 != 0xFFFFFF) EnginePreheatEstiamtedTime = D[4] + D[5] * 0x100 + D[6] * 0x10000;
+                        break;
+                    case 0xAA:
+                        if (D[1] < 4) Zones[0].Connected = (zoneType_t)D[1];
+                        if (D[2] < 4) Zones[1].Connected = (zoneType_t)D[2];
+                        if (D[3] < 4) Zones[2].Connected = (zoneType_t)D[3];
+                        if (D[4] < 4) Zones[3].Connected = (zoneType_t)D[4];
+                        if (D[5] < 4) Zones[4].Connected = (zoneType_t)D[5];
+                        break;
+                }
+                return;
+            }
+
+            // Address claiming simulator: intercept requests for occupied addresses
+            int dgn = (int)msg.Dgn;
+            if (dgn >= 0xEA00 && dgn <= 0xEAFF)
+            {
+                int targetAddr = dgn - 0xEA00;
+                if (D[0] == 0 && D[1] == 0xEE && D[2] == 0 && occupiedAddresses.Contains(targetAddr))
+                {
+                    AddToClaimLog($"[{DateTime.Now:HH:mm:ss.fff}] ← Request SA={targetAddr} from SA={msg.SourceAdress}");
+                    RespondWithAddressClaim(targetAddr);
+                }
+            }
+
             switch (msg.Dgn)
             {
                 case 0x1FFF7://Water heater status
@@ -234,6 +327,17 @@ namespace CAN_Tool.ViewModels
 
                     break;
 
+                case 0xEE00:
+                    AddToClaimLog($"[{DateTime.Now:HH:mm:ss.fff}] ← CLAIM SA={msg.SourceAdress} byte7=0x{D[7]:X2}");
+                    if (D[7] == 0x80) // dynamic address capable = our HCU
+                    {
+                        if (occupiedAddresses.Contains(msg.SourceAdress))
+                            RespondWithAddressClaim(msg.SourceAdress); // evict device from occupied address
+                        else
+                            SaToRequest = msg.SourceAdress; // device settled on a free address
+                    }
+                    break;
+
                 case 0xECFF:
                     if (D[0] != 0x20) break;
                     MultipackInitiated = true;
@@ -254,85 +358,6 @@ namespace CAN_Tool.ViewModels
                         MultipackInitiated = false;
                     }
 
-                    break;
-                case 0x1EF65: //Proprietary dgn
-                    switch (D[0])
-                    {
-                        case 0xA0:
-                            if (D[1] != 0xFF) TankTemperature = D[1] - 40;
-                            if (D[2] != 0xFF) HeaterTemperature = D[2] - 40;
-                            if (D[3] != 0xFF) Zones[0].ManualPercent = (byte)(D[3] / 2);
-                            if (D[4] != 0xFF) Zones[1].ManualPercent = (byte)(D[4] / 2);
-                            if (D[5] != 0xFF) Zones[2].ManualPercent = (byte)(D[5] / 2);
-                            if (D[6] != 0xFF) Zones[3].ManualPercent = (byte)(D[6] / 2);
-                            if (D[7] != 0xFF) Zones[4].ManualPercent = (byte)(D[7] / 2);
-                            break;
-                        case 0xA1: //Estimated time
-                            if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) SystemEstimatedTime = D[1] + D[2] * 256 + D[3] * 65536;
-                            break;
-                        case 0xA2: //Pump timers #1
-                            if (D[1] != 0xFF || D[2] != 0xFF) Pump1EstimatedTime = D[1] + D[2] * 256;
-                            if (D[3] != 0xFF || D[4] != 0xFF) Pump2EstimatedTime = D[3] + D[4] * 256;
-                            if (D[5] != 0xFF || D[6] != 0xFF) HeaterPumpEstimatedTime = D[5] + D[6] * 256;
-                            break;
-                        case 0xA3: //Pump timers #2
-                            if (D[1] != 0xFF || D[2] != 0xFF) AuxPumpEstimatedTime[0].Value = D[1] + D[2] * 256;
-                            if (D[3] != 0xFF || D[4] != 0xFF) AuxPumpEstimatedTime[1].Value = D[3] + D[4] * 256;
-                            if (D[5] != 0xFF || D[6] != 0xFF) AuxPumpEstimatedTime[2].Value = D[5] + D[6] * 256;
-                            break;
-                        case 0xA4: // Heater info
-                            if (D[1] != 0xFF || D[2] != 0xFF || D[3] != 0xFF) HeaterTotalMinutes = D[1] + D[2] * 256 + D[3] * 65536;
-                            HeaterVersion = new byte[] { D[4], D[5], D[6], D[7] };
-                            break;
-                        case 0xA5: //Panel Info
-                            PanelVersion = new byte[] { D[4], D[5], D[6], D[7] };
-                            break;
-                        case 0xA6: //HCU info
-                            HcuVersion = new byte[] { D[4], D[5], D[6], D[7] };
-                            break;
-                        case 0xA8: //Timers config status
-                            if (D[1] != 0xFF)
-                            {
-                                if (D[1] < 1) SystemDuration = 1;
-                                if (D[1] > 100) SystemDuration = 100; //Unlimited
-                                SystemDuration = D[1];
-                            }
-                            if (D[2] != 0xFF)
-                            {
-                                if (D[2] < 2) PumpDuration = 2;
-                                if (D[2] > 60) SystemDuration = 60;
-                                PumpDuration = D[2];
-                            }
-                            if (D[3] != 0xFF)
-                            {
-                                EnginePreheatSetpoint = D[3] - 40;
-                                if (EnginePreheatSetpoint < 0)
-                                    EnginePreheatSetpoint = 0;
-                                if (EnginePreheatSetpoint > 80)
-                                    EnginePreheatSetpoint = 80;
-                            }
-
-                            if (D[4] != 0xFF || D[5] != 255)
-                            {
-                                EnginePreheatDuration = D[4] + D[5] * 256;
-                                if (EnginePreheatDuration < 10) EnginePreheatDuration = 10;
-                                if (EnginePreheatDuration > 1450) EnginePreheatDuration = 1450;
-                            }
-                            break;
-                        case 0xA9:
-                            if ((D[1] & 3) != 3) DomesticWater = (D[1] & 3) != 0;
-                            if ((D[2] != 255)) HeaterIconCode = (heaterIcon)D[1];
-                            if (D[3] != 255) LiquidLevel = D[3];
-                            if (D[4] + D[5] * 0x100 + D[6] * 0x10000 != 0xFFFFFF) EnginePreheatEstiamtedTime = D[4] + D[5] * 0x100 + D[6] * 0x10000;
-                            break;
-                        case 0xAA:
-                            if (D[1] < 4) Zones[0].Connected = (zoneType_t)D[1];
-                            if (D[2] < 4) Zones[1].Connected = (zoneType_t)D[2];
-                            if (D[3] < 4) Zones[2].Connected = (zoneType_t)D[3];
-                            if (D[4] < 4) Zones[3].Connected = (zoneType_t)D[4];
-                            if (D[5] < 4) Zones[4].Connected = (zoneType_t)D[5];
-                            break;
-                    }
                     break;
             }
         }
@@ -563,7 +588,7 @@ namespace CAN_Tool.ViewModels
         public void ClearErrors()
         {
             RvcMessage msg = new();
-            msg.Dgn = 0x1EF65;
+            msg.Dgn = (int)(0x1EF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0x81;
 
@@ -576,7 +601,7 @@ namespace CAN_Tool.ViewModels
             if (hours > 100) hours = 100;
 
             RvcMessage msg = new();
-            msg.Dgn = 0x1EF65;
+            msg.Dgn = (int)(0x1EF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
             msg.Data[1] = (byte)hours;
@@ -591,7 +616,7 @@ namespace CAN_Tool.ViewModels
             if (deg > 80) deg = 80;
 
             RvcMessage msg = new();
-            msg.Dgn = 0x1EF65;
+            msg.Dgn = (int)(0x1EF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
             msg.Data[3] = (byte)(deg + 40);
@@ -606,7 +631,7 @@ namespace CAN_Tool.ViewModels
             if (minutes > 1450) minutes = 1450;
 
             RvcMessage msg = new();
-            msg.Dgn = 0x1EF65;
+            msg.Dgn = (int)(0x1EF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
             msg.Data[4] = (byte)minutes;
@@ -621,7 +646,7 @@ namespace CAN_Tool.ViewModels
             if (minutes > 60) minutes = 60;
 
             RvcMessage msg = new();
-            msg.Dgn = 0x1EF65;
+            msg.Dgn = (int)(0x1EF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
             msg.Data[2] = (byte)minutes;
@@ -707,6 +732,43 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
+        private string claimLog = "";
+        public string ClaimLog { get => claimLog; private set => SetProperty(ref claimLog, value); }
+
+        private List<int> occupiedAddresses = new() { 221, 222, 223 };
+
+        public string OccupiedAddressesText
+        {
+            get => string.Join(", ", occupiedAddresses);
+            set
+            {
+                var parsed = new List<int>();
+                foreach (var token in value.Split(','))
+                    if (int.TryParse(token.Trim(), out int sa) && sa >= 0 && sa <= 253)
+                        parsed.Add(sa);
+                occupiedAddresses = parsed;
+                OnPropertyChanged();
+            }
+        }
+
+        private void AddToClaimLog(string line)
+        {
+            ClaimLog += line + "\n";
+        }
+
+        private void RespondWithAddressClaim(int address)
+        {
+            RvcMessage claim = new();
+            claim.Dgn = 0xEE00;
+            claim.SourceAdress = (byte)address;
+            claim.Priority = 6;
+            claim.Data[0] = 0xFF; claim.Data[1] = 0xFF;
+            claim.Data[2] = 0x1F; claim.Data[3] = 0x50;
+            claim.Data[4] = 0;    claim.Data[5] = 0; claim.Data[6] = 0;
+            claim.Data[7] = 0x00; // Static (byte7=0), always beats HCU's dynamic (byte7=0x80)
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = claim.ToCanMessage() });
+            AddToClaimLog($"[{DateTime.Now:HH:mm:ss.fff}] → CLAIM SA={address} (simulator, static, wins)");
+        }
 
         public void RequestDgn()
         {

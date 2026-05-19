@@ -49,6 +49,8 @@ namespace CAN_Tool.CustomControls
                 FloorSetpointSlider.SilentChange(vm.UnderfloorSetpoint);
             if (FloorHysteresisSlider.Value!=vm.UnderfloorHysteresis)
                 FloorHysteresisSlider.SilentChange(vm.UnderfloorHysteresis);
+            if (ClaimLogScroller.ScrollableHeight - ClaimLogScroller.VerticalOffset < 30)
+                ClaimLogScroller.ScrollToEnd();
         }
 
         private void ToggleHeaterClick(object sender, RoutedEventArgs e)
@@ -214,7 +216,7 @@ namespace CAN_Tool.CustomControls
         }
         private void AddressRequestClick(object sender, RoutedEventArgs e)
         {
-            vm.ClaimSourceAddress();
+            vm.RequestSourceAddress();
         }
     }
 }

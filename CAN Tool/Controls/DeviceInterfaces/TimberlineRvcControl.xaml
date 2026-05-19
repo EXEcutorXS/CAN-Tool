@@ -16,15 +16,14 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="*" MinHeight="440"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="50"></RowDefinition>
             <RowDefinition Height="50"></RowDefinition>
             <RowDefinition Height="100"></RowDefinition>
         </Grid.RowDefinitions>
         <DockPanel Grid.ColumnSpan="2">
-        <WrapPanel DockPanel.Dock="Left" Orientation="Vertical" Margin="5">
-
+        <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Margin="5">
             <Button Margin="3" Opacity="{Binding HeaterEnabled,Converter={StaticResource BoolToOpacity}}" Click="ToggleHeaterClick">Heater</Button>
             <Button Margin="3" Opacity="{Binding ElementEnabled,Converter={StaticResource BoolToOpacity}}" Click="ElementToggleButtonClick">Element</Button>
             <Button Margin="3" Opacity="{Binding UnderfloorHeatingEnabled,Converter={StaticResource BoolToOpacity}}" Click="FloorButtonClick">Floor</Button>
@@ -36,8 +35,7 @@
             <Button Margin="3" Opacity="{Binding AuxPumpOverride[1].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump2ButtonClick">AUX pump 2</Button>
             <Button Margin="3" Opacity="{Binding AuxPumpOverride[2].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump3ButtonClick">AUX pump 3</Button>
             <Button Margin="3" Click="SyncTimeClick">Sync time</Button>
-
-        </WrapPanel>
+        </StackPanel>
 
             <WrapPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="10">
                 <TextBlock Text="{Binding OutsideTemperature,StringFormat={}Outside temp: {0}°,Converter={StaticResource ToFarenheit}}" />
@@ -128,20 +126,44 @@
                 </StackPanel>
             </WrapPanel>
         </DockPanel>
-        <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" Grid.ColumnSpan="2">
-            <TextBlock Margin="5" VerticalAlignment="Center">DGN:0x</TextBlock>
-            <TextBox Margin="5" VerticalAlignment="Center" MinWidth="30"  Text="{Binding DgnToRequest,Converter = {StaticResource HexConverter}}"></TextBox>
-            <TextBlock Margin="5" VerticalAlignment="Center">Instance:</TextBlock>
-            <TextBox Margin="5" VerticalAlignment="Center" MinWidth="30" TextAlignment="Center" Text="{Binding InstanceToRequest}" d:Text="1"></TextBox>
-            <TextBlock Margin="5" VerticalAlignment="Center">SubInstance:</TextBlock>
-            <TextBox Margin="5" VerticalAlignment="Center" MinWidth="40" TextAlignment="Center" Text="{Binding SubInstanceToRequest}" d:Text="1"></TextBox>
-            <Button Margin="5" VerticalAlignment="Center" Click="DgnRequestClick">Request</Button>
-            <TextBlock Margin="25 5 5 5" VerticalAlignment="Center">Source address:</TextBlock>
-            <TextBox Margin="5" VerticalAlignment="Center" MinWidth="40" Text="{Binding SaToRequest}"> </TextBox>
-            <Button Margin="5" VerticalAlignment="Center" Click="AddressRequestClick">Request</Button>
-            <Button Margin="5" VerticalAlignment="Center" Click="AddressClaimClick">Claim</Button>
-            <TextBlock Text="{Binding MultipackString}" TextAlignment="Center"></TextBlock>
-
+        <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Vertical" Grid.ColumnSpan="2">
+            <StackPanel Orientation="Horizontal" Margin="2">
+                <!-- DGN request -->
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">DGN:</TextBlock>
+                <TextBox Margin="2" VerticalAlignment="Center" Width="58" FontSize="13"
+                         Text="{Binding DgnToRequest, Converter={StaticResource HexConverter}}" ToolTip="DGN hex"/>
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">Inst:</TextBlock>
+                <TextBox Margin="2" VerticalAlignment="Center" Width="28" TextAlignment="Center" FontSize="13"
+                         Text="{Binding InstanceToRequest}" d:Text="1"/>
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">Sub:</TextBlock>
+                <TextBox Margin="2" VerticalAlignment="Center" Width="28" TextAlignment="Center" FontSize="13"
+                         Text="{Binding SubInstanceToRequest}" d:Text="1"/>
+                <Button Margin="4 2" Padding="6 2" VerticalAlignment="Center" Click="DgnRequestClick">Request</Button>
+                <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
+                <!-- Address claiming -->
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">SA:</TextBlock>
+                <TextBox Margin="2" VerticalAlignment="Center" Width="38" TextAlignment="Center" FontSize="13"
+                         Text="{Binding SaToRequest,UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Margin="4 2" Padding="6 2" VerticalAlignment="Center" Click="AddressRequestClick">Req addr</Button>
+                <Button Margin="2 2" Padding="6 2" VerticalAlignment="Center" Click="AddressClaimClick">Claim</Button>
+                <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
+                <!-- Simulator -->
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13">Sim:</TextBlock>
+                <TextBox Margin="2" VerticalAlignment="Center" MinWidth="120" FontSize="13"
+                         Text="{Binding OccupiedAddressesText, UpdateSourceTrigger=LostFocus}"
+                         ToolTip="Comma-separated addresses the simulator will defend"/>
+                <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
+                <!-- Multipack -->
+                <TextBlock Margin="4 0" VerticalAlignment="Center" FontSize="11"
+                           Text="{Binding MultipackString}"/>
+            </StackPanel>
+            <ScrollViewer x:Name="ClaimLogScroller" Height="65"
+                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <TextBox IsReadOnly="True" TextWrapping="Wrap"
+                         Text="{Binding ClaimLog, Mode=OneWay}"
+                         Background="Transparent" BorderThickness="0"
+                         FontFamily="Consolas" FontSize="11"/>
+            </ScrollViewer>
         </StackPanel>
         <StackPanel Grid.Column="0" Grid.Row="2" DataContext="{Binding SelectedZone}" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center" d:Visibility="Visible"  Visibility="{Binding Connected,Converter={StaticResource OnlyHetingZones}}">
             <TextBlock Margin="6" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignHeadline5TextBlock}">Mode:</TextBlock>
