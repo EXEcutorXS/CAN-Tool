@@ -12,6 +12,8 @@ namespace OmniProtocol
 
     public partial class OmniMessage : ObservableObject, IUpdatable<OmniMessage>, IComparable
     {
+        public DateTime Timestamp { get; } = DateTime.Now;
+
         public OmniMessage()
         {
             TransmitterId = new(126, 6);
@@ -35,6 +37,7 @@ namespace OmniProtocol
 
         [NotifyPropertyChangedFor(nameof(DataAsText), nameof(DataAsULong), nameof(VerboseInfo))]
         [ObservableProperty] private byte[] data = new byte[8];
+
 
         public CanMessage ToCanMessage()
         {
@@ -200,7 +203,7 @@ namespace OmniProtocol
         public override string ToString()
         {
             StringBuilder retString = new();
-            retString.Append($"<{Pgn:D02}>[{TransmitterId.Type}]({TransmitterId.Address})->[{ReceiverId.Type}]({ReceiverId.Address}):");
+            retString.Append($"{Timestamp:HH:mm:ss.fff} <{Pgn:D02}>[{TransmitterId.Type}]({TransmitterId.Address})->[{ReceiverId.Type}]({ReceiverId.Address}):");
             foreach (var b in Data)
                 retString.Append($"{b:X02} ");
             retString.Append("\n");

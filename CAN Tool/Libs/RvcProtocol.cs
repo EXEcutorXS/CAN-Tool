@@ -81,7 +81,7 @@ namespace RVC
         new DGN() { Dgn = 0x1FE99, Name = "WATERHEATER_STATUS_2" },
         new DGN() {  Dgn = 0xFF80, Name = "GENERATOR_DEMAND_STATUS",},
         new DGN() { Dgn = 0x1FECA, Name = "DM_RV"},
-        new DGN(1) {Dgn = 0x1EF65, Name = "Timberline Extension", MultiPack = true,  }
+        new DGN(1) {Dgn = 0xEF00, Name = "Timberline Extension", MultiPack = true,  }
     };
 
             // Добавляем DGN в словарь
@@ -1015,8 +1015,8 @@ namespace RVC
                 Meanings = new() { { 15, "Not supported" } }
             });
 
-            // Timberline Extension (0x1EF65)
-            allParameters.Add(new Parameter(0x1EF65)
+            // Timberline Extension (0xEF00)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x84,
                 Name = "Solenoid",
@@ -1024,7 +1024,7 @@ namespace RVC
                 Size = 2,
                 Meanings = defMeaningsOnOff
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x84,
                 Name = "Tank temperature",
@@ -1032,7 +1032,7 @@ namespace RVC
                 frstByte = 2,
                 Size = 16
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x84,
                 Name = "Heater temperature",
@@ -1040,7 +1040,7 @@ namespace RVC
                 frstByte = 4,
                 Size = 16
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x84,
                 Name = "Manual fan speed",
@@ -1048,7 +1048,7 @@ namespace RVC
                 frstByte = 6,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x85,
                 Name = "System timer",
@@ -1056,7 +1056,7 @@ namespace RVC
                 frstByte = 1,
                 Size = 24
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x85,
                 Name = "Water priority timer",
@@ -1064,7 +1064,7 @@ namespace RVC
                 frstByte = 4,
                 Size = 16
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x85,
                 Name = "Pump timer",
@@ -1072,7 +1072,7 @@ namespace RVC
                 frstByte = 6,
                 Size = 16
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x86,
                 Name = "Total heater minutes",
@@ -1080,35 +1080,35 @@ namespace RVC
                 frstByte = 1,
                 Size = 24
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x86,
                 Name = "Heater version 1",
                 frstByte = 4,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x86,
                 Name = "Heater version 2",
                 frstByte = 5,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x86,
                 Name = "Heater version 3",
                 frstByte = 6,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x86,
                 Name = "Heater version 4",
                 frstByte = 7,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x87,
                 Name = "Minutes since start",
@@ -1116,63 +1116,63 @@ namespace RVC
                 Size = 24,
                 Unit = "min"
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x87,
                 Name = "Panel version 1",
                 frstByte = 4,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x87,
                 Name = "Panel version 2",
                 frstByte = 5,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x87,
                 Name = "Panel version 3",
                 frstByte = 6,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x87,
                 Name = "Panel version 4",
                 frstByte = 7,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x88,
                 Name = "HCU version 1",
                 frstByte = 4,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x88,
                 Name = "HCU version 2",
                 frstByte = 5,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x88,
                 Name = "HCU version 3",
                 frstByte = 6,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x88,
                 Name = "HCU version 4",
                 frstByte = 7,
                 Size = 8
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x89,
                 Name = "System limitation",
@@ -1180,7 +1180,7 @@ namespace RVC
                 Size = 16,
                 Unit = "min"
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x89,
                 Name = "Water limitation",
@@ -1188,7 +1188,7 @@ namespace RVC
                 Size = 8,
                 Unit = "min"
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x8A,
                 Name = "System limitation",
@@ -1196,7 +1196,7 @@ namespace RVC
                 Size = 16,
                 Unit = "min"
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0x8A,
                 Name = "Water limitation",
@@ -1204,7 +1204,7 @@ namespace RVC
                 Size = 8,
                 Unit = "min"
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA0,
                 Name = "Tank Temperature",
@@ -1212,7 +1212,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.temperature
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA0,
                 Name = "Heater Temperature",
@@ -1220,7 +1220,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.temperature
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA0,
                 Name = "Zone 1 fan manual percent",
@@ -1228,7 +1228,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.percent
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA0,
                 Name = "Zone 2 fan manual percent",
@@ -1236,7 +1236,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.percent
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA0,
                 Name = "Zone 3 fan manual percent",
@@ -1244,7 +1244,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.percent
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA0,
                 Name = "Zone 4 fan manual percent",
@@ -1252,7 +1252,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.percent
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA0,
                 Name = "Zone 5 fan manual percent",
@@ -1260,7 +1260,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.percent
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA1,
                 Name = "System timer",
@@ -1268,7 +1268,7 @@ namespace RVC
                 Size = 24,
                 Type = paramTyp.seconds
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA2,
                 Name = "Loop 1 pump timer",
@@ -1276,7 +1276,7 @@ namespace RVC
                 Size = 16,
                 Type = paramTyp.seconds
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA2,
                 Name = "Loop 2 pump timer",
@@ -1284,7 +1284,7 @@ namespace RVC
                 Size = 16,
                 Type = paramTyp.seconds
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA2,
                 Name = "Heater pump timer",
@@ -1292,7 +1292,7 @@ namespace RVC
                 Size = 16,
                 Type = paramTyp.seconds
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA3,
                 Name = "AUX pump 1 timer",
@@ -1300,7 +1300,7 @@ namespace RVC
                 Size = 16,
                 Type = paramTyp.seconds
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA3,
                 Name = "AUX pump 2 timer",
@@ -1308,7 +1308,7 @@ namespace RVC
                 Size = 16,
                 Type = paramTyp.seconds
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA3,
                 Name = "AUX pump 3 timer",
@@ -1316,7 +1316,7 @@ namespace RVC
                 Size = 16,
                 Type = paramTyp.seconds
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA4,
                 Name = "Heater total minutes",
@@ -1324,7 +1324,7 @@ namespace RVC
                 Size = 24,
                 Type = paramTyp.minutes
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA4,
                 Name = "Heater version byte 1",
@@ -1332,7 +1332,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA4,
                 Name = "Heater version byte 2",
@@ -1340,7 +1340,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA4,
                 Name = "Heater version byte 3",
@@ -1348,7 +1348,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA4,
                 Name = "Heater version byte 4",
@@ -1356,7 +1356,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA5,
                 Name = "Panel version byte 1",
@@ -1364,7 +1364,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA5,
                 Name = "Panel version byte 2",
@@ -1372,7 +1372,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA5,
                 Name = "Panel version byte 3",
@@ -1380,7 +1380,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA5,
                 Name = "Panel version byte 4",
@@ -1388,7 +1388,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA6,
                 Name = "HCU version byte 1",
@@ -1396,7 +1396,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA6,
                 Name = "HCU version byte 2",
@@ -1404,7 +1404,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA6,
                 Name = "HCU version byte 3",
@@ -1412,7 +1412,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA6,
                 Name = "HCU version byte 4",
@@ -1420,7 +1420,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA7,
                 Name = "System time limit",
@@ -1428,7 +1428,7 @@ namespace RVC
                 Size = 1,
                 Type = paramTyp.hours
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA7,
                 Name = "Pump overridelimit",
@@ -1436,7 +1436,7 @@ namespace RVC
                 Size = 1,
                 Type = paramTyp.minutes
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA7,
                 Name = "Engine preheat setpoint",
@@ -1444,7 +1444,7 @@ namespace RVC
                 Size = 1,
                 Type = paramTyp.temperature
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA7,
                 Name = "Engine preheat duration",
@@ -1452,7 +1452,7 @@ namespace RVC
                 Size = 16,
                 Type = paramTyp.minutes
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA8,
                 Name = "System time limit",
@@ -1460,7 +1460,7 @@ namespace RVC
                 Size = 1,
                 Type = paramTyp.hours
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA8,
                 Name = "Pump overridelimit",
@@ -1468,7 +1468,7 @@ namespace RVC
                 Size = 1,
                 Type = paramTyp.minutes
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA8,
                 Name = "Engine preheat setpoint",
@@ -1476,7 +1476,7 @@ namespace RVC
                 Size = 1,
                 Type = paramTyp.temperature
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA8,
                 Name = "Engine preheat duration",
@@ -1484,7 +1484,7 @@ namespace RVC
                 Size = 16,
                 Type = paramTyp.minutes
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA9,
                 Name = "Domestic Water",
@@ -1492,7 +1492,7 @@ namespace RVC
                 Size = 2,
                 Type = paramTyp.boolean
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA9,
                 Name = "Element status",
@@ -1500,7 +1500,7 @@ namespace RVC
                 Size = 2,
                 Type = paramTyp.boolean
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA9,
                 Name = "Heater Icon",
@@ -1508,7 +1508,7 @@ namespace RVC
                 Size = 8,
                 Meanings = mnsMkr("Idle", "Blowing", "Ignition", "Lit")
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA9,
                 Name = "Liquid level",
@@ -1516,7 +1516,7 @@ namespace RVC
                 Size = 8,
                 Type = paramTyp.natural
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA9,
                 Name = "Engine estimated time",
@@ -1524,7 +1524,7 @@ namespace RVC
                 Size = 24,
                 Type = paramTyp.seconds
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xA9,
                 Name = "Fuel type",
@@ -1532,7 +1532,7 @@ namespace RVC
                 Size = 8,
                 Meanings = new() { { 0, "Diesel" }, { 1, "Gasoline" }, { 2, "Propane" } }
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xAA,
                 Name = "Zone 1 Type",
@@ -1540,7 +1540,7 @@ namespace RVC
                 Size = 8,
                 Meanings = mnsMkr("Disconnected", "Furnace", "Freeze protection", "Radiator")
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xAA,
                 Name = "Zone 2 Type",
@@ -1548,7 +1548,7 @@ namespace RVC
                 Size = 8,
                 Meanings = mnsMkr("Disconnected", "Furnace", "Freeze protection", "Radiator")
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xAA,
                 Name = "Zone 3 Type",
@@ -1556,7 +1556,7 @@ namespace RVC
                 Size = 8,
                 Meanings = mnsMkr("Disconnected", "Furnace", "Freeze protection", "Radiator")
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xAA,
                 Name = "Zone 4 Type",
@@ -1564,7 +1564,7 @@ namespace RVC
                 Size = 8,
                 Meanings = mnsMkr("Disconnected", "Furnace", "Freeze protection", "Radiator")
             });
-            allParameters.Add(new Parameter(0x1EF65)
+            allParameters.Add(new Parameter(0xEF00)
             {
                 multipackNum = 0xAA,
                 Name = "Zone 5 Type",

@@ -159,7 +159,7 @@
             </StackPanel>
             <ScrollViewer x:Name="ClaimLogScroller" Height="65"
                           VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <TextBox IsReadOnly="True" TextWrapping="Wrap"
+                <TextBox TextWrapping="Wrap"
                          Text="{Binding ClaimLog, Mode=OneWay}"
                          Background="Transparent" BorderThickness="0"
                          FontFamily="Consolas" FontSize="11"/>

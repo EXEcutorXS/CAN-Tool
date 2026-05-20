@@ -112,7 +112,7 @@
         <TabItem Header="{DynamicResource b_messages}">
             <DockPanel>
                 <Grid DockPanel.Dock="Right" Background="{DynamicResource MaterialDesignCardBackground}">
-                    <Border CornerRadius="10" Margin="10" BorderThickness="2" Background="{DynamicResource MaterialDesignDarkBackground}">
+                    <Border CornerRadius="10" Margin="10" BorderThickness="2">
                         <TextBox Text="{Binding ConstructedMessage.VerboseInfo,Mode=OneWay}" Margin="5" />
                     </Border>
                 </Grid>

@@ -206,6 +206,7 @@ namespace RVC
     }
     public sealed class RvcMessage : ObservableObject, IComparable, IUpdatable<RvcMessage>
     {
+        public DateTime Timestamp { get; } = DateTime.Now;
 
         private byte priority;
         public byte Priority
@@ -322,8 +323,7 @@ namespace RVC
 
         public override string ToString()
         {
-
-            var ret = $"{Priority} | {Dgn:X05} {SourceAdress:D3} ||";
+            var ret = $"{Timestamp:HH:mm:ss.fff} | {Priority} | {Dgn:X05} {SourceAdress:D3} ||";
             foreach (var item in Data)
                 ret += $" {item:X02} ";
             return ret;
@@ -331,11 +331,14 @@ namespace RVC
 
         public string VerboseInfo => PrintParameters().Replace(';', '\n');
 
+        public bool IsProprietaryDgn => (Dgn & 0x1FF00) == 0x1EF00 || (Dgn & 0x1FF00) == 0xEF00;
+
         public string PrintParameters()
         {
-            if (!RVC.DGNs.ContainsKey(Dgn))
-                return $"{Dgn:X} is not supported yet";
-            return RVC.DGNs[Dgn].Decode(Data);
+            var lookupDgn = IsProprietaryDgn ? 0xEF00 : Dgn;
+            if (!RVC.DGNs.ContainsKey(lookupDgn))
+                return $"{Dgn:X5} is not supported yet";
+            return RVC.DGNs[lookupDgn].Decode(Data);
         }
 
         public override int GetHashCode()
@@ -361,14 +364,20 @@ namespace RVC
 
         public bool IsSimiliarTo(RvcMessage item)
         {
+            if (IsProprietaryDgn && item.IsProprietaryDgn)
+            {
+                // Proprietary packets from different SAs (different DGNs) are distinct
+                if (Dgn != item.Dgn) return false;
+                // Within the same destination SA, distinguish by sub-command (Data[0])
+                return Data[0] == item.Data[0];
+            }
             if (Dgn != item.Dgn) return false;
-            if (!RVC.DGNs.ContainsKey(Dgn)) 
+            if (!RVC.DGNs.ContainsKey(Dgn))
                 return true;
             for (var i = 0; i < RVC.DGNs[Dgn].idLen; i++)
                 if (Data[i] != item.Data[i])
                     return false;
             return true;
-
         }
     }
 }

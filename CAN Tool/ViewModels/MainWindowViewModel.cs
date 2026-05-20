@@ -17,6 +17,7 @@ using System.Windows.Threading;
 using Xceed.Words.NET;
 using static CAN_Tool.Libs.Helper;
 using Alignment = Xceed.Document.NET.Alignment;
+using RVC;
 
 namespace CAN_Tool.ViewModels
 {
@@ -69,7 +70,7 @@ namespace CAN_Tool.ViewModels
 
         private string canLogFileName = "";
 
-        private FileStream canLogStream;
+        private StreamWriter canLogStream;
 
         [RelayCommand]
         private void ToggleCanLog(object Parameter)
@@ -86,8 +87,8 @@ namespace CAN_Tool.ViewModels
                 canLogging = true;
                 ToggleCanLogButtonName = GetString("b_stop_can_log");
                 var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CAN Log_" + DateTime.Now.ToLongTimeString().Replace(':', '.') + ".txt";
-                canLogStream = File.Create(path);
-                canLogFileName = canLogStream.Name;
+                canLogStream = new StreamWriter(path, false, System.Text.Encoding.UTF8);
+                canLogFileName = path;
             }
         }
 
@@ -529,13 +530,33 @@ namespace CAN_Tool.ViewModels
 
         public void NewMessgeReceived(object sender, EventArgs e)
         {
+            var msg = (e as GotCanMessageEventArgs).receivedMessage;
             switch (Mode)
             {
-                case
-        WorkMode_t.Omni:
-                    UIContext.Send(x => OmniInstance.ProcessCanMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
-                case WorkMode_t.Rvc: UIContext.Send(x => RvcPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
-                case WorkMode_t.RegularCan: UIContext.Send(x => CanPage.ProcessMessage((e as GotCanMessageEventArgs).receivedMessage), null); break;
+                case WorkMode_t.Omni:
+                    UIContext.Send(x => OmniInstance.ProcessCanMessage(msg), null); break;
+                case WorkMode_t.Rvc:
+                    UIContext.Send(x => RvcPage.ProcessMessage(msg), null); break;
+                case WorkMode_t.RegularCan:
+                    UIContext.Send(x => CanPage.ProcessMessage(msg), null); break;
+            }
+
+            if (canLogging && canLogStream != null)
+            {
+                string line;
+                if (Mode == WorkMode_t.Rvc && msg.RvcCompatible)
+                {
+                    var rvcMsg = new RvcMessage(msg);
+                    line = rvcMsg.ToString() + " | " + rvcMsg.PrintParameters();
+                }
+                else if (Mode == WorkMode_t.Omni && msg.RvcCompatible)
+                {
+                    try { line = new OmniMessage(msg).ToString().TrimEnd(); }
+                    catch { line = $"{DateTime.Now:HH:mm:ss.fff} {msg}"; }
+                }
+                else
+                    line = $"{DateTime.Now:HH:mm:ss.fff} {msg}";
+                canLogStream.WriteLine(line);
             }
         }
 

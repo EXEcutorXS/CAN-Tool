@@ -126,7 +126,7 @@
                                                     <ColorAnimation
                                                         Storyboard.TargetProperty="(DataGridRow.Background).(SolidColorBrush.Color)"
                                                         From="#FF4CAF50" To="Transparent"
-                                                        Duration="0:0:0.6" FillBehavior="Stop"/>
+                                                        Duration="0:0:1.8" FillBehavior="Stop"/>
                                                 </Storyboard>
                                             </BeginStoryboard>
                                         </EventTrigger>

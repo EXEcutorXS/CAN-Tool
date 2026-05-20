@@ -21,8 +21,9 @@ namespace CAN_Tool.Libs.CanAdapters
         {
             _port.PortName = portName;
             _port.Open();
-            _port.Write($"{modeCommand}\r");
+            _port.Write("C\r");
             _port.Write($"S{_speed}\r");
+            _port.Write($"{modeCommand}\r");
             _port.DataReceived += DataReceivedHandler;
         }
 

@@ -128,7 +128,7 @@ namespace CAN_Tool.ViewModels
             var D = msg.Data;
 
             // Proprietary DGN: low byte of DGN encodes the device SA
-            if (msg.Dgn == (uint)(0x1EF00 + SaToRequest))
+            if (msg.Dgn == (uint)(0xEF00 + SaToRequest))
             {
                 switch (D[0])
                 {
@@ -588,7 +588,7 @@ namespace CAN_Tool.ViewModels
         public void ClearErrors()
         {
             RvcMessage msg = new();
-            msg.Dgn = (int)(0x1EF00 + SaToRequest);
+            msg.Dgn = (int)(0xEF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0x81;
 
@@ -601,7 +601,7 @@ namespace CAN_Tool.ViewModels
             if (hours > 100) hours = 100;
 
             RvcMessage msg = new();
-            msg.Dgn = (int)(0x1EF00 + SaToRequest);
+            msg.Dgn = (int)(0xEF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
             msg.Data[1] = (byte)hours;
@@ -616,7 +616,7 @@ namespace CAN_Tool.ViewModels
             if (deg > 80) deg = 80;
 
             RvcMessage msg = new();
-            msg.Dgn = (int)(0x1EF00 + SaToRequest);
+            msg.Dgn = (int)(0xEF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
             msg.Data[3] = (byte)(deg + 40);
@@ -631,7 +631,7 @@ namespace CAN_Tool.ViewModels
             if (minutes > 1450) minutes = 1450;
 
             RvcMessage msg = new();
-            msg.Dgn = (int)(0x1EF00 + SaToRequest);
+            msg.Dgn = (int)(0xEF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
             msg.Data[4] = (byte)minutes;
@@ -646,7 +646,7 @@ namespace CAN_Tool.ViewModels
             if (minutes > 60) minutes = 60;
 
             RvcMessage msg = new();
-            msg.Dgn = (int)(0x1EF00 + SaToRequest);
+            msg.Dgn = (int)(0xEF00 + SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = 0xA7;
             msg.Data[2] = (byte)minutes;

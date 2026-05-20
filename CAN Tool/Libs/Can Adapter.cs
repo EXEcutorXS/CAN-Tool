@@ -308,8 +308,8 @@ namespace CAN_Tool
                 return;
             }
             
-            _driver.OpenNormal(portName);
             _driver.SetBitrate(Speed);
+            _driver.OpenNormal(portName);
             PortOpened = true;
         }
 
@@ -320,9 +320,9 @@ namespace CAN_Tool
                 MessageBox.Show(GetString("t_port_already_opened"));
                 return;
             }
-            
-            _driver.OpenSelfReception(portName);
+
             _driver.SetBitrate(Speed);
+            _driver.OpenSelfReception(portName);
             PortOpened = true;
         }
 
