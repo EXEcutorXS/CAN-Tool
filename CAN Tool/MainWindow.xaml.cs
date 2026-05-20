@@ -195,6 +195,12 @@ namespace CAN_Tool
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            var src = e.OriginalSource as DependencyObject;
+            while (src != null)
+            {
+                if (src is ScottPlot.WpfPlot) return;
+                src = VisualTreeHelper.GetParent(src);
+            }
             try { DragMove(); } catch { }
         }
 

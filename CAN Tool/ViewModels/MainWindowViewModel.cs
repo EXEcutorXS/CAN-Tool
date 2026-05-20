@@ -485,8 +485,8 @@ namespace CAN_Tool.ViewModels
                 d.LogTick();
             }
 
-            if (AutoRedraw)                                 //Перерисовка графиков
-                if (OmniInstance.SelectedConnectedDevice?.LogCurrentPos < 600)
+            if (AutoRedraw && System.Windows.Input.Mouse.LeftButton != System.Windows.Input.MouseButtonState.Pressed)
+                if (OmniInstance.SelectedConnectedDevice?.LogCurrentPos < 600)  //Перерисовка графиков
                     ChartDraw(null);
                 else if (DateTime.Now.Second % 10 == 0)
                     ChartDraw(null);
