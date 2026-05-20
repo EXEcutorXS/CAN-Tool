@@ -321,9 +321,11 @@ namespace RVC
             return ToCanMessage().Equals(comp.ToCanMessage());
         }
 
-        public override string ToString()
+        public override string ToString() => PrintLine("|");
+
+        public string PrintLine(string direction)
         {
-            var ret = $"{Timestamp:HH:mm:ss.fff} | {Priority} | {Dgn:X05} {SourceAdress:D3} ||";
+            var ret = $"{Timestamp:HH:mm:ss.fff} {direction} {Priority} | {Dgn:X05} {SourceAdress:D3} ||";
             foreach (var item in Data)
                 ret += $" {item:X02} ";
             return ret;
@@ -335,6 +337,17 @@ namespace RVC
 
         public string PrintParameters()
         {
+            if (Dgn == 0xEE00)
+            {
+                int mfrCode = ((Data[3] << 3) | (Data[2] >> 5)) & 0x7FF;
+                bool selfConfig = (Data[7] & 0x80) != 0;
+                return $"ADDRESS_CLAIM: Mfr={mfrCode}, SelfConfig={selfConfig}";
+            }
+            if ((Dgn & 0x1FF00) == 0xEA00)
+            {
+                int targetSa = Dgn & 0xFF;
+                return $"ADDRESS_REQUEST: SA={targetSa:D3}";
+            }
             var lookupDgn = IsProprietaryDgn ? 0xEF00 : Dgn;
             if (!RVC.DGNs.ContainsKey(lookupDgn))
                 return $"{Dgn:X5} is not supported yet";

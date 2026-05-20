@@ -107,6 +107,9 @@ namespace CAN_Tool.ViewModels
             set => SetProperty(ref selectedMessage, value);
         }
 
+        [RelayCommand]
+        private void ClearMessageList() => MessageList.Clear();
+
         public void ProcessMessage(CanMessage m)
         {
             if (m.RvcCompatible)

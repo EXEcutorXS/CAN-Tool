@@ -528,9 +528,33 @@ namespace CAN_Tool.ViewModels
             return (CanAdapter.PortOpened && OmniInstance.SelectedConnectedDevice is HeaterDeviceViewModel h && h.ManualMode);
         }
 
+        private void WriteToLog(CanMessage msg, string direction)
+        {
+            if (!canLogging || canLogStream == null) return;
+            string line;
+            if (Mode == WorkMode_t.Rvc && msg.RvcCompatible)
+            {
+                var rvcMsg = new RvcMessage(msg);
+                line = rvcMsg.PrintLine(direction) + " | " + rvcMsg.PrintParameters();
+            }
+            else if (Mode == WorkMode_t.Omni && msg.RvcCompatible)
+            {
+                try
+                {
+                    var omniStr = new OmniMessage(msg).ToString().TrimEnd();
+                    line = omniStr.Substring(0, 12) + " " + direction + omniStr.Substring(12);
+                }
+                catch { line = $"{DateTime.Now:HH:mm:ss.fff} {direction} {msg}"; }
+            }
+            else
+                line = $"{DateTime.Now:HH:mm:ss.fff} {direction} {msg}";
+            canLogStream.WriteLine(line);
+        }
+
         public void NewMessgeReceived(object sender, EventArgs e)
         {
             var msg = (e as GotCanMessageEventArgs).receivedMessage;
+            WriteToLog(msg, "←");
             switch (Mode)
             {
                 case WorkMode_t.Omni:
@@ -540,24 +564,12 @@ namespace CAN_Tool.ViewModels
                 case WorkMode_t.RegularCan:
                     UIContext.Send(x => CanPage.ProcessMessage(msg), null); break;
             }
+        }
 
-            if (canLogging && canLogStream != null)
-            {
-                string line;
-                if (Mode == WorkMode_t.Rvc && msg.RvcCompatible)
-                {
-                    var rvcMsg = new RvcMessage(msg);
-                    line = rvcMsg.ToString() + " | " + rvcMsg.PrintParameters();
-                }
-                else if (Mode == WorkMode_t.Omni && msg.RvcCompatible)
-                {
-                    try { line = new OmniMessage(msg).ToString().TrimEnd(); }
-                    catch { line = $"{DateTime.Now:HH:mm:ss.fff} {msg}"; }
-                }
-                else
-                    line = $"{DateTime.Now:HH:mm:ss.fff} {msg}";
-                canLogStream.WriteLine(line);
-            }
+        public void MessageTransmittedHandler(object sender, EventArgs e)
+        {
+            var msg = (e as GotCanMessageEventArgs).receivedMessage;
+            WriteToLog(msg, "→");
         }
 
         public MainWindowViewModel()
@@ -578,6 +590,7 @@ namespace CAN_Tool.ViewModels
             RvcPage = new(this);
 
             CanAdapter.GotNewMessage += NewMessgeReceived;
+            CanAdapter.MessageTransmitted += MessageTransmittedHandler;
 
 
 

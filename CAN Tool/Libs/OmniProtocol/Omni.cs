@@ -82,6 +82,9 @@ public partial class Omni : ObservableObject
     [ObservableProperty] private string selectedModel;
 
     [RelayCommand]
+    void ClearMessages() => Messages.Clear();
+
+    [RelayCommand]
     void ClearDevices()
     {
         ConnectedDevices.Clear();

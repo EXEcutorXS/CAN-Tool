@@ -14,6 +14,7 @@
 <v:String x:Key="b_vent">Belüftung</v:String>
 <v:String x:Key="b_calibrate">Thermoelemente kalibrieren</v:String>
 <v:String x:Key="b_clear_errors">Fehler löschen</v:String>
+<v:String x:Key="b_clear_list">Liste leeren</v:String>
 <v:String x:Key="b_save_report">Bericht</v:String>
 <v:String x:Key="b_read">Lesen</v:String>
 <v:String x:Key="b_save">Speichern</v:String>

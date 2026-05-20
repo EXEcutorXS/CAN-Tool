@@ -250,6 +250,7 @@ namespace CAN_Tool
         [ObservableProperty] private int speed = 5;
 
         public event EventHandler GotNewMessage;
+        public event EventHandler MessageTransmitted;
         public long ReceivedMessagesCount { get; private set; } = 0;
         public long TransmittedMessagesCount { get; private set; } = 0;
         [ObservableProperty] private string status = "RX: 0  TX: 0";
@@ -346,7 +347,12 @@ namespace CAN_Tool
 
         public void SetBitrate(int bitrate) { Speed = bitrate; _driver.SetBitrate(bitrate); }
 
-        public void Transmit(CanMessage message) { TransmittedMessagesCount++; _driver.Transmit(message); }
+        public void Transmit(CanMessage message)
+        {
+            TransmittedMessagesCount++;
+            _driver.Transmit(message);
+            MessageTransmitted?.Invoke(this, new GotCanMessageEventArgs { receivedMessage = message });
+        }
 
         public void InjectMessage(CanMessage m) =>
             GotNewMessage?.Invoke(this, new GotCanMessageEventArgs { receivedMessage = m });

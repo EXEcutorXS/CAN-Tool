@@ -14,6 +14,7 @@ b_water_pump	Water pump	Помпа	Wasserpumpe
 b_vent	Ventilation	Вентиляция	Belüftung
 b_calibrate	Calibrate termocouples	Калибровка термопар	Thermoelemente kalibrieren
 b_clear_errors	Clear errors	Стереть ошибки	Fehler löschen
+b_clear_list	Clear list	Очистить список	Liste leeren
 b_save_report	Report	Отчёт	Bericht
 b_read	Read	Считать	Lesen
 b_save	Save	Сохранить	Speichern

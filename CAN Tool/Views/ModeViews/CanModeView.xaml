@@ -47,6 +47,13 @@
                     </Style.Triggers>
                 </Style>
             </DataGrid.RowStyle>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="{DynamicResource b_clear_list}"
+                              Command="{Binding PlacementTarget.DataContext.CanPage.ClearMessageListCommand,
+                                        RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding IdAsText,Mode=OneWay}" />
                 <DataGridCheckBoxColumn Header="IDE" Binding="{Binding Ide,Mode=OneWay}" />

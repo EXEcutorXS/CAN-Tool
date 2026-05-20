@@ -14,6 +14,7 @@
 <v:String x:Key="b_vent">Ventilation</v:String>
 <v:String x:Key="b_calibrate">Calibrate termocouples</v:String>
 <v:String x:Key="b_clear_errors">Clear errors</v:String>
+<v:String x:Key="b_clear_list">Clear list</v:String>
 <v:String x:Key="b_save_report">Report</v:String>
 <v:String x:Key="b_read">Read</v:String>
 <v:String x:Key="b_save">Save</v:String>

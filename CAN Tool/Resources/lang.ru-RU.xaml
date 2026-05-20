@@ -14,6 +14,7 @@
 <v:String x:Key="b_vent">Вентиляция</v:String>
 <v:String x:Key="b_calibrate">Калибровка термопар</v:String>
 <v:String x:Key="b_clear_errors">Стереть ошибки</v:String>
+<v:String x:Key="b_clear_list">Очистить список</v:String>
 <v:String x:Key="b_save_report">Отчёт</v:String>
 <v:String x:Key="b_read">Считать</v:String>
 <v:String x:Key="b_save">Сохранить</v:String>

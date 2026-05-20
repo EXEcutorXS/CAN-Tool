@@ -58,6 +58,9 @@ namespace CAN_Tool.ViewModels
         public void ProcessMessage(CanMessage m) => MessageList.TryToAdd(m);
 
         [RelayCommand]
+        private void ClearMessageList() => MessageList.Clear();
+
+        [RelayCommand]
         private void SaveCanLog()
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CAN_Log.txt";
