@@ -46,6 +46,7 @@
 <v:String x:Key="b_manual">Ручник</v:String>
 <v:String x:Key="b_firmware">Прошивка</v:String>
 <v:String x:Key="b_load_hex">Загрузить HEX</v:String>
+<v:String x:Key="b_auto_update">АВТО</v:String>
 <v:String x:Key="b_burn">Прошить</v:String>
 <v:String x:Key="b_burn_old">Прошить(старый загрузчик)</v:String>
 <v:String x:Key="b_find_boot">Найти загрузчик</v:String>
@@ -75,6 +76,13 @@
 <v:String x:Key="b_load_can_log">Загрузить из лога</v:String>
 <v:String x:Key="b_send_from_log">Транслировать из лога</v:String>
 
+<v:String x:Key="t_auto_waiting_bootloader">Ожидание загрузчика...</v:String>
+<v:String x:Key="t_auto_bootloader_timeout">Загрузчик не появился в течение отведённого времени</v:String>
+<v:String x:Key="t_auto_waiting_device">Ожидаем обновлённое устройство</v:String>
+<v:String x:Key="t_auto_device_timeout">Устройство не перезапустилось в течение отведённого времени</v:String>
+<v:String x:Key="t_auto_done">Автоматическое обновление ПО завершено</v:String>
+<v:String x:Key="t_bootloader_already_on_bus">На шине уже присутствует загрузчик. Программирование прервано во избежание порчи прошивки.</v:String>
+<v:String x:Key="t_bootloader_conflict_title">Конфликт загрузчиков</v:String>
 <v:String x:Key="t_delay">Задержка</v:String>
 <v:String x:Key="t_value">Значение</v:String>
 <v:String x:Key="t_description">Описание</v:String>
@@ -959,7 +967,7 @@
 <v:String x:Key="d_123">Программный загрузчик</v:String>
 <v:String x:Key="d_124">Пульт кондиционера</v:String>
 <v:String x:Key="d_125">Модуль управления</v:String>
-<v:String x:Key="d_126">Пульт управления</v:String>
+<v:String x:Key="d_126">Устройство управления</v:String>
 <v:String x:Key="d_127">Все</v:String>
 
 <v:String x:Key="u_voltage">В</v:String>

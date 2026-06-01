@@ -46,6 +46,7 @@ b_glow_plug_set	Glow Plug	Свеча	Glühkerze
 b_manual	Manual	Ручник	Manuell
 b_firmware	Firmware	Прошивка	Firmware
 b_load_hex	Load HEX	Загрузить HEX	HEX laden
+b_auto_update	AUTO	АВТО	AUTO
 b_burn	Program	Прошить	Programmieren
 b_burn_old	Program(obsolete)	Прошить(старый загрузчик)	Programmieren (veraltet)
 b_find_boot	Ping Bootloader	Найти загрузчик	Bootloader suchen
@@ -74,7 +75,14 @@ b_list_press_in	Press	Давл	Druck
 b_list_press_ex	Ex.press	Выхл.давл	Ausl.Druck
 b_load_can_log	Load from log	Загрузить из лога	Aus Log laden
 b_send_from_log	Send from log	Транслировать из лога	Aus Log senden
-			
+		
+t_auto_waiting_bootloader	Waiting for bootloader...	Ожидание загрузчика...	Waiting for bootloader...
+t_auto_bootloader_timeout	Bootloader did not appear within timeout	Загрузчик не появился в течение отведённого времени	Bootloader timed out
+t_auto_waiting_device	Waiting for updated device	Ожидаем обновлённое устройство	Waiting for updated device
+t_auto_device_timeout	Device did not restart within timeout	Устройство не перезапустилось в течение отведённого времени	Device restart timed out
+t_auto_done	Auto updating done	Автоматическое обновление ПО завершено	Auto updating done
+t_bootloader_already_on_bus	A bootloader is already present on the bus. Programming aborted to prevent flash corruption.	На шине уже присутствует загрузчик. Программирование прервано во избежание порчи прошивки.	Ein Bootloader ist bereits am Bus. Programmierung abgebrochen.
+t_bootloader_conflict_title	Bootloader conflict	Конфликт загрузчиков	Bootloader-Konflikt
 t_delay	Delay	Задержка	Verzögerung
 t_value	Value	Значение	Wert
 t_description	Description	Описание	Beschreibung
@@ -959,7 +967,7 @@ d_121	Modem	Модем	Modem
 d_123	Bootloader	Программный загрузчик	Bootloader
 d_124	AC control	Пульт кондиционера	Klimaanlagen-Steuerung
 d_125	MBC Module	Модуль управления	MBC-Modul
-d_126	Generic panel	Пульт управления	Allgemeines Bedienfeld
+d_126	Control device	Устройство управления	Allgemeines Bedienfeld
 d_127	Everyone	Все	Alle
 			
 u_voltage	V	В	V

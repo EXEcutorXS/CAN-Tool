@@ -482,6 +482,7 @@
                 </TabItem.Header>
                 <DockPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
+                        <Button Content="{DynamicResource b_auto_update}" Margin="10" Command="{Binding AutoUpdateFirmwareCommand}" />
                         <Button Content="{DynamicResource b_load_hex}" Margin="10" Command="{Binding LoadHexCommand}" />
                         <Button Content="{DynamicResource b_switch_to_boot}" Margin="10" Command="{Binding SwitchToBootLoaderCommand}" />
                         <Button Content="{DynamicResource b_burn}" Margin="10" Command="{Binding UpdateFirmwareCommand}" />

@@ -46,6 +46,7 @@
 <v:String x:Key="b_manual">Manual</v:String>
 <v:String x:Key="b_firmware">Firmware</v:String>
 <v:String x:Key="b_load_hex">Load HEX</v:String>
+<v:String x:Key="b_auto_update">AUTO</v:String>
 <v:String x:Key="b_burn">Program</v:String>
 <v:String x:Key="b_burn_old">Program(obsolete)</v:String>
 <v:String x:Key="b_find_boot">Ping Bootloader</v:String>
@@ -75,6 +76,13 @@
 <v:String x:Key="b_load_can_log">Load from log</v:String>
 <v:String x:Key="b_send_from_log">Send from log</v:String>
 
+<v:String x:Key="t_auto_waiting_bootloader">Waiting for bootloader...</v:String>
+<v:String x:Key="t_auto_bootloader_timeout">Bootloader did not appear within timeout</v:String>
+<v:String x:Key="t_auto_waiting_device">Waiting for updated device</v:String>
+<v:String x:Key="t_auto_device_timeout">Device did not restart within timeout</v:String>
+<v:String x:Key="t_auto_done">Auto updating done</v:String>
+<v:String x:Key="t_bootloader_already_on_bus">A bootloader is already present on the bus. Programming aborted to prevent flash corruption.</v:String>
+<v:String x:Key="t_bootloader_conflict_title">Bootloader conflict</v:String>
 <v:String x:Key="t_delay">Delay</v:String>
 <v:String x:Key="t_value">Value</v:String>
 <v:String x:Key="t_description">Description</v:String>
@@ -959,7 +967,7 @@
 <v:String x:Key="d_123">Bootloader</v:String>
 <v:String x:Key="d_124">AC control</v:String>
 <v:String x:Key="d_125">MBC Module</v:String>
-<v:String x:Key="d_126">Generic panel</v:String>
+<v:String x:Key="d_126">Control device</v:String>
 <v:String x:Key="d_127">Everyone</v:String>
 
 <v:String x:Key="u_voltage">V</v:String>

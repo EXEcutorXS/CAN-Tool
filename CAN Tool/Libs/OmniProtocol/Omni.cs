@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using CAN_Tool;
 using CAN_Tool.Libs;
+using CAN_Tool.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
@@ -625,34 +626,32 @@ public partial class Omni : ObservableObject
                 break;
 
             case 100:
-                if (m.Data[0] == 1 && m.Data[1] == 1)
                 {
-                    senderDevice.flagEraseDone = true;
+                    var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
+                    if (m.Data[0] == 1 && m.Data[1] == 1)
+                        fw.flagEraseDone = true;
+                    if (m.Data[0] == 2 && m.Data[1] == 1)
+                        fw.flagSetAdrDone = true;
+                    if (m.Data[0] == 3 && m.Data[1] == 1)
+                        fw.flagProgramDone = true;
+                    break;
                 }
-                if (m.Data[0] == 2 && m.Data[1] == 1)
-                {
-                    senderDevice.flagSetAdrDone = true;
-                }
-                if (m.Data[0] == 3 && m.Data[1] == 1)
-                {
-                    senderDevice.flagProgramDone = true;
-                }
-                break;
             case 105:
                 {
+                    var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
                     if (m.Data[0] == 1)
                     {
-                        senderDevice.fragmentAddress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
-                        Debug.WriteLine($"Adress set to 0X{senderDevice.fragmentAddress:X}");
-                        senderDevice.flagSetAdrDone = true;
+                        fw.fragmentAddress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                        Debug.WriteLine($"Adress set to 0X{fw.fragmentAddress:X}");
+                        fw.flagSetAdrDone = true;
                     }
 
                     if (m.Data[0] == 3)
                     {
-                        senderDevice.receivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
-                        senderDevice.receivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
-                        Debug.WriteLine($"Data fragment len:{senderDevice.receivedFragmentLength},CRC:{senderDevice.receivedFragmentCrc:X}");
-                        senderDevice.flagDataGetDone = true;
+                        fw.receivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
+                        fw.receivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
+                        Debug.WriteLine($"Data fragment len:{fw.receivedFragmentLength},CRC:{fw.receivedFragmentCrc:X}");
+                        fw.flagDataGetDone = true;
                     }
 
                     if (m.Data[0] == 5)
@@ -660,7 +659,7 @@ public partial class Omni : ObservableObject
                         if (m.Data[1] == 0)
                         {
                             Debug.WriteLine("Flash fragment successed");
-                            senderDevice.flagProgramDone = true;
+                            fw.flagProgramDone = true;
                         }
                         else
                             Debug.WriteLine("Flash fragment failed");
@@ -671,7 +670,7 @@ public partial class Omni : ObservableObject
                         if (m.Data[1] == 0)
                         {
                             Debug.WriteLine("Memory erase confirmed");
-                            senderDevice.flagEraseDone = true;
+                            fw.flagEraseDone = true;
                         }
                         else
                             Debug.WriteLine("Memory erase fail");

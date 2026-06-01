@@ -3552,7 +3552,7 @@
     },
     {
       "id": 126,
-      "devType": "Panel",
+      "devType": "Hcu",
       "imageName": "hcu"
     },
     {

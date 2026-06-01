@@ -185,10 +185,12 @@ namespace OmniProtocol
         {
             if (Pgn != m.Pgn)
                 return false;
+            if (!TransmitterId.Equals(m.TransmitterId))
+                return false;
             if (Pgn == 1 || Pgn == 2)
                 if (Data[1] != m.Data[1])
                     return false;
-            if (Omni.Pgns.ContainsKey(Pgn) && Omni.Pgns[Pgn].multiPack && Data[0] != m.Data[0]) //Другой номер мультипакета
+            if (Omni.Pgns.ContainsKey(Pgn) && Omni.Pgns[Pgn].multiPack && Data[0] != m.Data[0])
                 return false;
             return true;
         }

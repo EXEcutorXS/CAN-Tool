@@ -3,11 +3,12 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using OmniProtocol;
 using System.IO;
-using System.Windows.Controls;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using static CAN_Tool.Libs.Helper;
 using System.Diagnostics;
@@ -28,6 +29,15 @@ namespace CAN_Tool.ViewModels
 
     public partial class FirmwarePageViewModel : ObservableObject
     {
+
+        // ── Флаги прошивки ─────────────────────────────────────────────
+        public bool flagEraseDone = false;
+        public bool flagSetAdrDone = false;
+        public bool flagProgramDone = false;
+        public bool flagDataGetDone = false;
+        public uint fragmentAddress = 0;
+        public int receivedFragmentLength = 0;
+        public uint receivedFragmentCrc = 0;
 
         private List<CodeFragment> fragments = new();
 
@@ -53,6 +63,12 @@ namespace CAN_Tool.ViewModels
         private void SwitchToBootLoader()
         {
             if (Vm?.OmniInstance.SelectedConnectedDevice == null) return;
+            if (BootloaderAlreadyOnBus())
+            {
+                MessageBox.Show(GetString("t_bootloader_already_on_bus"), GetString("t_bootloader_conflict_title"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             OmniMessage msg = new();
             msg.Pgn = 1;
             msg.ReceiverId.Address = Vm.OmniInstance.SelectedConnectedDevice.Id.Address;
@@ -124,7 +140,7 @@ namespace CAN_Tool.ViewModels
             msg.Data[1] = 255;  //Стереть всю память
             Debug.WriteLine("Отправляем запрос на стирание");
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
-            Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone = false;
+            flagEraseDone = false;
         }
 
         private async Task StartFlashing()
@@ -153,14 +169,14 @@ namespace CAN_Tool.ViewModels
             WriteFragmentToRam(f);
             for (var i = 0; i < 4; i++)
             {
-                Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone = false;
+                flagProgramDone = false;
                 if (i == 3)
                 {
                     Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_flash_memory"));
                     return;
                 }
                 StartFlashing();
-                if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagProgramDone, 100))
+                if (WaitForFlag(ref flagProgramDone, 100))
                     break;
             }
         }
@@ -179,20 +195,20 @@ namespace CAN_Tool.ViewModels
 
             for (var i = 0; i < 6; i++)
             {
-                Vm.OmniInstance.SelectedConnectedDevice.flagDataGetDone = false;
+                flagDataGetDone = false;
                 if (i == 5)
                 {
                     Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_check_transmission"));
                     return false;
                 }
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
-                WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagDataGetDone, 100);
+                WaitForFlag(ref flagDataGetDone, 100);
 
-                LogWriteLine($"Len:{Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentLength},CRC:0x{Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc:X08}");
-                if (crc == Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc && len == Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentLength)
+                LogWriteLine($"Len:{receivedFragmentLength},CRC:0x{receivedFragmentCrc:X08}");
+                if (crc == receivedFragmentCrc && len == receivedFragmentLength)
                     return true;
 
-                Debug.WriteLine($"CRC mismatch: expected {crc:X08}, got {Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc:X08}");
+                Debug.WriteLine($"CRC mismatch: expected {crc:X08}, got {receivedFragmentCrc:X08}");
                 LogWriteLine(GetString("t_transmission_failed"));
                 return false;
             }
@@ -217,15 +233,15 @@ namespace CAN_Tool.ViewModels
 
             for (var i = 0; i < 4; i++)
             {
-                Vm.OmniInstance.SelectedConnectedDevice.flagSetAdrDone = false;
+                flagSetAdrDone = false;
                 if (i == 3)
                 {
                     Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_set_address"));
                     return;
                 }
                 Vm.CanAdapter.Transmit(msg.ToCanMessage());
-                if (!WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagSetAdrDone, 300)) continue;
-                if (Vm.OmniInstance.SelectedConnectedDevice.fragmentAddress == f.StartAddress)
+                if (!WaitForFlag(ref flagSetAdrDone, 300)) continue;
+                if (fragmentAddress == f.StartAddress)
                     break;
             }
         }
@@ -254,8 +270,8 @@ namespace CAN_Tool.ViewModels
                 }
                 uint crc = 0;
                 var len = 0;
-                Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentCrc = 0;
-                Vm.OmniInstance.SelectedConnectedDevice.receivedFragmentLength = 0;
+                receivedFragmentCrc = 0;
+                receivedFragmentLength = 0;
 
                 for (var i = 0; i < (f.Length + 7) / 8; i++)
                 {
@@ -313,7 +329,7 @@ namespace CAN_Tool.ViewModels
                     }
 
                     await EraseFlash();
-                    if (WaitForFlag(ref Vm.OmniInstance.SelectedConnectedDevice.flagEraseDone, 5000)) break;
+                    if (WaitForFlag(ref flagEraseDone, 5000)) break;
                 }
 
                 Vm.OmniInstance.CurrentTask.OnDone();
@@ -585,9 +601,132 @@ namespace CAN_Tool.ViewModels
             Task.Run(() => UpdateFirmwareOld(fragments));
         }
 
+        [RelayCommand]
+        private void AutoUpdateFirmware()
+        {
+            Task.Run(() => RunAutoUpdate());
+        }
+
+        private void RunAutoUpdate()
+        {
+            try
+            {
+                if (fragments.Count == 0)
+                {
+                    bool loaded = false;
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        OpenFileDialog dialog = new() { Filter = "Hex Files|*.hex" };
+                        if ((bool)dialog.ShowDialog())
+                        {
+                            lastHexFilePath = dialog.FileName;
+                            fragments = ParseHexFile(lastHexFilePath, FragmentSize);
+                            loaded = fragments.Count > 0;
+                        }
+                    });
+                    if (!loaded) return;
+                }
+
+                var omni = Vm.OmniInstance;
+
+                if (BootloaderAlreadyOnBus())
+                {
+                    MessageBox.Show(GetString("t_bootloader_already_on_bus"), GetString("t_bootloader_conflict_title"),
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Запоминаем исходный тип устройства перед входом в загрузчик
+                var originalDeviceType = omni.SelectedConnectedDevice?.Id.Type ?? -1;
+
+                // Шаг 1: переход в загрузчик
+                SwitchToBootLoader();
+
+                // Шаг 2: ждём появления устройства-загрузчика (тип 123)
+                LogWriteLine(GetString("t_auto_waiting_bootloader"));
+                DeviceViewModel bootDev = null;
+                for (var i = 0; i < 150; i++) // 15 сек
+                {
+                    Thread.Sleep(100);
+                    Application.Current.Dispatcher.Invoke(() =>
+                        bootDev = omni.ConnectedDevices.FirstOrDefault(d => d.Id.Type == 123));
+                    if (bootDev != null) break;
+                }
+
+                if (bootDev == null)
+                {
+                    LogWriteLine(GetString("t_auto_bootloader_timeout"));
+                    return;
+                }
+
+                Application.Current.Dispatcher.Invoke(() => omni.SelectedConnectedDevice = bootDev);
+
+                // Шаг 3: запрашиваем версию загрузчика и ждём ответа
+                _ = RequestBootLoaderVersion();
+                Thread.Sleep(500);
+
+                // Шаг 4: прошиваем (выбор протокола по версии загрузчика)
+                var boot = omni.SelectedConnectedDevice;
+                if (boot != null && boot.BootFirmware[0] == 123 && boot.BootFirmware[3] <= 4)
+                    UpdateFirmwareOld(fragments);
+                else
+                    UpdateFirmware(fragments);
+
+                // Шаг 5: возврат в основную программу
+                _ = SwitchToMainProgram();
+
+                if (originalDeviceType < 0) return;
+
+                // Шаг 6: ждём повторного появления исходного устройства
+                LogWriteLine(GetString("t_auto_waiting_device"));
+                DeviceViewModel originalDev = null;
+                for (var i = 0; i < 150; i++) // 15 сек
+                {
+                    Thread.Sleep(100);
+                    Application.Current.Dispatcher.Invoke(() =>
+                        originalDev = omni.ConnectedDevices.FirstOrDefault(d => d.Id.Type == originalDeviceType));
+                    if (originalDev != null) break;
+                }
+
+                if (originalDev == null)
+                    LogWriteLine(GetString("t_auto_device_timeout"));
+                else
+                {
+                    Application.Current.Dispatcher.Invoke(() => omni.SelectedConnectedDevice = originalDev);
+                    LogWriteLine(GetString("t_auto_done"));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void SendWhoIsHere(object sender, ElapsedEventArgs e)
+        {
+            if (Vm?.CanAdapter == null) return;
+            OmniMessage msg = new();
+            msg.Pgn = 6;
+            msg.ReceiverId.Type = 123;
+            msg.Data[0] = 0;
+            msg.Data[1] = 18;
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+        }
+
+        private bool BootloaderAlreadyOnBus()
+        {
+            bool found = false;
+            Application.Current.Dispatcher.Invoke(() =>
+                found = Vm.OmniInstance.ConnectedDevices.Any(d => d.Id.Type == 123));
+            return found;
+        }
+
         public FirmwarePageViewModel(MainWindowViewModel vm)
         {
             Vm = vm;
+            var whoIsHereTimer = new System.Timers.Timer(1000);
+            whoIsHereTimer.Elapsed += SendWhoIsHere;
+            whoIsHereTimer.Start();
         }
     }
 }

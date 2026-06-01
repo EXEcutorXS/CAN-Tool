@@ -18,8 +18,8 @@ namespace OmniProtocol
     {
         public DeviceViewModel(DeviceId newId)
         {
-            LogInit();
-            Id = newId;
+            Id = new DeviceId(newId.Type, newId.Address);
+            LogStart();
 
             if (Omni.Devices.TryGetValue(Id.Type, out var device))
                 DeviceReference = device;
@@ -87,13 +87,30 @@ namespace OmniProtocol
         [ObservableProperty] private bool isLogWriting = true;
         [ObservableProperty] private int logCurrentPos;
 
+        private const int LogShortLength = 7200;   // 2 часа
+        private const int LogLongLength  = 86400;  // 24 часа
+        private const int LogExpandAt    = 6900;   // расширяем за ~5 минут до конца двухчасового буфера
+
         public void LogTick()
         {
             // Снимок истории раз в секунду для водопадной таблицы
             foreach (var sv in Status)
                 sv.TakeHistorySnapshot();
 
-            if (!IsLogWriting) return;
+            if (!IsLogWriting || LogData.Count == 0) return;
+
+            if (LogData[0].Length == LogShortLength && LogCurrentPos >= LogExpandAt)
+            {
+                var expanded = new List<double[]>(LogData.Count);
+                for (var i = 0; i < LogData.Count; i++)
+                {
+                    var newArr = new double[LogLongLength];
+                    Array.Copy(LogData[i], newArr, LogCurrentPos);
+                    expanded.Add(newArr);
+                }
+                LogData = expanded;
+            }
+
             if (LogCurrentPos < LogData[0].Length)
             {
                 foreach (var sv in Status)
@@ -125,7 +142,7 @@ namespace OmniProtocol
             sw.Flush();
         }
 
-        public void LogInit(int length = 86400)
+        public void LogInit(int length = LogShortLength)
         {
             LogCurrentPos = 0;
             LogData = new List<double[]>();
@@ -134,23 +151,12 @@ namespace OmniProtocol
         }
 
         public void LogStart() { LogInit(); IsLogWriting = true; }
-        public void LogStop() { IsLogWriting = false; }
+        public void LogStop() { IsLogWriting = false; LogData = new List<double[]>(); }
 
-        // ── Флаги прошивки (используются FirmwarePageViewModel) ────────
-        public bool flagEraseDone = false;
-        public bool flagSetAdrDone = false;
-        public bool flagProgramDone = false;
-        public bool flagTransmissionCheck = false;
-        public bool flagCrcGetDone = false;
-        public bool flagDataGetDone = false;
-        public int receivedDataLength = 0;
-        public uint receiverDataCrc = 0;
+        // ── Флаги чтения данных (используются Omni.cs) ─────────────────
         public bool flagGetParamDone = false;
         public bool flagGetBbDone = false;
         public bool waitForBb = false;
-        public uint fragmentAddress = 0;
-        public int receivedFragmentLength = 0;
-        public uint receivedFragmentCrc = 0;
 
         // ── Транспорт ──────────────────────────────────────────────────
         public void Transmit(CanMessage msg)
