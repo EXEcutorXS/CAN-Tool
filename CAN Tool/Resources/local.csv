@@ -49,6 +49,8 @@ b_load_hex	Load HEX	Загрузить HEX	HEX laden
 b_auto_update	AUTO	АВТО	AUTO
 b_burn	Program	Прошить	Programmieren
 b_burn_old	Program(obsolete)	Прошить(старый загрузчик)	Programmieren (veraltet)
+b_verify_crc	Verify by CRC	Проверить по CRC	CRC prüfen
+b_verify_bytes	Verify byte-by-byte	Проверить побайтно	Byteweise prüfen
 b_find_boot	Ping Bootloader	Найти загрузчик	Bootloader suchen
 b_switch_to_boot	to Bootloader	войти в Bootloader	zum Bootloader
 b_switch_to_main_program	to Main Program	Запустить программу	zum Hauptprogramm

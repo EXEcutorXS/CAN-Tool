@@ -481,16 +481,18 @@
                     <fa:ImageAwesome Icon="Solid_FileCode" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_firmware}" />
                 </TabItem.Header>
                 <DockPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
+                    <WrapPanel DockPanel.Dock="Top" Margin="10">
                         <Button Content="{DynamicResource b_auto_update}" Margin="10" Command="{Binding AutoUpdateFirmwareCommand}" />
                         <Button Content="{DynamicResource b_load_hex}" Margin="10" Command="{Binding LoadHexCommand}" />
                         <Button Content="{DynamicResource b_switch_to_boot}" Margin="10" Command="{Binding SwitchToBootLoaderCommand}" />
                         <Button Content="{DynamicResource b_burn}" Margin="10" Command="{Binding UpdateFirmwareCommand}" />
                         <Button Content="{DynamicResource b_burn_old}" Margin="10" Command="{Binding UpdateFirmwareOldCommand}" />
                         <Button Content="{DynamicResource b_switch_to_main_program}" Margin="10" Command="{Binding SwitchToMainProgramCommand}" />
+                        <Button Content="{DynamicResource b_verify_crc}" Margin="10" Command="{Binding VerifyFirmwareCommand}" />
+                        <Button Content="{DynamicResource b_verify_bytes}" Margin="10" Command="{Binding VerifyFirmwareBytesCommand}" />
                         <Button Content="{DynamicResource b_find_boot}" Margin="10" Command="{Binding RequestBootLoaderVersionCommand}" />
                         <Button Content="{DynamicResource b_get_version}" Margin="10" Command="{Binding GetVersionCommand}" />
-                    </StackPanel>
+                    </WrapPanel>
                     <StackPanel DockPanel.Dock="Top">
                         <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding Vm.OmniInstance.SelectedConnectedDevice.Firmware,Converter={StaticResource VersionConverter}, Mode=OneWay}" />
                         <TextBlock Margin="10" VerticalAlignment="Center" FontSize="20" Text="{Binding Vm.OmniInstance.SelectedConnectedDevice.BootFirmware,Converter={StaticResource VersionConverter},Mode=OneWay}" />

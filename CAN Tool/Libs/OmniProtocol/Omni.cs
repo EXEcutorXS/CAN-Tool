@@ -625,6 +625,43 @@ public partial class Omni : ObservableObject
                 }
                 break;
 
+            case 60:
+                {
+                    var mp = senderDevice.ModemParams;
+                    switch (m.Data[0])
+                    {
+                        case 0: // регистрация/роуминг + CSQ, каждые 5 сек
+                            if ((m.Data[1] & 3) < 2) mp.Registered = (m.Data[1] & 1) != 0;
+                            if (((m.Data[1] >> 2) & 3) < 2) mp.Roaming = ((m.Data[1] >> 2) & 1) != 0;
+                            mp.Csq = m.Data[2] == 0xFF ? -1 : m.Data[2];
+                            break;
+                        case 1: // флаги настроек, раз в 30-60 сек
+                            if ((m.Data[1] & 3) < 2) mp.OnlySmsMode = (m.Data[1] & 1) != 0;
+                            if (((m.Data[1] >> 2) & 3) < 2) mp.FaultReport = ((m.Data[1] >> 2) & 1) != 0;
+                            if (((m.Data[1] >> 4) & 3) < 2) mp.CmdAck = ((m.Data[1] >> 4) & 1) != 0;
+                            if (((m.Data[1] >> 6) & 3) < 2) mp.TempUnitF = ((m.Data[1] >> 6) & 1) != 0;
+                            break;
+                        case 2: // код оператора, раз в 30-60 сек
+                            mp.OperatorCode = m.Data[1] == 0xFF
+                                ? ""
+                                : new string(new[] { (char)m.Data[1], (char)m.Data[2], (char)m.Data[3], (char)m.Data[4], (char)m.Data[5] });
+                            break;
+                        case 3: // LAC + Cell ID, раз в 30-60 сек
+                            if (m.Data[1] == 0xFF && m.Data[2] == 0xFF)
+                            {
+                                mp.Lac = -1;
+                                mp.CellId = -1;
+                            }
+                            else
+                            {
+                                mp.Lac = (m.Data[1] << 8) | m.Data[2];
+                                mp.CellId = ((long)m.Data[3] << 24) | ((long)m.Data[4] << 16) | ((long)m.Data[5] << 8) | m.Data[6];
+                            }
+                            break;
+                    }
+                    break;
+                }
+
             case 100:
                 {
                     var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
@@ -674,6 +711,27 @@ public partial class Omni : ObservableObject
                         }
                         else
                             Debug.WriteLine("Memory erase fail");
+                    }
+
+                    if (m.Data[0] == 9)
+                    {
+                        fw.readResultOk = m.Data[1] == 0;
+                        // D[2]=data>>24, D[3]=data>>16, D[4]=data>>8, D[5]=data&0xFF
+                        // where data = *(uint32_t*)adr — ARM little-endian, byte[addr] is LSB.
+                        // Reassembling in the same order gives the original uint32 value.
+                        fw.readResultData = m.Data[2] * 0x1000000U + m.Data[3] * 0x10000U
+                                          + m.Data[4] * 0x100U + m.Data[5];
+                        Debug.WriteLine($"Read response: ok={fw.readResultOk}, data=0x{fw.readResultData:X08}");
+                        fw.flagReadDone = true;
+                    }
+
+                    if (m.Data[0] == 11)
+                    {
+                        fw.verifyResultOk = m.Data[1] == 0;
+                        fw.verifyResultCrc = m.Data[2] * 0x1000000U + m.Data[3] * 0x10000U
+                                           + m.Data[4] * 0x100U + m.Data[5];
+                        Debug.WriteLine($"Verify response: ok={fw.verifyResultOk}, CRC=0x{fw.verifyResultCrc:X08}");
+                        fw.flagVerifyDone = true;
                     }
 
                     break;

@@ -49,6 +49,8 @@
 <v:String x:Key="b_auto_update">АВТО</v:String>
 <v:String x:Key="b_burn">Прошить</v:String>
 <v:String x:Key="b_burn_old">Прошить(старый загрузчик)</v:String>
+<v:String x:Key="b_verify_crc">Проверить по CRC</v:String>
+<v:String x:Key="b_verify_bytes">Проверить побайтно</v:String>
 <v:String x:Key="b_find_boot">Найти загрузчик</v:String>
 <v:String x:Key="b_switch_to_boot">войти в Bootloader</v:String>
 <v:String x:Key="b_switch_to_main_program">Запустить программу</v:String>

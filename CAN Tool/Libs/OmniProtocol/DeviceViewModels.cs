@@ -89,6 +89,20 @@ namespace OmniProtocol
         [ObservableProperty] private BindingList<OmniZoneHandler> zones = new();
     }
 
+    public partial class ModemViewModel : ObservableObject
+    {
+        [ObservableProperty] public bool registered;
+        [ObservableProperty] public bool roaming;
+        [ObservableProperty] public int csq = -1;          // -1 = нет данных
+        [ObservableProperty] public bool onlySmsMode;
+        [ObservableProperty] public bool faultReport;
+        [ObservableProperty] public bool cmdAck;
+        [ObservableProperty] public bool tempUnitF;
+        [ObservableProperty] public string operatorCode = "";
+        [ObservableProperty] public int lac = -1;           // -1 = нет данных
+        [ObservableProperty] public long cellId = -1;        // -1 = нет данных
+    }
+
     public partial class ACPanelViewModel : ObservableObject
     {
         [ObservableProperty] private float setTemperature;

@@ -15,6 +15,18 @@ namespace CAN_Tool.Libs
             ["bb_param_number_ans"]= d => d[0] == 4 ? "Параметр:" + (d[2] * 256 + d[3]) + ";" : "",
             ["bb_param_value"]     = d => d[0] == 4 ? "Значение:" + (d[4] * 0x1000000 + d[5] * 0x10000 + d[6] * 0x100 + d[7]) + ";" : "",
             ["firmware_version"]   = i => $"{i[0]}.{i[1]}.{i[2]}.{i[3]}\r\n",
+            ["modem_operator_code"]= d =>
+            {
+                var s = new string(new[] { (char)d[1], (char)d[2], (char)d[3], (char)d[4], (char)d[5] });
+                return "Код оператора: " + (d[1] == 0xFF ? GetString("t_no_data") : s) + ";";
+            },
+            ["modem_lac_cellid"]    = d =>
+            {
+                if (d[1] == 0xFF && d[2] == 0xFF) return "LAC/CellID: " + GetString("t_no_data") + ";";
+                int lac = (d[1] << 8) | d[2];
+                long cellId = ((long)d[3] << 24) | ((long)d[4] << 16) | ((long)d[5] << 8) | d[6];
+                return $"LAC: {lac}, CellID: {cellId};";
+            },
         };
 
         public static readonly Dictionary<string, Func<int, string>> GetMeaningHandlers;

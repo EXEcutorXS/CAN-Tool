@@ -35,9 +35,15 @@ namespace CAN_Tool.ViewModels
         public bool flagSetAdrDone = false;
         public bool flagProgramDone = false;
         public bool flagDataGetDone = false;
+        public bool flagVerifyDone = false;
+        public bool flagReadDone = false;
         public uint fragmentAddress = 0;
         public int receivedFragmentLength = 0;
         public uint receivedFragmentCrc = 0;
+        public uint verifyResultCrc = 0;
+        public bool verifyResultOk = false;
+        public uint readResultData = 0;
+        public bool readResultOk = false;
 
         private List<CodeFragment> fragments = new();
 
@@ -352,6 +358,207 @@ namespace CAN_Tool.ViewModels
             }
 
         }
+        // CAN Tool sends data padded to 8-byte CAN frame boundaries; the bootloader
+        // accumulates exactly that many bytes, so CRC and length for verification must
+        // use the same padded size, not f.Length.
+        private static int VerifyLen(CodeFragment f) => (f.Length + 7) / 8 * 8;
+
+        private static uint CalcFragmentCrc(CodeFragment f)
+        {
+            uint crc = 0;
+            var totalLen = VerifyLen(f);
+            for (var i = 0; i < totalLen; i++)
+            {
+                crc += f.Data[i] * 170771U;
+                crc ^= (crc >> 16) & 0xFFFFU;
+            }
+            return crc;
+        }
+
+        // Returns true=match, false=CRC mismatch, null=no response (abort)
+        private bool? VerifyFragment(CodeFragment f)
+        {
+            var verifyLen = VerifyLen(f);
+            var expectedCrc = CalcFragmentCrc(f);
+
+            OmniMessage msg = new()
+            {
+                Pgn = 105,
+                ReceiverId = new(123, 0),
+                Data =
+                {
+                    [0] = 10,
+                    [1] = (byte)(f.StartAddress >> 24),
+                    [2] = (byte)(f.StartAddress >> 16),
+                    [3] = (byte)(f.StartAddress >> 8),
+                    [4] = (byte)(f.StartAddress),
+                    [5] = (byte)(verifyLen >> 16),
+                    [6] = (byte)(verifyLen >> 8),
+                    [7] = (byte)(verifyLen)
+                }
+            };
+
+            for (var attempt = 0; attempt < 4; attempt++)
+            {
+                flagVerifyDone = false;
+                Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                if (!WaitForFlag(ref flagVerifyDone, 2000))
+                {
+                    LogWriteLine($"Verify: no response for 0x{f.StartAddress:X08} (attempt {attempt + 1})");
+                    continue;
+                }
+                if (!verifyResultOk)
+                {
+                    LogWriteLine($"Verify: bootloader rejected address 0x{f.StartAddress:X08}");
+                    return null;
+                }
+                if (verifyResultCrc == expectedCrc)
+                {
+                    LogWriteLine($"Verify OK 0x{f.StartAddress:X08} len={verifyLen} CRC=0x{expectedCrc:X08}");
+                    return true;
+                }
+                LogWriteLine($"Verify FAIL 0x{f.StartAddress:X08}: expected 0x{expectedCrc:X08}, got 0x{verifyResultCrc:X08}");
+                return false;
+            }
+
+            LogWriteLine($"Verify: timeout for 0x{f.StartAddress:X08}");
+            return null;
+        }
+
+        private bool VerifyFlash(List<CodeFragment> fragmentsArg)
+        {
+            if (fragmentsArg == null || fragmentsArg.Count == 0)
+            {
+                LogWriteLine("Verify: no fragments to check");
+                return false;
+            }
+
+            if (!Vm.OmniInstance.CurrentTask.Capture("Verifying")) return false;
+            LogWriteLine("=== CRC verification ===");
+
+            var cnt = 0;
+            var mismatchCount = 0;
+            foreach (var f in fragmentsArg)
+            {
+                var result = VerifyFragment(f);
+                if (result == null)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail("Verification aborted: no response");
+                    return false;
+                }
+                if (result == false)
+                    mismatchCount++;
+
+                Vm.OmniInstance.CurrentTask.PercentComplete = ++cnt * 100 / fragmentsArg.Count;
+                if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail("Cancelled");
+                    return false;
+                }
+            }
+
+            if (mismatchCount == 0)
+                LogWriteLine($"=== CRC verification passed: {fragmentsArg.Count} fragment(s) ===");
+            else
+                LogWriteLine($"=== CRC verification done: {fragmentsArg.Count} fragment(s), {mismatchCount} mismatch(es) ===");
+
+            Vm.OmniInstance.CurrentTask.OnDone();
+            return mismatchCount == 0;
+        }
+
+        // Reads one 32-bit word from the bootloader via PGN 105 case 8.
+        // Returns false on timeout or if the bootloader rejected the address.
+        private bool ReadWordAtAddress(uint address, out uint data)
+        {
+            data = 0;
+            OmniMessage msg = new()
+            {
+                Pgn = 105,
+                ReceiverId = new(123, 0),
+                Data =
+                {
+                    [0] = 8,
+                    [1] = (byte)(address >> 24),
+                    [2] = (byte)(address >> 16),
+                    [3] = (byte)(address >> 8),
+                    [4] = (byte)(address)
+                }
+            };
+
+            for (var attempt = 0; attempt < 4; attempt++)
+            {
+                flagReadDone = false;
+                Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                if (!WaitForFlag(ref flagReadDone, 500)) continue;
+                if (!readResultOk) return false;
+                data = readResultData;
+                return true;
+            }
+            return false;
+        }
+
+        private bool VerifyFlashOld(List<CodeFragment> rawFragmentsArg)
+        {
+            if (rawFragmentsArg == null || rawFragmentsArg.Count == 0)
+            {
+                LogWriteLine("Verify: no fragments");
+                return false;
+            }
+
+            if (!Vm.OmniInstance.CurrentTask.Capture("Verifying")) return false;
+            LogWriteLine("=== Byte-by-byte verification ===");
+
+            var totalBytes = rawFragmentsArg.Sum(f => f.Length);
+            var checkedBytes = 0;
+            var mismatchCount = 0;
+
+            foreach (var f in rawFragmentsArg)
+            {
+                var wordCount = (f.Length + 3) / 4;
+                for (var w = 0; w < wordCount; w++)
+                {
+                    if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested)
+                    {
+                        Vm.OmniInstance.CurrentTask.OnFail("Cancelled");
+                        return false;
+                    }
+
+                    var addr = f.StartAddress + (uint)(w * 4);
+                    if (!ReadWordAtAddress(addr, out var flashWord))
+                    {
+                        LogWriteLine($"Verify: no response reading 0x{addr:X08}");
+                        Vm.OmniInstance.CurrentTask.OnFail("Verification aborted: no response");
+                        return false;
+                    }
+
+                    var byteOffset = w * 4;
+                    uint expectedWord = 0;
+                    for (var b = 0; b < 4; b++)
+                    {
+                        var byteVal = (byteOffset + b < f.Length) ? f.Data[byteOffset + b] : (byte)0xFF;
+                        expectedWord |= (uint)byteVal << (b * 8);
+                    }
+
+                    if (flashWord != expectedWord)
+                    {
+                        LogWriteLine($"  [!] 0x{addr:X08}: hex=0x{expectedWord:X08}  flash=0x{flashWord:X08}");
+                        mismatchCount++;
+                    }
+
+                    checkedBytes += Math.Min(4, f.Length - byteOffset);
+                    Vm.OmniInstance.CurrentTask.PercentComplete = checkedBytes * 100 / totalBytes;
+                }
+            }
+
+            if (mismatchCount == 0)
+                LogWriteLine($"=== Verification passed: {totalBytes} bytes, no mismatches ===");
+            else
+                LogWriteLine($"=== Verification done: {totalBytes} bytes, {mismatchCount} mismatch(es) ===");
+
+            Vm.OmniInstance.CurrentTask.OnDone();
+            return mismatchCount == 0;
+        }
+
         #region oldVersionBootloader
 
         // Old bootloader flash command: PGN 100, Data[0]=3
@@ -577,6 +784,7 @@ namespace CAN_Tool.ViewModels
                             currentFragment = new CodeFragment(maxFragmentSize);
                         }
                         pageAddress = (uint)(bytes[4] * 256 + bytes[5]) << 16;
+                        lastLineAddress = 0;
                         LogWriteLine($"Base address:0x{pageAddress:X08}");
                         break;
                     case 1:
@@ -599,6 +807,31 @@ namespace CAN_Tool.ViewModels
         private void UpdateFirmwareOld()
         {
             Task.Run(() => UpdateFirmwareOld(fragments));
+        }
+
+        [RelayCommand]
+        private void VerifyFirmware()
+        {
+            var dev = Vm?.OmniInstance?.SelectedConnectedDevice;
+            if (dev == null || dev.BootFirmware[0] != 123 || dev.BootFirmware[3] < 13)
+            {
+                MessageBox.Show("CRC verification requires bootloader version 123.0.0.13 or newer.",
+                                "Unsupported bootloader", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            Task.Run(() => VerifyFlash(fragments));
+        }
+
+        [RelayCommand]
+        private void VerifyFirmwareBytes()
+        {
+            if (string.IsNullOrEmpty(lastHexFilePath))
+            {
+                MessageBox.Show(GetString("t_load_hex_first"));
+                return;
+            }
+            var rawFragments = ParseHexFileRaw(lastHexFilePath, FragmentSize);
+            Task.Run(() => VerifyFlashOld(rawFragments));
         }
 
         [RelayCommand]

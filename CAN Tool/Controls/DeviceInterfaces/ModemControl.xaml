@@ -11,15 +11,48 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
-            <RowDefinition Height="50" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="55" />
+            <RowDefinition Height="55" />
+            <RowDefinition Height="55" />
         </Grid.RowDefinitions>
         <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" CornerRadius="15" Margin="10" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2" Width="120" Height="120" HorizontalAlignment="Left">
             <Border.Background>
                 <ImageBrush ImageSource="{Binding Img}" Stretch="Fill" />
             </Border.Background>
         </Border>
-        <TextBlock Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Firmware}" VerticalAlignment="Center" FontSize="20" />
+        <TextBlock Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Firmware,Converter={StaticResource VersionConverter},Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
         <TextBlock Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding ProductionDate}" VerticalAlignment="Center" FontSize="20" />
-        <TextBlock Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding Serial}" VerticalAlignment="Center" FontSize="20" />
+        <TextBlock Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding Serial,Converter={StaticResource VersionConverter},Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
+
+        <TextBlock Margin="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" VerticalAlignment="Center" FontSize="18"
+                   Text="{Binding ModemParams.Registered, StringFormat='Зарегистрирован: {0}'}" />
+        <TextBlock Margin="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" VerticalAlignment="Center" FontSize="18"
+                   Text="{Binding ModemParams.Roaming, StringFormat='Роуминг: {0}'}" />
+        <TextBlock Margin="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" VerticalAlignment="Center" FontSize="18"
+                   Text="{Binding ModemParams.Csq, StringFormat='Уровень сигнала (CSQ): {0}'}" />
+        <TextBlock Margin="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" VerticalAlignment="Center" FontSize="18"
+                   Text="{Binding ModemParams.OperatorCode, StringFormat='Код оператора: {0}'}" />
+        <TextBlock Margin="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="7" VerticalAlignment="Center" FontSize="18"
+                   Text="{Binding ModemParams.Lac, StringFormat='LAC: {0}'}" />
+        <TextBlock Margin="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="8" VerticalAlignment="Center" FontSize="18"
+                   Text="{Binding ModemParams.CellId, StringFormat='Cell ID: {0}'}" />
+        <Button Margin="5" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="9" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="20"
+                Opacity="{Binding ModemParams.OnlySmsMode, Converter={StaticResource BoolToOpacity}}"
+                Click="OnlySmsModeClick"
+                Content="Только SMS" />
+        <Button Margin="5" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="10" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="20"
+                Opacity="{Binding ModemParams.FaultReport, Converter={StaticResource BoolToOpacity}}"
+                Click="FaultReportClick"
+                Content="SMS при неисправности" />
+        <Button Margin="5" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="11" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="20"
+                Opacity="{Binding ModemParams.CmdAck, Converter={StaticResource BoolToOpacity}}"
+                Click="CmdAckClick"
+                Content="Подтверждение команд" />
     </Grid>
 </UserControl>

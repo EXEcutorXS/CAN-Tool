@@ -261,6 +261,11 @@
       "name": "t_extra_heater_Parameters"
     },
     {
+      "id": 60,
+      "name": "t_modem_status",
+      "multiPack": true
+    },
+    {
       "id": 99,
       "name": "t_debug_pack"
     },
@@ -1279,6 +1284,79 @@
       "bitLength": 24,
       "startByte": 5,
       "getMeaning": "release_date"
+    },
+    {
+      "pgn": 60,
+      "name": "Модем зарегистрирован",
+      "bitLength": 2,
+      "startBit": 0,
+      "startByte": 1,
+      "packNumber": 0,
+      "meanings": "OnOff"
+    },
+    {
+      "pgn": 60,
+      "name": "Роуминг",
+      "bitLength": 2,
+      "startBit": 2,
+      "startByte": 1,
+      "packNumber": 0,
+      "meanings": "OnOff"
+    },
+    {
+      "pgn": 60,
+      "name": "Уровень сигнала (CSQ)",
+      "bitLength": 8,
+      "startByte": 2,
+      "packNumber": 0
+    },
+    {
+      "pgn": 60,
+      "name": "Режим только SMS",
+      "bitLength": 2,
+      "startBit": 0,
+      "startByte": 1,
+      "packNumber": 1,
+      "meanings": "OnOff"
+    },
+    {
+      "pgn": 60,
+      "name": "Отправка SMS при неисправности",
+      "bitLength": 2,
+      "startBit": 2,
+      "startByte": 1,
+      "packNumber": 1,
+      "meanings": "OnOff"
+    },
+    {
+      "pgn": 60,
+      "name": "Подтверждение команд",
+      "bitLength": 2,
+      "startBit": 4,
+      "startByte": 1,
+      "packNumber": 1,
+      "meanings": "OnOff"
+    },
+    {
+      "pgn": 60,
+      "name": "Единица температуры",
+      "bitLength": 2,
+      "startBit": 6,
+      "startByte": 1,
+      "packNumber": 1,
+      "meanings": { "0": "t_celsius", "1": "t_fahrenheit", "3": "t_no_data" }
+    },
+    {
+      "pgn": 60,
+      "name": "Код оператора",
+      "packNumber": 2,
+      "decoder": "modem_operator_code"
+    },
+    {
+      "pgn": 60,
+      "name": "LAC / Cell ID",
+      "packNumber": 3,
+      "decoder": "modem_lac_cellid"
     },
     {
       "pgn": 19,

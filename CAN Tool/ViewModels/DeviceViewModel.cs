@@ -65,6 +65,7 @@ namespace OmniProtocol
         // ── Специализированные данные (используются при обработке сообщений) ──
         public virtual Timberline20OmniViewModel TimberlineParams { get; } = new();
         public virtual ACInverterViewModel ACInverterParams { get; } = new();
+        public virtual ModemViewModel ModemParams { get; } = new();
         public virtual GenericLoadTrippleViewModel GenericLoadTripple { get; } = new();
         public virtual OverrideStateClass OverrideState { get; } = new();
 

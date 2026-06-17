@@ -49,6 +49,8 @@
 <v:String x:Key="b_auto_update">AUTO</v:String>
 <v:String x:Key="b_burn">Program</v:String>
 <v:String x:Key="b_burn_old">Program(obsolete)</v:String>
+<v:String x:Key="b_verify_crc">Verify by CRC</v:String>
+<v:String x:Key="b_verify_bytes">Verify byte-by-byte</v:String>
 <v:String x:Key="b_find_boot">Ping Bootloader</v:String>
 <v:String x:Key="b_switch_to_boot">to Bootloader</v:String>
 <v:String x:Key="b_switch_to_main_program">to Main Program</v:String>

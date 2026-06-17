@@ -49,6 +49,8 @@
 <v:String x:Key="b_auto_update">AUTO</v:String>
 <v:String x:Key="b_burn">Programmieren</v:String>
 <v:String x:Key="b_burn_old">Programmieren (veraltet)</v:String>
+<v:String x:Key="b_verify_crc">CRC prüfen</v:String>
+<v:String x:Key="b_verify_bytes">Byteweise prüfen</v:String>
 <v:String x:Key="b_find_boot">Bootloader suchen</v:String>
 <v:String x:Key="b_switch_to_boot">zum Bootloader</v:String>
 <v:String x:Key="b_switch_to_main_program">zum Hauptprogramm</v:String>
