@@ -770,6 +770,16 @@ namespace CAN_Tool.ViewModels
             AddToClaimLog($"[{DateTime.Now:HH:mm:ss.fff}] → CLAIM SA={address} (simulator, static, wins)");
         }
 
+        public void RequestPropPacket(byte packetCode)
+        {
+            RvcMessage msg = new();
+            msg.Dgn = (int)(0xEF00 + SaToRequest);
+            msg.Priority = 6;
+            msg.Data[0] = 0xB0;
+            msg.Data[1] = packetCode;
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
+        }
+
         public void RequestDgn()
         {
             RvcMessage msg = new();

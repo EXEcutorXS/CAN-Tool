@@ -210,6 +210,13 @@ namespace CAN_Tool.CustomControls
             vm.RequestDgn();
         }
 
+        private void PropPacketRequestClick(object sender, RoutedEventArgs e)
+        {
+            if (PropPacketCombo.SelectedItem is ComboBoxItem item &&
+                byte.TryParse(item.Tag?.ToString(), System.Globalization.NumberStyles.HexNumber, null, out byte code))
+                vm?.RequestPropPacket(code);
+        }
+
         private void AddressClaimClick(object sender, RoutedEventArgs e)
         {
             vm.ClaimSourceAddress();

@@ -140,6 +140,22 @@
                          Text="{Binding SubInstanceToRequest}" d:Text="1"/>
                 <Button Margin="4 2" Padding="6 2" VerticalAlignment="Center" Click="DgnRequestClick" Content="{DynamicResource b_request_dgn}"/>
                 <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
+                <!-- Proprietary packet request (0xB0) -->
+                <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13" Text="Prop:"/>
+                <ComboBox x:Name="PropPacketCombo" Margin="2" VerticalAlignment="Center" Width="158" FontSize="11">
+                    <ComboBoxItem Tag="A0" Content="A0: Extension Status" IsSelected="True"/>
+                    <ComboBoxItem Tag="A1" Content="A1: System Timer"/>
+                    <ComboBoxItem Tag="A2" Content="A2: Pump Timers 1"/>
+                    <ComboBoxItem Tag="A3" Content="A3: Pump Timers 2"/>
+                    <ComboBoxItem Tag="A4" Content="A4: Heater Info"/>
+                    <ComboBoxItem Tag="A5" Content="A5: Panel Info"/>
+                    <ComboBoxItem Tag="A6" Content="A6: HCU Info"/>
+                    <ComboBoxItem Tag="A8" Content="A8: Extra Config"/>
+                    <ComboBoxItem Tag="A9" Content="A9: Extra Status"/>
+                    <ComboBoxItem Tag="AA" Content="AA: Zone Types"/>
+                </ComboBox>
+                <Button Margin="4 2" Padding="6 2" VerticalAlignment="Center" Click="PropPacketRequestClick" Content="Request"/>
+                <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
                 <!-- Address claiming -->
                 <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13" Text="{DynamicResource t_sa_label}"/>
                 <TextBox Margin="2" VerticalAlignment="Center" Width="38" TextAlignment="Center" FontSize="13"
