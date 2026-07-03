@@ -327,6 +327,19 @@ namespace CAN_Tool.ViewModels
 
                     break;
 
+                case 0x1FECA: // DM_RV diagnostic message
+                    if (msg.SourceAdress == SaToRequest)
+                    {
+                        byte code = D[2]; // spnMsb = error code (0 = no faults)
+                        if (code == 0)
+                            faultLastSeen.Clear();
+                        else
+                            faultLastSeen[code] = DateTime.Now;
+                        OnPropertyChanged(nameof(ActiveFaultCodes));
+                        OnPropertyChanged(nameof(FaultCodesString));
+                    }
+                    break;
+
                 case 0xEE00:
                     AddToClaimLog($"[{DateTime.Now:HH:mm:ss.fff}] ← CLAIM SA={msg.SourceAdress} byte7=0x{D[7]:X2}");
                     if (D[7] == 0x80) // dynamic address capable = our HCU
@@ -908,6 +921,26 @@ namespace CAN_Tool.ViewModels
         {
             get => enginePreheatDuration;
             set { if (SetProperty(ref enginePreheatDuration, value)) OnPropertyChanged(nameof(EngineDurationString)); }
+        }
+
+        private static readonly TimeSpan FaultTimeout = TimeSpan.FromSeconds(3);
+        private readonly Dictionary<byte, DateTime> faultLastSeen = new();
+
+        public List<byte> ActiveFaultCodes => faultLastSeen
+            .Where(kv => DateTime.Now - kv.Value < FaultTimeout)
+            .Select(kv => kv.Key)
+            .OrderBy(c => c)
+            .ToList();
+
+        public string FaultCodesString
+        {
+            get
+            {
+                var codes = ActiveFaultCodes;
+                return codes.Count == 0
+                    ? "No faults"
+                    : string.Join(", ", codes.Select(c => $"{c}"));
+            }
         }
 
         private byte saToRequest = 101;

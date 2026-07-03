@@ -59,6 +59,7 @@
                 <TextBlock Text="{Binding UnderfloorPumpState,StringFormat={}Underfloor pump run: {0}}" />
                 <TextBlock Text="{Binding SystemEstimatedTime,StringFormat={}System off in: {0} s}" Visibility="{Binding SystemEstimatedTime,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible" />
                 <TextBlock Text="{Binding EnginePreheatEstiamtedTime,StringFormat={}Engine preheat off in: {0} s}" Visibility="{Binding EnginePreheatEstiamtedTime,Converter={StaticResource NotZeroToVisibilityConverter}}" d:Visibility="Visible"  />
+                <TextBlock Text="{Binding FaultCodesString,StringFormat={}Faults: {0}}"/>
                 <TextBlock Text="{Binding HcuVersionString,StringFormat={}HCU:{0}}"></TextBlock>
                 <TextBlock Text="{Binding PanelVersionString,StringFormat={}Panel:{0}}"></TextBlock>
                 <TextBlock Text="{Binding HeaterIconCode,StringFormat={}Heater Mode: {0}}"></TextBlock>
