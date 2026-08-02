@@ -460,8 +460,27 @@
 
 <v:String x:Key="par_571">Ручной режим разбора воды</v:String>
 <v:String x:Key="par_572">Номер датчика зоны для резервного выкл.</v:String>
-
+<v:String x:Key="par_573">Режим с 2 уставками</v:String>
+<v:String x:Key="par_574">Номер главного подогревателя</v:String>
+<v:String x:Key="par_575">Режим CAN2 передатчика(0-RVC,1-Internal)</v:String>
+<v:String x:Key="par_576">Яркость экрана в режиме сна</v:String>
+<v:String x:Key="par_577">Вариант розжига для подогревателя 0</v:String>
+<v:String x:Key="par_578">Вариант розжига для подогревателя 1</v:String>
+<v:String x:Key="par_579">Вариант розжига для подогревателя 2</v:String>
+<v:String x:Key="par_580">Вариант розжига для подогревателя 3</v:String>
+<v:String x:Key="par_581">Вариант розжига для подогревателя 4</v:String>
+<v:String x:Key="par_582">Вариант розжига для подогревателя 5</v:String>
+<v:String x:Key="par_583">Вариант розжига для подогревателя 6</v:String>
+<v:String x:Key="par_584">Название зоны 1</v:String>
+<v:String x:Key="par_585">Название зоны 2</v:String>
+<v:String x:Key="par_586">Название зоны 3</v:String>
+<v:String x:Key="par_587">Название зоны 4</v:String>
+<v:String x:Key="par_588">Название зоны 5</v:String>
+<v:String x:Key="par_589">Эко режим нагревателя</v:String>
+<v:String x:Key="par_590">Режим работы UART(0-DWIN/PU36,1-RS485/Modbus)</v:String>
+<v:String x:Key="par_591">Адрес на шине RS485(для Modbus)</v:String>
 <v:String x:Key="par_600">номер устройства на шине CAN RV-C</v:String>
+<v:String x:Key="par_601">Адрес устройства (SA) на RV-C шине</v:String>
 
 <v:String x:Key="bb_1">счетчик запусков</v:String>
 <v:String x:Key="bb_2">счетчик запусков на вентиляции</v:String>
