@@ -1236,4 +1236,13 @@
 <v:String x:Key="t_stop_device_tt">Gerät stoppen</v:String>
 <v:String x:Key="t_run_water_pump_tt">Nur Wasserpumpe starten</v:String>
 <v:String x:Key="t_run_ventilation_tt">Belüftung starten</v:String>
+<v:String x:Key="b_images">Bilder</v:String>
+<v:String x:Key="b_load_images">Bilder laden...</v:String>
+<v:String x:Key="b_erase_and_send_images">Bilder löschen und senden</v:String>
+<v:String x:Key="b_load_firmware">Panel-Firmware laden...</v:String>
+<v:String x:Key="b_send_firmware">Firmware senden</v:String>
+<v:String x:Key="b_patch_firmware_crc">Länge+CRC eintragen</v:String>
+<v:String x:Key="b_legacy_slow_mode">Langsameres Intervall</v:String>
+<v:String x:Key="t_legacy_slow_mode_tt">Fügt beim Legacy-Bildtransfer (&lt;15.5) kleine Pausen ein - für einen belegten/verrauschten CAN-Bus. Langsamer, aber auf einem ruhigen Bus nicht nötig.</v:String>
+<v:String x:Key="t_port_not_open">Port ist nicht geöffnet</v:String>
 </ResourceDictionary>

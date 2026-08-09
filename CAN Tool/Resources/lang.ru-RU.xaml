@@ -1236,4 +1236,13 @@
 <v:String x:Key="t_stop_device_tt">Остановить устройство</v:String>
 <v:String x:Key="t_run_water_pump_tt">Запустить только помпу</v:String>
 <v:String x:Key="t_run_ventilation_tt">Запустить вентиляцию</v:String>
+<v:String x:Key="b_images">Картинки</v:String>
+<v:String x:Key="b_load_images">Загрузить картинки...</v:String>
+<v:String x:Key="b_erase_and_send_images">Стереть и отправить картинки</v:String>
+<v:String x:Key="b_load_firmware">Загрузить прошивку панели...</v:String>
+<v:String x:Key="b_send_firmware">Отправить прошивку</v:String>
+<v:String x:Key="b_patch_firmware_crc">Вписать длину+CRC</v:String>
+<v:String x:Key="b_legacy_slow_mode">Увеличенный интервал</v:String>
+<v:String x:Key="t_legacy_slow_mode_tt">Добавляет небольшие паузы при передаче картинок на старых (&lt;15.5) загрузчиках — для шумной/общей шины CAN. Медленнее, но на тихой шине не требуется.</v:String>
+<v:String x:Key="t_port_not_open">Порт не открыт</v:String>
 </ResourceDictionary>

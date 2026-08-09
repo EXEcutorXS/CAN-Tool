@@ -1236,4 +1236,13 @@
 <v:String x:Key="t_stop_device_tt">Stop Device</v:String>
 <v:String x:Key="t_run_water_pump_tt">Run just water pump</v:String>
 <v:String x:Key="t_run_ventilation_tt">Run ventilation</v:String>
+<v:String x:Key="b_images">Images</v:String>
+<v:String x:Key="b_load_images">Load images...</v:String>
+<v:String x:Key="b_erase_and_send_images">Erase and send images</v:String>
+<v:String x:Key="b_load_firmware">Load panel firmware...</v:String>
+<v:String x:Key="b_send_firmware">Send firmware</v:String>
+<v:String x:Key="b_patch_firmware_crc">Patch length+CRC</v:String>
+<v:String x:Key="b_legacy_slow_mode">Slower interval</v:String>
+<v:String x:Key="t_legacy_slow_mode_tt">Adds small delays on the legacy (&lt;15.5) image transfer for a noisy/shared CAN bus. Slower, but a quiet bus doesn't need it.</v:String>
+<v:String x:Key="t_port_not_open">Port is not open</v:String>
 </ResourceDictionary>
