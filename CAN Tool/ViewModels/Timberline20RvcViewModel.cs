@@ -128,7 +128,7 @@ namespace CAN_Tool.ViewModels
             var D = msg.Data;
 
             // Proprietary DGN: low byte of DGN encodes the device SA
-            if (msg.Dgn == (uint)(0xEF00 + SaToRequest))
+            if (msg.Dgn == (uint)(0xEF00 + SaToRequest) || msg.Dgn == (uint)(0x1EF00 + SaToRequest))//new Style and old style prop messages
             {
                 switch (D[0])
                 {

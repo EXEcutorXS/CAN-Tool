@@ -460,8 +460,27 @@
 
 <v:String x:Key="par_571">Manueller Warmwassermodus</v:String>
 <v:String x:Key="par_572">Zonenreserve-Abschaltsensor-Nummer</v:String>
-
+<v:String x:Key="par_573">Modus mit 2 Sollwerten</v:String>
+<v:String x:Key="par_574">Hauptheizgerät-Nummer</v:String>
+<v:String x:Key="par_575">CAN2-Modus(0-RVC,1-Intern)</v:String>
+<v:String x:Key="par_576">LCD-Helligkeit im Ruhemodus</v:String>
+<v:String x:Key="par_577">Zündvariante Heizgerät 0</v:String>
+<v:String x:Key="par_578">Zündvariante Heizgerät 1</v:String>
+<v:String x:Key="par_579">Zündvariante Heizgerät 2</v:String>
+<v:String x:Key="par_580">Zündvariante Heizgerät 3</v:String>
+<v:String x:Key="par_581">Zündvariante Heizgerät 4</v:String>
+<v:String x:Key="par_582">Zündvariante Heizgerät 5</v:String>
+<v:String x:Key="par_583">Zündvariante Heizgerät 6</v:String>
+<v:String x:Key="par_584">Zone 1 Name</v:String>
+<v:String x:Key="par_585">Zone 2 Name</v:String>
+<v:String x:Key="par_586">Zone 3 Name</v:String>
+<v:String x:Key="par_587">Zone 4 Name</v:String>
+<v:String x:Key="par_588">Zone 5 Name</v:String>
+<v:String x:Key="par_589">Heizgerät-ECO-Modus</v:String>
+<v:String x:Key="par_590">UART-Protokoll(0-DWIN/PU36,1-RS485/Modbus)</v:String>
+<v:String x:Key="par_591">Modbus-Adresse</v:String>
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
+<v:String x:Key="par_601">RVC_SOURCE_ADDRESS</v:String>
 
 <v:String x:Key="bb_1">Startanzahl</v:String>
 <v:String x:Key="bb_2">Belüftungsstarts</v:String>
