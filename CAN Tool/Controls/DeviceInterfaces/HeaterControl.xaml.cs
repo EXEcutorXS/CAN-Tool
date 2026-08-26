@@ -64,6 +64,7 @@ namespace CAN_Tool.CustomControls
             foreach (var sv in Vm.Status)
             {
                 string colId = $"C{sv.Id}";
+                if (_waterfallTable.Columns.Contains(colId)) continue; // guard against a duplicate Id in Vm.Status
                 _waterfallTable.Columns.Add(colId, typeof(string));
                 WaterfallGrid.Columns.Add(new DataGridTextColumn
                 {

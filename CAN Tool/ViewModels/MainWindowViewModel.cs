@@ -555,14 +555,19 @@ namespace CAN_Tool.ViewModels
         {
             var msg = (e as GotCanMessageEventArgs).receivedMessage;
             WriteToLog(msg, "←");
+            // Post (не Send): адаптер шлёт кадры на фоновом потоке приёма, и синхронный Send
+            // блокирует этот поток на время обработки каждого сообщения в UI-потоке. При
+            // всплеске из сотен кадров подряд (например, потоковое чтение PGN109) это не
+            // даёт потоку приёма вовремя вычитывать очередь драйвера/адаптера, и часть
+            // кадров теряется на приёме ещё до того, как долетит до этого обработчика.
             switch (Mode)
             {
                 case WorkMode_t.Omni:
-                    UIContext.Send(x => OmniInstance.ProcessCanMessage(msg), null); break;
+                    UIContext.Post(x => OmniInstance.ProcessCanMessage(msg), null); break;
                 case WorkMode_t.Rvc:
-                    UIContext.Send(x => RvcPage.ProcessMessage(msg), null); break;
+                    UIContext.Post(x => RvcPage.ProcessMessage(msg), null); break;
                 case WorkMode_t.RegularCan:
-                    UIContext.Send(x => CanPage.ProcessMessage(msg), null); break;
+                    UIContext.Post(x => CanPage.ProcessMessage(msg), null); break;
             }
         }
 

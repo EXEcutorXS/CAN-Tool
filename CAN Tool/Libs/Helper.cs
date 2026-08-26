@@ -49,6 +49,11 @@ namespace CAN_Tool.Libs
         {
             lock (_syncRoot)
             {
+                // Send, не Post: должна выполниться синхронно, пока держим _syncRoot, иначе
+                // проверка "уже есть?" и реальная мутация коллекции не атомарны - при быстром
+                // потоке вызовов (сообщения теперь диспетчеризуются в UI-поток через Post, не
+                // Send) несколько TryToAdd успевают пройти проверку "не найдено" до того, как
+                // первый Add/Insert реально попадёт в коллекцию, и получаем дубликаты.
                 var found = Items.FirstOrDefault(i => i.IsSimiliarTo(item));
                 if (found == null)
                 {
@@ -58,23 +63,21 @@ namespace CAN_Tool.Libs
                         {
                             if (item.CompareTo(Items[i]) <= 0)
                             {
-                                // Добавление в UI потоке
-                                _uiContext.Post(_ => Insert(i, item), null);
+                                _uiContext.Send(_ => Insert(i, item), null);
                                 return true;
                             }
                         }
-                        _uiContext.Post(_ => Add(item), null);
+                        _uiContext.Send(_ => Add(item), null);
                         return true;
                     }
                     else
                     {
-                        _uiContext.Post(_ => Add(item), null);
+                        _uiContext.Send(_ => Add(item), null);
                     }
                 }
                 else
                 {
-                    // Update может также изменять коллекцию?
-                    _uiContext.Post(_ => found.Update(item), null);
+                    _uiContext.Send(_ => found.Update(item), null);
                 }
                 return false;
             }

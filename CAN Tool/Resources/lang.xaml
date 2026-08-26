@@ -55,6 +55,13 @@
 <v:String x:Key="b_switch_to_boot">to Bootloader</v:String>
 <v:String x:Key="b_switch_to_main_program">to Main Program</v:String>
 <v:String x:Key="b_get_version">Get Version</v:String>
+<v:String x:Key="b_erase_memory">Erase Memory</v:String>
+<v:String x:Key="b_load_dump_hex">Load Dump HEX</v:String>
+<v:String x:Key="b_write_dump">Write Dump</v:String>
+<v:String x:Key="b_read_dump">Read Dump</v:String>
+<v:String x:Key="t_dump_read_start">Start (hex)</v:String>
+<v:String x:Key="t_dump_read_length">Length (KB)</v:String>
+<v:String x:Key="t_legacy_adapter_mode">Old adapter (slow, safe)</v:String>
 <v:String x:Key="b_cancel">Cancel</v:String>
 <v:String x:Key="b_expert">Expert</v:String>
 <v:String x:Key="b_list_mode">Mode</v:String>

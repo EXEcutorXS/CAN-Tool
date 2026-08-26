@@ -55,6 +55,13 @@
 <v:String x:Key="b_switch_to_boot">войти в Bootloader</v:String>
 <v:String x:Key="b_switch_to_main_program">Запустить программу</v:String>
 <v:String x:Key="b_get_version">Запросить версию</v:String>
+<v:String x:Key="b_erase_memory">Стереть память</v:String>
+<v:String x:Key="b_load_dump_hex">Загрузить дамп HEX</v:String>
+<v:String x:Key="b_write_dump">Записать дамп</v:String>
+<v:String x:Key="b_read_dump">Считать дамп</v:String>
+<v:String x:Key="t_dump_read_start">Начало (hex)</v:String>
+<v:String x:Key="t_dump_read_length">Длина (КБ)</v:String>
+<v:String x:Key="t_legacy_adapter_mode">Старый адаптер (медленно, надёжно)</v:String>
 <v:String x:Key="b_cancel">Отмена</v:String>
 <v:String x:Key="b_expert">Эксперт</v:String>
 <v:String x:Key="b_list_mode">Реж</v:String>

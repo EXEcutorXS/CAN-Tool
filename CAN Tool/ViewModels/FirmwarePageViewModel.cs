@@ -45,10 +45,52 @@ namespace CAN_Tool.ViewModels
         public uint readResultData = 0;
         public bool readResultOk = false;
 
+        // ── Флаги для внешней flash-микросхемы (PGN 107/108/109, дамп памяти) ──
+        public bool flagExtSetAdrDone = false;
+        public bool flagExtDataGetDone = false;
+        public bool flagExtProgramDone = false;
+        public bool flagExtEraseDone = false;
+        public bool flagExtBulkReadDone = false;
+        public uint extFragmentAddress = 0;
+        public int extReceivedFragmentLength = 0;
+        public uint extReceivedFragmentCrc = 0;
+        public uint extBulkReadLen = 0;
+        public uint extBulkReadCrc = 0;
+
+        private readonly List<byte> extReadBuffer = new();
+
+        public void AppendExtReadData(byte[] data)
+        {
+            extReadBuffer.AddRange(data);
+        }
+
+        private const int ExtFragmentSize = 256; // размер буфера mExtData в загрузчике
+        // Раньше рвалось на ~314 кадрах из-за бага прошивки самого USB-CAN адаптера (терял
+        // кадры при быстрой пачке) - после его фикса держим чанк побольше, чтобы меньше
+        // round-trip'ов на установку адреса на каждый чанк.
+        private const int DumpReadChunkSize = 8192; // байт за один запрос PGN107 case16 (1024 кадра)
+
         private List<CodeFragment> fragments = new();
+        private List<CodeFragment> dumpFragments = new();
 
         [ObservableProperty]
         private int fragmentSize = 512;
+
+        // Диапазон для чтения дампа - полный чип 8МБ читать долго (retries + 1мс/кадр),
+        // поэтому даём указать поддиапазон. Старт - шестнадцатеричный адрес, длина - в КБ.
+        [ObservableProperty]
+        private string dumpReadStartHex = "0x0";
+        [ObservableProperty]
+        private int dumpReadLengthKb = 8192;
+
+        // Старые прошивки USB-CAN адаптеров (до фикса переполнения буфера) не успевают
+        // вычерпывать быстрый всплеск кадров PGN109 через USB и тихо роняют часть. Для них -
+        // маленький чанк (умещается в их буфер) плюс пауза между чанками (дать адаптеру
+        // успеть вычерпать предыдущий всплеск до следующего).
+        [ObservableProperty]
+        private bool legacyAdapterMode = false;
+        private const int LegacyDumpReadChunkSize = 32; // байт (4 кадра)
+        private const int LegacyInterChunkDelayMs = 150;
 
         [ObservableProperty]
         private string log;
@@ -651,7 +693,7 @@ namespace CAN_Tool.ViewModels
                         {
                             if (current.Length > 0) { result.Add(current); current = new(maxFragmentSize); }
                         }
-                        if (current.StartAddress == 0)
+                        if (current.Length == 0) // see ParseHexFile for why not StartAddress==0
                             current.StartAddress = absAddr;
                         lastLineAddress = absAddr;
                         for (var i = 0; i < recordLen; i++)
@@ -718,14 +760,24 @@ namespace CAN_Tool.ViewModels
 
         #endregion
 
-        private void AddFragment(CodeFragment fragment)
-        {
-            fragments.Add(fragment);
-            LogWriteLine($"Fragment added, {fragment.Length} bytes");
-        }
         private List<CodeFragment> ParseHexFile(string path, int maxFragmentSize)
         {
             fragments.Clear();
+            return ParseHexFile(path, maxFragmentSize, fragments);
+        }
+
+        private List<CodeFragment> ParseHexFile(string path, int maxFragmentSize, List<CodeFragment> target)
+        {
+            // Не логируем сюда построчно/пофрагментно: LogWriteLine делает Log = str + Log,
+            // то есть каждый вызов копирует весь накопленный лог целиком - для файла на
+            // несколько тысяч фрагментов (например, дамп в 1МБ при 256-байтных фрагментах)
+            // это O(n^2) и превращает загрузку в дело на десятки секунд. Итоговое количество
+            // фрагментов логируется один раз в LoadHex/LoadDumpHex после завершения парсинга.
+            void AddFragment(CodeFragment fragment)
+            {
+                target.Add(fragment);
+            }
+
             CodeFragment currentFragment = new(maxFragmentSize);
             uint pageAddress = 0;
 
@@ -750,12 +802,16 @@ namespace CAN_Tool.ViewModels
                         {
                             AddFragment(currentFragment);
                             currentFragment = new CodeFragment(maxFragmentSize);
-                            LogWriteLine($"Line is not after previous. Current:0x{(pageAddress + localAddress):X08},prev:0x{lastLineAddress:X08} + {lastLineSize} bytes");
                         }
-                        if (currentFragment.StartAddress == 0) //First line in data fragment, saving address
+                        if (currentFragment.Length == 0) //First line in data fragment, saving address
                         {
+                            // Length==0, not StartAddress==0: a fragment whose true start address
+                            // is exactly 0 (the very first fragment of a file starting at 0x000000)
+                            // would otherwise be indistinguishable from "not yet set", so every
+                            // following line at address 0, 16, 32... would keep overwriting
+                            // StartAddress - firmware then wrote a full 256-byte page starting
+                            // mid-page, and the flash's own page-program wrap corrupted the data.
                             currentFragment.StartAddress = pageAddress + localAddress;
-                            LogWriteLine($"New Fragment Start:0x{(pageAddress + localAddress):X08}");
                         }
                         lastLineAddress = pageAddress + localAddress;
                         var gotNotReserveData = false;
@@ -785,16 +841,467 @@ namespace CAN_Tool.ViewModels
                         }
                         pageAddress = (uint)(bytes[4] * 256 + bytes[5]) << 16;
                         lastLineAddress = 0;
-                        LogWriteLine($"Base address:0x{pageAddress:X08}");
                         break;
                     case 1:
                         if (currentFragment.Length > 0)
                             AddFragment(currentFragment);
-                        return fragments;
+                        return target;
 
                 }
             }
-            return fragments;
+            return target;
+        }
+
+        [RelayCommand]
+        private void LoadDumpHex()
+        {
+            OpenFileDialog dialog = new() { Filter = "Hex Files|*.hex" };
+            if (!(bool)dialog.ShowDialog()) return;
+            dumpFragments.Clear();
+            ParseHexFile(dialog.FileName, ExtFragmentSize, dumpFragments);
+            LogWriteLine($"Dump hex is loaded, contains {dumpFragments.Count} fragments.");
+        }
+
+        private async Task EraseExtFlash()
+        {
+            OmniMessage msg = new();
+            msg.Pgn = 107;
+            msg.ReceiverId.Type = 123;
+            msg.Data[0] = 14;
+            msg.Data[1] = 0; //Стереть всю память
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            flagExtEraseDone = false;
+        }
+
+        private async Task StartExtFlashing()
+        {
+            OmniMessage msg = new();
+            msg.Pgn = 107;
+            msg.ReceiverId.Type = 123;
+            msg.Data[0] = 4;
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+        }
+
+        private bool CheckExtTransmittedData(int len, uint crc)
+        {
+            OmniMessage msg = new()
+            {
+                Pgn = 107,
+                ReceiverId = new(123, 0),
+                Data =
+                {
+                    [0] = 2
+                }
+            };
+
+            for (var i = 0; i < 6; i++)
+            {
+                flagExtDataGetDone = false;
+                if (i == 5)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_check_transmission"));
+                    return false;
+                }
+                Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                WaitForFlag(ref flagExtDataGetDone, 100);
+
+                LogWriteLine($"Len:{extReceivedFragmentLength},CRC:0x{extReceivedFragmentCrc:X08}");
+                if (crc == extReceivedFragmentCrc && len == extReceivedFragmentLength)
+                    return true;
+
+                LogWriteLine(GetString("t_transmission_failed"));
+                return false;
+            }
+            return false;
+        }
+
+        private async Task SetExtFragmentAdr(CodeFragment f)
+        {
+            OmniMessage msg = new()
+            {
+                Pgn = 107,
+                ReceiverId = new(123, 0),
+                Data =
+                {
+                    [0] = 0,
+                    [1] = (byte)(f.StartAddress >> 24),
+                    [2] = (byte)(f.StartAddress >> 16),
+                    [3] = (byte)(f.StartAddress >> 8),
+                    [4] = (byte)(f.StartAddress >> 0)
+                }
+            };
+
+            for (var i = 0; i < 4; i++)
+            {
+                flagExtSetAdrDone = false;
+                if (i == 3)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_set_address"));
+                    return;
+                }
+                Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                if (!WaitForFlag(ref flagExtSetAdrDone, 300)) continue;
+                if (extFragmentAddress == f.StartAddress)
+                    break;
+            }
+        }
+
+        private async void WriteExtFragmentToRam(CodeFragment f)
+        {
+            OmniMessage msg = new()
+            {
+                Pgn = 108,
+                ReceiverId = new(123, 0),
+            };
+            LogWrite($"Ext fragment {f.StartAddress:X08}...");
+            for (var k = 0; k < 16; k++)
+            {
+                SetExtFragmentAdr(f);
+
+                if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested)
+                    return;
+
+                if (k == 15)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_transmit_data"));
+                    return;
+                }
+                if (k > 0)
+                {
+                    LogWriteLine($"Try: {k + 1}");
+                }
+                uint crc = 0;
+                var len = 0;
+                extReceivedFragmentCrc = 0;
+                extReceivedFragmentLength = 0;
+
+                for (var i = 0; i < (f.Length + 7) / 8; i++)
+                {
+                    for (var j = 0; j < 8; j++)
+                    {
+                        msg.Data[j] = f.Data[i * 8 + j];
+                        crc += f.Data[i * 8 + j] * 170771U;
+                        crc ^= ((crc >> 16) & 0xFFFFU);
+                        len++;
+                    }
+                    Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                }
+                if (CheckExtTransmittedData(len, crc)) break;
+            }
+        }
+
+        private async Task FlashExtFragment(CodeFragment f)
+        {
+            WriteExtFragmentToRam(f);
+            for (var i = 0; i < 4; i++)
+            {
+                flagExtProgramDone = false;
+                if (i == 3)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_flash_memory"));
+                    return;
+                }
+                StartExtFlashing();
+                if (WaitForFlag(ref flagExtProgramDone, 100))
+                    break;
+            }
+        }
+
+        // Стирает внешнюю flash-микросхему целиком, ждёт подтверждения (с ретраями). Возвращает
+        // true, если стирание завершилось успешно (задача Capture/OnDone уже закрыта самим
+        // методом), false - если не удалось (уже сообщено пользователю через OnFail/OnCancel,
+        // или задача занята другой операцией).
+        private async Task<bool> EraseExtMemory()
+        {
+            if (!Vm.OmniInstance.CurrentTask.Capture("Memory Erasing")) return false;
+            LogWriteLine(GetString("t_starting_flash_erase"));
+            for (var i = 0; i < 4; i++)
+            {
+                if (i == 3)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_erase_memory"));
+                    return false;
+                }
+
+                await EraseExtFlash();
+                if (WaitForFlag(ref flagExtEraseDone, 60000)) break;
+            }
+
+            Vm.OmniInstance.CurrentTask.OnDone();
+            return true;
+        }
+
+        [RelayCommand]
+        private void EraseMemory()
+        {
+            Task.Run(async () =>
+            {
+                if (await EraseExtMemory())
+                    LogWriteLine("Memory erase completed.");
+            });
+        }
+
+        private async void WriteDumpToMemory(List<CodeFragment> fragmentsArg)
+        {
+            try
+            {
+                if (fragmentsArg.Count == 0)
+                {
+                    MessageBox.Show(GetString("t_load_hex_first"));
+                    return;
+                }
+                LogWriteLine("Starting memory dump write...");
+                if (!await EraseExtMemory()) return;
+                Vm.OmniInstance.CurrentTask.Capture("Programming");
+
+                var cnt = 0;
+                foreach (var f in fragmentsArg)
+                {
+                    FlashExtFragment(f);
+                    Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragmentsArg.Count;
+                    if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested) return;
+                }
+                LogWriteLine("Memory dump write completed.");
+                Vm.OmniInstance.CurrentTask.OnDone();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        [RelayCommand]
+        private void WriteDumpToMemory()
+        {
+            if (dumpFragments.Count == 0)
+            {
+                MessageBox.Show(GetString("t_load_hex_first"));
+                return;
+            }
+            Task.Run(() => WriteDumpToMemory(dumpFragments));
+        }
+
+        // Устанавливает адрес и запрашивает у загрузчика чтение len байт (PGN107 case16),
+        // получает их через поток кадров PGN109 и сверяет по CRC (case17).
+        private bool ReadExtChunk(uint addr, int len, out byte[] data)
+        {
+            data = null;
+
+            OmniMessage setMsg = new()
+            {
+                Pgn = 107,
+                ReceiverId = new(123, 0),
+                Data =
+                {
+                    [0] = 0,
+                    [1] = (byte)(addr >> 24),
+                    [2] = (byte)(addr >> 16),
+                    [3] = (byte)(addr >> 8),
+                    [4] = (byte)(addr)
+                }
+            };
+            var addrOk = false;
+            for (var i = 0; i < 4; i++)
+            {
+                flagExtSetAdrDone = false;
+                Vm.CanAdapter.Transmit(setMsg.ToCanMessage());
+                if (WaitForFlag(ref flagExtSetAdrDone, 300) && extFragmentAddress == addr)
+                {
+                    addrOk = true;
+                    break;
+                }
+            }
+            if (!addrOk)
+            {
+                LogWriteLine($"Dump read: can't set address 0x{addr:X08}");
+                return false;
+            }
+
+            extReadBuffer.Clear();
+            OmniMessage readMsg = new()
+            {
+                Pgn = 107,
+                ReceiverId = new(123, 0),
+                Data =
+                {
+                    [0] = 16,
+                    [1] = (byte)(len >> 16),
+                    [2] = (byte)(len >> 8),
+                    [3] = (byte)(len)
+                }
+            };
+            flagExtBulkReadDone = false;
+            Vm.CanAdapter.Transmit(readMsg.ToCanMessage());
+            // Каждый из ~len/8 кадров PGN109 маршалится в UI-поток синхронно
+            // (UIContext.Send в MainWindowViewModel.NewMessgeReceived), так что
+            // запас по времени должен считаться не от битрейта шины, а от этого overhead.
+            var timeoutMs = Math.Max(5000, len * 3);
+            if (!WaitForFlag(ref flagExtBulkReadDone, timeoutMs))
+            {
+                LogWriteLine($"Dump read: timeout at 0x{addr:X08}, got {extReadBuffer.Count}/{len} bytes");
+                return false;
+            }
+            if (extBulkReadLen != (uint)len || extReadBuffer.Count < len)
+            {
+                LogWriteLine($"Dump read: device rejected chunk at 0x{addr:X08} (got {extReadBuffer.Count}/{len} bytes, reported len={extBulkReadLen})");
+                return false;
+            }
+
+            uint crc = 0;
+            for (var i = 0; i < len; i++)
+            {
+                crc += extReadBuffer[i] * 170771U;
+                crc ^= (crc >> 16) & 0xFFFFU;
+            }
+            if (crc != extBulkReadCrc)
+            {
+                LogWriteLine($"Dump read: CRC mismatch at 0x{addr:X08} (expected 0x{extBulkReadCrc:X08}, got 0x{crc:X08})");
+                return false;
+            }
+
+            data = extReadBuffer.Take(len).ToArray();
+            return true;
+        }
+
+        private void ReadDumpFromMemory()
+        {
+            try
+            {
+                const uint chipSize = 0x800000;
+
+                var startHex = DumpReadStartHex.Trim();
+                if (startHex.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) startHex = startHex[2..];
+                if (startHex.Length == 0) startHex = "0";
+                if (!uint.TryParse(startHex, System.Globalization.NumberStyles.HexNumber, null, out var startAddr))
+                {
+                    MessageBox.Show("Bad start address (hex)");
+                    return;
+                }
+                if (DumpReadLengthKb <= 0)
+                {
+                    MessageBox.Show("Bad length (KB)");
+                    return;
+                }
+                var readLen = (uint)DumpReadLengthKb * 1024;
+                if (startAddr >= chipSize || (ulong)startAddr + readLen > chipSize || readLen == 0)
+                {
+                    MessageBox.Show($"Range must fit within the chip (0..0x{chipSize:X}) and be non-zero");
+                    return;
+                }
+
+                if (!Vm.OmniInstance.CurrentTask.Capture("Reading Memory Dump")) return;
+                LogWriteLine($"Starting dump read: 0x{startAddr:X08}..0x{(startAddr + readLen):X08}...");
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+                var readData = new byte[readLen];
+                uint addr = startAddr;
+                var endAddr = startAddr + readLen;
+                var effectiveChunkSize = LegacyAdapterMode ? LegacyDumpReadChunkSize : DumpReadChunkSize;
+                while (addr < endAddr)
+                {
+                    var chunk = (int)Math.Min(effectiveChunkSize, endAddr - addr);
+                    byte[] data = null;
+                    var ok = false;
+                    // В legacy-режиме потери не стопроцентные, а retry не всегда пробивает за
+                    // 4 попытки - даём больше шансов вместо обрыва всей операции.
+                    var maxAttempts = LegacyAdapterMode ? 20 : 4;
+                    for (var attempt = 0; attempt < maxAttempts; attempt++)
+                    {
+                        if (ReadExtChunk(addr, chunk, out data)) { ok = true; break; }
+                        LogWriteLine($"Retry chunk at 0x{addr:X08} (attempt {attempt + 1})");
+                    }
+                    if (!ok)
+                    {
+                        Vm.OmniInstance.CurrentTask.OnFail($"Can't read chunk at 0x{addr:X08}");
+                        return;
+                    }
+                    Array.Copy(data, 0, readData, addr - startAddr, chunk);
+                    addr += (uint)chunk;
+                    if (LegacyAdapterMode) Thread.Sleep(LegacyInterChunkDelayMs);
+                    Vm.OmniInstance.CurrentTask.PercentComplete = (int)((ulong)(addr - startAddr) * 100 / readLen);
+                    if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested)
+                    {
+                        Vm.OmniInstance.CurrentTask.OnCancel();
+                        return;
+                    }
+                }
+
+                stopwatch.Stop();
+                var seconds = stopwatch.Elapsed.TotalSeconds;
+                var rate = seconds > 0 ? readLen / seconds : 0;
+                LogWriteLine($"Dump read complete in {seconds:F1}s ({rate / 1024:F1} KB/s), choose file to save...");
+                Vm.OmniInstance.CurrentTask.OnDone();
+
+                string savePath = null;
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SaveFileDialog dialog = new() { Filter = "Hex Files|*.hex", FileName = "dump.hex" };
+                    if ((bool)dialog.ShowDialog()) savePath = dialog.FileName;
+                });
+                if (string.IsNullOrEmpty(savePath)) return;
+
+                WriteIntelHexFile(savePath, readData, startAddr);
+                LogWriteLine($"Dump saved to {savePath}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        [RelayCommand]
+        private void ReadDump()
+        {
+            Task.Run(ReadDumpFromMemory);
+        }
+
+        private static void WriteHexRecord(StreamWriter sw, int len, ushort addr, byte type, byte[] payload)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append(':');
+            var sum = 0;
+            void AppendByte(int b) { sb.Append(b.ToString("X2")); sum += b; }
+            AppendByte(len);
+            AppendByte((addr >> 8) & 0xFF);
+            AppendByte(addr & 0xFF);
+            AppendByte(type);
+            foreach (var b in payload) AppendByte(b);
+            var checksum = (byte)(0x100 - (sum & 0xFF));
+            sb.Append(checksum.ToString("X2"));
+            sw.WriteLine(sb.ToString());
+        }
+
+        // Пишет дамп в Intel HEX, пропуская 16-байтные строки из одних 0xFF (нестёртые/неиспользуемые
+        // области чипа), чтобы файл оставался компактным и симметричным записи через WriteDumpToMemory
+        // (которая тоже пропускает чистые 0xFF записи). baseAddress - реальный адрес в чипе, с которого
+        // начинается data (для частичного чтения, не только с нуля).
+        private static void WriteIntelHexFile(string path, byte[] data, uint baseAddress = 0)
+        {
+            using var sw = new StreamWriter(path, false);
+            var lastUpperAddr = uint.MaxValue;
+            const int lineLen = 16;
+            for (var offset = 0; offset < data.Length; offset += lineLen)
+            {
+                var len = Math.Min(lineLen, data.Length - offset);
+                var allFF = true;
+                for (var i = 0; i < len; i++)
+                    if (data[offset + i] != 0xFF) { allFF = false; break; }
+                if (allFF) continue;
+
+                var absAddr = baseAddress + (uint)offset;
+                var upperAddr = absAddr >> 16;
+                if (upperAddr != lastUpperAddr)
+                {
+                    WriteHexRecord(sw, 2, 0, 4, new byte[] { (byte)(upperAddr >> 8), (byte)upperAddr });
+                    lastUpperAddr = upperAddr;
+                }
+
+                var lowerAddr = (ushort)(absAddr & 0xFFFF);
+                var lineData = new byte[len];
+                Array.Copy(data, offset, lineData, 0, len);
+                WriteHexRecord(sw, len, lowerAddr, 0, lineData);
+            }
+            sw.WriteLine(":00000001FF");
         }
 
         [RelayCommand]

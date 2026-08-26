@@ -736,6 +736,46 @@ public partial class Omni : ObservableObject
 
                     break;
                 }
+            case 107: //External flash (memory dump)
+                {
+                    var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
+                    if (m.Data[0] == 1)
+                    {
+                        fw.extFragmentAddress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+                        fw.flagExtSetAdrDone = true;
+                    }
+
+                    if (m.Data[0] == 3)
+                    {
+                        fw.extReceivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
+                        fw.extReceivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
+                        fw.flagExtDataGetDone = true;
+                    }
+
+                    if (m.Data[0] == 5 && m.Data[1] == 0)
+                        fw.flagExtProgramDone = true;
+
+                    if (m.Data[0] == 7 && m.Data[1] == 0)
+                        fw.flagExtEraseDone = true;
+
+                    if (m.Data[0] == 15 && m.Data[1] == 0)
+                        fw.flagExtEraseDone = true;
+
+                    if (m.Data[0] == 17)
+                    {
+                        fw.extBulkReadLen = (uint)(m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3]);
+                        fw.extBulkReadCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
+                        fw.flagExtBulkReadDone = true;
+                    }
+
+                    break;
+                }
+            case 109: //Streamed raw data from external flash bulk read (PGN107 case16)
+                {
+                    var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
+                    fw.AppendExtReadData(m.Data);
+                    break;
+                }
         }
 
         Messages.TryToAdd(m);

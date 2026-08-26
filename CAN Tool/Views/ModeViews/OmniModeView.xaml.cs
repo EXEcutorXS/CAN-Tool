@@ -62,7 +62,14 @@ namespace CAN_Tool.CustomControls
 
         private void MessageHandler(object sender, System.EventArgs args)
         {
-            Dispatcher.Invoke(() =>
+            // InvokeAsync (не Invoke): этот обработчик висит на GotNewMessage и вызывается
+            // синхронно с фонового потока приёма адаптера для КАЖДОГО кадра, независимо от
+            // того, развёрнут ли LogExpander (проверка IsExpanded происходит уже внутри
+            // диспетчеризованного действия). Блокирующий Invoke здесь держал поток приёма на
+            // каждом сообщении и был реальной причиной потери кадров при всплесках (например,
+            // потоковое чтение дампа по PGN109), даже после того как второй обработчик того
+            // же события (NewMessgeReceived) был переведён на неблокирующий Post.
+            Dispatcher.InvokeAsync(() =>
             {
                 if (LogExpander.IsExpanded)
                 {

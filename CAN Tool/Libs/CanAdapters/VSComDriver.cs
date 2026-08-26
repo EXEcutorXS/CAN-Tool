@@ -70,12 +70,19 @@ namespace CAN_Tool.Libs.CanAdapters
 
         private void ReceiveLoop()
         {
-            VSCAN_MSG[] msgs = new VSCAN_MSG[1];
-            uint readbytes = 0;
+            // Читаем пачкой, а не по одному кадру за вызов: при чтении Size=1 каждый кадр
+            // требует отдельного вызова в драйвер (плюс Marshal.AllocHGlobal/FreeHGlobal на
+            // каждый вызов) - при всплеске из сотен кадров подряд (например, потоковое чтение
+            // PGN109) это не поспевает за реальным потоком, и кадры теряются во внутреннем
+            // буфере драйвера ещё до того, как долетают до managed-кода.
+            const uint batchSize = 64;
+            VSCAN_MSG[] msgs = new VSCAN_MSG[batchSize];
+            uint readCount = 0;
             while (true)
             {
-                _canWrapper.Read(ref msgs, 1, ref readbytes);
-                MessageReceived?.Invoke(this, new GotCanMessageEventArgs { receivedMessage = new CanMessage(msgs[0]) });
+                _canWrapper.Read(ref msgs, batchSize, ref readCount);
+                for (var i = 0; i < readCount; i++)
+                    MessageReceived?.Invoke(this, new GotCanMessageEventArgs { receivedMessage = new CanMessage(msgs[i]) });
             }
         }
     }
