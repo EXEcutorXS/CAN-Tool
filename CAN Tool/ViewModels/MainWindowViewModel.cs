@@ -96,12 +96,32 @@ namespace CAN_Tool.ViewModels
         [ObservableProperty] int messageDelay = 100;
 
 
+        // How long a BLE "refresh ports" scan runs before settling on whatever it found -
+        // advertisements arrive roughly a few times a second, so this is comfortably long
+        // enough to catch a nearby PU-28 without making the button feel unresponsive.
+        private static readonly TimeSpan BleScanDuration = TimeSpan.FromSeconds(4);
+
         [RelayCommand]
-        private void RefreshPortList(object Parameter)
+        private async Task RefreshPortList(object Parameter)
         {
             PortList.Clear();
-            foreach (var port in SerialPort.GetPortNames())
-                PortList.Add(port);
+
+            if (CanAdapter.DriverSupportsDeviceScan)
+            {
+                CanAdapter.StartDeviceScan(name =>
+                    UIContext.Post(_ =>
+                    {
+                        if (!PortList.Contains(name)) PortList.Add(name);
+                    }, null));
+                await Task.Delay(BleScanDuration);
+                CanAdapter.StopDeviceScan();
+            }
+            else
+            {
+                foreach (var port in SerialPort.GetPortNames())
+                    PortList.Add(port);
+            }
+
             if (PortList.Count > 0)
                 PortName = PortList[^1];
         }

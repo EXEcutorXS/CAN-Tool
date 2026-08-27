@@ -239,7 +239,8 @@ namespace CAN_Tool
             VSCom,
             Slcan, // named after the wire protocol, not the CANable brand - any SLCAN-compatible adapter works
             PCAN,
-            CandleLight
+            CandleLight,
+            Ble // PU-28 bootloader's BLE-CAN bridge mode - see BleDriver
         }
 
         public Array AdapterTypes => Enum.GetValues(typeof(AdapterType));
@@ -288,11 +289,26 @@ namespace CAN_Tool
                 AdapterType.Slcan => new SlcanDriver(),
                 AdapterType.PCAN => new PcanDriver(),
                 AdapterType.CandleLight => new CandleLightDriver(),
+                AdapterType.Ble => new BleDriver(),
                 _ => throw new ArgumentOutOfRangeException(nameof(adapterType))
             };
 
             driver.MessageReceived += OnDriverMessageReceived;
             return driver;
+        }
+
+        // Lets the UI drive BLE device discovery into the same port-list combo box used
+        // for serial ports, without hard-coding a dependency on BleDriver specifically.
+        public bool DriverSupportsDeviceScan => _driver is IScannableCanAdapterDriver;
+
+        public void StartDeviceScan(Action<string> onDeviceFound)
+        {
+            if (_driver is IScannableCanAdapterDriver scannable) scannable.StartScan(onDeviceFound);
+        }
+
+        public void StopDeviceScan()
+        {
+            if (_driver is IScannableCanAdapterDriver scannable) scannable.StopScan();
         }
 
         private void OnDriverMessageReceived(object sender, GotCanMessageEventArgs e)
