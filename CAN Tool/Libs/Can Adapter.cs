@@ -237,7 +237,7 @@ namespace CAN_Tool
         public enum AdapterType
         {
             VSCom,
-            Canable,
+            Slcan, // named after the wire protocol, not the CANable brand - any SLCAN-compatible adapter works
             PCAN,
             CandleLight
         }
@@ -285,7 +285,7 @@ namespace CAN_Tool
             ICanAdapterDriver driver = adapterType switch
             {
                 AdapterType.VSCom => new VSComDriver(),
-                AdapterType.Canable => new CanableDriver(),
+                AdapterType.Slcan => new SlcanDriver(),
                 AdapterType.PCAN => new PcanDriver(),
                 AdapterType.CandleLight => new CandleLightDriver(),
                 _ => throw new ArgumentOutOfRangeException(nameof(adapterType))

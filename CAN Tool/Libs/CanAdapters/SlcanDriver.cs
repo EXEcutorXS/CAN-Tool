@@ -1,15 +1,20 @@
-﻿using System;
+using System;
 using System.IO.Ports;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CAN_Tool.Libs.CanAdapters
 {
-    public class CanableDriver : ICanAdapterDriver
+    public class SlcanDriver : ICanAdapterDriver
     {
         private readonly SerialPort _port = new();
-        private string _currentBuf = "";
+        private readonly StringBuilder _currentBuf = new();
         private int _speed;
+
+        // If parsing ever falls behind badly enough that no '\r' shows up for this long,
+        // the buffer is garbage (or the device stopped framing) - drop it instead of
+        // growing forever.
+        private const int MaxBufferChars = 16384;
 
         public event EventHandler<GotCanMessageEventArgs> MessageReceived;
 
@@ -75,14 +80,36 @@ namespace CAN_Tool.Libs.CanAdapters
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs args)
         {
-            _currentBuf += _port.ReadExisting();
+            _currentBuf.Append(_port.ReadExisting());
             ProcessBuffer();
         }
 
         private void ProcessBuffer()
         {
-            var splitted = _currentBuf.Split('\r');
-            foreach (var line in splitted)
+            // Only process whole lines that have actually arrived (up to the last '\r'),
+            // and only pay for what's newly consumed - not for rebuilding/resplitting the
+            // whole accumulated buffer on every single receive event. The old version did
+            // "_currentBuf += ..." (copies the entire buffer every call) followed by
+            // Split('\r') over the whole thing again; under any backlog (parsing falling
+            // behind the incoming stream, e.g. on a slow machine) that's O(n^2) and is
+            // exactly why this protocol used to bog down on weak computers while it stayed
+            // fine on fast ones - a fast machine just never builds up enough backlog to
+            // notice.
+            int lastCr = -1;
+            for (var i = _currentBuf.Length - 1; i >= 0; i--)
+            {
+                if (_currentBuf[i] == '\r') { lastCr = i; break; }
+            }
+            if (lastCr < 0)
+            {
+                if (_currentBuf.Length > MaxBufferChars) _currentBuf.Clear(); // no framing char in a very long run - discard garbage
+                return;
+            }
+
+            var complete = _currentBuf.ToString(0, lastCr + 1);
+            _currentBuf.Remove(0, lastCr + 1);
+
+            foreach (var line in complete.Split('\r'))
             {
                 if (line.Length == 0) continue;
                 if (line[0] is 'T' or 't' or 'r' or 'R')
@@ -95,7 +122,6 @@ namespace CAN_Tool.Libs.CanAdapters
                     catch { }
                 }
             }
-            _currentBuf = splitted[^1];
         }
     }
 }
