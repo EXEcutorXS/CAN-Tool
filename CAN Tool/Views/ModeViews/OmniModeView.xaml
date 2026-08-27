@@ -515,6 +515,55 @@
                     <StackPanel />
                 </DockPanel>
             </TabItem>
+            <TabItem DataContext="{Binding ImagesPage}">
+                <TabItem.Header>
+                    <fa:ImageAwesome Icon="Solid_Images" Margin="10" Foreground="{DynamicResource MaterialDesignTextAreaBorder}" Height="40" ToolTip="{DynamicResource b_images}" />
+                </TabItem.Header>
+                <DockPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
+                        <Button Content="{DynamicResource b_load_images}" Margin="10" Command="{Binding LoadImagesCommand}" />
+                        <Button Content="{DynamicResource b_clear_list}" Margin="10" Command="{Binding ClearListCommand}" />
+                        <Button Content="{DynamicResource b_erase_and_send_images}" Margin="10" Command="{Binding SendImagesCommand}" IsEnabled="{Binding IsNotBusy,Mode=OneWay}" />
+                        <Button Content="{DynamicResource b_cancel}" Margin="10" Command="{Binding CancelSendCommand}" IsEnabled="{Binding IsBusy}" />
+                        <ProgressBar Width="200" Height="20" Margin="10" VerticalAlignment="Center" Minimum="0" Maximum="100" Value="{Binding Progress,Mode=OneWay}" />
+                        <CheckBox Content="{DynamicResource b_legacy_slow_mode}" IsChecked="{Binding LegacySlowMode}" VerticalAlignment="Center" Margin="20,10,10,10" ToolTip="{DynamicResource t_legacy_slow_mode_tt}" />
+                    </StackPanel>
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+                        <Border DockPanel.Dock="Right" Width="220" Height="220" Margin="0,0,10,0" BorderBrush="{DynamicResource MaterialDesignTextAreaBorder}" BorderThickness="1" Background="Black">
+                            <Image Source="{Binding PreviewBitmap,Mode=OneWay}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                        </Border>
+                        <DataGrid ItemsSource="{Binding Images,Mode=OneWay}" AutoGenerateColumns="False" CanUserReorderColumns="False" SelectionMode="Single" IsReadOnly="True" MaxHeight="320" Margin="10,0,0,0" RowHeight="56">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="" Width="56">
+                                    <DataGridTemplateColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                                        </Style>
+                                    </DataGridTemplateColumn.CellStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Source="{Binding Thumbnail,Mode=OneWay}" Width="32" Height="48" Stretch="Uniform" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="{DynamicResource t_name}" Binding="{Binding Path=FileName,Mode=OneWay}" Width="*" />
+                                <DataGridTextColumn Header="{DynamicResource t_value}" Binding="{Binding Path=Status,Mode=OneWay}" Width="100" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                    <Separator DockPanel.Dock="Top" Margin="10,10,10,0" />
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10">
+                        <Button Content="{DynamicResource b_load_firmware}" Margin="10" Command="{Binding LoadFirmwareCommand}" />
+                        <TextBlock Text="{Binding FirmwareFileName,Mode=OneWay}" VerticalAlignment="Center" Margin="10" />
+                        <CheckBox Content="{DynamicResource b_patch_firmware_crc}" IsChecked="{Binding PatchFirmwareCrc}" VerticalAlignment="Center" Margin="10" />
+                        <Button Content="{DynamicResource b_send_firmware}" Margin="10" Command="{Binding SendFirmwareCommand}" IsEnabled="{Binding IsNotBusy,Mode=OneWay}" />
+                    </StackPanel>
+                    <TextBox DockPanel.Dock="Top" Text="{Binding Log,Mode=OneWay}" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="20" IsReadOnly="True" FontFamily="Courier New" />
+                    <StackPanel />
+                </DockPanel>
+            </TabItem>
         </TabControl>
     </DockPanel>
 </UserControl>

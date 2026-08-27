@@ -469,8 +469,27 @@
 
 <v:String x:Key="par_571">Ручной режим разбора воды</v:String>
 <v:String x:Key="par_572">Номер датчика зоны для резервного выкл.</v:String>
-
+<v:String x:Key="par_573">Режим с 2 уставками</v:String>
+<v:String x:Key="par_574">Номер главного подогревателя</v:String>
+<v:String x:Key="par_575">Режим CAN2 передатчика(0-RVC,1-Internal)</v:String>
+<v:String x:Key="par_576">Яркость экрана в режиме сна</v:String>
+<v:String x:Key="par_577">Вариант розжига для подогревателя 0</v:String>
+<v:String x:Key="par_578">Вариант розжига для подогревателя 1</v:String>
+<v:String x:Key="par_579">Вариант розжига для подогревателя 2</v:String>
+<v:String x:Key="par_580">Вариант розжига для подогревателя 3</v:String>
+<v:String x:Key="par_581">Вариант розжига для подогревателя 4</v:String>
+<v:String x:Key="par_582">Вариант розжига для подогревателя 5</v:String>
+<v:String x:Key="par_583">Вариант розжига для подогревателя 6</v:String>
+<v:String x:Key="par_584">Название зоны 1</v:String>
+<v:String x:Key="par_585">Название зоны 2</v:String>
+<v:String x:Key="par_586">Название зоны 3</v:String>
+<v:String x:Key="par_587">Название зоны 4</v:String>
+<v:String x:Key="par_588">Название зоны 5</v:String>
+<v:String x:Key="par_589">Эко режим нагревателя</v:String>
+<v:String x:Key="par_590">Режим работы UART(0-DWIN/PU36,1-RS485/Modbus)</v:String>
+<v:String x:Key="par_591">Адрес на шине RS485(для Modbus)</v:String>
 <v:String x:Key="par_600">номер устройства на шине CAN RV-C</v:String>
+<v:String x:Key="par_601">Адрес устройства (SA) на RV-C шине</v:String>
 
 <v:String x:Key="bb_1">счетчик запусков</v:String>
 <v:String x:Key="bb_2">счетчик запусков на вентиляции</v:String>
@@ -1245,4 +1264,13 @@
 <v:String x:Key="t_stop_device_tt">Остановить устройство</v:String>
 <v:String x:Key="t_run_water_pump_tt">Запустить только помпу</v:String>
 <v:String x:Key="t_run_ventilation_tt">Запустить вентиляцию</v:String>
+<v:String x:Key="b_images">Картинки</v:String>
+<v:String x:Key="b_load_images">Загрузить картинки...</v:String>
+<v:String x:Key="b_erase_and_send_images">Стереть и отправить картинки</v:String>
+<v:String x:Key="b_load_firmware">Загрузить прошивку панели...</v:String>
+<v:String x:Key="b_send_firmware">Отправить прошивку</v:String>
+<v:String x:Key="b_patch_firmware_crc">Вписать длину+CRC</v:String>
+<v:String x:Key="b_legacy_slow_mode">Увеличенный интервал</v:String>
+<v:String x:Key="t_legacy_slow_mode_tt">Добавляет небольшие паузы при передаче картинок на старых (&lt;15.5) загрузчиках — для шумной/общей шины CAN. Медленнее, но на тихой шине не требуется.</v:String>
+<v:String x:Key="t_port_not_open">Порт не открыт</v:String>
 </ResourceDictionary>

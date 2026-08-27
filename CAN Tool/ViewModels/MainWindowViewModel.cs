@@ -41,6 +41,7 @@ namespace CAN_Tool.ViewModels
         public ManualPageViewModel ManualPage { set; get; }
         public RvcPageViewModel RvcPage { set; get; }
         public CanPageViewModel CanPage { set; get; }
+        public ImagesPageViewModel ImagesPage { set; get; }
 
 
         [ObservableProperty] private bool canAdapterSettings = false;
@@ -593,6 +594,7 @@ namespace CAN_Tool.ViewModels
             ManualPage = new(this);
             CanPage = new(this);
             RvcPage = new(this);
+            ImagesPage = new(this);
 
             CanAdapter.GotNewMessage += NewMessgeReceived;
             CanAdapter.MessageTransmitted += MessageTransmittedHandler;

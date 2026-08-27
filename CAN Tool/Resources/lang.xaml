@@ -469,8 +469,27 @@
 
 <v:String x:Key="par_571">Manual water heating mode</v:String>
 <v:String x:Key="par_572">The number of the zone  used as a backup switch</v:String>
-
+<v:String x:Key="par_573">Schedule mode</v:String>
+<v:String x:Key="par_574">Main burner number</v:String>
+<v:String x:Key="par_575">CAN2 Mode(0-RVC,1-Internal)</v:String>
+<v:String x:Key="par_576">LCD sleep brightness</v:String>
+<v:String x:Key="par_577">Heater 0 ignition variant</v:String>
+<v:String x:Key="par_578">Heater 1 ignition variant</v:String>
+<v:String x:Key="par_579">Heater 2 ignition variant</v:String>
+<v:String x:Key="par_580">Heater 3 ignition variant</v:String>
+<v:String x:Key="par_581">Heater 4 ignition variant</v:String>
+<v:String x:Key="par_582">Heater 5 ignition variant</v:String>
+<v:String x:Key="par_583">Heater 6 ignition variant</v:String>
+<v:String x:Key="par_584">Zone 1 name</v:String>
+<v:String x:Key="par_585">Zone 2 name</v:String>
+<v:String x:Key="par_586">Zone 3 name</v:String>
+<v:String x:Key="par_587">Zone 4 name</v:String>
+<v:String x:Key="par_588">Zone 5 name</v:String>
+<v:String x:Key="par_589">Heater ECO mode</v:String>
+<v:String x:Key="par_590">UART protocol(0-DWIN/PU36,1-RS485/Modbus)</v:String>
+<v:String x:Key="par_591">Modbus address</v:String>
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
+<v:String x:Key="par_601">RVC_SOURCE_ADDRESS</v:String>
 
 <v:String x:Key="bb_1">Start counter</v:String>
 <v:String x:Key="bb_2">Vent counter</v:String>
@@ -1245,4 +1264,13 @@
 <v:String x:Key="t_stop_device_tt">Stop Device</v:String>
 <v:String x:Key="t_run_water_pump_tt">Run just water pump</v:String>
 <v:String x:Key="t_run_ventilation_tt">Run ventilation</v:String>
+<v:String x:Key="b_images">Images</v:String>
+<v:String x:Key="b_load_images">Load images...</v:String>
+<v:String x:Key="b_erase_and_send_images">Erase and send images</v:String>
+<v:String x:Key="b_load_firmware">Load panel firmware...</v:String>
+<v:String x:Key="b_send_firmware">Send firmware</v:String>
+<v:String x:Key="b_patch_firmware_crc">Patch length+CRC</v:String>
+<v:String x:Key="b_legacy_slow_mode">Slower interval</v:String>
+<v:String x:Key="t_legacy_slow_mode_tt">Adds small delays on the legacy (&lt;15.5) image transfer for a noisy/shared CAN bus. Slower, but a quiet bus doesn't need it.</v:String>
+<v:String x:Key="t_port_not_open">Port is not open</v:String>
 </ResourceDictionary>

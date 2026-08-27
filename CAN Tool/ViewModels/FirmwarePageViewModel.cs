@@ -339,6 +339,7 @@ namespace CAN_Tool.ViewModels
                     msg.Data[6] = f.Data[i * 8 + 6];
                     msg.Data[7] = f.Data[i * 8 + 7];
                     Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                    //Task.Delay(1).Wait(); // Enough for bootloader to process one 8-byte CAN frame
 
                 }
                 if (CheckTransmittedData(len, crc)) break;

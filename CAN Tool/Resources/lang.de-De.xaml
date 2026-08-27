@@ -469,8 +469,27 @@
 
 <v:String x:Key="par_571">Manueller Warmwassermodus</v:String>
 <v:String x:Key="par_572">Zonenreserve-Abschaltsensor-Nummer</v:String>
-
+<v:String x:Key="par_573">Modus mit 2 Sollwerten</v:String>
+<v:String x:Key="par_574">Hauptheizgerät-Nummer</v:String>
+<v:String x:Key="par_575">CAN2-Modus(0-RVC,1-Intern)</v:String>
+<v:String x:Key="par_576">LCD-Helligkeit im Ruhemodus</v:String>
+<v:String x:Key="par_577">Zündvariante Heizgerät 0</v:String>
+<v:String x:Key="par_578">Zündvariante Heizgerät 1</v:String>
+<v:String x:Key="par_579">Zündvariante Heizgerät 2</v:String>
+<v:String x:Key="par_580">Zündvariante Heizgerät 3</v:String>
+<v:String x:Key="par_581">Zündvariante Heizgerät 4</v:String>
+<v:String x:Key="par_582">Zündvariante Heizgerät 5</v:String>
+<v:String x:Key="par_583">Zündvariante Heizgerät 6</v:String>
+<v:String x:Key="par_584">Zone 1 Name</v:String>
+<v:String x:Key="par_585">Zone 2 Name</v:String>
+<v:String x:Key="par_586">Zone 3 Name</v:String>
+<v:String x:Key="par_587">Zone 4 Name</v:String>
+<v:String x:Key="par_588">Zone 5 Name</v:String>
+<v:String x:Key="par_589">Heizgerät-ECO-Modus</v:String>
+<v:String x:Key="par_590">UART-Protokoll(0-DWIN/PU36,1-RS485/Modbus)</v:String>
+<v:String x:Key="par_591">Modbus-Adresse</v:String>
 <v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
+<v:String x:Key="par_601">RVC_SOURCE_ADDRESS</v:String>
 
 <v:String x:Key="bb_1">Startanzahl</v:String>
 <v:String x:Key="bb_2">Belüftungsstarts</v:String>
@@ -1245,4 +1264,13 @@
 <v:String x:Key="t_stop_device_tt">Gerät stoppen</v:String>
 <v:String x:Key="t_run_water_pump_tt">Nur Wasserpumpe starten</v:String>
 <v:String x:Key="t_run_ventilation_tt">Belüftung starten</v:String>
+<v:String x:Key="b_images">Bilder</v:String>
+<v:String x:Key="b_load_images">Bilder laden...</v:String>
+<v:String x:Key="b_erase_and_send_images">Bilder löschen und senden</v:String>
+<v:String x:Key="b_load_firmware">Panel-Firmware laden...</v:String>
+<v:String x:Key="b_send_firmware">Firmware senden</v:String>
+<v:String x:Key="b_patch_firmware_crc">Länge+CRC eintragen</v:String>
+<v:String x:Key="b_legacy_slow_mode">Langsameres Intervall</v:String>
+<v:String x:Key="t_legacy_slow_mode_tt">Fügt beim Legacy-Bildtransfer (&lt;15.5) kleine Pausen ein - für einen belegten/verrauschten CAN-Bus. Langsamer, aber auf einem ruhigen Bus nicht nötig.</v:String>
+<v:String x:Key="t_port_not_open">Port ist nicht geöffnet</v:String>
 </ResourceDictionary>

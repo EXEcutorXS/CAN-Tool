@@ -469,8 +469,27 @@ par_570	Aux Heater on by tank temperature(domestic water)	уставка тем�
 			
 par_571	Manual water heating mode	Ручной режим разбора воды	Manueller Warmwassermodus
 par_572	The number of the zone  used as a backup switch	Номер датчика зоны для резервного выкл.	Zonenreserve-Abschaltsensor-Nummer
-			
+par_573	Schedule mode	Режим с 2 уставками	Modus mit 2 Sollwerten
+par_574	Main burner number	Номер главного подогревателя	Hauptheizgerät-Nummer
+par_575	CAN2 Mode(0-RVC,1-Internal)	Режим CAN2 передатчика(0-RVC,1-Internal)	CAN2-Modus(0-RVC,1-Intern)
+par_576	LCD sleep brightness	Яркость экрана в режиме сна	LCD-Helligkeit im Ruhemodus
+par_577	Heater 0 ignition variant	Вариант розжига для подогревателя 0	Zündvariante Heizgerät 0
+par_578	Heater 1 ignition variant	Вариант розжига для подогревателя 1	Zündvariante Heizgerät 1
+par_579	Heater 2 ignition variant	Вариант розжига для подогревателя 2	Zündvariante Heizgerät 2
+par_580	Heater 3 ignition variant	Вариант розжига для подогревателя 3	Zündvariante Heizgerät 3
+par_581	Heater 4 ignition variant	Вариант розжига для подогревателя 4	Zündvariante Heizgerät 4
+par_582	Heater 5 ignition variant	Вариант розжига для подогревателя 5	Zündvariante Heizgerät 5
+par_583	Heater 6 ignition variant	Вариант розжига для подогревателя 6	Zündvariante Heizgerät 6
+par_584	Zone 1 name	Название зоны 1	Zone 1 Name
+par_585	Zone 2 name	Название зоны 2	Zone 2 Name
+par_586	Zone 3 name	Название зоны 3	Zone 3 Name
+par_587	Zone 4 name	Название зоны 4	Zone 4 Name
+par_588	Zone 5 name	Название зоны 5	Zone 5 Name
+par_589	Heater ECO mode	Эко режим нагревателя	Heizgerät-ECO-Modus
+par_590	UART protocol(0-DWIN/PU36,1-RS485/Modbus)	Режим работы UART(0-DWIN/PU36,1-RS485/Modbus)	UART-Protokoll(0-DWIN/PU36,1-RS485/Modbus)
+par_591	Modbus address	Адрес на шине RS485(для Modbus)	Modbus-Adresse
 par_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C	RVC_DEVICE_INSTANCE
+par_601	RVC_SOURCE_ADDRESS	Адрес устройства (SA) на RV-C шине	RVC_SOURCE_ADDRESS
 			
 bb_1	Start counter	счетчик запусков	Startanzahl
 bb_2	Vent counter	счетчик запусков на вентиляции	Belüftungsstarts
@@ -1245,3 +1264,12 @@ t_run_device_tt	Run Device	Запустить устройство	Gerät starte
 t_stop_device_tt	Stop Device	Остановить устройство	Gerät stoppen
 t_run_water_pump_tt	Run just water pump	Запустить только помпу	Nur Wasserpumpe starten
 t_run_ventilation_tt	Run ventilation	Запустить вентиляцию	Belüftung starten
+b_images	Images	Картинки	Bilder
+b_load_images	Load images...	Загрузить картинки...	Bilder laden...
+b_erase_and_send_images	Erase and send images	Стереть и отправить картинки	Bilder löschen und senden
+b_load_firmware	Load panel firmware...	Загрузить прошивку панели...	Panel-Firmware laden...
+b_send_firmware	Send firmware	Отправить прошивку	Firmware senden
+b_patch_firmware_crc	Patch length+CRC	Вписать длину+CRC	Länge+CRC eintragen
+b_legacy_slow_mode	Slower interval	Увеличенный интервал	Langsameres Intervall
+t_legacy_slow_mode_tt	Adds small delays on the legacy (<15.5) image transfer for a noisy/shared CAN bus. Slower, but a quiet bus doesn't need it.	Добавляет небольшие паузы при передаче картинок на старых (<15.5) загрузчиках — для шумной/общей шины CAN. Медленнее, но на тихой шине не требуется.	Fügt beim Legacy-Bildtransfer (<15.5) kleine Pausen ein - für einen belegten/verrauschten CAN-Bus. Langsamer, aber auf einem ruhigen Bus nicht nötig.
+t_port_not_open	Port is not open	Порт не открыт	Port ist nicht geöffnet
