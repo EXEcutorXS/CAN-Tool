@@ -48,6 +48,7 @@ b_firmware	Firmware	Прошивка	Firmware
 b_load_hex	Load HEX	Загрузить HEX	HEX laden
 b_auto_update	AUTO	АВТО	AUTO
 b_burn	Program	Прошить	Programmieren
+b_burn_v3	Program(gen. 3)	Прошить(3-е поколение)	Programmieren (3. Generation)
 b_burn_old	Program(obsolete)	Прошить(старый загрузчик)	Programmieren (veraltet)
 b_verify_crc	Verify by CRC	Проверить по CRC	CRC prüfen
 b_verify_bytes	Verify byte-by-byte	Проверить побайтно	Byteweise prüfen

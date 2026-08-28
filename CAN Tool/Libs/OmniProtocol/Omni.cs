@@ -674,68 +674,11 @@ public partial class Omni : ObservableObject
                     break;
                 }
             case 105:
-                {
-                    var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
-                    if (m.Data[0] == 1)
-                    {
-                        fw.fragmentAddress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
-                        Debug.WriteLine($"Adress set to 0X{fw.fragmentAddress:X}");
-                        fw.flagSetAdrDone = true;
-                    }
-
-                    if (m.Data[0] == 3)
-                    {
-                        fw.receivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
-                        fw.receivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
-                        Debug.WriteLine($"Data fragment len:{fw.receivedFragmentLength},CRC:{fw.receivedFragmentCrc:X}");
-                        fw.flagDataGetDone = true;
-                    }
-
-                    if (m.Data[0] == 5)
-                    {
-                        if (m.Data[1] == 0)
-                        {
-                            Debug.WriteLine("Flash fragment successed");
-                            fw.flagProgramDone = true;
-                        }
-                        else
-                            Debug.WriteLine("Flash fragment failed");
-                    }
-
-                    if (m.Data[0] == 7)
-                    {
-                        if (m.Data[1] == 0)
-                        {
-                            Debug.WriteLine("Memory erase confirmed");
-                            fw.flagEraseDone = true;
-                        }
-                        else
-                            Debug.WriteLine("Memory erase fail");
-                    }
-
-                    if (m.Data[0] == 9)
-                    {
-                        fw.readResultOk = m.Data[1] == 0;
-                        // D[2]=data>>24, D[3]=data>>16, D[4]=data>>8, D[5]=data&0xFF
-                        // where data = *(uint32_t*)adr — ARM little-endian, byte[addr] is LSB.
-                        // Reassembling in the same order gives the original uint32 value.
-                        fw.readResultData = m.Data[2] * 0x1000000U + m.Data[3] * 0x10000U
-                                          + m.Data[4] * 0x100U + m.Data[5];
-                        Debug.WriteLine($"Read response: ok={fw.readResultOk}, data=0x{fw.readResultData:X08}");
-                        fw.flagReadDone = true;
-                    }
-
-                    if (m.Data[0] == 11)
-                    {
-                        fw.verifyResultOk = m.Data[1] == 0;
-                        fw.verifyResultCrc = m.Data[2] * 0x1000000U + m.Data[3] * 0x10000U
-                                           + m.Data[4] * 0x100U + m.Data[5];
-                        Debug.WriteLine($"Verify response: ok={fw.verifyResultOk}, CRC=0x{fw.verifyResultCrc:X08}");
-                        fw.flagVerifyDone = true;
-                    }
-
-                    break;
-                }
+                DecodeFragmentProtocolResponse(m);
+                break;
+            case 110: //3-е поколение протокола прошивки (PGN110/111) - формат ответов идентичен 105
+                DecodeFragmentProtocolResponse(m);
+                break;
             case 107: //External flash (memory dump)
                 {
                     var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
@@ -780,6 +723,71 @@ public partial class Omni : ObservableObject
 
         Messages.TryToAdd(m);
 
+    }
+
+    // Общий разбор ответов протокола фрагментов прошивки - формат байт (тег/длина/CRC/статус)
+    // одинаков у PGN105 и PGN110 (3-е поколение), меняется только сам PGN и то, каким
+    // алгоритмом отправитель посчитал CRC (это уже решается на стороне FirmwarePageViewModel).
+    private void DecodeFragmentProtocolResponse(OmniMessage m)
+    {
+        var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
+        if (m.Data[0] == 1)
+        {
+            fw.fragmentAddress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
+            Debug.WriteLine($"Adress set to 0X{fw.fragmentAddress:X}");
+            fw.flagSetAdrDone = true;
+        }
+
+        if (m.Data[0] == 3)
+        {
+            fw.receivedFragmentLength = m.Data[1] * 0x10000 + m.Data[2] * 0x100 + m.Data[3];
+            fw.receivedFragmentCrc = m.Data[4] * 0x1000000U + m.Data[5] * 0x10000U + m.Data[6] * 0x100U + m.Data[7];
+            Debug.WriteLine($"Data fragment len:{fw.receivedFragmentLength},CRC:{fw.receivedFragmentCrc:X}");
+            fw.flagDataGetDone = true;
+        }
+
+        if (m.Data[0] == 5)
+        {
+            if (m.Data[1] == 0)
+            {
+                Debug.WriteLine("Flash fragment successed");
+                fw.flagProgramDone = true;
+            }
+            else
+                Debug.WriteLine("Flash fragment failed");
+        }
+
+        if (m.Data[0] == 7)
+        {
+            if (m.Data[1] == 0)
+            {
+                Debug.WriteLine("Memory erase confirmed");
+                fw.flagEraseDone = true;
+            }
+            else
+                Debug.WriteLine("Memory erase fail");
+        }
+
+        if (m.Data[0] == 9)
+        {
+            fw.readResultOk = m.Data[1] == 0;
+            // D[2]=data>>24, D[3]=data>>16, D[4]=data>>8, D[5]=data&0xFF
+            // где data = *(uint32_t*)adr - ARM little-endian, byte[addr] это LSB.
+            // Собираем в том же порядке, чтобы получить исходное значение uint32.
+            fw.readResultData = m.Data[2] * 0x1000000U + m.Data[3] * 0x10000U
+                              + m.Data[4] * 0x100U + m.Data[5];
+            Debug.WriteLine($"Read response: ok={fw.readResultOk}, data=0x{fw.readResultData:X08}");
+            fw.flagReadDone = true;
+        }
+
+        if (m.Data[0] == 11)
+        {
+            fw.verifyResultOk = m.Data[1] == 0;
+            fw.verifyResultCrc = m.Data[2] * 0x1000000U + m.Data[3] * 0x10000U
+                               + m.Data[4] * 0x100U + m.Data[5];
+            Debug.WriteLine($"Verify response: ok={fw.verifyResultOk}, CRC=0x{fw.verifyResultCrc:X08}");
+            fw.flagVerifyDone = true;
+        }
     }
 
     public void ProcessUartMessage(byte[] buf)

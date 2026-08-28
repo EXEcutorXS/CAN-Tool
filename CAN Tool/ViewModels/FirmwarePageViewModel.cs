@@ -406,27 +406,18 @@ namespace CAN_Tool.ViewModels
         // use the same padded size, not f.Length.
         private static int VerifyLen(CodeFragment f) => (f.Length + 7) / 8 * 8;
 
-        private static uint CalcFragmentCrc(CodeFragment f)
-        {
-            uint crc = 0;
-            var totalLen = VerifyLen(f);
-            for (var i = 0; i < totalLen; i++)
-            {
-                crc += f.Data[i] * 170771U;
-                crc ^= (crc >> 16) & 0xFFFFU;
-            }
-            return crc;
-        }
-
         // Returns true=match, false=CRC mismatch, null=no response (abort)
+        // Проверка по CRC доступна только с загрузчика build 13+ (см. VerifyFirmwareCommand),
+        // а с этой версии загрузчик уже понимает PGN110 - поэтому используем его вместе с
+        // настоящим CRC32 (Crc32() ниже) вместо старого слабого алгоритма PGN105/10.
         private bool? VerifyFragment(CodeFragment f)
         {
             var verifyLen = VerifyLen(f);
-            var expectedCrc = CalcFragmentCrc(f);
+            var expectedCrc = Crc32(f.Data, verifyLen);
 
             OmniMessage msg = new()
             {
-                Pgn = 105,
+                Pgn = 110,
                 ReceiverId = new(123, 0),
                 Data =
                 {
@@ -601,6 +592,237 @@ namespace CAN_Tool.ViewModels
             Vm.OmniInstance.CurrentTask.OnDone();
             return mismatchCount == 0;
         }
+
+        #region thirdGenerationBootloader (PGN110/111)
+
+        // Загрузчики с этой сборки (BootFirmware[3], VER_ASSEMBLAGE_NUMBER) и новее понимают
+        // протокол 3-го поколения (PGN110/111). Используется в RunAutoUpdate для выбора протокола.
+        private const byte Gen3MinBootBuild = 13;
+
+        // CRC-32/ISO-HDLC (poly 0xEDB88320, init/final 0xFFFFFFFF) - тот же алгоритм, что
+        // Crc32() в прошивке (messages.cpp), используется вместо старого слабого счётчика
+        // ("x*170771 ^ (x>>16)") в PGN105/2 и PGN105/10.
+        private static uint Crc32(byte[] data, int length)
+        {
+            uint crc = 0xFFFFFFFFu;
+            for (var i = 0; i < length; i++)
+            {
+                crc ^= data[i];
+                for (var b = 0; b < 8; b++)
+                    crc = (crc & 1) != 0 ? (crc >> 1) ^ 0xEDB88320u : (crc >> 1);
+            }
+            return crc ^ 0xFFFFFFFFu;
+        }
+
+        private async Task EraseFlash110()
+        {
+            OmniMessage msg = new();
+            msg.Pgn = 110;
+            msg.ReceiverId.Type = 123;
+            msg.Data[0] = 6;
+            msg.Data[1] = 1; // режим 1: только основная программа (настройки/чёрные ящики не трогаются)
+            Debug.WriteLine("Отправляем запрос на стирание (PGN110)");
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+            flagEraseDone = false;
+        }
+
+        private async Task StartFlashing110()
+        {
+            OmniMessage msg = new();
+            msg.Pgn = 110;
+            msg.ReceiverId.Type = 123;
+            msg.Data[0] = 4;
+            Vm.CanAdapter.Transmit(msg.ToCanMessage());
+        }
+
+        private bool CheckTransmittedData110(int len, uint crc)
+        {
+            OmniMessage msg = new()
+            {
+                Pgn = 110,
+                ReceiverId = new(123, 0),
+                Data =
+                {
+                    [0] = 2
+                }
+            };
+
+            for (var i = 0; i < 6; i++)
+            {
+                flagDataGetDone = false;
+                if (i == 5)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_check_transmission"));
+                    return false;
+                }
+                Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                WaitForFlag(ref flagDataGetDone, 100);
+
+                LogWriteLine($"Len:{receivedFragmentLength},CRC32:0x{receivedFragmentCrc:X08}");
+                if (crc == receivedFragmentCrc && len == receivedFragmentLength)
+                    return true;
+
+                Debug.WriteLine($"CRC32 mismatch: expected {crc:X08}, got {receivedFragmentCrc:X08}");
+                LogWriteLine(GetString("t_transmission_failed"));
+                return false;
+            }
+            return false;
+        }
+
+        private async Task SetFragmentAdr110(CodeFragment f)
+        {
+            OmniMessage msg = new()
+            {
+                Pgn = 110,
+                ReceiverId = new(123, 0),
+                Data =
+                {
+                    [0] = 0,
+                    [1] = (byte)(f.StartAddress >> 24),
+                    [2] = (byte)(f.StartAddress >> 16),
+                    [3] = (byte)(f.StartAddress >> 8),
+                    [4] = (byte)(f.StartAddress >> 0)
+                }
+            };
+
+            for (var i = 0; i < 4; i++)
+            {
+                flagSetAdrDone = false;
+                if (i == 3)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_set_address"));
+                    return;
+                }
+                Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                if (!WaitForFlag(ref flagSetAdrDone, 300)) continue;
+                if (fragmentAddress == f.StartAddress)
+                    break;
+            }
+        }
+
+        private async void WriteFragmentToRam110(CodeFragment f)
+        {
+            OmniMessage msg = new()
+            {
+                Pgn = 111,
+                ReceiverId = new(123, 0),
+            };
+            LogWrite($"Fragment {f.StartAddress:X08}...");
+            for (var k = 0; k < 16; k++)
+            {
+                SetFragmentAdr110(f);
+
+                if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested)
+                    return;
+
+                if (k == 15)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_transmit_data"));
+                    Debug.WriteLine($"Превышено число попыток передачи");
+                    return;
+                }
+                if (k > 0)
+                {
+                    LogWriteLine($"Try: {k + 1}");
+                }
+                receivedFragmentCrc = 0;
+                receivedFragmentLength = 0;
+
+                // Бутлоадер буферизует ровно то, что получил в 8-байтных кадрах (без фильтрации
+                // хвоста), поэтому локальный CRC32 считаем по тем же дополненным до границы 8
+                // байт данным (см. VerifyLen/CalcFragmentCrc ниже - тот же приём для новой КС).
+                var len = VerifyLen(f);
+                for (var i = 0; i < len / 8; i++)
+                {
+                    for (var j = 0; j < 8; j++)
+                        msg.Data[j] = f.Data[i * 8 + j];
+                    Vm.CanAdapter.Transmit(msg.ToCanMessage());
+                }
+                var crc = Crc32(f.Data, len);
+                if (CheckTransmittedData110(len, crc)) break;
+            }
+        }
+
+        private async Task FlashFragment110(CodeFragment f)
+        {
+            WriteFragmentToRam110(f);
+            for (var i = 0; i < 4; i++)
+            {
+                flagProgramDone = false;
+                if (i == 3)
+                {
+                    Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_flash_memory"));
+                    return;
+                }
+                StartFlashing110();
+                if (WaitForFlag(ref flagProgramDone, 100))
+                    break;
+            }
+        }
+
+        private async void UpdateFirmware110(List<CodeFragment> fragmentsArg)
+        {
+            try
+            {
+                if (fragmentsArg.Count == 0)
+                {
+                    MessageBox.Show(GetString("t_load_hex_first"));
+                    return;
+                }
+                LogWriteLine(GetString("t_starting_firmware_update"));
+                if (!Vm.OmniInstance.CurrentTask.Capture("Memory Erasing")) return;
+                LogWriteLine(GetString("t_starting_flash_erase"));
+                for (var i = 0; i < 4; i++)
+                {
+                    if (i == 3)
+                    {
+                        Vm.OmniInstance.CurrentTask.OnFail(GetString("t_cant_erase_memory"));
+                        return;
+                    }
+
+                    await EraseFlash110();
+                    if (WaitForFlag(ref flagEraseDone, 5000)) break;
+                }
+
+                Vm.OmniInstance.CurrentTask.OnDone();
+
+                Vm.OmniInstance.CurrentTask.Capture("Programming");
+
+                var cnt = 0;
+                foreach (var f in fragmentsArg)
+                {
+                    FlashFragment110(f);
+                    Vm.OmniInstance.CurrentTask.PercentComplete = cnt++ * 100 / fragmentsArg.Count;
+                    if (Vm.OmniInstance.CurrentTask.Cts.IsCancellationRequested) return;
+                }
+                LogWriteLine(GetString("t_firmware_update_success"));
+                Vm.OmniInstance.CurrentTask.OnDone();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        [RelayCommand]
+        private void UpdateFirmware110()
+        {
+            if (fragments.Count == 0)
+            {
+                MessageBox.Show(GetString("t_load_hex_first"));
+                return;
+            }
+            var dev = Vm?.OmniInstance?.SelectedConnectedDevice;
+            if (dev == null || dev.Id.Type != 123 || dev.BootFirmware[0] != 123 || dev.BootFirmware[3] < Gen3MinBootBuild)
+            {
+                MessageBox.Show($"Gen.3 protocol requires bootloader (type 123) version 123.0.0.{Gen3MinBootBuild} or newer.",
+                                "Unsupported bootloader", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            Task.Run(() => UpdateFirmware110(fragments));
+        }
+
+        #endregion
 
         #region oldVersionBootloader
 
@@ -1565,10 +1787,15 @@ namespace CAN_Tool.ViewModels
         [RelayCommand]
         private void VerifyFirmware()
         {
-            var dev = Vm?.OmniInstance?.SelectedConnectedDevice;
-            if (dev == null || dev.BootFirmware[0] != 123 || dev.BootFirmware[3] < 13)
+            if (fragments.Count == 0)
             {
-                MessageBox.Show("CRC verification requires bootloader version 123.0.0.13 or newer.",
+                MessageBox.Show(GetString("t_load_hex_first"));
+                return;
+            }
+            var dev = Vm?.OmniInstance?.SelectedConnectedDevice;
+            if (dev == null || dev.Id.Type != 123 || dev.BootFirmware[0] != 123 || dev.BootFirmware[3] < Gen3MinBootBuild)
+            {
+                MessageBox.Show($"CRC verification (PGN110/CRC32) requires bootloader version 123.0.0.{Gen3MinBootBuild} or newer.",
                                 "Unsupported bootloader", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -1655,6 +1882,8 @@ namespace CAN_Tool.ViewModels
                 var boot = omni.SelectedConnectedDevice;
                 if (boot != null && boot.BootFirmware[0] == 123 && boot.BootFirmware[3] <= 4)
                     UpdateFirmwareOld(fragments);
+                else if (boot != null && boot.BootFirmware[0] == 123 && boot.BootFirmware[3] >= Gen3MinBootBuild)
+                    UpdateFirmware110(fragments);
                 else
                     UpdateFirmware(fragments);
 

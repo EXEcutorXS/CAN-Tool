@@ -287,6 +287,23 @@ namespace CAN_Tool.ViewModels.Converters
     }
 
 
+    // Показывает элемент только для загрузчика версии 123.X.3.X (ПУ28) - BootFirmware[0]=123
+    // (тип "загрузчик"), BootFirmware[2]=3 (ПУ28-подтип). Voltage[1] и build[3] не важны.
+    public class Pu28BootloaderToVisible : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is BindingList<int> { Count: 4 } v && v[0] == 123 && v[2] == 3)
+                return Visibility.Visible;
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
     public class PlanarToVisibleConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

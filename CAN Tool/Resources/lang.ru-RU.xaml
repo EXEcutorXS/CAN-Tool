@@ -48,6 +48,7 @@
 <v:String x:Key="b_load_hex">Загрузить HEX</v:String>
 <v:String x:Key="b_auto_update">АВТО</v:String>
 <v:String x:Key="b_burn">Прошить</v:String>
+<v:String x:Key="b_burn_v3">Прошить(3-е поколение)</v:String>
 <v:String x:Key="b_burn_old">Прошить(старый загрузчик)</v:String>
 <v:String x:Key="b_verify_crc">Проверить по CRC</v:String>
 <v:String x:Key="b_verify_bytes">Проверить побайтно</v:String>

@@ -486,6 +486,7 @@
                         <Button Content="{DynamicResource b_load_hex}" Margin="10" Command="{Binding LoadHexCommand}" />
                         <Button Content="{DynamicResource b_switch_to_boot}" Margin="10" Command="{Binding SwitchToBootLoaderCommand}" />
                         <Button Content="{DynamicResource b_burn}" Margin="10" Command="{Binding UpdateFirmwareCommand}" />
+                        <Button Content="{DynamicResource b_burn_v3}" Margin="10" Command="{Binding UpdateFirmware110Command}" />
                         <Button Content="{DynamicResource b_burn_old}" Margin="10" Command="{Binding UpdateFirmwareOldCommand}" />
                         <Button Content="{DynamicResource b_switch_to_main_program}" Margin="10" Command="{Binding SwitchToMainProgramCommand}" />
                         <Button Content="{DynamicResource b_verify_crc}" Margin="10" Command="{Binding VerifyFirmwareCommand}" />
@@ -493,7 +494,10 @@
                         <Button Content="{DynamicResource b_find_boot}" Margin="10" Command="{Binding RequestBootLoaderVersionCommand}" />
                         <Button Content="{DynamicResource b_get_version}" Margin="10" Command="{Binding GetVersionCommand}" />
                     </WrapPanel>
-                    <WrapPanel DockPanel.Dock="Top" Margin="10">
+                    <Separator DockPanel.Dock="Top" Margin="10,0,10,0"
+                               Visibility="{Binding Vm.OmniInstance.SelectedConnectedDevice.BootFirmware, Converter={StaticResource OnlyForPu28Bootloader}}" />
+                    <WrapPanel DockPanel.Dock="Top" Margin="10"
+                               Visibility="{Binding Vm.OmniInstance.SelectedConnectedDevice.BootFirmware, Converter={StaticResource OnlyForPu28Bootloader}}">
                         <Button Content="{DynamicResource b_erase_memory}" Margin="10" Command="{Binding EraseMemoryCommand}" />
                         <Button Content="{DynamicResource b_load_dump_hex}" Margin="10" Command="{Binding LoadDumpHexCommand}" />
                         <Button Content="{DynamicResource b_write_dump}" Margin="10" Command="{Binding WriteDumpToMemoryCommand}" />
@@ -506,7 +510,10 @@
                         </StackPanel>
                         <Button Content="{DynamicResource b_read_dump}" Margin="10" Command="{Binding ReadDumpCommand}" />
                     </WrapPanel>
-                    <WrapPanel DockPanel.Dock="Top" Margin="10">
+                    <Separator DockPanel.Dock="Top" Margin="10,0,10,0"
+                               Visibility="{Binding Vm.OmniInstance.SelectedConnectedDevice.BootFirmware, Converter={StaticResource OnlyForPu28Bootloader}}" />
+                    <WrapPanel DockPanel.Dock="Top" Margin="10"
+                               Visibility="{Binding Vm.OmniInstance.SelectedConnectedDevice.BootFirmware, Converter={StaticResource OnlyForPu28Bootloader}}">
                         <TextBlock Text="Slot:" VerticalAlignment="Center" Margin="10,0,5,0" />
                         <ComboBox Width="50" SelectedIndex="{Binding SlotIndex}" VerticalAlignment="Center">
                             <ComboBoxItem Content="0" />
