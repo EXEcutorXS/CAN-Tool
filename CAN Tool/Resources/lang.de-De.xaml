@@ -93,6 +93,8 @@
 <v:String x:Key="t_auto_done">Auto updating done</v:String>
 <v:String x:Key="t_bootloader_already_on_bus">Ein Bootloader ist bereits am Bus. Programmierung abgebrochen.</v:String>
 <v:String x:Key="t_bootloader_conflict_title">Bootloader-Konflikt</v:String>
+<v:String x:Key="t_vulnerable_mbc_on_bus">Ein MBC-2 mit anfälliger Firmware (125.0.0.5 - 125.0.0.15) ist am Bus vorhanden. Er würde fälschlicherweise zusammen mit dem zu programmierenden Gerät in den Bootloader wechseln und beide beschädigen. Aktualisieren Sie zuerst den MBC-2.</v:String>
+<v:String x:Key="t_vulnerable_mbc_title">MBC-2 Update erforderlich</v:String>
 <v:String x:Key="t_delay">Verzögerung</v:String>
 <v:String x:Key="t_value">Wert</v:String>
 <v:String x:Key="t_description">Beschreibung</v:String>

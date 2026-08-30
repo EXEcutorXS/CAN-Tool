@@ -93,6 +93,8 @@
 <v:String x:Key="t_auto_done">Auto updating done</v:String>
 <v:String x:Key="t_bootloader_already_on_bus">A bootloader is already present on the bus. Programming aborted to prevent flash corruption.</v:String>
 <v:String x:Key="t_bootloader_conflict_title">Bootloader conflict</v:String>
+<v:String x:Key="t_vulnerable_mbc_on_bus">An MBC-2 with vulnerable firmware (125.0.0.5 - 125.0.0.15) is present on the bus. It would wrongly enter the bootloader together with the flashed device and corrupt both. Update the MBC-2 first.</v:String>
+<v:String x:Key="t_vulnerable_mbc_title">MBC-2 update required</v:String>
 <v:String x:Key="t_delay">Delay</v:String>
 <v:String x:Key="t_value">Value</v:String>
 <v:String x:Key="t_description">Description</v:String>

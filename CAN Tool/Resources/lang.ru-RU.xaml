@@ -93,6 +93,8 @@
 <v:String x:Key="t_auto_done">Автоматическое обновление ПО завершено</v:String>
 <v:String x:Key="t_bootloader_already_on_bus">На шине уже присутствует загрузчик. Программирование прервано во избежание порчи прошивки.</v:String>
 <v:String x:Key="t_bootloader_conflict_title">Конфликт загрузчиков</v:String>
+<v:String x:Key="t_vulnerable_mbc_on_bus">На шине обнаружен MBC-2 с уязвимой прошивкой (125.0.0.5 - 125.0.0.15). Он ошибочно перейдёт в загрузчик вместе с прошиваемым устройством, что приведёт к порче обоих. Сначала обновите MBC-2.</v:String>
+<v:String x:Key="t_vulnerable_mbc_title">Требуется обновление MBC-2</v:String>
 <v:String x:Key="t_delay">Задержка</v:String>
 <v:String x:Key="t_value">Значение</v:String>
 <v:String x:Key="t_description">Описание</v:String>

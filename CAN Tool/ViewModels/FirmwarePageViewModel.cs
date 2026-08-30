@@ -117,6 +117,12 @@ namespace CAN_Tool.ViewModels
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+            if (VulnerableMbcOnBus(Vm.OmniInstance.SelectedConnectedDevice))
+            {
+                MessageBox.Show(GetString("t_vulnerable_mbc_on_bus"), GetString("t_vulnerable_mbc_title"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             OmniMessage msg = new();
             msg.Pgn = 1;
             msg.ReceiverId.Address = Vm.OmniInstance.SelectedConnectedDevice.Id.Address;
@@ -1848,6 +1854,12 @@ namespace CAN_Tool.ViewModels
                         MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+                if (VulnerableMbcOnBus(omni.SelectedConnectedDevice))
+                {
+                    MessageBox.Show(GetString("t_vulnerable_mbc_on_bus"), GetString("t_vulnerable_mbc_title"),
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
                 // Запоминаем исходный тип устройства перед входом в загрузчик
                 var originalDeviceType = omni.SelectedConnectedDevice?.Id.Type ?? -1;
@@ -1933,6 +1945,31 @@ namespace CAN_Tool.ViewModels
             bool found = false;
             Application.Current.Dispatcher.Invoke(() =>
                 found = Vm.OmniInstance.ConnectedDevices.Any(d => d.Id.Type == 123));
+            return found;
+        }
+
+        // HCU (MBC-2, device type 125) firmware 125.0.0.5 - 125.0.0.15 has a CAN filter bug:
+        // it wrongly accepts any frame addressed to ReceiverType 126 (Control device / remote
+        // panel) as if it were its own, including the "enter bootloader" command. Flashing the
+        // panel with such an MBC-2 on the bus makes both jump into the bootloader at once, and
+        // the two bootloaders answering the flash protocol simultaneously bricks the flash.
+        // Fixed properly in firmware (per-command target check) starting with 125.0.0.16.
+        private const int VulnerableMbcDeviceType = 125;
+        private const int VulnerableMbcMinBuild = 5;
+        private const int VulnerableMbcMaxBuild = 15;
+
+        // excludeDevice: the device actually being switched to bootloader is not itself a risk
+        // (its own "enter bootloader" command is addressed to its own type, never to 126), and
+        // must be excluded so that updating a vulnerable MBC-2 to fix it isn't blocked by itself.
+        private bool VulnerableMbcOnBus(DeviceViewModel excludeDevice)
+        {
+            bool found = false;
+            Application.Current.Dispatcher.Invoke(() =>
+                found = Vm.OmniInstance.ConnectedDevices.Any(d =>
+                    d != excludeDevice &&
+                    d.Id.Type == VulnerableMbcDeviceType &&
+                    d.Firmware[3] >= VulnerableMbcMinBuild &&
+                    d.Firmware[3] <= VulnerableMbcMaxBuild));
             return found;
         }
 

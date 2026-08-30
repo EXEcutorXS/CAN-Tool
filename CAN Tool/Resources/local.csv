@@ -93,6 +93,8 @@ t_auto_device_timeout	Device did not restart within timeout	Устройство
 t_auto_done	Auto updating done	Автоматическое обновление ПО завершено	Auto updating done
 t_bootloader_already_on_bus	A bootloader is already present on the bus. Programming aborted to prevent flash corruption.	На шине уже присутствует загрузчик. Программирование прервано во избежание порчи прошивки.	Ein Bootloader ist bereits am Bus. Programmierung abgebrochen.
 t_bootloader_conflict_title	Bootloader conflict	Конфликт загрузчиков	Bootloader-Konflikt
+t_vulnerable_mbc_on_bus	An MBC-2 with vulnerable firmware (125.0.0.5 - 125.0.0.15) is present on the bus. It would wrongly enter the bootloader together with the flashed device and corrupt both. Update the MBC-2 first.	На шине обнаружен MBC-2 с уязвимой прошивкой (125.0.0.5 - 125.0.0.15). Он ошибочно перейдёт в загрузчик вместе с прошиваемым устройством, что приведёт к порче обоих. Сначала обновите MBC-2.	Ein MBC-2 mit anfälliger Firmware (125.0.0.5 - 125.0.0.15) ist am Bus vorhanden. Er würde fälschlicherweise zusammen mit dem zu programmierenden Gerät in den Bootloader wechseln und beide beschädigen. Aktualisieren Sie zuerst den MBC-2.
+t_vulnerable_mbc_title	MBC-2 update required	Требуется обновление MBC-2	MBC-2 Update erforderlich
 t_delay	Delay	Задержка	Verzögerung
 t_value	Value	Значение	Wert
 t_description	Description	Описание	Beschreibung
