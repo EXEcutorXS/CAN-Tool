@@ -90,6 +90,8 @@
 <v:String x:Key="t_auto_bootloader_timeout">Загрузчик не появился в течение отведённого времени</v:String>
 <v:String x:Key="t_auto_waiting_device">Ожидаем обновлённое устройство</v:String>
 <v:String x:Key="t_auto_device_timeout">Устройство не перезапустилось в течение отведённого времени</v:String>
+<v:String x:Key="t_auto_version_mismatch">Версия выбранной прошивки ({1}) не совпадает с текущей версией устройства ({0}). Прошивка от другого изделия может окирпичить устройство. Продолжить?</v:String>
+<v:String x:Key="t_auto_version_mismatch_title">Несовпадение версии прошивки</v:String>
 <v:String x:Key="t_auto_done">Автоматическое обновление ПО завершено</v:String>
 <v:String x:Key="t_bootloader_already_on_bus">На шине уже присутствует загрузчик. Программирование прервано во избежание порчи прошивки.</v:String>
 <v:String x:Key="t_bootloader_conflict_title">Конфликт загрузчиков</v:String>

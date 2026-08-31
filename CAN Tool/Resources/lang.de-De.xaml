@@ -90,6 +90,8 @@
 <v:String x:Key="t_auto_bootloader_timeout">Bootloader timed out</v:String>
 <v:String x:Key="t_auto_waiting_device">Waiting for updated device</v:String>
 <v:String x:Key="t_auto_device_timeout">Device restart timed out</v:String>
+<v:String x:Key="t_auto_version_mismatch">Die gewählte Firmware-Version ({1}) stimmt nicht mit der aktuellen Version des Geräts ({0}) überein. Eine Firmware eines anderen Produkts kann das Gerät unbrauchbar machen. Trotzdem fortfahren?</v:String>
+<v:String x:Key="t_auto_version_mismatch_title">Firmware-Versionskonflikt</v:String>
 <v:String x:Key="t_auto_done">Auto updating done</v:String>
 <v:String x:Key="t_bootloader_already_on_bus">Ein Bootloader ist bereits am Bus. Programmierung abgebrochen.</v:String>
 <v:String x:Key="t_bootloader_conflict_title">Bootloader-Konflikt</v:String>

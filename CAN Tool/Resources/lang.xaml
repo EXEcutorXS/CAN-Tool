@@ -90,6 +90,8 @@
 <v:String x:Key="t_auto_bootloader_timeout">Bootloader did not appear within timeout</v:String>
 <v:String x:Key="t_auto_waiting_device">Waiting for updated device</v:String>
 <v:String x:Key="t_auto_device_timeout">Device did not restart within timeout</v:String>
+<v:String x:Key="t_auto_version_mismatch">Selected firmware version ({1}) does not match the device's current version ({0}). Flashing a firmware from a different product can brick the device. Continue anyway?</v:String>
+<v:String x:Key="t_auto_version_mismatch_title">Firmware version mismatch</v:String>
 <v:String x:Key="t_auto_done">Auto updating done</v:String>
 <v:String x:Key="t_bootloader_already_on_bus">A bootloader is already present on the bus. Programming aborted to prevent flash corruption.</v:String>
 <v:String x:Key="t_bootloader_conflict_title">Bootloader conflict</v:String>

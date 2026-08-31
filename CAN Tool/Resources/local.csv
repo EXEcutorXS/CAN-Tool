@@ -90,6 +90,8 @@ t_auto_waiting_bootloader	Waiting for bootloader...	Ожидание загру�
 t_auto_bootloader_timeout	Bootloader did not appear within timeout	Загрузчик не появился в течение отведённого времени	Bootloader timed out
 t_auto_waiting_device	Waiting for updated device	Ожидаем обновлённое устройство	Waiting for updated device
 t_auto_device_timeout	Device did not restart within timeout	Устройство не перезапустилось в течение отведённого времени	Device restart timed out
+t_auto_version_mismatch	Selected firmware version ({1}) does not match the device's current version ({0}). Flashing a firmware from a different product can brick the device. Continue anyway?	Версия выбранной прошивки ({1}) не совпадает с текущей версией устройства ({0}). Прошивка от другого изделия может окирпичить устройство. Продолжить?	Die gewählte Firmware-Version ({1}) stimmt nicht mit der aktuellen Version des Geräts ({0}) überein. Eine Firmware eines anderen Produkts kann das Gerät unbrauchbar machen. Trotzdem fortfahren?
+t_auto_version_mismatch_title	Firmware version mismatch	Несовпадение версии прошивки	Firmware-Versionskonflikt
 t_auto_done	Auto updating done	Автоматическое обновление ПО завершено	Auto updating done
 t_bootloader_already_on_bus	A bootloader is already present on the bus. Programming aborted to prevent flash corruption.	На шине уже присутствует загрузчик. Программирование прервано во избежание порчи прошивки.	Ein Bootloader ist bereits am Bus. Programmierung abgebrochen.
 t_bootloader_conflict_title	Bootloader conflict	Конфликт загрузчиков	Bootloader-Konflikt

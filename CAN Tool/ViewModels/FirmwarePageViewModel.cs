@@ -1830,21 +1830,21 @@ namespace CAN_Tool.ViewModels
         {
             try
             {
-                if (fragments.Count == 0)
+                // Всегда запрашиваем hex при нажатии AUTO, даже если он уже был загружен ранее -
+                // иначе повторное нажатие AUTO для другого устройства на шине молча прошивает
+                // его тем же файлом, что и предыдущее устройство, и может окирпичить его.
+                bool loaded = false;
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    bool loaded = false;
-                    Application.Current.Dispatcher.Invoke(() =>
+                    OpenFileDialog dialog = new() { Filter = "Hex Files|*.hex" };
+                    if ((bool)dialog.ShowDialog())
                     {
-                        OpenFileDialog dialog = new() { Filter = "Hex Files|*.hex" };
-                        if ((bool)dialog.ShowDialog())
-                        {
-                            lastHexFilePath = dialog.FileName;
-                            fragments = ParseHexFile(lastHexFilePath, FragmentSize);
-                            loaded = fragments.Count > 0;
-                        }
-                    });
-                    if (!loaded) return;
-                }
+                        lastHexFilePath = dialog.FileName;
+                        fragments = ParseHexFile(lastHexFilePath, FragmentSize);
+                        loaded = fragments.Count > 0;
+                    }
+                });
+                if (!loaded) return;
 
                 var omni = Vm.OmniInstance;
 
@@ -1863,6 +1863,12 @@ namespace CAN_Tool.ViewModels
 
                 // Запоминаем исходный тип устройства перед входом в загрузчик
                 var originalDeviceType = omni.SelectedConnectedDevice?.Id.Type ?? -1;
+
+                // Проверяем версию прошиваемого hex против текущей версии ПО устройства (пока
+                // оно ещё не перешло в загрузчик и не потеряло свою "личность") - защита от
+                // прошивки бинарником другого изделия (например, PU28 в MBC-2). Сверяем первые
+                // 2 байта версии (тип изделия и его вариант/подтип) - см. CalcVersionMismatch.
+                if (!ConfirmVersionMatch(omni.SelectedConnectedDevice)) return;
 
                 // Шаг 1: переход в загрузчик
                 SwitchToBootLoader();
@@ -1946,6 +1952,50 @@ namespace CAN_Tool.ViewModels
             Application.Current.Dispatcher.Invoke(() =>
                 found = Vm.OmniInstance.ConnectedDevices.Any(d => d.Id.Type == 123));
             return found;
+        }
+
+        // Имя файла прошивки по соглашению начинается с версии, напр.
+        // "126.0.4.19_STM_Main.hex" (см. также BrowseSlotHex). Порядок байт совпадает с
+        // BootFirmware/Firmware: [0]=тип изделия, [1]=напряжение/вариант, [2]=подтип, [3]=сборка.
+        private static bool TryParseVersionFromFileName(string path, out byte[] version)
+        {
+            version = null;
+            if (string.IsNullOrEmpty(path)) return false;
+            var candidate = Path.GetFileNameWithoutExtension(path).Split('_')[0];
+            var parts = candidate.Split('.');
+            if (parts.Length != 4 || !parts.All(p => byte.TryParse(p, out _))) return false;
+            version = parts.Select(byte.Parse).ToArray();
+            return true;
+        }
+
+        // Сверяет версию, зашитую в имя выбранного hex-файла, с версией ПО, которое сейчас
+        // реально работает на устройстве (запрашиваем заново, чтобы не полагаться на
+        // потенциально устаревшие данные). Если первые 2 байта версии (тип изделия и
+        // подтип/вариант) не совпадают - это явный признак, что выбран бинарник от другого
+        // изделия (например, прошивка PU28 для MBC-2), и такую прошивку легко можно
+        // окирпичить. Если версия имени файла не распознана или версия устройства ещё
+        // неизвестна, сравнение пропускается - молча проходить дальше без спроса не даём
+        // только в случае явного расхождения.
+        private bool ConfirmVersionMatch(DeviceViewModel dev)
+        {
+            if (dev == null) return true;
+            if (!TryParseVersionFromFileName(lastHexFilePath, out var hexVersion)) return true;
+
+            _ = GetVersion();
+            Thread.Sleep(500);
+
+            var curVersion = dev.Firmware;
+            if (curVersion == null || (curVersion[0] == 0 && curVersion[1] == 0)) return true; // версия устройства неизвестна
+
+            if (curVersion[0] == hexVersion[0] && curVersion[1] == hexVersion[1]) return true;
+
+            var curStr = string.Join(".", curVersion);
+            var hexStr = string.Join(".", hexVersion);
+            var result = MessageBox.Show(
+                string.Format(GetString("t_auto_version_mismatch"), curStr, hexStr),
+                GetString("t_auto_version_mismatch_title"),
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            return result == MessageBoxResult.Yes;
         }
 
         // HCU (MBC-2, device type 125) firmware 125.0.0.5 - 125.0.0.15 has a CAN filter bug:
