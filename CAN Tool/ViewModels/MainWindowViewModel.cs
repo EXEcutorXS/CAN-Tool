@@ -597,8 +597,18 @@ namespace CAN_Tool.ViewModels
             WriteToLog(msg, "→");
         }
 
+        // Кэшированная ссылка на себя - используется DeviceViewModel.Transmit/Bus (в т.ч. из
+        // фоновых потоков команд загрузчика, см. BootloaderDeviceViewModel), где обращение к
+        // Application.Current.MainWindow.DataContext бросает "The calling thread cannot access
+        // this object because a different thread owns it" (Window - DispatcherObject, его
+        // свойства можно читать только из потока, которому он принадлежит). Инстанс создаётся
+        // один раз на UI-потоке при старте приложения, поэтому кэшированную ссылку безопасно
+        // читать из любого потока.
+        public static MainWindowViewModel Instance { get; private set; }
+
         public MainWindowViewModel()
         {
+            Instance = this;
 
             canAdapter = new();
 

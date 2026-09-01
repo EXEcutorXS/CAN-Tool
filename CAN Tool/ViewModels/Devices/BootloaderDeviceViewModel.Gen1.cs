@@ -103,7 +103,7 @@ namespace OmniProtocol
             foreach (var f in rawFragments)
             {
                 flashFragmentOld(f);
-                Bus.CurrentTask.PercentComplete = cnt++ * 100 / rawFragments.Count;
+                Bus.CurrentTask.UpdatePercent(cnt++ * 100 / rawFragments.Count);
                 if (Bus.CurrentTask.Cts.IsCancellationRequested) return;
             }
 

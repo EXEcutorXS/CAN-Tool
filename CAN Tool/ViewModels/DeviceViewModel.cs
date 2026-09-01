@@ -164,20 +164,21 @@ namespace OmniProtocol
         // ── Транспорт ──────────────────────────────────────────────────
         public void Transmit(CanMessage msg)
         {
-            if (Application.Current.MainWindow != null)
-                ((MainWindowViewModel)Application.Current.MainWindow.DataContext).CanAdapter.Transmit(msg);
+            MainWindowViewModel.Instance?.CanAdapter.Transmit(msg);
         }
 
         public static void TransmitStatic(CanMessage msg)
         {
-            if (Application.Current.MainWindow != null)
-                ((MainWindowViewModel)Application.Current.MainWindow.DataContext).CanAdapter.Transmit(msg);
+            MainWindowViewModel.Instance?.CanAdapter.Transmit(msg);
         }
 
         // Доступ к общей шине/списку устройств - используется командами загрузчика (см. ниже
         // и BootloaderDeviceViewModel), которым нужен не только Transmit, но и ConnectedDevices/
-        // CurrentTask/SelectedConnectedDevice.
-        protected static Omni Bus => ((MainWindowViewModel)Application.Current.MainWindow.DataContext).OmniInstance;
+        // CurrentTask/SelectedConnectedDevice. Через кэшированный MainWindowViewModel.Instance,
+        // а не Application.Current.MainWindow.DataContext - последнее обращается к Window
+        // (DispatcherObject) и бросает исключение при вызове из фонового потока (а команды
+        // загрузчика выполняются через Task.Run).
+        protected static Omni Bus => MainWindowViewModel.Instance.OmniInstance;
 
         // ── Переход в загрузчик ────────────────────────────────────────
         // Единственная кнопка, которая остаётся на странице обычного устройства - всё

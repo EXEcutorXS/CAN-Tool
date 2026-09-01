@@ -69,15 +69,23 @@ namespace OmniProtocol
         [ObservableProperty]
         private string log;
 
-        private void LogWrite(string str)
+        // Log привязан к TextBox на странице загрузчика, а пишут в него методы, выполняющиеся
+        // в фоновом потоке (Task.Run - см. AutoUpdateFirmware/UpdateFirmware*/EraseFlash* и т.д.).
+        // WPF-биндинг требует, чтобы изменение UI-привязанного свойства происходило в потоке,
+        // которому принадлежит Dispatcher, иначе - "The calling thread cannot access this
+        // object because a different thread owns it".
+        private static void RunOnUi(Action action)
         {
-            Log = str + Log;
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher == null || dispatcher.CheckAccess())
+                action();
+            else
+                dispatcher.Invoke(action);
         }
 
-        private void LogWriteLine(string str)
-        {
-            Log = str + Environment.NewLine + Log;
-        }
+        private void LogWrite(string str) => RunOnUi(() => Log = str + Log);
+
+        private void LogWriteLine(string str) => RunOnUi(() => Log = str + Environment.NewLine + Log);
 
         // ── Hex-файл (общий парсер и поле fragments - используются всеми поколениями) ──
         [ObservableProperty]
@@ -359,7 +367,7 @@ namespace OmniProtocol
                     }
 
                     checkedBytes += Math.Min(4, f.Length - byteOffset);
-                    Bus.CurrentTask.PercentComplete = checkedBytes * 100 / totalBytes;
+                    Bus.CurrentTask.UpdatePercent(checkedBytes * 100 / totalBytes);
                 }
             }
 
@@ -467,7 +475,7 @@ namespace OmniProtocol
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.ToString());
             }
         }
 

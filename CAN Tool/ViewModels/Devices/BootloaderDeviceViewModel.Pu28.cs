@@ -263,7 +263,7 @@ namespace OmniProtocol
                 foreach (var f in fragmentsArg)
                 {
                     FlashExtFragment(f);
-                    Bus.CurrentTask.PercentComplete = cnt++ * 100 / fragmentsArg.Count;
+                    Bus.CurrentTask.UpdatePercent(cnt++ * 100 / fragmentsArg.Count);
                     if (Bus.CurrentTask.Cts.IsCancellationRequested) return;
                 }
                 LogWriteLine("Memory dump write completed.");
@@ -271,7 +271,7 @@ namespace OmniProtocol
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -343,7 +343,7 @@ namespace OmniProtocol
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -471,7 +471,7 @@ namespace OmniProtocol
                         FlashExtFragment(f, deviceType);
                     }
                     offset += (uint)chunkLen;
-                    Bus.CurrentTask.PercentComplete = (int)(cnt++ * 100 / fragmentCount);
+                    Bus.CurrentTask.UpdatePercent((int)(cnt++ * 100 / fragmentCount));
                     if (Bus.CurrentTask.Cts.IsCancellationRequested) return;
                 }
 
@@ -488,13 +488,13 @@ namespace OmniProtocol
                 Array.Copy(meta, metaFragment.Data, meta.Length);
                 FlashExtFragment(metaFragment, deviceType);
 
-                SlotStatusText = $"Slot {slot}: {imageLen}B, CRC 0x{crc16:X4}, uploaded.";
+                RunOnUi(() => SlotStatusText = $"Slot {slot}: {imageLen}B, CRC 0x{crc16:X4}, uploaded.");
                 LogWriteLine($"Slot {slot} upload complete: {imageLen} bytes, CRC16 0x{crc16:X4}.");
                 Bus.CurrentTask.OnDone();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -668,7 +668,7 @@ namespace OmniProtocol
                     Array.Copy(data, 0, readData, addr - startAddr, chunk);
                     addr += (uint)chunk;
                     if (LegacyAdapterMode) System.Threading.Thread.Sleep(LegacyInterChunkDelayMs);
-                    Bus.CurrentTask.PercentComplete = (int)((ulong)(addr - startAddr) * 100 / readLen);
+                    Bus.CurrentTask.UpdatePercent((int)((ulong)(addr - startAddr) * 100 / readLen));
                     if (Bus.CurrentTask.Cts.IsCancellationRequested)
                     {
                         Bus.CurrentTask.OnCancel();
@@ -695,7 +695,7 @@ namespace OmniProtocol
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.ToString());
             }
         }
 

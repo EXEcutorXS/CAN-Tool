@@ -53,31 +53,54 @@ public partial class OmniTask : ObservableObject
 
     [ObservableProperty] private TimeSpan? lastOperationDuration;
 
-    public void OnDone()
+    // Команды загрузчика (BootloaderDeviceViewModel) выполняются в фоновом потоке (Task.Run),
+    // но Capture/OnDone/OnCancel/OnFail/UpdatePercent меняют свойства, привязанные к UI
+    // (индикатор прогресса, статус задачи) - WPF-биндинг требует, чтобы такие изменения
+    // происходили в потоке, которому принадлежит Dispatcher, иначе падает "The calling thread
+    // cannot access this object because a different thread owns it". Маршалим здесь один раз,
+    // чтобы не разбирать это в каждом месте, откуда вызываются эти методы.
+    private static void RunOnUi(Action action)
+    {
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+        if (dispatcher == null || dispatcher.CheckAccess())
+            action();
+        else
+            dispatcher.Invoke(action);
+    }
+
+    private static T RunOnUi<T>(Func<T> func)
+    {
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+        if (dispatcher == null || dispatcher.CheckAccess())
+            return func();
+        return dispatcher.Invoke(func);
+    }
+
+    public void OnDone() => RunOnUi(() =>
     {
         LastOperationDuration = DateTime.Now - capturedTime;
         Occupied = false;
         PercentComplete = 100;
         Done = true;
         TaskDone?.Invoke(null, null!);
-    }
+    });
 
-    public void OnCancel()
+    public void OnCancel() => RunOnUi(() =>
     {
         Cts.Cancel();
         Occupied = false;
         Cancelled = true;
         TaskCancelled?.Invoke(null, null!);
-    }
+    });
 
-    public void OnFail(string reason = "")
+    public void OnFail(string reason = "") => RunOnUi(() =>
     {
         FailReason = reason;
         Cts.Cancel();
         Occupied = false;
         Failed = true;
         TaskCancelled?.Invoke(null, null!);
-    }
+    });
 
 
     [NotifyPropertyChangedFor(nameof(TaskStatus))]
@@ -89,7 +112,7 @@ public partial class OmniTask : ObservableObject
     [NotifyPropertyChangedFor(nameof(TaskStatus))]
     [ObservableProperty] private bool failed;
 
-    public bool Capture(string taskName)
+    public bool Capture(string taskName) => RunOnUi(() =>
     {
         if (Occupied) return false;
         Occupied = true;
@@ -101,12 +124,9 @@ public partial class OmniTask : ObservableObject
         Cts = new CancellationTokenSource();
         capturedTime = DateTime.Now;
         return true;
-    }
+    });
 
-    public void UpdatePercent(int p)
-    {
-        PercentComplete = p;
-    }
+    public void UpdatePercent(int p) => RunOnUi(() => PercentComplete = p);
 
     public string TaskStatus
     {

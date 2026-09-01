@@ -211,7 +211,7 @@ namespace OmniProtocol
                 foreach (var f in fragmentsArg)
                 {
                     FlashFragment(f);
-                    Bus.CurrentTask.PercentComplete = cnt++ * 100 / fragmentsArg.Count;
+                    Bus.CurrentTask.UpdatePercent(cnt++ * 100 / fragmentsArg.Count);
                     if (Bus.CurrentTask.Cts.IsCancellationRequested) return;
                 }
                 LogWriteLine(GetString("t_firmware_update_success"));
@@ -219,7 +219,7 @@ namespace OmniProtocol
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.ToString());
             }
         }
 
