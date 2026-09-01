@@ -627,6 +627,8 @@ namespace CAN_Tool.ViewModels
             msg.ReceiverId.Type = 123;
             msg.Data[0] = 6;
             msg.Data[1] = 1; // режим 1: только основная программа (настройки/чёрные ящики не трогаются)
+            msg.Data[6] = 0xAA; // magic-слово, защита от случайного стирания (см. Messages::ProcessMessage, PGN110/6)
+            msg.Data[7] = 0x55;
             Debug.WriteLine("Отправляем запрос на стирание (PGN110)");
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
             flagEraseDone = false;
@@ -638,6 +640,8 @@ namespace CAN_Tool.ViewModels
             msg.Pgn = 110;
             msg.ReceiverId.Type = 123;
             msg.Data[0] = 4;
+            msg.Data[6] = 0x55; // magic-слово, защита от случайной записи (см. Messages::ProcessMessage, PGN110/4)
+            msg.Data[7] = 0xAA;
             Vm.CanAdapter.Transmit(msg.ToCanMessage());
         }
 
