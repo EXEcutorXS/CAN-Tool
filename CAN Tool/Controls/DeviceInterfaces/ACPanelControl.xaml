@@ -47,6 +47,7 @@
             <Slider x:Name="SetpointSlider" Minimum="16" Maximum="30" Height="30" Margin="0 14 0 5" ValueChanged="SetpointChanged" Width="300" />
             <TextBlock Foreground="Beige" VerticalAlignment="Center" FontSize="25" Text="{Binding ACPanelParams.Setpoint}" d:Text="15" Width="30" Margin="10"></TextBlock>
             <TextBlock x:Name="ErrorString" Text="{Binding Parameters.ErrorString}" FontSize="25" Margin="10" Foreground="PaleVioletRed" VerticalAlignment="Center" />
+            <Button Content="{DynamicResource b_switch_to_boot}" Margin="10" Command="{Binding SwitchToBootLoaderCommand}" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" Grid.RowSpan="2">

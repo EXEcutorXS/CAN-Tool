@@ -5,7 +5,7 @@ namespace CAN_Tool.Libs
 {
     // Loads an Intel HEX file for the ПУ-28 panel's own main application (the program the
     // panel's GD32 bootloader jumps to - NOT the OmniProtocol/type-123 firmware handled by
-    // FirmwarePageViewModel, which is a different device on the bus entirely).
+    // BootloaderDeviceViewModel, which is a different device on the bus entirely).
     //
     // Mirrors the original Delphi tool's LoadHexFile/downloadOneDataLine: builds a flat,
     // 0xFF-filled memory image and pokes hex data records into it at their absolute address.

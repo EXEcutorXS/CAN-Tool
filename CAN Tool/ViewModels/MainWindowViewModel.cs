@@ -37,7 +37,6 @@ namespace CAN_Tool.ViewModels
 
         [ObservableProperty] private WorkMode_t mode;
 
-        public FirmwarePageViewModel FirmwarePage { set; get; }
         public ManualPageViewModel ManualPage { set; get; }
         public RvcPageViewModel RvcPage { set; get; }
         public CanPageViewModel CanPage { set; get; }
@@ -610,7 +609,6 @@ namespace CAN_Tool.ViewModels
             OmniInstance = new Omni(CanAdapter);
 
             OmniInstance.plot = myChart;
-            FirmwarePage = new(this);
             ManualPage = new(this);
             CanPage = new(this);
             RvcPage = new(this);

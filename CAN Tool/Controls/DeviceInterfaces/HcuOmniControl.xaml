@@ -10,6 +10,7 @@
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Liquid level: {0:d1},Path=TimberlineParams.LiquidLevel}" />
                 <ProgressBar Margin="15" Orientation="Vertical" Maximum="7" Value="{Binding TimberlineParams.LiquidLevel}" Height="50" />
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Outside: {0:F1}°,Path=TimberlineParams.OutsideTemperature,Converter={StaticResource ToFarenheit}}" />
+                <Button Content="{DynamicResource b_switch_to_boot}" Margin="10" Command="{Binding SwitchToBootLoaderCommand}" />
 
             </StackPanel>
             <StackPanel Orientation="Vertical">

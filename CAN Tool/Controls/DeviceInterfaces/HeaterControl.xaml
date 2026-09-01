@@ -64,6 +64,7 @@
                     <Button Content="{DynamicResource b_calibrate}" Margin="2" Command="{Binding CalibrateTermocouplesCommand}" />
                     <Button Content="{DynamicResource b_clear_errors}" Margin="2" Command="{Binding ClearErrorsCommand}" />
                     <TextBlock Margin="5" Text="{Binding Parameters.ErrorString}" Foreground="Red" FontSize="20" VerticalAlignment="Center" Visibility="{Binding Parameters.Error, Converter={StaticResource IntToVisibileConverter}}" TextWrapping="Wrap" />
+                    <Button Content="{DynamicResource b_switch_to_boot}" Margin="2" Command="{Binding SwitchToBootLoaderCommand}" />
                 </StackPanel>
             </Border>
             <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Stretch">

@@ -44,6 +44,25 @@ public partial class Omni : ObservableObject
         }
 
         allPresets.ListChanged += PresetCollectionChanged;
+
+        // Периодический опрос "кто в загрузчике" (PGN6/18 на ReceiverId.Type=123) - чтобы
+        // только что перешедшее в загрузчик устройство появилось в ConnectedDevices, не
+        // дожидаясь, пока оно само о себе объявит. Раньше жил в конструкторе
+        // FirmwarePageViewModel (создавался один раз на всё приложение) - перенесено сюда,
+        // т.к. отдельной вкладки-синглтона для загрузчика больше нет.
+        var whoIsHereTimer = new System.Timers.Timer(1000);
+        whoIsHereTimer.Elapsed += SendWhoIsHere;
+        whoIsHereTimer.Start();
+    }
+
+    private void SendWhoIsHere(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        OmniMessage msg = new();
+        msg.Pgn = 6;
+        msg.ReceiverId.Type = 123;
+        msg.Data[0] = 0;
+        msg.Data[1] = 18;
+        canAdapter.Transmit(msg.ToCanMessage());
     }
 
     private void PresetCollectionChanged(object sender, ListChangedEventArgs e)
@@ -664,7 +683,8 @@ public partial class Omni : ObservableObject
 
             case 100:
                 {
-                    var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
+                    var fw = senderDevice as BootloaderDeviceViewModel;
+                    if (fw == null) break;
                     if (m.Data[0] == 1 && m.Data[1] == 1)
                         fw.flagEraseDone = true;
                     if (m.Data[0] == 2 && m.Data[1] == 1)
@@ -674,14 +694,15 @@ public partial class Omni : ObservableObject
                     break;
                 }
             case 105:
-                DecodeFragmentProtocolResponse(m);
+                DecodeFragmentProtocolResponse(senderDevice as BootloaderDeviceViewModel, m);
                 break;
             case 110: //3-е поколение протокола прошивки (PGN110/111) - формат ответов идентичен 105
-                DecodeFragmentProtocolResponse(m);
+                DecodeFragmentProtocolResponse(senderDevice as BootloaderDeviceViewModel, m);
                 break;
             case 107: //External flash (memory dump)
                 {
-                    var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
+                    var fw = senderDevice as BootloaderDeviceViewModel;
+                    if (fw == null) break;
                     if (m.Data[0] == 1)
                     {
                         fw.extFragmentAddress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);
@@ -715,8 +736,8 @@ public partial class Omni : ObservableObject
                 }
             case 109: //Streamed raw data from external flash bulk read (PGN107 case16)
                 {
-                    var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
-                    fw.AppendExtReadData(m.Data);
+                    var fw = senderDevice as BootloaderDeviceViewModel;
+                    fw?.AppendExtReadData(m.Data);
                     break;
                 }
         }
@@ -727,10 +748,10 @@ public partial class Omni : ObservableObject
 
     // Общий разбор ответов протокола фрагментов прошивки - формат байт (тег/длина/CRC/статус)
     // одинаков у PGN105 и PGN110 (3-е поколение), меняется только сам PGN и то, каким
-    // алгоритмом отправитель посчитал CRC (это уже решается на стороне FirmwarePageViewModel).
-    private void DecodeFragmentProtocolResponse(OmniMessage m)
+    // алгоритмом отправитель посчитал CRC (это уже решается на стороне BootloaderDeviceViewModel).
+    private void DecodeFragmentProtocolResponse(BootloaderDeviceViewModel fw, OmniMessage m)
     {
-        var fw = ((MainWindowViewModel)Application.Current.MainWindow.DataContext).FirmwarePage;
+        if (fw == null) return;
         if (m.Data[0] == 1)
         {
             fw.fragmentAddress = (uint)(m.Data[1] * 0x1000000 + m.Data[2] * 0x10000 + m.Data[3] * 0x100 + m.Data[4]);

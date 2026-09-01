@@ -1,28 +1,90 @@
-﻿<UserControl x:Class="CAN_Tool.CustomControls.BootloaderControl"
+<UserControl x:Class="CAN_Tool.CustomControls.BootloaderControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CAN_Tool.CustomControls"
              xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters"
              xmlns:op="clr-namespace:OmniProtocol"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=op:DeviceViewModel}">
-    <Grid>
-        
-        <StackPanel>
-            <Border Grid.Column="0" Grid.Row="1" CornerRadius="15" Margin="10" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2" Width="120" Height="120" HorizontalAlignment="Left">
+             d:DataContext="{d:DesignInstance Type=op:BootloaderDeviceViewModel}">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
+            <Border CornerRadius="15" Margin="0,0,10,0" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2" Width="120" Height="120" HorizontalAlignment="Left">
                 <Border.Background>
-                    <ImageBrush ImageSource="{Binding Img}"  Stretch="Fill" />
+                    <ImageBrush ImageSource="{Binding Img}" Stretch="Fill" />
                 </Border.Background>
             </Border>
-            <TextBlock Margin="5" Grid.Row="0" Text="{Binding Firmware}" VerticalAlignment="Center" FontSize="20" />
-            <TextBlock Margin="5" Grid.Row="1" Text="{Binding ProductionDate}" VerticalAlignment="Center" FontSize="20" />
-            <TextBlock Margin="5" Grid.Row="2" Text="{Binding Serial}" VerticalAlignment="Center" FontSize="20" />
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Margin="5" Text="{Binding Firmware,Converter={StaticResource VersionConverter},Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
+                <TextBlock Margin="5" Text="{Binding BootFirmware,Converter={StaticResource VersionConverter},Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
+                <TextBlock Margin="5" Text="{Binding ProductionDate,Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
+            </StackPanel>
         </StackPanel>
-        
-    </Grid>
-    
+
+        <!-- Общие команды - доступны независимо от поколения загрузчика -->
+        <WrapPanel DockPanel.Dock="Top" Margin="10">
+            <Button Content="{DynamicResource b_get_version}" Margin="10" Command="{Binding GetVersionCommand}" />
+            <Button Content="{DynamicResource b_find_boot}" Margin="10" Command="{Binding RequestBootLoaderVersionCommand}" />
+            <Button Content="{DynamicResource b_switch_to_main_program}" Margin="10" Command="{Binding SwitchToMainProgramCommand}" />
+            <Button Content="{DynamicResource b_load_hex}" Margin="10" Command="{Binding LoadHexCommand}" />
+            <Button Content="{DynamicResource b_auto_update}" Margin="10" Command="{Binding AutoUpdateFirmwareCommand}" />
+            <Button Content="{DynamicResource b_verify_bytes}" Margin="10" Command="{Binding VerifyFirmwareBytesCommand}" />
+        </WrapPanel>
+
+        <!-- Gen1 (сборка ≤4): протокол PGN100/101, только заливка целиком, без CRC-verify -->
+        <WrapPanel DockPanel.Dock="Top" Margin="10" Visibility="{Binding Generation, Converter={StaticResource IntEqualsToVisible}, ConverterParameter=1}">
+            <Button Content="{DynamicResource b_burn_old}" Margin="10" Command="{Binding UpdateFirmwareOldCommand}" />
+        </WrapPanel>
+
+        <!-- Gen2 ("всё остальное"): протокол PGN105/106 -->
+        <WrapPanel DockPanel.Dock="Top" Margin="10" Visibility="{Binding Generation, Converter={StaticResource IntEqualsToVisible}, ConverterParameter=2}">
+            <Button Content="{DynamicResource b_burn}" Margin="10" Command="{Binding UpdateFirmwareCommand}" />
+        </WrapPanel>
+
+        <!-- Gen3 (сборка ≥13): протокол PGN110/111, magic words + настоящий CRC32-verify -->
+        <WrapPanel DockPanel.Dock="Top" Margin="10" Visibility="{Binding Generation, Converter={StaticResource IntEqualsToVisible}, ConverterParameter=3}">
+            <Button Content="{DynamicResource b_burn_v3}" Margin="10" Command="{Binding UpdateFirmware110Command}" />
+            <Button Content="{DynamicResource b_verify_crc}" Margin="10" Command="{Binding VerifyFirmwareCommand}" />
+        </WrapPanel>
+
+        <!-- ПУ28 (BootFirmware[2]==3): управление внешней flash-микросхемой -->
+        <StackPanel DockPanel.Dock="Top" Visibility="{Binding IsPu28, Converter={StaticResource BoolToVisibileConverter}}">
+            <Separator Margin="10,0,10,0" />
+            <WrapPanel Margin="10">
+                <Button Content="{DynamicResource b_erase_memory}" Margin="10" Command="{Binding EraseMemoryCommand}" />
+                <Button Content="{DynamicResource b_load_dump_hex}" Margin="10" Command="{Binding LoadDumpHexCommand}" />
+                <Button Content="{DynamicResource b_write_dump}" Margin="10" Command="{Binding WriteDumpToMemoryCommand}" />
+                <StackPanel Orientation="Horizontal" Margin="10" VerticalAlignment="Center">
+                    <TextBlock Text="{DynamicResource t_dump_read_start}" VerticalAlignment="Center" Margin="0,0,5,0" />
+                    <TextBox Text="{Binding DumpReadStartHex}" Width="80" VerticalAlignment="Center" />
+                    <TextBlock Text="{DynamicResource t_dump_read_length}" VerticalAlignment="Center" Margin="10,0,5,0" />
+                    <TextBox Text="{Binding DumpReadLengthKb}" Width="80" VerticalAlignment="Center" />
+                    <CheckBox Content="{DynamicResource t_legacy_adapter_mode}" IsChecked="{Binding LegacyAdapterMode}" VerticalAlignment="Center" Margin="10,0,0,0" />
+                </StackPanel>
+                <Button Content="{DynamicResource b_read_dump}" Margin="10" Command="{Binding ReadDumpCommand}" />
+            </WrapPanel>
+            <Separator Margin="10,0,10,0" />
+            <WrapPanel Margin="10">
+                <TextBlock Text="Slot:" VerticalAlignment="Center" Margin="10,0,5,0" />
+                <ComboBox Width="50" SelectedIndex="{Binding SlotIndex}" VerticalAlignment="Center">
+                    <ComboBoxItem Content="0" />
+                    <ComboBoxItem Content="1" />
+                    <ComboBoxItem Content="2" />
+                </ComboBox>
+                <Button Content="Browse hex..." Margin="10" Command="{Binding BrowseSlotHexCommand}" />
+                <TextBlock Text="{Binding SlotHexFilePath}" VerticalAlignment="Center" Margin="0,0,10,0" MaxWidth="200" TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="Target addr:" VerticalAlignment="Center" Margin="10,0,5,0" />
+                <TextBox Text="{Binding SlotTargetAddressHex}" Width="90" VerticalAlignment="Center" />
+                <TextBlock Text="Version:" VerticalAlignment="Center" Margin="10,0,5,0" />
+                <TextBox Text="{Binding SlotVersionText}" Width="90" VerticalAlignment="Center" />
+                <Button Content="Upload to slot" Margin="10" Command="{Binding UploadToSlotCommand}" />
+                <TextBlock Text="{Binding SlotStatusText}" VerticalAlignment="Center" Margin="10,0,0,0" />
+            </WrapPanel>
+        </StackPanel>
+
+        <TextBox x:Name="logField" DockPanel.Dock="Top" Text="{Binding Log,Mode=OneWay}" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="20" IsReadOnly="True" FontFamily="Courier New" />
+    </DockPanel>
 </UserControl>

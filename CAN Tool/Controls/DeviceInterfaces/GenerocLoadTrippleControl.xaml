@@ -33,7 +33,7 @@
         <TextBlock Text="{Binding GenericLoadTripple.PwmLevel1,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="3" Grid.Row="0" d:Text="50%" VerticalAlignment="Center" HorizontalAlignment="Center" />
         <TextBlock Text="{Binding GenericLoadTripple.PwmLevel2,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="3" Grid.Row="1" d:Text="50%" VerticalAlignment="Center" HorizontalAlignment="Center" />
         <TextBlock Text="{Binding GenericLoadTripple.PwmLevel3,Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.Column="3" Grid.Row="2" d:Text="50%" VerticalAlignment="Center" HorizontalAlignment="Center" />
-        
+        <Button Content="{DynamicResource b_switch_to_boot}" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Margin="5" HorizontalAlignment="Left" Command="{Binding SwitchToBootLoaderCommand}" />
 
     </Grid>
 </UserControl>

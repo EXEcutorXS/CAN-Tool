@@ -2,11 +2,13 @@
 using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -171,6 +173,76 @@ namespace OmniProtocol
             if (Application.Current.MainWindow != null)
                 ((MainWindowViewModel)Application.Current.MainWindow.DataContext).CanAdapter.Transmit(msg);
         }
+
+        // Доступ к общей шине/списку устройств - используется командами загрузчика (см. ниже
+        // и BootloaderDeviceViewModel), которым нужен не только Transmit, но и ConnectedDevices/
+        // CurrentTask/SelectedConnectedDevice.
+        protected static Omni Bus => ((MainWindowViewModel)Application.Current.MainWindow.DataContext).OmniInstance;
+
+        // ── Переход в загрузчик ────────────────────────────────────────
+        // Единственная кнопка, которая остаётся на странице обычного устройства - всё
+        // остальное (заливка hex, verify, дамп памяти) теперь живёт на странице загрузчика
+        // (BootloaderDeviceViewModel), т.к. набор доступных операций зависит от конкретного
+        // варианта загрузчика (см. Generation/IsPu28 там), а не только от типа устройства.
+        //
+        // Когда устройство переходит в загрузчик, оно физически меняет свой CAN-адрес на
+        // Type=123, поэтому в ConnectedDevices оно появляется как СОВЕРШЕННО НОВАЯ запись -
+        // текущий объект (this) её не увидит и не сможет забрать. PendingBootloaderOriginType/
+        // PendingBootloaderOriginFirmware - способ передать данные об исходном устройстве в тот
+        // будущий объект (см. RunAutoUpdate в BootloaderDeviceViewModel.cs).
+        public static int? PendingBootloaderOriginType { get; private set; }
+        public static BindingList<int> PendingBootloaderOriginFirmware { get; private set; }
+
+        [RelayCommand]
+        private void SwitchToBootLoader()
+        {
+            if (BootloaderAlreadyOnBus())
+            {
+                MessageBox.Show(GetString("t_bootloader_already_on_bus"), GetString("t_bootloader_conflict_title"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (VulnerableMbcOnBus(this))
+            {
+                MessageBox.Show(GetString("t_vulnerable_mbc_on_bus"), GetString("t_vulnerable_mbc_title"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            PendingBootloaderOriginType = Id.Type;
+            PendingBootloaderOriginFirmware = new BindingList<int>(Firmware.ToList());
+
+            OmniMessage msg = new();
+            msg.Pgn = 1;
+            msg.ReceiverId.Address = Id.Address;
+            msg.ReceiverId.Type = Id.Type;
+            msg.Data[0] = 0;
+            msg.Data[1] = 22;
+            msg.Data[2] = 0;
+            Transmit(msg.ToCanMessage());
+        }
+
+        private static bool BootloaderAlreadyOnBus() => Bus.ConnectedDevices.Any(d => d.Id.Type == 123);
+
+        // HCU (MBC-2, device type 125) firmware 125.0.0.5 - 125.0.0.15 has a CAN filter bug:
+        // it wrongly accepts any frame addressed to ReceiverType 126 (Control device / remote
+        // panel) as if it were its own, including the "enter bootloader" command. Flashing the
+        // panel with such an MBC-2 on the bus makes both jump into the bootloader at once, and
+        // the two bootloaders answering the flash protocol simultaneously bricks the flash.
+        // Fixed properly in firmware (per-command target check) starting with 125.0.0.16.
+        private const int VulnerableMbcDeviceType = 125;
+        private const int VulnerableMbcMinBuild = 5;
+        private const int VulnerableMbcMaxBuild = 15;
+
+        // excludeDevice: the device actually being switched to bootloader is not itself a risk
+        // (its own "enter bootloader" command is addressed to its own type, never to 126), and
+        // must be excluded so that updating a vulnerable MBC-2 to fix it isn't blocked by itself.
+        private static bool VulnerableMbcOnBus(DeviceViewModel excludeDevice) =>
+            Bus.ConnectedDevices.Any(d =>
+                d != excludeDevice &&
+                d.Id.Type == VulnerableMbcDeviceType &&
+                d.Firmware[3] >= VulnerableMbcMinBuild &&
+                d.Firmware[3] <= VulnerableMbcMaxBuild);
 
         public void ExecuteCommand(int cmdNum, params byte[] data)
         {

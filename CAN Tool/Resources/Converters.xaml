@@ -9,7 +9,7 @@
     <c:BinarToVisibleConverter x:Key="OnlyForBinars" />
     <c:PressureSensorToVisible x:Key="OnlyForPressureSensors" />
     <c:BootloaderToVisible x:Key="OnlyForBootloaders" />
-    <c:Pu28BootloaderToVisible x:Key="OnlyForPu28Bootloader" />
+    <c:IntEqualsToVisibleConverter x:Key="IntEqualsToVisible" />
     <c:PlanarToVisibleConverter x:Key="OnlyForPlanars" />
     <c:HcuToVisibleConverter x:Key="OnlyForHcu" />
     <c:GenericLoadTrippleToVisible x:Key="OnlyForGenericLoadTripple" />
