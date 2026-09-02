@@ -10,6 +10,8 @@
             </EventTrigger.Actions>
         </EventTrigger>
     </UserControl.Triggers>
+    <DockPanel>
+    <local:DeviceHeaderControl DockPanel.Dock="Top" />
     <Grid>
 
         <Grid.ColumnDefinitions>
@@ -26,17 +28,8 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="*" />
-            
-        </Grid.RowDefinitions>
-        <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" CornerRadius="15" Margin="10,15,0,15" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2" Width="120" Height="120" HorizontalAlignment="Left">
-            <Border.Background>
-                <ImageBrush ImageSource="{Binding Img}" Stretch="Fill" />
-            </Border.Background>
-        </Border>
 
-        <TextBlock Margin="5,0,5,0" Grid.Column="1" Text="{Binding Firmware,Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" FontSize="20" />
-        <TextBlock Margin="5,0,5,0" Grid.Column="1" Grid.Row="1" Text="{Binding ProductionDate}" VerticalAlignment="Center" FontSize="20" />
-        <TextBlock Margin="5,0,5,0" Grid.Column="1" Grid.Row="2" Text="{Binding Serial,Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" FontSize="20" />
+        </Grid.RowDefinitions>
         <ProgressBar Margin="10,10,10,10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="0" Value="{Binding ACPanelParams.CompressorPwmsSet}" Height="30"></ProgressBar>
         <ProgressBar Margin="10,10,10,10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="1" Value="{Binding ACPanelParams.CondensorPwmSet}" Height="30"></ProgressBar>
         <ProgressBar Margin="10,10,10,10" Minimum="0" Maximum="100" Grid.Column="2" Grid.Row="2" Value="{Binding ACPanelParams.EvapoPwmSet}" Height="30"></ProgressBar>
@@ -47,7 +40,6 @@
             <Slider x:Name="SetpointSlider" Minimum="16" Maximum="30" Height="30" Margin="0 14 0 5" ValueChanged="SetpointChanged" Width="300" />
             <TextBlock Foreground="Beige" VerticalAlignment="Center" FontSize="25" Text="{Binding ACPanelParams.Setpoint}" d:Text="15" Width="30" Margin="10"></TextBlock>
             <TextBlock x:Name="ErrorString" Text="{Binding Parameters.ErrorString}" FontSize="25" Margin="10" Foreground="PaleVioletRed" VerticalAlignment="Center" />
-            <Button Content="{DynamicResource b_switch_to_boot}" Margin="10" Command="{Binding SwitchToBootLoaderCommand}" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" Grid.RowSpan="2">
@@ -89,4 +81,5 @@
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
+    </DockPanel>
 </UserControl>

@@ -3,12 +3,15 @@ using CAN_Tool.Libs;
 using CAN_Tool.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -25,6 +28,8 @@ namespace OmniProtocol
 
             if (Omni.Devices.TryGetValue(Id.Type, out var device))
                 DeviceReference = device;
+
+            Task.Run(RefreshAvailableServerFirmwares);
         }
 
         // ── Идентификация ──────────────────────────────────────────────
@@ -55,6 +60,81 @@ namespace OmniProtocol
         [ObservableProperty] public BindingList<int> serial = new() { 0, 0, 0 };
         [ObservableProperty] public BindingList<int> firmware = new() { 0, 0, 0, 0 };
         [ObservableProperty] public BindingList<int> bootFirmware = new() { 0, 0, 0, 0 };
+
+        // ── Прошивка с сервера (multihot.online, см. Libs/OnlineFirmwareService.cs) ──
+        // Тип, по которому запрашивается список версий: обычно это Id.Type устройства, но на
+        // странице загрузчика (BootloaderDeviceViewModel) Id.Type всегда 123 - там
+        // переопределяется на исходный тип устройства (PendingBootloaderOriginType).
+        public virtual int FirmwareQueryType => Id.Type;
+
+        // Псевдо-версия в начале списка - выбрана по умолчанию. Означает "источник - локальный
+        // hex-файл, не сервер": и ComboBox всегда показывает этот вариант, и AutoUpdateFirmware
+        // (см. RunAutoUpdate) по нему понимает, что нужно спросить файл диалогом, как раньше,
+        // а не качать с сервера.
+        private static string FromFileOption => GetString("t_firmware_from_file");
+
+        public ObservableCollection<string> AvailableServerFirmwares { get; } = new();
+        [ObservableProperty] private string selectedServerFirmware;
+
+        private void RefreshAvailableServerFirmwares()
+        {
+            var versions = OnlineFirmwareService.GetVersionsAsync(FirmwareQueryType).GetAwaiter().GetResult();
+            RunOnUi(() =>
+            {
+                AvailableServerFirmwares.Clear();
+                AvailableServerFirmwares.Add(FromFileOption);
+                foreach (var v in versions)
+                    AvailableServerFirmwares.Add(v);
+                SelectedServerFirmware = FromFileOption;
+            });
+        }
+
+        // Выбор версии в комбобоксе - как нажатие "Load hex", только источник не файл, а
+        // сервер: скачивает бинарник, строит fragments из него напрямую (без Intel HEX -
+        // сервер publish'ит уже готовый плоский .bin + адрес начала прошивки), и подставляет
+        // синтетическое имя файла в ожидаемом ConfirmVersionMatch формате "<version>_....",
+        // чтобы сверка версии (см. ConfirmVersionMatch) продолжала работать как обычно. Нужно и
+        // для того, чтобы после выбора версии сразу были доступны кнопки "Прошить" конкретного
+        // поколения на странице загрузчика (не только Auto Update, который качает версию заново
+        // сам - см. RunAutoUpdate).
+        partial void OnSelectedServerFirmwareChanged(string value)
+        {
+            if (string.IsNullOrEmpty(value) || value == FromFileOption) return;
+            var queryType = FirmwareQueryType;
+            Task.Run(() => LoadServerFirmware(queryType, value));
+        }
+
+        private bool LoadServerFirmware(int deviceType, string version)
+        {
+            try
+            {
+                LogWriteLine($"Downloading firmware {version} from server...");
+                var (data, flashBase) = OnlineFirmwareService.DownloadFirmwareAsync(deviceType, version).GetAwaiter().GetResult();
+                lastHexFilePath = $"{version}_server.hex";
+                fragments = BuildFragmentsFromBinary(data, flashBase, FragmentSize);
+                LogWriteLine($"Firmware {version} loaded from server, contains {fragments.Count} fragments.");
+                return fragments.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                LogWriteLine($"Failed to load firmware {version} from server: {ex.Message}");
+                MessageBox.Show(ex.Message);
+                return false;
+            }
+        }
+
+        private static List<CodeFragment> BuildFragmentsFromBinary(byte[] data, uint baseAddress, int maxFragmentSize)
+        {
+            var result = new List<CodeFragment>();
+            for (var offset = 0; offset < data.Length; offset += maxFragmentSize)
+            {
+                var len = Math.Min(maxFragmentSize, data.Length - offset);
+                var fragment = new CodeFragment(maxFragmentSize) { StartAddress = baseAddress + (uint)offset, Length = len };
+                Array.Copy(data, offset, fragment.Data, 0, len);
+                result.Add(fragment);
+            }
+            return result;
+        }
 
         // ── Данные устройства ──────────────────────────────────────────
         public CommonParameters Parameters { get; set; } = new();
@@ -180,34 +260,227 @@ namespace OmniProtocol
         // загрузчика выполняются через Task.Run).
         protected static Omni Bus => MainWindowViewModel.Instance.OmniInstance;
 
-        // ── Переход в загрузчик ────────────────────────────────────────
-        // Единственная кнопка, которая остаётся на странице обычного устройства - всё
-        // остальное (заливка hex, verify, дамп памяти) теперь живёт на странице загрузчика
-        // (BootloaderDeviceViewModel), т.к. набор доступных операций зависит от конкретного
-        // варианта загрузчика (см. Generation/IsPu28 там), а не только от типа устройства.
+        // ── Лог ────────────────────────────────────────────────────────
+        // Общий для всех устройств: страница загрузчика показывает его в текстовом поле, у
+        // остальных устройств просто накапливается невидимо. Пишут в него методы, выполняющиеся
+        // в фоновом потоке (Task.Run - AutoUpdateFirmware/UpdateFirmware*/EraseFlash* и т.д.),
+        // а WPF-биндинг требует, чтобы изменение UI-привязанного свойства происходило в потоке,
+        // которому принадлежит Dispatcher - иначе "The calling thread cannot access this object
+        // because a different thread owns it".
+        [ObservableProperty]
+        private string log;
+
+        protected static void RunOnUi(Action action)
+        {
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher == null || dispatcher.CheckAccess())
+                action();
+            else
+                dispatcher.Invoke(action);
+        }
+
+        protected void LogWrite(string str) => RunOnUi(() => Log = str + Log);
+
+        protected void LogWriteLine(string str) => RunOnUi(() => Log = str + Environment.NewLine + Log);
+
+        // ── Hex-файл (общий парсер - используется всеми поколениями загрузчика) ─────────────
+        [ObservableProperty]
+        private int fragmentSize = 512;
+
+        protected List<CodeFragment> fragments = new();
+        protected string lastHexFilePath = "";
+
+        [RelayCommand]
+        private void LoadHex()
+        {
+            OpenFileDialog dialog = new();
+            dialog.Filter = "Hex Files|*.hex";
+            if (!(bool)dialog.ShowDialog()) return;
+            lastHexFilePath = dialog.FileName;
+            fragments = ParseHexFile(lastHexFilePath, FragmentSize);
+            LogWriteLine($"Hex is loaded, contains {fragments.Count} fragments.");
+        }
+
+        protected List<CodeFragment> ParseHexFile(string path, int maxFragmentSize)
+        {
+            fragments.Clear();
+            return ParseHexFile(path, maxFragmentSize, fragments);
+        }
+
+        protected List<CodeFragment> ParseHexFile(string path, int maxFragmentSize, List<CodeFragment> target)
+        {
+            // Не логируем сюда построчно/пофрагментно: LogWriteLine делает Log = str + Log,
+            // то есть каждый вызов копирует весь накопленный лог целиком - для файла на
+            // несколько тысяч фрагментов (например, дамп в 1МБ при 256-байтных фрагментах)
+            // это O(n^2) и превращает загрузку в дело на десятки секунд. Итоговое количество
+            // фрагментов логируется один раз в LoadHex/LoadDumpHex после завершения парсинга.
+            void AddFragment(CodeFragment fragment)
+            {
+                target.Add(fragment);
+            }
+
+            CodeFragment currentFragment = new(maxFragmentSize);
+            uint pageAddress = 0;
+
+            if (path is not { Length: > 0 }) return null;
+            uint lastLineAddress = 0;
+            using StreamReader sr = new(path);
+            while (!sr.EndOfStream)
+            {
+                var line = sr.ReadLine()?[1..];
+                var bytes = new byte[60];
+                for (var i = 0; i < line?.Length / 2; i++)
+                    bytes[i] = Convert.ToByte(line.Substring(i * 2, 2), 16);
+                int recordLen = bytes[0];
+
+                var lastLineSize = recordLen;
+                switch (bytes[3])
+                {
+                    case 0:
+                        var localAddress = (uint)(bytes[1] * 256 + bytes[2]);
+                        if ((pageAddress + localAddress != lastLineAddress + lastLineSize) && (lastLineAddress != 0)) //Current line is not just after previous, fragment must be divided
+                        {
+                            AddFragment(currentFragment);
+                            currentFragment = new CodeFragment(maxFragmentSize);
+                        }
+                        if (currentFragment.Length == 0) //First line in data fragment, saving address
+                        {
+                            // Length==0, not StartAddress==0: a fragment whose true start address
+                            // is exactly 0 (the very first fragment of a file starting at 0x000000)
+                            // would otherwise be indistinguishable from "not yet set", so every
+                            // following line at address 0, 16, 32... would keep overwriting
+                            // StartAddress - firmware then wrote a full 256-byte page starting
+                            // mid-page, and the flash's own page-program wrap corrupted the data.
+                            currentFragment.StartAddress = pageAddress + localAddress;
+                        }
+                        lastLineAddress = pageAddress + localAddress;
+                        var gotNotReserveData = false;
+
+                        for (var i = 0; i < recordLen; i++)
+                        {
+                            if (bytes[i + 4] == 0xff) continue;
+                            gotNotReserveData = true;
+                            break;
+                        }
+
+                        if (gotNotReserveData)
+                            for (var i = 0; i < recordLen; i++)
+                            {
+                                currentFragment.Data[currentFragment.Length++] = bytes[i + 4];
+                                if (currentFragment.Length != maxFragmentSize) continue;
+                                AddFragment(currentFragment);
+                                currentFragment = new CodeFragment(maxFragmentSize);
+                            }
+
+                        break;
+                    case 4:
+                        if (currentFragment.Length != 0)
+                        {
+                            AddFragment(currentFragment);
+                            currentFragment = new CodeFragment(maxFragmentSize);
+                        }
+                        pageAddress = (uint)(bytes[4] * 256 + bytes[5]) << 16;
+                        lastLineAddress = 0;
+                        break;
+                    case 1:
+                        if (currentFragment.Length > 0)
+                            AddFragment(currentFragment);
+                        return target;
+
+                }
+            }
+            return target;
+        }
+
+        // Parses hex file including ALL bytes (even 0xFF).
+        // Required for old (Gen1) bootloader: its write pointer advances for every received
+        // byte, so skipping reserved 0xFF blocks would misalign subsequent data in flash.
+        // Также используется VerifyFirmwareBytes - она сверяет побайтно, независимо от поколения.
+        protected List<CodeFragment> ParseHexFileRaw(string path, int maxFragmentSize)
+        {
+            var result = new List<CodeFragment>();
+            CodeFragment current = new(maxFragmentSize);
+            uint pageAddress = 0;
+            uint lastLineAddress = 0;
+
+            if (string.IsNullOrEmpty(path)) return result;
+            using StreamReader sr = new(path);
+            while (!sr.EndOfStream)
+            {
+                var line = sr.ReadLine()?[1..];
+                var bytes = new byte[60];
+                for (var i = 0; i < line?.Length / 2; i++)
+                    bytes[i] = Convert.ToByte(line.Substring(i * 2, 2), 16);
+
+                int recordLen = bytes[0];
+                switch (bytes[3])
+                {
+                    case 0:
+                        var localAddr = (uint)(bytes[1] * 256 + bytes[2]);
+                        uint absAddr = pageAddress + localAddr;
+                        if (lastLineAddress != 0 && absAddr != lastLineAddress + (uint)recordLen)
+                        {
+                            if (current.Length > 0) { result.Add(current); current = new(maxFragmentSize); }
+                        }
+                        if (current.Length == 0) // see ParseHexFile for why not StartAddress==0
+                            current.StartAddress = absAddr;
+                        lastLineAddress = absAddr;
+                        for (var i = 0; i < recordLen; i++)
+                        {
+                            current.Data[current.Length++] = bytes[i + 4];
+                            if (current.Length == maxFragmentSize)
+                            { result.Add(current); current = new(maxFragmentSize); }
+                        }
+                        break;
+                    case 4:
+                        if (current.Length > 0) { result.Add(current); current = new(maxFragmentSize); }
+                        pageAddress = (uint)(bytes[4] * 256 + bytes[5]) << 16;
+                        lastLineAddress = 0;
+                        break;
+                    case 1:
+                        if (current.Length > 0) result.Add(current);
+                        return result;
+                }
+            }
+            return result;
+        }
+
+        // ── Переход в загрузчик / авто-обновление ──────────────────────
+        // Единая кнопка на странице обычного устройства и на странице загрузчика: если
+        // устройство ещё не в загрузчике - сама переводит его туда и ждёт появления; если уже
+        // в загрузчике (страница BootloaderDeviceViewModel) - просто перепрошивает. Раньше это
+        // было разнесено (Switch to bootloader отдельно от Auto Update), но общий блок
+        // изображение/версия/серийник/дата теперь один на всех страницах, и там нужны обе
+        // кнопки сразу.
         //
         // Когда устройство переходит в загрузчик, оно физически меняет свой CAN-адрес на
         // Type=123, поэтому в ConnectedDevices оно появляется как СОВЕРШЕННО НОВАЯ запись -
         // текущий объект (this) её не увидит и не сможет забрать. PendingBootloaderOriginType/
         // PendingBootloaderOriginFirmware - способ передать данные об исходном устройстве в тот
-        // будущий объект (см. RunAutoUpdate в BootloaderDeviceViewModel.cs).
+        // будущий объект.
         public static int? PendingBootloaderOriginType { get; private set; }
         public static BindingList<int> PendingBootloaderOriginFirmware { get; private set; }
 
+        // На странице загрузчика (BootloaderDeviceViewModel) переопределяется в false - там уже
+        // некуда "входить".
+        public virtual bool CanEnterBootloader => true;
+
         [RelayCommand]
-        private void SwitchToBootLoader()
+        private void SwitchToBootLoader() => TrySwitchToBootLoader();
+
+        private bool TrySwitchToBootLoader()
         {
             if (BootloaderAlreadyOnBus())
             {
                 MessageBox.Show(GetString("t_bootloader_already_on_bus"), GetString("t_bootloader_conflict_title"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                return false;
             }
             if (VulnerableMbcOnBus(this))
             {
                 MessageBox.Show(GetString("t_vulnerable_mbc_on_bus"), GetString("t_vulnerable_mbc_title"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                return false;
             }
 
             PendingBootloaderOriginType = Id.Type;
@@ -221,6 +494,13 @@ namespace OmniProtocol
             msg.Data[1] = 22;
             msg.Data[2] = 0;
             Transmit(msg.ToCanMessage());
+
+            // Формально устройство в этот момент перестаёт существовать на шине под своим
+            // текущим адресом/типом (оно физически меняет их на Type=123) - убираем его из
+            // списка сразу, не дожидаясь тайм-аута опроса. Когда оно объявится как загрузчик,
+            // появится новая отдельная запись (см. Omni.ProcessOmniMessage).
+            RunOnUi(() => Bus.ConnectedDevices.Remove(this));
+            return true;
         }
 
         private static bool BootloaderAlreadyOnBus() => Bus.ConnectedDevices.Any(d => d.Id.Type == 123);
@@ -233,7 +513,7 @@ namespace OmniProtocol
         // Fixed properly in firmware (per-command target check) starting with 125.0.0.16.
         private const int VulnerableMbcDeviceType = 125;
         private const int VulnerableMbcMinBuild = 5;
-        private const int VulnerableMbcMaxBuild = 15;
+        private const int VulnerableMbcMaxBuild = 16;
 
         // excludeDevice: the device actually being switched to bootloader is not itself a risk
         // (its own "enter bootloader" command is addressed to its own type, never to 126), and
@@ -244,6 +524,162 @@ namespace OmniProtocol
                 d.Id.Type == VulnerableMbcDeviceType &&
                 d.Firmware[3] >= VulnerableMbcMinBuild &&
                 d.Firmware[3] <= VulnerableMbcMaxBuild);
+
+        [RelayCommand]
+        private void AutoUpdateFirmware()
+        {
+            Task.Run(() => RunAutoUpdate());
+        }
+
+        private void RunAutoUpdate()
+        {
+            try
+            {
+                // Источник прошивки решает комбобокс: "Из файла" (по умолчанию) - как раньше,
+                // диалог выбора hex-файла каждый раз заново (иначе повторное нажатие AUTO для
+                // другого устройства на шине молча прошивает его тем же файлом, что и
+                // предыдущее устройство, и может окирпичить его); любая реальная версия -
+                // скачиваем именно её с сервера (тоже заново, той же логики ради).
+                bool loaded;
+                var selectedVersion = SelectedServerFirmware;
+                if (string.IsNullOrEmpty(selectedVersion) || selectedVersion == FromFileOption)
+                {
+                    loaded = false;
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        OpenFileDialog dialog = new() { Filter = "Hex Files|*.hex" };
+                        if ((bool)dialog.ShowDialog())
+                        {
+                            lastHexFilePath = dialog.FileName;
+                            fragments = ParseHexFile(lastHexFilePath, FragmentSize);
+                            loaded = fragments.Count > 0;
+                        }
+                    });
+                }
+                else
+                {
+                    loaded = LoadServerFirmware(FirmwareQueryType, selectedVersion);
+                }
+                if (!loaded) return;
+
+                if (!ConfirmVersionMatch()) return;
+
+                BootloaderDeviceViewModel bootDev;
+                int originalDeviceType;
+
+                if (this is BootloaderDeviceViewModel selfAsBoot)
+                {
+                    // Уже находимся на странице загрузчика - переводить некуда, сразу прошиваем.
+                    bootDev = selfAsBoot;
+                    originalDeviceType = PendingBootloaderOriginType ?? -1;
+                }
+                else
+                {
+                    // Обычное устройство - переводим его в загрузчик сами и ждём, пока оно
+                    // появится в списке устройств уже как BootloaderDeviceViewModel (см.
+                    // TrySwitchToBootLoader/DeviceViewModel.Create).
+                    if (!TrySwitchToBootLoader()) return;
+                    originalDeviceType = Id.Type;
+
+                    LogWriteLine(GetString("t_auto_waiting_bootloader"));
+                    DeviceViewModel found = null;
+                    for (var i = 0; i < 150; i++) // 15 сек
+                    {
+                        Thread.Sleep(100);
+                        Application.Current.Dispatcher.Invoke(() =>
+                            found = Bus.ConnectedDevices.FirstOrDefault(d => d.Id.Type == 123));
+                        if (found != null) break;
+                    }
+
+                    if (found is not BootloaderDeviceViewModel foundBoot)
+                    {
+                        LogWriteLine(GetString("t_auto_bootloader_timeout"));
+                        return;
+                    }
+                    bootDev = foundBoot;
+                    Application.Current.Dispatcher.Invoke(() => Bus.SelectedConnectedDevice = bootDev);
+                }
+
+                // Запрашиваем версию загрузчика и ждём ответа - от неё зависит, каким
+                // протоколом (Generation) будем прошивать. Вызываем сам метод, а не
+                // RequestBootLoaderVersionCommand.Execute() - см. комментарий у объявления
+                // метода в BootloaderDeviceViewModel.cs про фоновый поток и CanExecuteChanged.
+                _ = bootDev.RequestBootLoaderVersion();
+                Thread.Sleep(500);
+
+                bootDev.FlashFragments(fragments);
+
+                // Возврат в основную программу
+                _ = bootDev.SwitchToMainProgram();
+
+                if (originalDeviceType < 0) return;
+
+                // Ждём повторного появления исходного устройства и переизбираем его в списке
+                LogWriteLine(GetString("t_auto_waiting_device"));
+                DeviceViewModel originalDev = null;
+                for (var i = 0; i < 150; i++) // 15 сек
+                {
+                    Thread.Sleep(100);
+                    Application.Current.Dispatcher.Invoke(() =>
+                        originalDev = Bus.ConnectedDevices.FirstOrDefault(d => d.Id.Type == originalDeviceType));
+                    if (originalDev != null) break;
+                }
+
+                if (originalDev == null)
+                    LogWriteLine(GetString("t_auto_device_timeout"));
+                else
+                {
+                    Application.Current.Dispatcher.Invoke(() => Bus.SelectedConnectedDevice = originalDev);
+                    LogWriteLine(GetString("t_auto_done"));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        // Имя файла прошивки по соглашению начинается с версии, напр.
+        // "126.0.4.19_STM_Main.hex" (см. также BrowseSlotHex в BootloaderDeviceViewModel.Pu28.cs).
+        // Порядок байт совпадает с BootFirmware/Firmware: [0]=тип изделия, [1]=напряжение/вариант,
+        // [2]=подтип, [3]=сборка.
+        private static bool TryParseVersionFromFileName(string path, out byte[] version)
+        {
+            version = null;
+            if (string.IsNullOrEmpty(path)) return false;
+            var candidate = Path.GetFileNameWithoutExtension(path).Split('_')[0];
+            var parts = candidate.Split('.');
+            if (parts.Length != 4 || !parts.All(p => byte.TryParse(p, out _))) return false;
+            version = parts.Select(byte.Parse).ToArray();
+            return true;
+        }
+
+        // Сверяет версию, зашитую в имя выбранного hex-файла, с версией реально работавшего ПО:
+        // если мы ещё не в загрузчике - берём текущую живую Firmware (это устройство и есть то
+        // самое изделие); если уже в загрузчике - берём снимок версии, сделанный в момент
+        // перехода (PendingBootloaderOriginFirmware), т.к. текущая Firmware у объекта-загрузчика
+        // не отражает исходное устройство. Если первые 2 байта версии (тип изделия и
+        // подтип/вариант) не совпадают - явный признак, что выбран бинарник от другого изделия
+        // (например, ПУ28 для MBC-2), и такую прошивку легко можно окирпичить. Если версия имени
+        // файла не распознана или версия устройства ещё неизвестна, сравнение пропускается -
+        // молча проходить дальше без спроса не даём только в случае явного расхождения.
+        private bool ConfirmVersionMatch()
+        {
+            if (!TryParseVersionFromFileName(lastHexFilePath, out var hexVersion)) return true;
+
+            var curVersion = this is BootloaderDeviceViewModel ? PendingBootloaderOriginFirmware : Firmware;
+            if (curVersion == null || (curVersion[0] == 0 && curVersion[1] == 0)) return true; // версия устройства неизвестна
+
+            if (curVersion[0] == hexVersion[0] && curVersion[1] == hexVersion[1]) return true;
+
+            var curStr = string.Join(".", curVersion);
+            var hexStr = string.Join(".", hexVersion);
+            var result = MessageBox.Show(
+                string.Format(GetString("t_auto_version_mismatch"), curStr, hexStr),
+                GetString("t_auto_version_mismatch_title"),
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            return result == MessageBoxResult.Yes;
+        }
 
         public void ExecuteCommand(int cmdNum, params byte[] data)
         {
@@ -312,11 +748,7 @@ namespace OmniProtocol
                 ? $"{DeviceReference.Name}({Id.Address})"
                 : $"Device #<{Id.Type}>({Id.Address})";
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null || obj.GetType() != typeof(DeviceViewModel)) return false;
-            return Id.Equals((obj as DeviceViewModel).Id);
-        }
+        public override bool Equals(object obj) => obj is DeviceViewModel other && Id.Equals(other.Id);
 
         public override int GetHashCode() => Id.GetHashCode();
     }

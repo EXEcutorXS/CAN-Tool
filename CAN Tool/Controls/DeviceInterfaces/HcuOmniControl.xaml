@@ -1,5 +1,7 @@
 ﻿<UserControl x:Class="CAN_Tool.CustomControls.HcuOmniControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:op="clr-namespace:OmniProtocol" xmlns:local="clr-namespace:CAN_Tool.CustomControls" xmlns:fa="http://schemas.fontawesome.com/icons/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:c="clr-namespace:CAN_Tool.ViewModels.Converters" xmlns:vm="clr-namespace:CAN_Tool.ViewModels" mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="1200" d:DataContext="{d:DesignInstance Type=op:DeviceViewModel}">
 
+    <DockPanel>
+    <local:DeviceHeaderControl DockPanel.Dock="Top" />
     <Grid>
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
@@ -10,7 +12,6 @@
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Liquid level: {0:d1},Path=TimberlineParams.LiquidLevel}" />
                 <ProgressBar Margin="15" Orientation="Vertical" Maximum="7" Value="{Binding TimberlineParams.LiquidLevel}" Height="50" />
                 <TextBlock FontSize="25" Foreground="{DynamicResource MaterialDesignCheckBoxOff}" VerticalAlignment="Center" Text="{Binding StringFormat = Outside: {0:F1}°,Path=TimberlineParams.OutsideTemperature,Converter={StaticResource ToFarenheit}}" />
-                <Button Content="{DynamicResource b_switch_to_boot}" Margin="10" Command="{Binding SwitchToBootLoaderCommand}" />
 
             </StackPanel>
             <StackPanel Orientation="Vertical">
@@ -63,4 +64,5 @@
             </StackPanel>
         </StackPanel>
     </Grid>
+    </DockPanel>
 </UserControl>

@@ -54,6 +54,8 @@
 <v:String x:Key="b_verify_bytes">Проверить побайтно</v:String>
 <v:String x:Key="b_find_boot">Найти загрузчик</v:String>
 <v:String x:Key="b_switch_to_boot">войти в Bootloader</v:String>
+<v:String x:Key="t_online_firmware">Прошивка с сервера</v:String>
+<v:String x:Key="t_firmware_from_file">Из файла...</v:String>
 <v:String x:Key="b_switch_to_main_program">Запустить программу</v:String>
 <v:String x:Key="b_get_version">Запросить версию</v:String>
 <v:String x:Key="b_erase_memory">Стереть память</v:String>

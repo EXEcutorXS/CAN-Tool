@@ -9,44 +9,24 @@
                     </Storyboard>
                 </BeginStoryboard>
                 <BeginStoryboard>
-                    <Storyboard TargetProperty="Opacity" TargetName="ErrorButton">
-                        <DoubleAnimation From="0" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:0.5" />
+                    <Storyboard TargetProperty="Opacity" TargetName="ErrorTextBlock">
+                        <DoubleAnimation From="0.3" To="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:0.5" />
                     </Storyboard>
                 </BeginStoryboard>
             </EventTrigger.Actions>
         </EventTrigger>
     </UserControl.Triggers>
     <DockPanel>
+        <local:DeviceHeaderControl DockPanel.Dock="Top" />
         <Grid Name="DeviceInfoGrid" DockPanel.Dock="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="55" />
                 <RowDefinition Height="200" />
                 <RowDefinition Height="50" />
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition Width="120" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" x:Name="StageTextBlock" HorizontalAlignment="Center" Text="{Binding Parameters.StageString}" FontSize="30" Margin="8" TextWrapping="WrapWithOverflow" />
-            <Border Grid.Column="0" Grid.Row="1" CornerRadius="15" Margin="10" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2">
-                <Button x:Name="ErrorButton" Style="{DynamicResource MaterialDesignFloatingActionButton}" Height="100" Width="100" Background="Red" Command="{Binding ClearErrorsCommand}" ToolTip="{DynamicResource t_press_clean_error}" Visibility="{Binding Parameters.Error, Converter={StaticResource NotZeroToVisibilityConverter}}">
-                    <StackPanel Orientation="Horizontal">
-                        <fa:FontAwesome Icon="Solid_ExclamationTriangle" FontSize="25" Foreground="{DynamicResource MaterialDesignTextAreaBorder}"></fa:FontAwesome>
-                        <TextBlock FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Parameters.Error}" />
-                    </StackPanel>
-                </Button>
-                <Border.Background>
-                    <ImageBrush ImageSource="{Binding Img}" Stretch="Fill" />
-                </Border.Background>
-            </Border>
-            <StackPanel Grid.Row="1" Grid.Column="1">
-                <TextBlock Margin="5" Grid.Row="0" Text="{Binding Firmware,Converter={StaticResource VersionConverter},Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
-                <TextBlock Margin="5" Grid.Row="1" Text="{Binding ProductionDate,Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
-                <TextBlock Margin="5" Grid.Row="2" Text="{Binding Serial,Converter={StaticResource VersionConverter},Mode=OneWay}" VerticalAlignment="Center" FontSize="20" />
-            </StackPanel>
+            <TextBlock Grid.Row="0" x:Name="StageTextBlock" HorizontalAlignment="Center" Text="{Binding Parameters.StageString}" FontSize="30" Margin="8" TextWrapping="WrapWithOverflow" />
 
-            <Border Grid.Row="2" Grid.ColumnSpan="3" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignDivider}" CornerRadius="5" Margin="2">
+            <Border Grid.Row="2" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignDivider}" CornerRadius="5" Margin="2">
                 <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Left">
                     <Button Margin="2" ToolTip="{DynamicResource t_run_device_tt}" Command="{Binding StartHeaterCommand}">
                         <Button.Content>
@@ -62,12 +42,11 @@
                     <Button Margin="2" ToolTip="{DynamicResource t_run_water_pump_tt}" Command="{Binding StartPumpCommand}" Content="{DynamicResource b_water_pump}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForBinars}}"></Button>
                     <Button Margin="2" ToolTip="{DynamicResource t_run_ventilation_tt}" Command="{Binding StartVentCommand}" Content="{DynamicResource b_vent}" Visibility="{Binding DeviceReference.DevType,Converter={StaticResource OnlyForPlanars}}"></Button>
                     <Button Content="{DynamicResource b_calibrate}" Margin="2" Command="{Binding CalibrateTermocouplesCommand}" />
-                    <Button Content="{DynamicResource b_clear_errors}" Margin="2" Command="{Binding ClearErrorsCommand}" />
-                    <TextBlock Margin="5" Text="{Binding Parameters.ErrorString}" Foreground="Red" FontSize="20" VerticalAlignment="Center" Visibility="{Binding Parameters.Error, Converter={StaticResource IntToVisibileConverter}}" TextWrapping="Wrap" />
-                    <Button Content="{DynamicResource b_switch_to_boot}" Margin="2" Command="{Binding SwitchToBootLoaderCommand}" />
+                    <Button Content="{DynamicResource b_clear_errors}" Margin="2" ToolTip="{DynamicResource t_press_clean_error}" Command="{Binding ClearErrorsCommand}" Visibility="{Binding Parameters.Error, Converter={StaticResource IntToVisibileConverter}}" />
+                    <TextBlock x:Name="ErrorTextBlock" Margin="5" Text="{Binding Parameters.ErrorString}" Foreground="Red" FontWeight="Bold" FontSize="20" VerticalAlignment="Center" Visibility="{Binding Parameters.Error, Converter={StaticResource IntToVisibileConverter}}" TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
-            <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Stretch">
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <Border BorderBrush="{DynamicResource MaterialDesignBody}" CornerRadius="20" BorderThickness="0" Margin="10" Background="{DynamicResource MaterialDesignDataGridRowHoverBackground}">
                     <StackPanel>
                         <Grid>
