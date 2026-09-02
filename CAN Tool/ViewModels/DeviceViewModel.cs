@@ -296,6 +296,7 @@ namespace OmniProtocol
             OpenFileDialog dialog = new();
             dialog.Filter = "Hex Files|*.hex";
             if (!(bool)dialog.ShowDialog()) return;
+            if (!ValidateFirmwareFileName(dialog.FileName)) return;
             lastHexFilePath = dialog.FileName;
             fragments = ParseHexFile(lastHexFilePath, FragmentSize);
             LogWriteLine($"Hex is loaded, contains {fragments.Count} fragments.");
@@ -548,7 +549,7 @@ namespace OmniProtocol
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         OpenFileDialog dialog = new() { Filter = "Hex Files|*.hex" };
-                        if ((bool)dialog.ShowDialog())
+                        if ((bool)dialog.ShowDialog() && ValidateFirmwareFileName(dialog.FileName))
                         {
                             lastHexFilePath = dialog.FileName;
                             fragments = ParseHexFile(lastHexFilePath, FragmentSize);
@@ -561,8 +562,6 @@ namespace OmniProtocol
                     loaded = LoadServerFirmware(FirmwareQueryType, selectedVersion);
                 }
                 if (!loaded) return;
-
-                if (!ConfirmVersionMatch()) return;
 
                 BootloaderDeviceViewModel bootDev;
                 int originalDeviceType;
@@ -654,31 +653,40 @@ namespace OmniProtocol
             return true;
         }
 
-        // Сверяет версию, зашитую в имя выбранного hex-файла, с версией реально работавшего ПО:
-        // если мы ещё не в загрузчике - берём текущую живую Firmware (это устройство и есть то
-        // самое изделие); если уже в загрузчике - берём снимок версии, сделанный в момент
-        // перехода (PendingBootloaderOriginFirmware), т.к. текущая Firmware у объекта-загрузчика
-        // не отражает исходное устройство. Если первые 2 байта версии (тип изделия и
-        // подтип/вариант) не совпадают - явный признак, что выбран бинарник от другого изделия
-        // (например, ПУ28 для MBC-2), и такую прошивку легко можно окирпичить. Если версия имени
-        // файла не распознана или версия устройства ещё неизвестна, сравнение пропускается -
-        // молча проходить дальше без спроса не даём только в случае явного расхождения.
-        private bool ConfirmVersionMatch()
+        // Проверяет выбранный hex-файл перед тем, как разрешить его грузить в fragments -
+        // жёсткая блокировка (не "уверены?"), т.к. прошивка от другого изделия может
+        // окирпичить устройство. Имя файла должно быть по соглашению ("<4 байта версии
+        // через точку>_..."), а первые 2 байта (тип изделия и подтип/вариант) должны совпадать
+        // с версией реально работавшего ПО: если мы ещё не в загрузчике - берём текущую живую
+        // Firmware (это устройство и есть то самое изделие); если уже в загрузчике - берём
+        // снимок версии, сделанный в момент перехода (PendingBootloaderOriginFirmware), т.к.
+        // текущая Firmware у объекта-загрузчика не отражает исходное устройство. Если версия
+        // устройства ещё неизвестна, сравнение пропускается - иначе любой первый выбор файла
+        // для только что появившегося устройства блокировался бы просто из-за отсутствия данных
+        // для сравнения.
+        private bool ValidateFirmwareFileName(string path)
         {
-            if (!TryParseVersionFromFileName(lastHexFilePath, out var hexVersion)) return true;
+            if (!TryParseVersionFromFileName(path, out var hexVersion))
+            {
+                MessageBox.Show(
+                    string.Format(GetString("t_firmware_name_invalid"), Path.GetFileName(path)),
+                    GetString("t_firmware_mismatch_title"),
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
 
             var curVersion = this is BootloaderDeviceViewModel ? PendingBootloaderOriginFirmware : Firmware;
-            if (curVersion == null || (curVersion[0] == 0 && curVersion[1] == 0)) return true; // версия устройства неизвестна
+            if (curVersion == null || (curVersion[0] == 0 && curVersion[1] == 0)) return true; // версия устройства пока неизвестна
 
             if (curVersion[0] == hexVersion[0] && curVersion[1] == hexVersion[1]) return true;
 
             var curStr = string.Join(".", curVersion);
             var hexStr = string.Join(".", hexVersion);
-            var result = MessageBox.Show(
-                string.Format(GetString("t_auto_version_mismatch"), curStr, hexStr),
-                GetString("t_auto_version_mismatch_title"),
-                MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            return result == MessageBoxResult.Yes;
+            MessageBox.Show(
+                string.Format(GetString("t_firmware_version_mismatch"), hexStr, curStr),
+                GetString("t_firmware_mismatch_title"),
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            return false;
         }
 
         public void ExecuteCommand(int cmdNum, params byte[] data)

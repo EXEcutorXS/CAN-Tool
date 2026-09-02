@@ -1,15 +1,21 @@
 using System;
 using System.IO.Ports;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace CAN_Tool.Libs.CanAdapters
 {
+    // Generic driver for any SLCAN-compatible adapter - see CanAdapter.AdapterType's own
+    // comment. Assumes real dedicated hardware, which needs no artificial pacing between
+    // transmits (GetDelay() below is 0 here). A device that speaks SLCAN but genuinely
+    // can't keep up at that rate - the org's own modem acting as a USB-CAN bridge, notably
+    // (see ModemSlcanDriver) - gets its own AdapterType/subclass instead of slowing every
+    // SLCAN adapter down to its pace.
     public class SlcanDriver : ICanAdapterDriver
     {
         private readonly SerialPort _port = new();
         private readonly StringBuilder _currentBuf = new();
-        private int _speed;
+        protected int _speed;
 
         // If parsing ever falls behind badly enough that no '\r' shows up for this long,
         // the buffer is garbage (or the device stopped framing) - drop it instead of
@@ -66,17 +72,21 @@ namespace CAN_Tool.Libs.CanAdapters
             str.Append(message.GetDataInTextFormat());
             str.Append('\r');
             _port.Write(str.ToString());
-            Task.Delay(GetDelay());
+            /* This used to be Task.Delay(GetDelay()) without an await - that
+               starts a timer task and immediately discards it, so nothing
+               ever actually paused here regardless of GetDelay()'s value.
+               Fixed to a real blocking wait (safe here: Transmit() is
+               synchronous/void, and every call site - including flashing's
+               tight per-fragment-byte loops - already runs on a background
+               thread via Task.Run, never the UI thread). GetDelay() is 0 in
+               this base class (see the class comment above); a slower
+               device gets its own subclass overriding it, not a change
+               here. */
+            var delay = GetDelay();
+            if (delay > 0) Thread.Sleep(delay);
         }
 
-        private int GetDelay() => _speed switch
-        {
-            0 => 20,
-            1 => 8,
-            2 => 4,
-            3 => 2,
-            _ => 1
-        };
+        protected virtual int GetDelay() => 0;
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs args)
         {

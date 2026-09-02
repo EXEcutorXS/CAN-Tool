@@ -12,26 +12,26 @@ b_exit	Exit	Выход	Beenden
 b_common	Common	Общие данные	Allgemein
 b_water_pump	Water pump	Помпа	Wasserpumpe
 b_vent	Ventilation	Вентиляция	Belüftung
-b_calibrate	Calibrate termocouples	Калибровка термопар	Thermoelemente kalibrieren
+b_calibrate	Calibrate termocouples	Калибровка термопар	TE kalibrieren
 b_clear_errors	Clear errors	Стереть ошибки	Fehler löschen
 b_clear_list	Clear list	Очистить список	Liste leeren
 b_save_report	Report	Отчёт	Bericht
 b_read	Read	Считать	Lesen
 b_save	Save	Сохранить	Speichern
-b_reset	Reset	Сбросить	Zurücksetzen
+b_reset	Reset	Сбросить	Reset
 b_start_log	Start	Начать	Start
 b_stop_log	Stop	Остановить	Stop
 b_redraw	Redraw	Отрисовать	Neu zeichnen
 b_save_log	Save log	Сохранить лог	Log speichern
-b_autoredraw	Autoredraw	Автоотрисовка	Autom. neu zeichnen
+b_autoredraw	Autoredraw	Автоотрисовка	Auto-Neuzeichnen
 b_log_length	Log length:	Длина лога:	Loggingdauer:
 b_dataset	Dataset:	Набор данных	Datensatz:
 b_messages	Messages	Сообщения	Nachrichten
 b_commands	Commands	Комманды	Befehle
 b_config	Config	Настройки	Einstellungen
-b_log_chart	Log & Chart	График	Protokoll & Diagramm
+b_log_chart	Log & Chart	График	Log & Diagramm
 b_status	Status	Статус	Status
-b_black_box	Black Box	ЧЯ	Schwarze Box
+b_black_box	Black Box	ЧЯ	Blackbox
 b_read_bb_data	Read Data	Считать данные	Daten lesen
 b_read_bb_errors	Read Errors	Считать ошибки	Fehler lesen
 b_clear_bb_data	Clear Data	Стереть данные	Daten löschen
@@ -41,19 +41,21 @@ b_leave_manual	Leave Manual	Выкл	Manuell aus
 b_1000_ticks	1000 ticks	1000 качков	1000 Takte
 b_air_set	Blower	НВ	Gebläse
 b_air_measured	Blower real	НВ изм.	Gebläse (Ist)
-b_fuel_pump_set	Fuel Pump	ТН	Kraftstoffpumpe
+b_fuel_pump_set	Fuel Pump	ТН	Dosierpumpe
 b_glow_plug_set	Glow Plug	Свеча	Glühkerze
 b_manual	Manual	Ручник	Manuell
 b_firmware	Firmware	Прошивка	Firmware
 b_load_hex	Load HEX	Загрузить HEX	HEX laden
-b_auto_update	AUTO	АВТО	AUTO
-b_burn	Program	Прошить	Programmieren
-b_burn_v3	Program(gen. 3)	Прошить(3-е поколение)	Programmieren (3. Generation)
-b_burn_old	Program(obsolete)	Прошить(старый загрузчик)	Programmieren (veraltet)
+b_auto_update	Auto Update	Auto Update	Auto Update
+b_burn	Program	Прошить	Flashen
+b_burn_v3	Program(gen. 3)	Прошить(3-е поколение)	Flashen (Gen. 3)
+b_burn_old	Program(obsolete)	Прошить(старый загрузчик)	Flashen (veraltet)
 b_verify_crc	Verify by CRC	Проверить по CRC	CRC prüfen
 b_verify_bytes	Verify byte-by-byte	Проверить побайтно	Byteweise prüfen
 b_find_boot	Ping Bootloader	Найти загрузчик	Bootloader suchen
 b_switch_to_boot	to Bootloader	войти в Bootloader	zum Bootloader
+t_online_firmware	Firmware from server	Прошивка с сервера	Firmware vom Server
+t_firmware_from_file	From file...	Из файла...	Aus Datei...
 b_switch_to_main_program	to Main Program	Запустить программу	zum Hauptprogramm
 b_get_version	Get Version	Запросить версию	Version abfragen
 b_erase_memory	Erase Memory	Стереть память	Speicher löschen
@@ -92,6 +94,9 @@ t_auto_waiting_device	Waiting for updated device	Ожидаем обновлён
 t_auto_device_timeout	Device did not restart within timeout	Устройство не перезапустилось в течение отведённого времени	Device restart timed out
 t_auto_version_mismatch	Selected firmware version ({1}) does not match the device's current version ({0}). Flashing a firmware from a different product can brick the device. Continue anyway?	Версия выбранной прошивки ({1}) не совпадает с текущей версией устройства ({0}). Прошивка от другого изделия может окирпичить устройство. Продолжить?	Die gewählte Firmware-Version ({1}) stimmt nicht mit der aktuellen Version des Geräts ({0}) überein. Eine Firmware eines anderen Produkts kann das Gerät unbrauchbar machen. Trotzdem fortfahren?
 t_auto_version_mismatch_title	Firmware version mismatch	Несовпадение версии прошивки	Firmware-Versionskonflikt
+t_firmware_name_invalid	File "{0}" is named incorrectly - the name must start with the firmware version (e.g. "125.0.0.15_STM_Main.hex"). Firmware was not loaded.	Файл "{0}" назван неправильно - имя должно начинаться с версии прошивки (например "125.0.0.15_STM_Main.hex"). Прошивка не загружена.	Die Datei "{0}" ist falsch benannt - der Name muss mit der Firmware-Version beginnen (z.B. "125.0.0.15_STM_Main.hex"). Firmware wurde nicht geladen.
+t_firmware_version_mismatch	Selected firmware ({0}) does not match this device (current version {1}) - the first 2 version numbers must match. Firmware was not loaded.	Выбранная прошивка ({0}) не подходит этому устройству (текущая версия {1}) - совпадать должны первые 2 числа версии. Прошивка не загружена.	Die gewählte Firmware ({0}) passt nicht zu diesem Gerät (aktuelle Version {1}) - die ersten 2 Versionsziffern müssen übereinstimmen. Firmware wurde nicht geladen.
+t_firmware_mismatch_title	Unsuitable firmware	Неподходящая прошивка	Ungeeignete Firmware
 t_auto_done	Auto updating done	Автоматическое обновление ПО завершено	Auto updating done
 t_bootloader_already_on_bus	A bootloader is already present on the bus. Programming aborted to prevent flash corruption.	На шине уже присутствует загрузчик. Программирование прервано во избежание порчи прошивки.	Ein Bootloader ist bereits am Bus. Programmierung abgebrochen.
 t_bootloader_conflict_title	Bootloader conflict	Конфликт загрузчиков	Bootloader-Konflikt
@@ -125,8 +130,8 @@ e_13	No ignition	Нет горения	Keine Zündung
 e_14	Water pump error	Ошибка помпы	Wasserpumpenfehler
 e_15	Low supply voltage	Пониженное напряжение питания	Niedrige Versorgungsspannung
 e_16	Body temp.sensor does not cool down	Датчик температуры корпуса не остывает	Gehäusetemp.-Sensor kühlt nicht ab
-e_17	Short circuit of the fuel pump	КЗ в цепи топливного насоса	Kurzschluss Kraftstoffpumpe
-e_22	Open circuit of the fuel pump	Обрыв в цепи топливного насоса	Leitungsunterbrechung Kraftstoffpumpe
+e_17	Short circuit of the fuel pump	КЗ в цепи топливного насоса	Kurzschluss Dosierpumpe
+e_22	Open circuit of the fuel pump	Обрыв в цепи топливного насоса	Leitungsunterbrechung Dosierpumpe
 e_27	Fan does not rotate	Нет вращения вентилятора	Gebläse dreht nicht
 e_28	Fan self-rotation	Самопроизвольное вращение вентилятора	Gebläse dreht selbstständig
 e_29	Exceeding the limit of flame blowout	Превышено максимальное число срывов пламени	Max. Flammenabrisse überschritten
@@ -232,7 +237,7 @@ par_23	Zone3 enable	Зона3 подключена (для систем отоп
 par_24	Zone4 enable	Зона4 подключена (для систем отопления)	Zone 4 aktiv
 par_25	Zone5 enable	Зона5 подключена (для систем отопления)	Zone 5 aktiv
 par_26	Maximum flame temperature	максимальная темепература выхлопных газов	Max. Abgastemperatur
-par_27	Fuel pump performance	производительность топливного насоса, мл/100 качков	Kraftstoffpumpenleistung, ml/100 Takte
+par_27	Fuel pump performance	производительность топливного насоса, мл/100 качков	Dosierpumpenleistung, ml/100 Takte
 			
 par_28	Element off	уставка температуры ТЭНа для перехода в ждущий	Heizelement aus (Temp.)
 par_29	Element on temperature 	уставка температуры ТЭНа для выхода из ждущего	Heizelement ein (Temp.)
@@ -913,9 +918,9 @@ m_3-21	Blowing before vent	Продувка перед вентиляцией	Bl
 m_3-22	Blowing on flaeme break	Продувка при срыве пламени	Blasen bei Flammenabriss
 m_3-23	Blowing on overheat	Продувка и вентиляция при перегреве	Blasen bei Überhitzung
 m_3-24	Water pump only	Только помпа	Nur Pumpe
-m_3-25	Low power	Малый	Niedrigleistung
-m_3-26	Middle power	Средний	Mittlere Leistung
-m_3-27	High power	Сильный	Maximalleistung
+m_3-25	Low power	Малый	Niedrig
+m_3-26	Middle power	Средний	Mittel
+m_3-27	High power	Сильный	Maximal
 m_3-28	Blowing before waiting	Продувка перед ждущим	Blasen vor Bereitschaft
 m_3-29	Waiting	Ждущий	Bereitschaft
 m_3-30	Water pump only	Только помпа	Nur Pumpe
@@ -1017,7 +1022,7 @@ t_flash_conf_read_write	Read/Write configuration in flash	Запись/чтен�
 t_black_box_operation	Black box operations	Работа с ЧЯ	Schwarze-Box-Operationen
 t_stage_mode_failures	Stage,Mode Fail Codes and warnings	Стадия, режим, код неисправности, код предупреждения	Phase, Modus, Fehlercodes und Warnungen
 t_voltage_pressure_current	Voltage, pressure, motor current	Напряжение питания, атмосферное давление, ток двигателя	Spannung, Druck, Motorstrom
-t_blower_fp_plug_relay	Blower revs, fuel pump, glow plug, relay	Обороты НВ, частота ТН, свеча, реле	Gebläse, Kraftstoffpumpe, Glühkerze, Relais
+t_blower_fp_plug_relay	Blower revs, fuel pump, glow plug, relay	Обороты НВ, частота ТН, свеча, реле	Gebläse, Dosierpumpe, Glühkerze, Relais
 t_liquid_heater_temperatures	Liquid heater temperatures	Температуры жидкостных подогревателей	Flüssigkeitsheizgerät-Temperaturen
 t_flame_process	Flame process observing	Слежение за пламенем	Flammenüberwachung
 t_adc0-3	ADC channels 0..3	АЦП 0-3 каналы	ADC-Kanäle 0..3
@@ -1125,7 +1130,7 @@ t_stay_in_boot	Stay in bootloader	Оставаться в загрузчике	I
 t_to_main_program_without_delay	To main program without delay	Переход в основную программу без задержки	Sofort zum Hauptprogramm
 t_5_sec_in_boot	5 seconds in bootloader	5 секунд в загрузчике	5 Sekunden im Bootloader
 t_mask_all	Mask every failure	Игнорирование всех неисправностей	Alle Fehler ignorieren
-t_mask_fp_failures	Mask fuel pump failures	Игнорирование неисправностей ТН	Kraftstoffpumpenfehler ignorieren
+t_mask_fp_failures	Mask fuel pump failures	Игнорирование неисправностей ТН	Dosierpumpenfehler ignorieren
 t_mask_flamebreak_fails	Mask flame break failures	Игнорирование срывов пламени	Flammenabrisse ignorieren
 t_mask_glow_plug_failures	Mask glow plug failures	Игнорирование неисправностей свечи	Glühkerzenfehler ignorieren
 t_mask_blower_failures	MAsk air blower_failures	Игнорирование неисправностей НВ	Gebläsefehler ignorieren
@@ -1145,15 +1150,15 @@ t_leave_t	Leave test mode	Вход в режим Т	Testmodus beenden
 t_pump_state	Pump state	Состояние помпы	Pumpenstatus
 t_blower_revs	Blower revs	Обороты нагнетателя	Gebläsedrehzahl
 t_glow_plug	Glow plug power	Мощность свечи	Glühkerzenleistung
-t_fuel_pump_freq	Fuel pump frequency	Частота ТН	Kraftstoffpumpenfrequenz
+t_fuel_pump_freq	Fuel pump frequency	Частота ТН	Dosierpumpenfrequenz
 t_exec_dev_type	Executove device type	Тип устройства	Aktortyp
-t_fpx10	Fuel pump (Hz*10)	ТН, Гц*10	Kraftstoffpumpe (Hz*10)
+t_fpx10	Fuel pump (Hz*10)	ТН, Гц*10	Dosierpumpe (Hz*10)
 t_relay01	Relay (0/1)	Реле(0/1)	Relais (0/1)
 t_glow_plug_perc	Glow plug %	Свеча %	Glühkerze %
 t_pump_perc	Pump %	Помпа %	Pumpe %
 t_blower_perc	Blower PWM %	Шим НВ,%	Gebläse PWM %
 t_blower_revs_rps	Blower speed(RPS)	Обороты НВ, об/с	Gebläse (U/s)
-t_fuel_pump_state	Fuel pump state	Состояние ТН	Kraftstoffpumpenstatus
+t_fuel_pump_state	Fuel pump state	Состояние ТН	Dosierpumpenstatus
 t_relay_state	Relay state	Состояние реле	Relaisstatus
 t_glow_plug_state	Glow plug state	Состояние свечи	Glühkerzenstatus
 t_blower_state	Blower state	Состояние НВ	Gebläsestatus
@@ -1194,7 +1199,7 @@ t_channel2_adc_value	Channel 2 ADC value	Значение АЦП 2 канала	
 t_channel3_adc_value	Channel 3 ADC value	Значение АЦП 3 канала	Kanal 3 ADC-Wert
 t_channel4_adc_value	Channel 4 ADC value	Значение АЦП 4 канала	Kanal 4 ADC-Wert
 b_def_set	Default Set	По умолчанию	Standard
-t_fuel_pump_overriden	Fuel pump overriden flag	ТН переопределено	Kraftstoffpumpe überschrieben
+t_fuel_pump_overriden	Fuel pump overriden flag	ТН переопределено	Dosierpumpe überschrieben
 t_relay_overriden	Relay overriden flag	Реле переопределено	Relais überschrieben
 t_glow_plug_overriden	Glow plug overriden flag	Свеча переопределена	Glühkerze überschrieben
 t_pump_overriden	Pump state overriden flag	Состояние помпы переопределено	Pumpenstatus überschrieben
@@ -1203,7 +1208,7 @@ t_ovr_pump_state	Overriden pump state	Заданное состояние пом
 t_ovr_relay_state	Overriden relay state	Заданное состояние реле	Überschrieb. Relaisstatus
 t_overriden_blower_revs	Overriden air blower revs	Заданные обороты нагнетателя	Überschrieb. Gebläsedrehzahl
 t_overriden_glow_plug_power	Overriden glow plug power	Заданная мощность свечи	Überschrieb. Glühkerzenleistung
-t_overriden_fuel_pump_frequency	Overriden fuel pump frequency	Заданная частота ТН	Überschrieb. Kraftstoffpumpenfrequenz
+t_overriden_fuel_pump_frequency	Overriden fuel pump frequency	Заданная частота ТН	Überschrieb. Dosierpumpenfrequenz
 t_actuator_override	Actuators override	Переопределение исполнительных устройств	Aktorüberschreibung
 t_generic_load_control	Generic load control	Управления универсальной нагрузкой	Universallaststeuerung
 t_temperature_1	Temperature 1	Температура 1	Temperatur 1
@@ -1229,8 +1234,8 @@ t_cant_erase_memory	Can't erase memory	Не удалось стереть пам
 t_firmware_update_success	Firmware update successful	Прошивка успешно обновлена	Firmware-Update erfolgreich
 t_starting_old_boot_prog	Starting old bootloader programming ({0} fragments)	Прошивка через старый загрузчик ({0} фрагментов)	Alter Bootloader wird programmiert ({0} Fragmente)
 b_heater	Heater	Нагреватель	Heizgerät
-b_element	Element	ТЭН	Heizelement
-b_floor	Floor	Тёплый пол	Fußbodenheizung
+b_element	Element	ТЭН	Element
+b_floor	Floor	Тёплый пол	Fußboden
 b_engine_preheat	Engine	Двигатель	Motor
 b_heater_pump	Heater Pump	Помпа нагревателя	Heizungspumpe
 b_pump1	Pump 1	Помпа 1	Pumpe 1
@@ -1238,7 +1243,7 @@ b_pump2	Pump 2	Помпа 2	Pumpe 2
 b_aux_pump1	AUX pump 1	Доп. помпа 1	Zusatzpumpe 1
 b_aux_pump2	AUX pump 2	Доп. помпа 2	Zusatzpumpe 2
 b_aux_pump3	AUX pump 3	Доп. помпа 3	Zusatzpumpe 3
-b_sync_time	Sync time	Синхр. время	Zeit synchronisieren
+b_sync_time	Sync time	Синхр. время	Zeit sync.
 t_day_start_at	Day start at:	Начало дня:	Tagesbeginn:
 t_night_start_at	Night start at:	Начало ночи:	Nachtbeginn:
 t_system_time_limit	System time limit	Лимит работы системы	Systemlaufzeit-Limit
@@ -1254,7 +1259,7 @@ t_sub_label	Sub:	Под:	Sub:
 b_request_dgn	Request	Запрос	Anfragen
 t_sa_label	SA:	SA:	SA:
 b_req_addr	Req addr	Зап. адрес	Addr. anfragen
-b_claim_addr	Claim	Клейм	Beanspruchen
+b_claim_addr	Claim	Клейм	Anfordern
 t_sim_label	Sim:	Сим:	Sim:
 t_sim_tooltip	Comma-separated SA list the simulator will defend	SA через запятую для защиты симулятором	SA-Liste (kommagetrennt) für Simulator-Schutz
 t_mode_label	Mode:	Режим:	Modus:
@@ -1269,12 +1274,4 @@ t_run_device_tt	Run Device	Запустить устройство	Gerät starte
 t_stop_device_tt	Stop Device	Остановить устройство	Gerät stoppen
 t_run_water_pump_tt	Run just water pump	Запустить только помпу	Nur Wasserpumpe starten
 t_run_ventilation_tt	Run ventilation	Запустить вентиляцию	Belüftung starten
-b_images	Images	Картинки	Bilder
-b_load_images	Load images...	Загрузить картинки...	Bilder laden...
-b_erase_and_send_images	Erase and send images	Стереть и отправить картинки	Bilder löschen und senden
-b_load_firmware	Load panel firmware...	Загрузить прошивку панели...	Panel-Firmware laden...
-b_send_firmware	Send firmware	Отправить прошивку	Firmware senden
-b_patch_firmware_crc	Patch length+CRC	Вписать длину+CRC	Länge+CRC eintragen
-b_legacy_slow_mode	Slower interval	Увеличенный интервал	Langsameres Intervall
-t_legacy_slow_mode_tt	Adds small delays on the legacy (<15.5) image transfer for a noisy/shared CAN bus. Slower, but a quiet bus doesn't need it.	Добавляет небольшие паузы при передаче картинок на старых (<15.5) загрузчиках — для шумной/общей шины CAN. Медленнее, но на тихой шине не требуется.	Fügt beim Legacy-Bildtransfer (<15.5) kleine Pausen ein - für einen belegten/verrauschten CAN-Bus. Langsamer, aber auf einem ruhigen Bus nicht nötig.
 t_port_not_open	Port is not open	Порт не открыт	Port ist nicht geöffnet

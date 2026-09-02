@@ -240,7 +240,8 @@ namespace CAN_Tool
             Slcan, // named after the wire protocol, not the CANable brand - any SLCAN-compatible adapter works
             PCAN,
             CandleLight,
-            Ble // PU-28 bootloader's BLE-CAN bridge mode - see BleDriver
+            Ble, // PU-28 bootloader's BLE-CAN bridge mode - see BleDriver
+            Modem // the org's own modem's USB-CDC SLCAN bridge - see ModemSlcanDriver for why it's not just Slcan
         }
 
         public Array AdapterTypes => Enum.GetValues(typeof(AdapterType));
@@ -290,6 +291,7 @@ namespace CAN_Tool
                 AdapterType.PCAN => new PcanDriver(),
                 AdapterType.CandleLight => new CandleLightDriver(),
                 AdapterType.Ble => new BleDriver(),
+                AdapterType.Modem => new ModemSlcanDriver(),
                 _ => throw new ArgumentOutOfRangeException(nameof(adapterType))
             };
 

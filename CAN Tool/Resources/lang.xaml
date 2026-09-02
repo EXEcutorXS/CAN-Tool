@@ -46,7 +46,7 @@
 <v:String x:Key="b_manual">Manual</v:String>
 <v:String x:Key="b_firmware">Firmware</v:String>
 <v:String x:Key="b_load_hex">Load HEX</v:String>
-<v:String x:Key="b_auto_update">AUTO</v:String>
+<v:String x:Key="b_auto_update">Auto Update</v:String>
 <v:String x:Key="b_burn">Program</v:String>
 <v:String x:Key="b_burn_v3">Program(gen. 3)</v:String>
 <v:String x:Key="b_burn_old">Program(obsolete)</v:String>
@@ -94,6 +94,9 @@
 <v:String x:Key="t_auto_device_timeout">Device did not restart within timeout</v:String>
 <v:String x:Key="t_auto_version_mismatch">Selected firmware version ({1}) does not match the device's current version ({0}). Flashing a firmware from a different product can brick the device. Continue anyway?</v:String>
 <v:String x:Key="t_auto_version_mismatch_title">Firmware version mismatch</v:String>
+<v:String x:Key="t_firmware_name_invalid">File "{0}" is named incorrectly - the name must start with the firmware version (e.g. "125.0.0.15_STM_Main.hex"). Firmware was not loaded.</v:String>
+<v:String x:Key="t_firmware_version_mismatch">Selected firmware ({0}) does not match this device (current version {1}) - the first 2 version numbers must match. Firmware was not loaded.</v:String>
+<v:String x:Key="t_firmware_mismatch_title">Unsuitable firmware</v:String>
 <v:String x:Key="t_auto_done">Auto updating done</v:String>
 <v:String x:Key="t_bootloader_already_on_bus">A bootloader is already present on the bus. Programming aborted to prevent flash corruption.</v:String>
 <v:String x:Key="t_bootloader_conflict_title">Bootloader conflict</v:String>
@@ -1271,13 +1274,5 @@
 <v:String x:Key="t_stop_device_tt">Stop Device</v:String>
 <v:String x:Key="t_run_water_pump_tt">Run just water pump</v:String>
 <v:String x:Key="t_run_ventilation_tt">Run ventilation</v:String>
-<v:String x:Key="b_images">Images</v:String>
-<v:String x:Key="b_load_images">Load images...</v:String>
-<v:String x:Key="b_erase_and_send_images">Erase and send images</v:String>
-<v:String x:Key="b_load_firmware">Load panel firmware...</v:String>
-<v:String x:Key="b_send_firmware">Send firmware</v:String>
-<v:String x:Key="b_patch_firmware_crc">Patch length+CRC</v:String>
-<v:String x:Key="b_legacy_slow_mode">Slower interval</v:String>
-<v:String x:Key="t_legacy_slow_mode_tt">Adds small delays on the legacy (&lt;15.5) image transfer for a noisy/shared CAN bus. Slower, but a quiet bus doesn't need it.</v:String>
 <v:String x:Key="t_port_not_open">Port is not open</v:String>
 </ResourceDictionary>

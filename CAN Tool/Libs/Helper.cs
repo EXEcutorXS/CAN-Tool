@@ -86,14 +86,21 @@ namespace CAN_Tool.Libs
 
     public static class Helper
     {
+        // Ключи вида "b_auto_update"/"t_online_firmware"/"vars_12" - если ресурс не найден
+        // (например local.csv не загрузился), убираем однословный префикс категории (буквы до
+        // первого "_") и отдаём остаток как читаемый почти-английский текст вместо сырого ключа.
         public static string GetString(string key)
         {
             if (string.IsNullOrEmpty(key) || Application.Current == null) return "";
             var ret = (string)Application.Current.TryFindResource(key);
             if (ret != null)
                 return ret;
-            else
-                return key.Replace('_', ' ');
+
+            var underscoreIndex = key.IndexOf('_');
+            var body = underscoreIndex > 0 && key[..underscoreIndex].All(char.IsLower)
+                ? key[(underscoreIndex + 1)..]
+                : key;
+            return body.Replace('_', ' ');
         }
 
         public static bool GotResource(string key)

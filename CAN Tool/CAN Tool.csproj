@@ -90,10 +90,6 @@
     <Page Update="Controls\DeviceInterfaces\ACInverterControl.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Resources\lang.ru-RU.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
 
 	<ItemGroup>
@@ -124,8 +120,12 @@
 	</Target>
 
   <!--
-    Inline MSBuild task: converts local.csv → lang.xaml + lang.<culture>.xaml
+    Inline MSBuild task: converts local.csv → lang.xaml (English/first column only).
     No external exe required. Runs before each build only when local.csv changes.
+    Only lang.xaml is generated (and merged in App.xaml) as a static fallback for the
+    case LocalizationLoader.Initialize() can't read the embedded local.csv at runtime -
+    every other culture is loaded straight from local.csv into memory by LocalizationLoader,
+    so a per-culture lang.<culture>.xaml file would just be generated and never loaded.
   -->
   <UsingTask TaskName="CsvToLangXaml"
              TaskFactory="RoslynCodeTaskFactory"
@@ -167,7 +167,9 @@
             " xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"" +
             " xmlns:v=\"clr-namespace:System;assembly=mscorlib\">";
 
-        for (int i = 0; i < cultures.Count; i++)
+        // Только первая колонка (английский) - см. комментарий над этим таском про то,
+        // почему остальные культуры сюда не пишутся.
+        if (cultures.Count > 0)
         {
             var sb = new StringBuilder();
             sb.AppendLine(xmlHeader);
@@ -176,7 +178,7 @@
                 if (row == null) { sb.AppendLine(); continue; }
                 if (row[0].Length > 2)
                 {
-                    string val = row[1 + i]
+                    string val = row[1]
                         .Replace("&", "&amp;")
                         .Replace("<", "&lt;")
                         .Replace(">", "&gt;");
@@ -187,10 +189,7 @@
             }
             sb.AppendLine("</ResourceDictionary>");
 
-            // First culture column → lang.xaml (default / English)
-            // Others → lang.<culture>.xaml  (e.g. lang.ru-Ru.xaml)
-            string fileName = (i == 0) ? "lang.xaml" : "lang." + cultures[i] + ".xaml";
-            File.WriteAllText(Path.Combine(OutputDir, fileName), sb.ToString(), Encoding.UTF8);
+            File.WriteAllText(Path.Combine(OutputDir, "lang.xaml"), sb.ToString(), Encoding.UTF8);
         }
         return true;
       ]]>
