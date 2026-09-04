@@ -1086,6 +1086,13 @@ public partial class Omni : ObservableObject
         RequestPgn(id, 18);
     }
 
+    // Параметр "Device's CAN address" (см. Resources/local.csv par_18) при записи меняет
+    // адрес устройства на шине немедленно - если отправить его не последним, все следующие
+    // за ним Write Param в этом же проходе уходят на уже устаревший id.Address, и устройство
+    // их просто не видит (оно теперь слушает новый адрес). Поэтому в SaveParameters он всегда
+    // отправляется в самом конце, после всех остальных настроек.
+    private const int DeviceAddressParameterId = 18;
+
     public async void SaveParameters(DeviceId id)
     {
         if (!Capture("t_saving_params_to_flash")) return;
@@ -1093,8 +1100,13 @@ public partial class Omni : ObservableObject
         if (dev == null) return;
         var msg = new OmniMessage();
         var tempCollection = new List<ReadedParameter>();
+        ReadedParameter addressParameter = null;
         foreach (var p in dev.ReadParameters)
-            tempCollection.Add(p);
+        {
+            if (p.Id == DeviceAddressParameterId) addressParameter = p;
+            else tempCollection.Add(p);
+        }
+        if (addressParameter != null) tempCollection.Add(addressParameter);
         var cnt = 0;
         foreach (var p in tempCollection)
         {

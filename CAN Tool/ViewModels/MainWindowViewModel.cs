@@ -14,9 +14,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Xceed.Words.NET;
+using CAN_Tool.Libs;
 using static CAN_Tool.Libs.Helper;
-using Alignment = Xceed.Document.NET.Alignment;
 using RVC;
 
 namespace CAN_Tool.ViewModels
@@ -355,47 +354,12 @@ namespace CAN_Tool.ViewModels
         private void EraseBlackBoxData(object parameter) => Task.Run(() => OmniInstance.EraseCommonBlackBox(OmniInstance.SelectedConnectedDevice.Id));
 
         [RelayCommand]
-        private void SaveReport(object parameter)
+        private async Task SaveReport(object parameter)
         {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + OmniInstance.SelectedConnectedDevice.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".docx";
-            var doc = DocX.Create(path);
-            var headParagraph = doc.InsertParagraph();
-            headParagraph.AppendLine(GetString("t_device_report") + ": ").Append(OmniInstance.SelectedConnectedDevice.Name).Bold();
-            headParagraph.AppendLine(GetString("t_serial_number") + ": ").Append(OmniInstance.SelectedConnectedDevice.Serial[0].ToString() + "." + OmniInstance.SelectedConnectedDevice.Serial[1].ToString() + "." + OmniInstance.SelectedConnectedDevice.Serial[2].ToString()).Bold();
-            headParagraph.AppendLine(GetString("t_manufacturing_date") + ": ").Append(OmniInstance.SelectedConnectedDevice.ProductionDate.ToString()).Bold();
-            headParagraph.AppendLine(GetString("t_formed") + ": ").Append(DateTime.Now.ToLocalTime().ToString()).Bold();
-            headParagraph.AppendLine();
-            headParagraph.AppendLine(GetString("t_common_black_box_data") + ":").FontSize(18);
-            headParagraph.Alignment = Alignment.center;
-            var dataParagraph = doc.InsertParagraph();
-            foreach (var p in OmniInstance.SelectedConnectedDevice.BbValues)
-            {
-                dataParagraph.Append(GetString($"bb_{p.Id}") + ": ");
-                dataParagraph.Append(p.Value.ToString()).Bold();
-                dataParagraph.AppendLine();
-            }
-            dataParagraph.AppendLine();
-
-
-            if (OmniInstance.SelectedConnectedDevice.BbErrors.Count > 0)
-            {
-                var errorHeader = doc.InsertParagraph();
-                errorHeader.AppendLine($"{GetString("t_errors_found") + ": "} {OmniInstance.SelectedConnectedDevice.BbErrors.Count}").FontSize(17);
-                errorHeader.AppendLine();
-                errorHeader.Alignment = Alignment.center;
-                var errorParagraph = doc.InsertParagraph();
-
-                foreach (var e in OmniInstance.SelectedConnectedDevice.BbErrors)
-                {
-
-                    errorParagraph.AppendLine(e.Name).Bold();
-                    errorParagraph.AppendLine();
-                    foreach (var v in e.Variables)
-                        errorParagraph.AppendLine('\t' + v.Name + ": ").Append(v.Value.ToString()).Bold();
-                    errorParagraph.AppendLine();
-                }
-            }
-            doc.Save();
+            var dev = OmniInstance.SelectedConnectedDevice;
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + '\\' + dev.Name + " " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString().Replace(':', '-') + ".pdf";
+            var html = ReportHtmlBuilder.Build(dev);
+            await HtmlToPdfConverter.ConvertAsync(html, path);
         }
 
         [RelayCommand]

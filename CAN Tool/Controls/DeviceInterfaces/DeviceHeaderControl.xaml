@@ -15,8 +15,11 @@
 
         To Bootloader/Auto Update работают через DeviceViewModel.SwitchToBootLoaderCommand /
         AutoUpdateFirmwareCommand - они сами определяют, нужно ли сначала переводить устройство
-        в загрузчик, или оно уже там (см. DeviceViewModel.RunAutoUpdate). "To Bootloader"
-        скрывается на странице загрузчика (CanEnterBootloader=false там - уже некуда входить).
+        в загрузчик, или оно уже там (см. DeviceViewModel.RunAutoUpdate). На странице загрузчика
+        (CanEnterBootloader=false там) из шапки убраны "To Bootloader" (уже некуда входить),
+        Auto Update и выбор прошивки с сервера - там уже есть свой набор конкретных кнопок
+        "Прошить" под фактическое поколение загрузчика (см. BootloaderControl.xaml), и держать
+        рядом ещё и Auto/комбобокс избыточно.
 
         Комбобокс выбора прошивки с сервера - список версий подтягивается с multihot.online
         по типу устройства (DeviceViewModel.RefreshAvailableServerFirmwares), выбор версии
@@ -34,12 +37,13 @@
             <TextBlock Text="{Binding Serial, Converter={StaticResource VersionConverter}, Mode=OneWay}" FontSize="18" />
             <TextBlock Text="{Binding ProductionDate, Mode=OneWay}" FontSize="18" />
         </StackPanel>
-        <StackPanel VerticalAlignment="Center" Margin="10,0">
-            <Button Content="{DynamicResource b_switch_to_boot}" Margin="3" Command="{Binding SwitchToBootLoaderCommand}"
-                    Visibility="{Binding CanEnterBootloader, Converter={StaticResource BoolToVisibileConverter}}" />
+        <StackPanel VerticalAlignment="Center" Margin="10,0"
+                    Visibility="{Binding CanEnterBootloader, Converter={StaticResource BoolToVisibileConverter}}">
+            <Button Content="{DynamicResource b_switch_to_boot}" Margin="3" Command="{Binding SwitchToBootLoaderCommand}" />
             <Button Content="{DynamicResource b_auto_update}" Margin="3" Command="{Binding AutoUpdateFirmwareCommand}" />
         </StackPanel>
-        <StackPanel VerticalAlignment="Center" Margin="10,0">
+        <StackPanel VerticalAlignment="Center" Margin="10,0"
+                    Visibility="{Binding CanEnterBootloader, Converter={StaticResource BoolToVisibileConverter}}">
             <TextBlock Text="{DynamicResource t_online_firmware}" FontSize="11" Opacity="0.6" Margin="3,0,3,2" />
             <ComboBox Width="220" Margin="3,0"
                       ItemsSource="{Binding AvailableServerFirmwares}"

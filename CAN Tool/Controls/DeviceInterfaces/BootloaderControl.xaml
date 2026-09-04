@@ -15,10 +15,11 @@
         <TextBlock DockPanel.Dock="Top" Margin="15,0,15,10" FontSize="16" Opacity="0.8"
                    Text="{Binding BootFirmware, Converter={StaticResource VersionConverter}, Mode=OneWay, StringFormat='Bootloader: {0}'}" />
 
-        <!-- Общие команды - доступны независимо от поколения загрузчика. Auto Update и To
-             Bootloader теперь в общем блоке-шапке (DeviceHeaderControl) - здесь только то, что
-             специфично для страницы загрузчика. -->
-        <WrapPanel DockPanel.Dock="Top" Margin="10">
+        <!-- Общие команды - для Gen1/Gen3. Auto Update и To Bootloader теперь в общем
+             блоке-шапке (DeviceHeaderControl) - здесь только то, что специфично для страницы
+             загрузчика. У Gen2 свой, более короткий набор кнопок ниже - Get Version/Find boot
+             ему не нужны (см. следующий блок). -->
+        <WrapPanel DockPanel.Dock="Top" Margin="10" Visibility="{Binding Generation, Converter={StaticResource IntNotEqualsToVisible}, ConverterParameter=2}">
             <Button Content="{DynamicResource b_get_version}" Margin="10" Command="{Binding GetVersionCommand}" />
             <Button Content="{DynamicResource b_find_boot}" Margin="10" Command="{Binding RequestBootLoaderVersionCommand}" />
             <Button Content="{DynamicResource b_switch_to_main_program}" Margin="10" Command="{Binding SwitchToMainProgramCommand}" />
@@ -31,9 +32,13 @@
             <Button Content="{DynamicResource b_burn_old}" Margin="10" Command="{Binding UpdateFirmwareOldCommand}" />
         </WrapPanel>
 
-        <!-- Gen2 ("всё остальное"): протокол PGN105/106 -->
+        <!-- Gen2 ("всё остальное"): протокол PGN105/106. Без Get Version/Find boot - весь
+             набор в одну строку: hex, прошить, проверить побайтно, перейти в программу. -->
         <WrapPanel DockPanel.Dock="Top" Margin="10" Visibility="{Binding Generation, Converter={StaticResource IntEqualsToVisible}, ConverterParameter=2}">
+            <Button Content="{DynamicResource b_load_hex}" Margin="10" Command="{Binding LoadHexCommand}" />
             <Button Content="{DynamicResource b_burn}" Margin="10" Command="{Binding UpdateFirmwareCommand}" />
+            <Button Content="{DynamicResource b_verify_bytes}" Margin="10" Command="{Binding VerifyFirmwareBytesCommand}" />
+            <Button Content="{DynamicResource b_switch_to_main_program}" Margin="10" Command="{Binding SwitchToMainProgramCommand}" />
         </WrapPanel>
 
         <!-- Gen3 (сборка ≥13): протокол PGN110/111, magic words + настоящий CRC32-verify -->

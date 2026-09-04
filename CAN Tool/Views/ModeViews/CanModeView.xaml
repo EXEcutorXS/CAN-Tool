@@ -6,6 +6,7 @@
              xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:v="clr-namespace:CAN_Tool.ViewModels.Validators"
+             xmlns:cc="clr-namespace:CAN_Tool.CustomControls"
              mc:Ignorable="d">
     <DockPanel>
         <StackPanel Grid.Row="0" Orientation="Horizontal" DockPanel.Dock="Top">
@@ -14,6 +15,7 @@
             <TextBlock VerticalAlignment="Center" Margin="10" Text="DLC:" FontSize="25" />
             <TextBox ToolTip="DLC" MinWidth="40" Margin="10" Text="{Binding CanPage.ConstructedMessage.Dlc,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignOutlinedTextBox}" d:Text="8" />
             <TextBlock VerticalAlignment="Center" Margin="10" Text="Data:" FontSize="25" />
+            <cc:DataBox ToolTip="Enter data in HEX format" Text="{Binding CanPage.ConstructedMessage.Data,Converter={StaticResource HexToDataConverter},UpdateSourceTrigger=PropertyChanged}" Margin="5 10" Style="{StaticResource MaterialDesignTextBox}" FontSize="22" />
             <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.Rtr}" Margin="10" FontSize="20">RTR</CheckBox>
             <CheckBox IsChecked="{Binding CanPage.ConstructedMessage.Ide}" Margin="10" FontSize="20">IDE</CheckBox>
             <Button Margin="10" Command="{Binding CanPage.SendCanMessageCommand}">Send</Button>

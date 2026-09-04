@@ -10,6 +10,7 @@
     <c:PressureSensorToVisible x:Key="OnlyForPressureSensors" />
     <c:BootloaderToVisible x:Key="OnlyForBootloaders" />
     <c:IntEqualsToVisibleConverter x:Key="IntEqualsToVisible" />
+    <c:IntNotEqualsToVisibleConverter x:Key="IntNotEqualsToVisible" />
     <c:PlanarToVisibleConverter x:Key="OnlyForPlanars" />
     <c:HcuToVisibleConverter x:Key="OnlyForHcu" />
     <c:GenericLoadTrippleToVisible x:Key="OnlyForGenericLoadTripple" />

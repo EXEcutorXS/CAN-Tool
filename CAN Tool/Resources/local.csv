@@ -96,8 +96,11 @@ t_auto_version_mismatch	Selected firmware version ({1}) does not match the devic
 t_auto_version_mismatch_title	Firmware version mismatch	Несовпадение версии прошивки	Firmware-Versionskonflikt
 t_firmware_name_invalid	File "{0}" is named incorrectly - the name must start with the firmware version (e.g. "125.0.0.15_STM_Main.hex"). Firmware was not loaded.	Файл "{0}" назван неправильно - имя должно начинаться с версии прошивки (например "125.0.0.15_STM_Main.hex"). Прошивка не загружена.	Die Datei "{0}" ist falsch benannt - der Name muss mit der Firmware-Version beginnen (z.B. "125.0.0.15_STM_Main.hex"). Firmware wurde nicht geladen.
 t_firmware_version_mismatch	Selected firmware ({0}) does not match this device (current version {1}) - the first 2 version numbers must match. Firmware was not loaded.	Выбранная прошивка ({0}) не подходит этому устройству (текущая версия {1}) - совпадать должны первые 2 числа версии. Прошивка не загружена.	Die gewählte Firmware ({0}) passt nicht zu diesem Gerät (aktuelle Version {1}) - die ersten 2 Versionsziffern müssen übereinstimmen. Firmware wurde nicht geladen.
+t_firmware_version_mismatch_confirm	The loaded file's version ({0}) differs by type from the device's current version ({1}). Are you sure? A wrong firmware can brick the device.	Прошитая версия отличается по типу от загруженной только что ({0} против {1}). Вы уверены в своих действиях? Неверная прошивка может окирпичить устройство.	Die Version der geladenen Datei ({0}) unterscheidet sich im Typ von der aktuellen Geräteversion ({1}). Sind Sie sicher? Eine falsche Firmware kann das Gerät unbrauchbar machen.
 t_firmware_mismatch_title	Unsuitable firmware	Неподходящая прошивка	Ungeeignete Firmware
 t_auto_done	Auto updating done	Автоматическое обновление ПО завершено	Auto updating done
+t_save_settings_title	Save settings	Сохранение настроек	Einstellungen speichern
+t_save_settings_before_update	Save current device settings before flashing? They will be read now and written back once the update is finished. Not needed for Gen.3 bootloaders - they keep settings automatically.	Сохранить текущие настройки устройства перед прошивкой? Они будут считаны сейчас и записаны обратно после завершения обновления. Для загрузчика 3-го поколения не требуется - он сохраняет настройки автоматически.	Aktuelle Geräteeinstellungen vor dem Flashen sichern? Sie werden jetzt gelesen und nach Abschluss des Updates zurückgeschrieben. Bei Gen.3-Bootloadern nicht nötig - sie behalten die Einstellungen automatisch.
 t_bootloader_already_on_bus	A bootloader is already present on the bus. Programming aborted to prevent flash corruption.	На шине уже присутствует загрузчик. Программирование прервано во избежание порчи прошивки.	Ein Bootloader ist bereits am Bus. Programmierung abgebrochen.
 t_bootloader_conflict_title	Bootloader conflict	Конфликт загрузчиков	Bootloader-Konflikt
 t_vulnerable_mbc_on_bus	An MBC-2 with vulnerable firmware (125.0.0.5 - 125.0.0.15) is present on the bus. It would wrongly enter the bootloader together with the flashed device and corrupt both. Update the MBC-2 first.	На шине обнаружен MBC-2 с уязвимой прошивкой (125.0.0.5 - 125.0.0.15). Он ошибочно перейдёт в загрузчик вместе с прошиваемым устройством, что приведёт к порче обоих. Сначала обновите MBC-2.	Ein MBC-2 mit anfälliger Firmware (125.0.0.5 - 125.0.0.15) ist am Bus vorhanden. Er würde fälschlicherweise zusammen mit dem zu programmierenden Gerät in den Bootloader wechseln und beide beschädigen. Aktualisieren Sie zuerst den MBC-2.
@@ -110,7 +113,7 @@ t_ok	Ok	Ок	Ok
 t_confirm_action	Confirm action	Подтвердите действие	Aktion bestätigen
 t_device_report	Device report	Отчёт об устройстве	Gerätebericht
 t_serial_number	Serial number	Серийный номер	Seriennummer
-t_manufacturing_date	Manufacturing date	Дата производства	Herstellungsdatum
+t_manufacturing_date	Firmware date	Дата прошивки	Firmware-Datum
 t_formed	Formed	Отчёт сформирован	Erstellt
 t_common_black_box_data	Black box common data	Общие данные из чёрного ящика	Allg. Schwarze-Box-Daten
 t_errors_found	Stored errors found	Ошибок в памяти	Gespeicherte Fehler

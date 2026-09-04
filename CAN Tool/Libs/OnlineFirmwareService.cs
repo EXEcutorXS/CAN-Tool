@@ -1,8 +1,11 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,24 +30,84 @@ namespace CAN_Tool.Libs
         private const string BaseUrl = "https://multihot.online";
         private const int TimeoutSeconds = 8;
 
+        // Один HttpClient на всё приложение - конструктор DeviceViewModel запрашивает список
+        // версий на каждое появление устройства (в т.ч. на каждый переход в загрузчик/обратно
+        // во время прошивки), так что создавать/уничтожать HttpClient на каждый вызов - лишний
+        // расход сокетов при частых обновлениях.
+        private static readonly HttpClient Http = new();
+
+        // Локальный кэш списков версий по типам устройства - один JSON-файл в папке
+        // программы, ключ - номер типа. Не про надёжность (сервер и так публичный и почти
+        // всегда доступен), а про то, чтобы при запуске программы список не был пустым, пока
+        // идёт сетевой запрос (см. DeviceViewModel.RefreshAvailableServerFirmwaresAsync -
+        // сначала читает отсюда синхронно и сразу показывает, потом обновляет с сервера).
+        private static readonly string CacheFilePath =
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "firmware_versions_cache.json");
+        private static readonly object CacheLock = new();
+
+        public static List<string> LoadCachedVersions(int deviceType)
+        {
+            lock (CacheLock)
+            {
+                try
+                {
+                    if (!File.Exists(CacheFilePath)) return new List<string>();
+                    var obj = JObject.Parse(File.ReadAllText(CacheFilePath));
+                    if (obj[deviceType.ToString()] is JArray arr)
+                        return arr.Select(v => v.ToString()).ToList();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[OnlineFirmwareService] LoadCachedVersions({deviceType}) failed: {ex.Message}");
+                }
+                return new List<string>();
+            }
+        }
+
+        private static void SaveCachedVersions(int deviceType, List<string> versions)
+        {
+            lock (CacheLock)
+            {
+                try
+                {
+                    JObject obj = null;
+                    if (File.Exists(CacheFilePath))
+                    {
+                        try { obj = JObject.Parse(File.ReadAllText(CacheFilePath)); }
+                        catch { /* повреждённый кэш - просто перезапишем целиком */ }
+                    }
+                    obj ??= new JObject();
+                    obj[deviceType.ToString()] = new JArray(versions);
+                    File.WriteAllText(CacheFilePath, obj.ToString(Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[OnlineFirmwareService] SaveCachedVersions({deviceType}) failed: {ex.Message}");
+                }
+            }
+        }
+
+        // Возвращает null при сетевой ошибке (в отличие от пустого списка от сервера) - чтобы
+        // вызывающий код мог отличить "сеть недоступна, оставляем то, что уже показали из
+        // кэша" от "сервер ответил, но версий для этого типа действительно нет".
         public static async Task<List<string>> GetVersionsAsync(int deviceType)
         {
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(TimeoutSeconds));
-                using var http = new HttpClient();
-                var json = await http.GetStringAsync($"{BaseUrl}/firmware/{deviceType}/versions", cts.Token);
+                var json = await Http.GetStringAsync($"{BaseUrl}/firmware/{deviceType}/versions", cts.Token);
                 var obj = JObject.Parse(json);
                 var result = new List<string>();
                 if (obj["versions"] is JArray arr)
                     foreach (var v in arr)
                         result.Add(v.ToString());
+                SaveCachedVersions(deviceType, result);
                 return result;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[OnlineFirmwareService] GetVersions({deviceType}) failed: {ex.Message}");
-                return new List<string>();
+                return null;
             }
         }
 
@@ -54,9 +117,8 @@ namespace CAN_Tool.Libs
         public static async Task<(byte[] Data, uint FlashBase)> DownloadFirmwareAsync(int deviceType, string version)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(TimeoutSeconds));
-            using var http = new HttpClient();
 
-            var profileText = await http.GetStringAsync($"{BaseUrl}/firmware/{deviceType}/{version}/profile", cts.Token);
+            var profileText = await Http.GetStringAsync($"{BaseUrl}/firmware/{deviceType}/{version}/profile", cts.Token);
             uint? flashBase = null;
             foreach (var line in profileText.Split('\n'))
             {
@@ -70,7 +132,7 @@ namespace CAN_Tool.Libs
             if (flashBase == null)
                 throw new InvalidOperationException($"Server did not report flashBase for {deviceType}/{version}");
 
-            var data = await http.GetByteArrayAsync($"{BaseUrl}/firmware/{deviceType}/{version}/firmware.bin");
+            var data = await Http.GetByteArrayAsync($"{BaseUrl}/firmware/{deviceType}/{version}/firmware.bin", cts.Token);
             return (data, flashBase.Value);
         }
     }

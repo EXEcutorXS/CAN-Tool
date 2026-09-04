@@ -96,8 +96,11 @@
 <v:String x:Key="t_auto_version_mismatch_title">Firmware version mismatch</v:String>
 <v:String x:Key="t_firmware_name_invalid">File "{0}" is named incorrectly - the name must start with the firmware version (e.g. "125.0.0.15_STM_Main.hex"). Firmware was not loaded.</v:String>
 <v:String x:Key="t_firmware_version_mismatch">Selected firmware ({0}) does not match this device (current version {1}) - the first 2 version numbers must match. Firmware was not loaded.</v:String>
+<v:String x:Key="t_firmware_version_mismatch_confirm">The loaded file's version ({0}) differs by type from the device's current version ({1}). Are you sure? A wrong firmware can brick the device.</v:String>
 <v:String x:Key="t_firmware_mismatch_title">Unsuitable firmware</v:String>
 <v:String x:Key="t_auto_done">Auto updating done</v:String>
+<v:String x:Key="t_save_settings_title">Save settings</v:String>
+<v:String x:Key="t_save_settings_before_update">Save current device settings before flashing? They will be read now and written back once the update is finished. Not needed for Gen.3 bootloaders - they keep settings automatically.</v:String>
 <v:String x:Key="t_bootloader_already_on_bus">A bootloader is already present on the bus. Programming aborted to prevent flash corruption.</v:String>
 <v:String x:Key="t_bootloader_conflict_title">Bootloader conflict</v:String>
 <v:String x:Key="t_vulnerable_mbc_on_bus">An MBC-2 with vulnerable firmware (125.0.0.5 - 125.0.0.15) is present on the bus. It would wrongly enter the bootloader together with the flashed device and corrupt both. Update the MBC-2 first.</v:String>
@@ -110,7 +113,7 @@
 <v:String x:Key="t_confirm_action">Confirm action</v:String>
 <v:String x:Key="t_device_report">Device report</v:String>
 <v:String x:Key="t_serial_number">Serial number</v:String>
-<v:String x:Key="t_manufacturing_date">Manufacturing date</v:String>
+<v:String x:Key="t_manufacturing_date">Firmware date</v:String>
 <v:String x:Key="t_formed">Formed</v:String>
 <v:String x:Key="t_common_black_box_data">Black box common data</v:String>
 <v:String x:Key="t_errors_found">Stored errors found</v:String>

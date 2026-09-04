@@ -50,17 +50,19 @@ namespace CAN_Tool.ViewModels.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            try
-            {
-                System.Convert.ToUInt64((string)value, 16);
-                string tempString = (string)value + "0000000000000000";
-                byte[] data = new byte[8];
-                for (int i = 0; i < 8; i++)
-                    data[i] = System.Convert.ToByte(tempString.Substring(i * 2, 2), 16);
-                return data;
-            }
-            catch { }
-            return new byte[8];
+            // DataBox (см. Controls/CustomControls/DataBox.cs) всегда отдаёт текст с пробелами
+            // между байтами ("FF FF FF ...") - Convert.ToUInt64/ToByte пробелы внутри строки не
+            // терпят и бросают исключение на каждый вызов, так что раньше это всегда попадало в
+            // catch и молча возвращало 8 нулевых байт независимо от того, что ввёл пользователь.
+            // Отфильтровываем всё, кроме hex-цифр, и уже потом парсим по 2 символа.
+            if (value is not string str) return new byte[8];
+            var hex = new string(str.Where(Uri.IsHexDigit).ToArray());
+            if (hex.Length > 16) hex = hex.Substring(0, 16);
+            hex = hex.PadRight(16, '0');
+            var data = new byte[8];
+            for (int i = 0; i < 8; i++)
+                data[i] = System.Convert.ToByte(hex.Substring(i * 2, 2), 16);
+            return data;
         }
     }
 
@@ -297,6 +299,23 @@ namespace CAN_Tool.ViewModels.Converters
             if (value is int v && parameter != null && int.TryParse(parameter.ToString(), out var target) && v == target)
                 return Visibility.Visible;
             return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException("This is one way converter!");
+        }
+    }
+
+    // Инверсия IntEqualsToVisibleConverter - используется, например, чтобы показывать общий
+    // блок команд загрузчика для всех поколений, КРОМЕ конкретного (у него свой набор кнопок).
+    public class IntNotEqualsToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int v && parameter != null && int.TryParse(parameter.ToString(), out var target) && v == target)
+                return Visibility.Collapsed;
+            return Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -29,7 +29,13 @@ namespace OmniProtocol
             if (Omni.Devices.TryGetValue(Id.Type, out var device))
                 DeviceReference = device;
 
-            Task.Run(RefreshAvailableServerFirmwares);
+            // Fire-and-forget, но НЕ через Task.Run(...) с блокирующим .GetAwaiter().GetResult()
+            // внутри - конструктор дёргается на каждое появление устройства (в т.ч. на каждый
+            // переход в загрузчик/обратно во время прошивки), и такой синхронный HTTP-запрос
+            // держал бы поток из пула занятым до 8 сек на каждый вызов - при нескольких
+            // устройствах/частых переключениях это ощутимо тормозило всё приложение (пул
+            // потоков исчерпывается). Настоящий await ничего не блокирует, пока ждёт ответ.
+            _ = RefreshAvailableServerFirmwaresAsync();
         }
 
         // ── Идентификация ──────────────────────────────────────────────
@@ -76,16 +82,31 @@ namespace OmniProtocol
         public ObservableCollection<string> AvailableServerFirmwares { get; } = new();
         [ObservableProperty] private string selectedServerFirmware;
 
-        private void RefreshAvailableServerFirmwares()
+        private async Task RefreshAvailableServerFirmwaresAsync()
         {
-            var versions = OnlineFirmwareService.GetVersionsAsync(FirmwareQueryType).GetAwaiter().GetResult();
+            // Сначала мгновенно показываем то, что видели с сервера в прошлый раз (локальный
+            // файл, читается практически без задержки) - иначе список пуст, пока идёт
+            // сетевой запрос. Затем в фоне обновляем с сервера; если сеть недоступна,
+            // GetVersionsAsync вернёт null - тогда просто оставляем показанный кэш как есть.
+            var cached = OnlineFirmwareService.LoadCachedVersions(FirmwareQueryType);
+            if (cached.Count > 0) SetAvailableServerFirmwares(cached);
+
+            var versions = await OnlineFirmwareService.GetVersionsAsync(FirmwareQueryType);
+            if (versions != null) SetAvailableServerFirmwares(versions);
+        }
+
+        private void SetAvailableServerFirmwares(List<string> versions)
+        {
             RunOnUi(() =>
             {
+                // Не сбрасываем выбор пользователя, если он уже успел выбрать что-то из
+                // ранее показанного (кэшированного) списка, пока шёл сетевой запрос.
+                var previousSelection = SelectedServerFirmware;
                 AvailableServerFirmwares.Clear();
                 AvailableServerFirmwares.Add(FromFileOption);
                 foreach (var v in versions)
                     AvailableServerFirmwares.Add(v);
-                SelectedServerFirmware = FromFileOption;
+                SelectedServerFirmware = AvailableServerFirmwares.Contains(previousSelection) ? previousSelection : FromFileOption;
             });
         }
 
@@ -296,7 +317,7 @@ namespace OmniProtocol
             OpenFileDialog dialog = new();
             dialog.Filter = "Hex Files|*.hex";
             if (!(bool)dialog.ShowDialog()) return;
-            if (!ValidateFirmwareFileName(dialog.FileName)) return;
+            if (!ValidateFirmwareFileName(dialog.FileName, strict: false)) return;
             lastHexFilePath = dialog.FileName;
             fragments = ParseHexFile(lastHexFilePath, FragmentSize);
             LogWriteLine($"Hex is loaded, contains {fragments.Count} fragments.");
@@ -549,7 +570,7 @@ namespace OmniProtocol
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         OpenFileDialog dialog = new() { Filter = "Hex Files|*.hex" };
-                        if ((bool)dialog.ShowDialog() && ValidateFirmwareFileName(dialog.FileName))
+                        if ((bool)dialog.ShowDialog() && ValidateFirmwareFileName(dialog.FileName, strict: true))
                         {
                             lastHexFilePath = dialog.FileName;
                             fragments = ParseHexFile(lastHexFilePath, FragmentSize);
@@ -562,6 +583,25 @@ namespace OmniProtocol
                     loaded = LoadServerFirmware(FirmwareQueryType, selectedVersion);
                 }
                 if (!loaded) return;
+
+                // ── Сохранение настроек перед прошивкой ──────────────────────────
+                // Имеет смысл, только если мы ещё не в загрузчике (иначе живых настроек уже
+                // нет, читать нечего). Какое будет поколение загрузчика, узнаем только после
+                // перехода (см. ниже) - поэтому читаем сейчас на всякий случай (безобидно),
+                // а восстанавливать или нет решаем по факту позже: Gen3 не стирает настройки
+                // при прошивке (EraseFlash110 работает в режиме "только основная программа" -
+                // см. BootloaderDeviceViewModel.Gen3.cs), так что для него восстановление не
+                // требуется.
+                List<ReadedParameter> savedParams = null;
+                if (this is not BootloaderDeviceViewModel)
+                {
+                    var wantSave = MessageBox.Show(
+                        GetString("t_save_settings_before_update"),
+                        GetString("t_save_settings_title"),
+                        MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+                    if (wantSave)
+                        savedParams = ReadCurrentParametersBlocking();
+                }
 
                 BootloaderDeviceViewModel bootDev;
                 int originalDeviceType;
@@ -630,12 +670,71 @@ namespace OmniProtocol
                 {
                     Application.Current.Dispatcher.Invoke(() => Bus.SelectedConnectedDevice = originalDev);
                     LogWriteLine(GetString("t_auto_done"));
+
+                    if (savedParams != null)
+                    {
+                        if (bootDev.Generation == 3)
+                            LogWriteLine("Gen.3 bootloader keeps settings automatically - nothing to restore.");
+                        else
+                            RestoreParametersBlocking(originalDev, savedParams);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        // Читает все параметры устройства (тот же алгоритм, что кнопка "Read config" в общей
+        // вкладке - Omni.ReadAllParameters) и блокирующе ждёт завершения: тот метод сам по
+        // себе fire-and-forget (async void), рассчитан на то, что пользователь просто смотрит
+        // на прогрессбар, а не ждёт синхронно, как нужно здесь внутри RunAutoUpdate. Снимок
+        // копируем в отдельный список - к моменту восстановления это будет уже другой C#
+        // объект устройства (см. RunAutoUpdate), у которого ReadParameters пуст.
+        private List<ReadedParameter> ReadCurrentParametersBlocking()
+        {
+            LogWriteLine("Reading current settings...");
+            Bus.ReadAllParameters(Id);
+            if (!WaitForCurrentTask(1200)) // до ~120 сек на 700 параметров
+            {
+                LogWriteLine("Reading settings failed or timed out - the update will proceed without saving them.");
+                return null;
+            }
+            var snapshot = ReadParameters.Select(p => new ReadedParameter { Id = p.Id, Value = p.Value }).ToList();
+            LogWriteLine($"Read {snapshot.Count} parameter(s).");
+            return snapshot;
+        }
+
+        // Записывает снятые ReadCurrentParametersBlocking параметры обратно в устройство (тот
+        // же алгоритм, что кнопка "Save config" - Omni.SaveParameters, которая пишет то, что
+        // лежит в dev.ReadParameters) и блокирующе ждёт завершения.
+        private static void RestoreParametersBlocking(DeviceViewModel targetDevice, List<ReadedParameter> parameters)
+        {
+            targetDevice.LogWriteLine($"Restoring {parameters.Count} saved parameter(s)...");
+            RunOnUi(() =>
+            {
+                targetDevice.ReadParameters.Clear();
+                foreach (var p in parameters)
+                    targetDevice.ReadParameters.TryToAdd(new ReadedParameter { Id = p.Id, Value = p.Value });
+            });
+            Bus.SaveParameters(targetDevice.Id);
+            targetDevice.LogWriteLine(WaitForCurrentTask(600) // до ~60 сек
+                ? "Settings restored."
+                : "Restoring settings failed or timed out.");
+        }
+
+        // Ждёт завершения текущей операции на общем Bus.CurrentTask (см. OmniTask.Capture/
+        // OnDone/OnFail) - используется для тех же Omni.ReadAllParameters/SaveParameters, что
+        // и в меню настроек, но здесь синхронно, в отличие от их обычного fire-and-forget
+        // использования по клику кнопки.
+        private static bool WaitForCurrentTask(int maxCycles, int cycleMs = 100)
+        {
+            for (var i = 0; i < 20 && !Bus.CurrentTask.Occupied && !Bus.CurrentTask.Done && !Bus.CurrentTask.Failed; i++)
+                Thread.Sleep(cycleMs);
+            for (var i = 0; i < maxCycles && Bus.CurrentTask.Occupied; i++)
+                Thread.Sleep(cycleMs);
+            return Bus.CurrentTask.Done && !Bus.CurrentTask.Failed;
         }
 
         // Имя файла прошивки по соглашению начинается с версии, напр.
@@ -653,21 +752,41 @@ namespace OmniProtocol
             return true;
         }
 
-        // Проверяет выбранный hex-файл перед тем, как разрешить его грузить в fragments -
-        // жёсткая блокировка (не "уверены?"), т.к. прошивка от другого изделия может
-        // окирпичить устройство. Имя файла должно быть по соглашению ("<4 байта версии
-        // через точку>_..."), а первые 2 байта (тип изделия и подтип/вариант) должны совпадать
-        // с версией реально работавшего ПО: если мы ещё не в загрузчике - берём текущую живую
-        // Firmware (это устройство и есть то самое изделие); если уже в загрузчике - берём
-        // снимок версии, сделанный в момент перехода (PendingBootloaderOriginFirmware), т.к.
-        // текущая Firmware у объекта-загрузчика не отражает исходное устройство. Если версия
-        // устройства ещё неизвестна, сравнение пропускается - иначе любой первый выбор файла
-        // для только что появившегося устройства блокировался бы просто из-за отсутствия данных
-        // для сравнения.
-        private bool ValidateFirmwareFileName(string path)
+        // {0,0,...} - это то, во что Firmware/BootFirmware/PendingBootloaderOriginFirmware
+        // инициализированы по умолчанию, пока реальный ответ по PGN18 ещё не пришёл (или не
+        // придёт вовсе, как у старых загрузчиков) - отличить "версия 0.0.x.x" от "версии ещё не
+        // знаем" по первым 2 байтам, которые и так участвуют в сравнении типа/подтипа изделия.
+        private static bool IsKnownVersion(IList<int> v) => v != null && !(v[0] == 0 && v[1] == 0);
+
+        // Проверяет выбранный hex-файл перед тем, как разрешить его грузить в fragments.
+        // Первые 2 байта версии из имени файла (тип изделия и подтип/вариант) должны совпадать
+        // с версией реально работавшего ПО. Источник этой версии:
+        //  - если мы ещё не в загрузчике - текущая живая Firmware (это устройство и есть то
+        //    самое изделие);
+        //  - если уже в загрузчике - в первую очередь тоже живая Firmware: сам загрузчик знает
+        //    версию установленной основной программы и передаёт её по PGN18 отдельным ответом
+        //    (Data[0] = реальный тип изделия, не 123 - см. case 18 в Omni.cs, заполняет именно
+        //    Firmware, а не BootFirmware); если она ещё не известна (например, старый загрузчик
+        //    её вообще не передаёт), используем снимок версии, сделанный в момент перехода в
+        //    загрузчик (PendingBootloaderOriginFirmware), как запасной вариант.
+        // Если ни то ни другое не известно, сравнение пропускается - иначе любой первый выбор
+        // файла для только что появившегося устройства блокировался бы просто из-за отсутствия
+        // данных для сравнения.
+        //
+        // strict=true (Auto Update) - жёсткая блокировка без права продолжить: имя файла ещё и
+        // должно быть по соглашению ("<4 байта версии через точку>_..."), иначе тоже отказ.
+        // Автообновление само выбирает hex без участия пользователя в его смысле (по комбобоксу
+        // "Из файла"), так что нет причины полагаться на "он точно знает, что делает".
+        //
+        // strict=false (ручная кнопка "Load hex") - пользователь сам вошёл в загрузчик и сам
+        // выбирает файл осознанно, поэтому при несовпадении только уточняем "уверены?" (можно
+        // продолжить), а нераспознанное имя файла вообще не блокируем - мало ли, файл назван
+        // не по соглашению, но пользователь точно знает, что в нём нужная прошивка.
+        private bool ValidateFirmwareFileName(string path, bool strict)
         {
             if (!TryParseVersionFromFileName(path, out var hexVersion))
             {
+                if (!strict) return true;
                 MessageBox.Show(
                     string.Format(GetString("t_firmware_name_invalid"), Path.GetFileName(path)),
                     GetString("t_firmware_mismatch_title"),
@@ -675,18 +794,30 @@ namespace OmniProtocol
                 return false;
             }
 
-            var curVersion = this is BootloaderDeviceViewModel ? PendingBootloaderOriginFirmware : Firmware;
-            if (curVersion == null || (curVersion[0] == 0 && curVersion[1] == 0)) return true; // версия устройства пока неизвестна
+            var curVersion = this is BootloaderDeviceViewModel && !IsKnownVersion(Firmware)
+                ? PendingBootloaderOriginFirmware
+                : Firmware;
+            if (!IsKnownVersion(curVersion)) return true; // версия устройства пока неизвестна
 
             if (curVersion[0] == hexVersion[0] && curVersion[1] == hexVersion[1]) return true;
 
             var curStr = string.Join(".", curVersion);
             var hexStr = string.Join(".", hexVersion);
-            MessageBox.Show(
-                string.Format(GetString("t_firmware_version_mismatch"), hexStr, curStr),
+
+            if (strict)
+            {
+                MessageBox.Show(
+                    string.Format(GetString("t_firmware_version_mismatch"), hexStr, curStr),
+                    GetString("t_firmware_mismatch_title"),
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            var result = MessageBox.Show(
+                string.Format(GetString("t_firmware_version_mismatch_confirm"), hexStr, curStr),
                 GetString("t_firmware_mismatch_title"),
-                MessageBoxButton.OK, MessageBoxImage.Error);
-            return false;
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            return result == MessageBoxResult.Yes;
         }
 
         public void ExecuteCommand(int cmdNum, params byte[] data)
