@@ -97,6 +97,7 @@ namespace OmniProtocol
 
         private void SetAvailableServerFirmwares(List<string> versions)
         {
+            var filtered = FilterVersionsBySubtype(versions);
             RunOnUi(() =>
             {
                 // Не сбрасываем выбор пользователя, если он уже успел выбрать что-то из
@@ -104,10 +105,30 @@ namespace OmniProtocol
                 var previousSelection = SelectedServerFirmware;
                 AvailableServerFirmwares.Clear();
                 AvailableServerFirmwares.Add(FromFileOption);
-                foreach (var v in versions)
+                foreach (var v in filtered)
                     AvailableServerFirmwares.Add(v);
                 SelectedServerFirmware = AvailableServerFirmwares.Contains(previousSelection) ? previousSelection : FromFileOption;
             });
+        }
+
+        // Сервер группирует прошивки только по типу изделия (первая цифра версии, см.
+        // FirmwareQueryType) - директория public/firmware/<type> на multihot.online содержит все
+        // подтипы вперемешку (например, 12- и 24-вольтовые версии подогревателя). Подтипом
+        // (второй цифрой версии) сервер не фильтрует, поэтому фильтруем на клиенте - по подтипу
+        // из собственной версии устройства. Если она ещё не известна, ничего не отфильтровываем
+        // (тот же принцип, что и в ValidateFirmwareFileName).
+        private List<string> FilterVersionsBySubtype(List<string> versions)
+        {
+            var curVersion = CurrentKnownVersion;
+            if (!IsKnownVersion(curVersion)) return versions;
+            return versions.Where(v => TryParseVersionTypeAndSubtype(v, out _, out var subtype) && subtype == curVersion[1]).ToList();
+        }
+
+        private static bool TryParseVersionTypeAndSubtype(string version, out int type, out int subtype)
+        {
+            type = subtype = 0;
+            var parts = version.Split('.');
+            return parts.Length >= 2 && int.TryParse(parts[0], out type) && int.TryParse(parts[1], out subtype);
         }
 
         // Выбор версии в комбобоксе - как нажатие "Load hex", только источник не файл, а
@@ -758,6 +779,14 @@ namespace OmniProtocol
         // знаем" по первым 2 байтам, которые и так участвуют в сравнении типа/подтипа изделия.
         private static bool IsKnownVersion(IList<int> v) => v != null && !(v[0] == 0 && v[1] == 0);
 
+        // Версия устройства, которую можно считать достоверно известной прямо сейчас (см.
+        // ValidateFirmwareFileName и FilterVersionsBySubtype - оба сравнивают тип+подтип с этой
+        // версией). На странице загрузчика это версия основной программы (Firmware, приходит по
+        // PGN18 от самого загрузчика), либо, если загрузчик её ещё не сообщил, снимок на момент
+        // перехода в загрузчик (PendingBootloaderOriginFirmware).
+        private IList<int> CurrentKnownVersion =>
+            this is BootloaderDeviceViewModel && !IsKnownVersion(Firmware) ? PendingBootloaderOriginFirmware : Firmware;
+
         // Проверяет выбранный hex-файл перед тем, как разрешить его грузить в fragments.
         // Первые 2 байта версии из имени файла (тип изделия и подтип/вариант) должны совпадать
         // с версией реально работавшего ПО. Источник этой версии:
@@ -794,9 +823,7 @@ namespace OmniProtocol
                 return false;
             }
 
-            var curVersion = this is BootloaderDeviceViewModel && !IsKnownVersion(Firmware)
-                ? PendingBootloaderOriginFirmware
-                : Firmware;
+            var curVersion = CurrentKnownVersion;
             if (!IsKnownVersion(curVersion)) return true; // версия устройства пока неизвестна
 
             if (curVersion[0] == hexVersion[0] && curVersion[1] == hexVersion[1]) return true;
