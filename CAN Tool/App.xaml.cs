@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Globalization;
+using System.Text;
 using System.Windows;
 using System.Threading;
 using CAN_Tool.Libs;
@@ -11,6 +12,11 @@ namespace CAN_Tool
     {
         public App()
         {
+            // .NET (Core) не включает кодовые страницы вроде 1251 по умолчанию (только Unicode) -
+            // регистрация нужна до первого Encoding.GetEncoding(1251) (см. Omni.cs
+            // DecodeStringBytes, PGN61/62 - строки могут прийти в Win1251).
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             // Build language list from the CSV columns so adding a new language
             // to local.csv automatically makes it available — no code change needed.
             // CSV culture headers like "en-En", "ru-Ru", "de-De" are mapped to

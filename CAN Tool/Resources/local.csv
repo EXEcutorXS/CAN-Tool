@@ -1057,7 +1057,72 @@ t_memory_control_old	Memory control (obsolete)	Управления память
 t_buffer_data_transmitting_old	Memory buffer transmitting (obsolete)	Заполнение буферного массива для последующей записи во флэш	Pufferdatenübertragung (veraltet)
 t_memory_control	Memory control	Управления памятью (Мультипакет)	Speichersteuerung
 t_buffer_data_transmitting	Memory buffer transmitting	Заполнение буферного массива для последующей записи во флэш	Pufferdatenübertragung
-			
+t_external_memory_control	External memory control	Работа с внешней памятью (Мультипакет)	Externe Speichersteuerung
+t_external_buffer_data_transmitting	External memory buffer transmitting	Заполнение буферного массива для записи во внешний flash	Externe Pufferdatenübertragung
+t_external_memory_stream_read	External memory stream read	Потоковое чтение внешней flash ПУ28	Externer Speicher-Stream-Lesevorgang
+t_memory_control_gen3	Memory control (gen. 3)	Управления памятью (3 поколение, Мультипакет)	Speichersteuerung (Gen. 3)
+t_buffer_data_transmitting_gen3	Memory buffer transmitting (gen. 3)	Заполнение буферного массива для записи во флэш (3 поколение)	Pufferdatenübertragung (Gen. 3)
+t_string_transfer_control	String transfer (announce/request)	Передача строк (инициирование/запрос)	Zeichenfolgenübertragung (Steuerung)
+t_string_transfer_data	String transfer data	Передача строк (пакет данных)	Zeichenfolgenübertragung (Daten)
+b_string_transfers	Strings...	Строки...	Zeichenfolgen...
+t_string_transfers	Assembled strings (PGN61/62)	Собранные строки (PGN61/62)	Zusammengesetzte Zeichenfolgen (PGN61/62)
+t_sender	Sender	Отправитель	Absender
+t_receiver	Receiver	Получатель	Empfänger
+t_encoding	Encoding	Кодировка	Kodierung
+t_string_value	Text	Текст	Text
+t_name	Name	Название	Name
+t_strid_imei	IMEI	IMEI	IMEI
+t_strid_pin	PIN	PIN	PIN
+t_strid_admin_phone	Admin phone	Телефон администратора	Admin-Telefon
+t_strid_trusted_phone1	Trusted phone 1	Доверенный номер 1	Vertrauenswürdige Nummer 1
+t_strid_trusted_phone2	Trusted phone 2	Доверенный номер 2	Vertrauenswürdige Nummer 2
+t_strid_trusted_phone3	Trusted phone 3	Доверенный номер 3	Vertrauenswürdige Nummer 3
+t_strid_trusted_phone4	Trusted phone 4	Доверенный номер 4	Vertrauenswürdige Nummer 4
+t_strid_internet_check_url	Internet check URL	URL проверки интернета	Internet-Prüf-URL
+t_strid_mqtt_broker	MQTT broker	MQTT-брокер	MQTT-Broker
+t_strid_modem_login	Modem login	Логин модема	Modem-Login
+t_strid_modem_password	Modem password	Пароль модема	Modem-Passwort
+t_strid_last_rec_sms_text	Last received SMS text	Текст последней принятой SMS	Text der letzten empfangenen SMS
+t_strid_last_rec_sms_num	Last received SMS number	Номер последней принятой SMS	Nummer der letzten empfangenen SMS
+t_strid_last_sent_sms_text	Last sent SMS text	Текст последней отправленной SMS	Text der letzten gesendeten SMS
+t_strid_last_sent_sms_num	Last sent SMS number	Номер последней отправленной SMS	Nummer der letzten gesendeten SMS
+t_strid_operator_name	Operator name	Имя оператора	Betreibername
+t_strid_operator_code	Operator code	Код оператора	Betreibercode
+t_strid_ip_v4	IP address (v4)	IP-адрес (v4)	IP-Adresse (v4)
+t_strid_connection_link	Connection link	Ссылка подключения	Verbindungslink
+t_modem_status	Status	Статус	Status
+t_modem_registered	Registered	Зарегистрирован	Registriert
+t_modem_roaming	Roaming	Роуминг	Roaming
+t_modem_signal	Signal (CSQ)	Уровень сигнала (CSQ)	Signal (CSQ)
+t_modem_network	Network	Сеть	Netzwerk
+t_modem_operator	Operator	Оператор	Betreiber
+t_modem_operator_code	Operator code	Код оператора	Betreibercode
+t_modem_temp_unit	Temperature unit	Единица температуры	Temperatureinheit
+t_modem_lac	LAC	LAC	LAC
+t_modem_cell_id	Cell ID	Cell ID	Cell ID
+t_modem_internet	Internet / MQTT	Интернет / MQTT	Internet / MQTT
+t_modem_internet_connected	Internet connected	Интернет подключен	Internet verbunden
+t_modem_mqtt_connected	MQTT connected	MQTT подключен	MQTT verbunden
+t_modem_check_url	Check URL	URL проверки	Prüf-URL
+t_modem_broker	MQTT broker	MQTT-брокер	MQTT-Broker
+t_modem_login	Login	Логин	Login
+t_modem_password	Password	Пароль	Passwort
+t_modem_connection_link	Connection link	Ссылка подключения	Verbindungslink
+b_modem_autoregister	Auto-register	Автоматическая регистрация	Automatische Registrierung
+t_modem_last_sms	Last SMS	Последнее SMS	Letzte SMS
+t_modem_last_sms_num	Number	Номер	Nummer
+t_modem_last_sms_text	Text	Текст	Text
+t_modem_settings	Settings	Настройки	Einstellungen
+b_modem_only_sms	Only SMS	Только SMS	Nur SMS
+b_modem_only_2g	2G only	Только 2G	Nur 2G
+b_modem_allow_roaming	Allow roaming	Разрешить роуминг	Roaming erlauben
+b_modem_fault_report	Fault SMS	SMS при неисправности	Fehler-SMS
+b_modem_cmd_ack	Confirm commands	Подтверждение команд	Befehle bestätigen
+t_autoreg_idle	Idle	Готово к запуску	Bereit
+t_autoreg_busy	In progress...	Выполняется...	Wird ausgeführt...
+t_autoreg_done	Done	Завершено	Abgeschlossen
+t_autoreg_error	Error	Ошибка	Fehler
+
 c_0	Who is here?	Кто здесь?	Wer ist hier?
 c_1	Device start	пуск устройства	Gerät starten
 c_3	Device stop	остановка устройства	Gerät stoppen

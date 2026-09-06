@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using static CAN_Tool.Libs.Helper;
 
 
 namespace OmniProtocol
@@ -89,6 +90,14 @@ namespace OmniProtocol
         [ObservableProperty] private BindingList<OmniZoneHandler> zones = new();
     }
 
+    // Поля и их разбор в Omni.cs case 60/61/62 повторяют ровно то, что показывают/пишут
+    // страницы модема на самом ПУ28 (см. C:\source\PU28-Timberline\User\Activity\ModemInfo.cpp,
+    // ModemInternetInfo.cpp, ModemSettings.cpp и C:\source\...\Main\ModemData.h) - какие поля
+    // там только выводятся на экран (Registered/Roaming/Csq/OperatorName/Imei/LastSms*/
+    // InternetConnected/MqttConnected/NetworkAcT/InternetCheckUrl/MqttBroker/MqttLogin/
+    // MqttPassword/ConnectionLink/AutoRegStatus/TempUnitF), а какие пульт реально меняет
+    // (OnlySmsMode/Force2gOnly/AllowRoaming/FaultReport/CmdAck - через ModemSettings.cpp, плюс
+    // отдельная команда "auto-register" через PGN1/30) - см. ModemDeviceViewModel.cs.
     public partial class ModemViewModel : ObservableObject
     {
         [ObservableProperty] public bool registered;
@@ -97,10 +106,56 @@ namespace OmniProtocol
         [ObservableProperty] public bool onlySmsMode;
         [ObservableProperty] public bool faultReport;
         [ObservableProperty] public bool cmdAck;
-        [ObservableProperty] public bool tempUnitF;
+        [ObservableProperty] public bool tempUnitF;         // только отображается - пульт этим не управляет
         [ObservableProperty] public string operatorCode = "";
         [ObservableProperty] public int lac = -1;           // -1 = нет данных
         [ObservableProperty] public long cellId = -1;        // -1 = нет данных
+
+        // ── PGN60 sub0/sub4 (см. ModemInternetInfo.cpp) ──────────────────
+        [ObservableProperty] public bool internetConnected;
+        [ObservableProperty] public bool mqttConnected;
+
+        // Сырое значение <AcT> из AT+COPS? (3GPP 27.007) - реальная используемая технология
+        // связи, НЕ то же самое, что настройка Force2gOnly. -1 = нет данных/не зарегистрирован.
+        // NetworkTech ниже бакетирует его в "2G"/"3G"/"4G" тем же способом, что и
+        // ModemInternetInfo::DrawMode() на самом ПУ28.
+        [NotifyPropertyChangedFor(nameof(NetworkTech))]
+        [ObservableProperty] public int networkAcT = -1;
+
+        public string NetworkTech => NetworkAcT switch
+        {
+            0 or 1 or 3 or 8 => "2G",
+            2 or 4 or 5 or 6 => "3G",
+            7 or 9 => "4G",
+            _ => "--",
+        };
+
+        // 0=idle, 1=busy, 2=done, 3=error - см. AutoRegisterCommand в ModemDeviceViewModel.cs.
+        [NotifyPropertyChangedFor(nameof(AutoRegStatusText))]
+        [ObservableProperty] public int autoRegStatus;
+
+        public string AutoRegStatusText => AutoRegStatus switch
+        {
+            1 => GetString("t_autoreg_busy"),
+            2 => GetString("t_autoreg_done"),
+            3 => GetString("t_autoreg_error"),
+            _ => GetString("t_autoreg_idle"),
+        };
+
+        // ── Настройки, которые пульт реально позволяет менять (ModemSettings.cpp) ──
+        [ObservableProperty] public bool force2gOnly;
+        [ObservableProperty] public bool allowRoaming;
+
+        // ── Строки PGN61/62 (см. Omni.cs DecodeStringTransferData -> ApplyModemString) ──
+        [ObservableProperty] public string imei = "";
+        [ObservableProperty] public string operatorName = "";
+        [ObservableProperty] public string lastSmsText = "";
+        [ObservableProperty] public string lastSmsNum = "";
+        [ObservableProperty] public string internetCheckUrl = "";
+        [ObservableProperty] public string mqttBroker = "";
+        [ObservableProperty] public string mqttLogin = "";
+        [ObservableProperty] public string mqttPassword = "";
+        [ObservableProperty] public string connectionLink = "";
     }
 
     public partial class ACPanelViewModel : ObservableObject

@@ -79,6 +79,27 @@ namespace CAN_Tool.CustomControls
             });
         }
 
+        // Отдельное окно (не диалог - Show(), не ShowDialog(), чтобы можно было продолжать
+        // работать в основном окне, пока строки собираются в фоне) со списком строк, собранных
+        // из протокола PGN61/62 (см. Omni.StringTransfers/DecodeStringTransferData). Владелец
+        // выставляется явно, чтобы окно закрывалось вместе с главным.
+        private StringTransfersWindow stringTransfersWindow;
+
+        private void StringTransfersButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (stringTransfersWindow == null)
+            {
+                stringTransfersWindow = new StringTransfersWindow
+                {
+                    Owner = Window.GetWindow(this),
+                    DataContext = Vm.OmniInstance
+                };
+                stringTransfersWindow.Closed += (_, _) => stringTransfersWindow = null;
+            }
+            stringTransfersWindow.Show();
+            stringTransfersWindow.Activate();
+        }
+
         private void AC2PmessagesField_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try { Vm.SelectedMessage = (OmniMessage)(sender as DataGrid).SelectedItems[(sender as DataGrid).SelectedItems.Count - 1]; }

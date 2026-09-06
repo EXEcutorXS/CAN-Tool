@@ -1,0 +1,28 @@
+<Window x:Class="CAN_Tool.CustomControls.StringTransfersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:op="clr-namespace:OmniProtocol"
+        mc:Ignorable="d"
+        Title="{DynamicResource t_string_transfers}" Height="450" Width="700"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        d:DataContext="{d:DesignInstance Type=op:Omni}">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
+            <Button Content="{DynamicResource b_clear_list}" Command="{Binding ClearStringTransfersCommand}" />
+        </StackPanel>
+        <DataGrid AutoGenerateColumns="False" Margin="10" ItemsSource="{Binding StringTransfers}" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Sender}" Header="{DynamicResource t_sender}" />
+                <DataGridTextColumn Binding="{Binding Receiver}" Header="{DynamicResource t_receiver}" />
+                <DataGridTextColumn Binding="{Binding StringId}" Header="ID" />
+                <DataGridTextColumn Binding="{Binding StringName}" Header="{DynamicResource t_name}" />
+                <DataGridTextColumn Binding="{Binding Encoding}" Header="{DynamicResource t_encoding}" />
+                <DataGridTextColumn Binding="{Binding Text}" Header="{DynamicResource t_string_value}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

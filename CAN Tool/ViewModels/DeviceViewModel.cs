@@ -571,29 +571,15 @@ namespace OmniProtocol
         private const int VulnerableMbcMaxBuild = 16;
 
         // Раньше MBC-2 тоже жил под типом 126 ("Устройство управления"/пульт, см. d_125/d_126 в
-        // lang.xaml) - сейчас под 126 только пульты, а MBC-2 переехал на свой отдельный 125. Но
-        // старые MBC-2, выпущенные до этого разделения, до сих пор репортуют версию 126.x.x.x -
-        // и по одной только версии их от настоящего пульта не отличить, тип "зашит" в неё жёстко
-        // и совпадает у обоих. Отличить можно только по факту: PGN24 (данные зон Timberline -
-        // ступень вентилятора/PWM) шлёт исключительно MBC-2, пульт его не отправляет никогда
-        // (см. case 24 в Omni.cs).
-        private const int AmbiguousLegacyMbcVersionType = 126;
-
-        // Вызывается из Omni.cs при разборе PGN24 - как только видим этот PGN от устройства с
-        // Id.Type==126, значит на самом деле это старый MBC-2, а не пульт. Правим отображаемое
-        // имя/картинку (DeviceReference, см. EffectiveType) и тип, по которому качаются прошивки
-        // с сервера (FirmwareQueryType/ValidateFirmwareFileName используют EffectiveType) - без
-        // этого автообновление предложило бы прошивку пульта вместо MBC-2. Id.Type трогать
-        // нельзя - это реальный CAN-адрес устройства, по которому идёт вся остальная связь.
-        // Дёшево вызывать на каждый PGN24 - после первого раза EffectiveType уже 125, и метод
-        // сразу выходит по первой проверке.
-        public void ConfirmMbc2Identity()
-        {
-            if (Id.Type != AmbiguousLegacyMbcVersionType || EffectiveType == VulnerableMbcDeviceType) return;
-            if (!Omni.Devices.TryGetValue(VulnerableMbcDeviceType, out var mbc2Template)) return;
-            DeviceReference = mbc2Template;
-            _ = RefreshAvailableServerFirmwaresAsync();
-        }
+        // lang.xaml) - сейчас под 126 только пульты (PanelDeviceViewModel), а MBC-2 переехал на
+        // свой отдельный 125. Но старые MBC-2, выпущенные до этого разделения, до сих пор
+        // репортуют версию 126.x.x.x, и на шине сейчас может быть сразу и настоящий пульт, и
+        // такой старый MBC-2 - оба Id.Type==126, только на разных адресах. Отличить можно
+        // только по факту: PGN24 (данные зон Timberline) шлёт исключительно MBC-2, пульт его не
+        // отправляет никогда. У пульта и MBC-2 разные ViewModel-классы и разные View (см.
+        // Omni.ConfirmMbc2Identity в Omni.cs, которая при обнаружении PGN24 заменяет объект
+        // PanelDeviceViewModel на HcuDeviceViewModel прямо в ConnectedDevices) - здесь, на
+        // уровне отдельного устройства, для этого настраивать нечего.
 
         // excludeDevice: the device actually being switched to bootloader is not itself a risk
         // (its own "enter bootloader" command is addressed to its own type, never to 126), and

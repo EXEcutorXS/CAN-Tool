@@ -15,7 +15,8 @@ namespace CAN_Tool.Libs
             Dictionary<int, PgnClass> pgns,
             List<OmniPgnParameter> parameters,
             Dictionary<int, OmniCommand> commands,
-            Dictionary<int, DeviceTemplate> devices)
+            Dictionary<int, DeviceTemplate> devices,
+            Dictionary<int, string> stringIds)
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "omnidata.json");
             var json = File.ReadAllText(path);
@@ -26,11 +27,23 @@ namespace CAN_Tool.Libs
             LoadParameters(root, parameters, presets);
             LoadCommands(root, commands, presets);
             LoadDevices(root, devices);
+            LoadStringIds(root, stringIds);
 
             // Link each parameter to its PGN's parameter list so ProcessOmniMessage can iterate them
             foreach (var p in parameters)
                 if (pgns.TryGetValue(p.Pgn, out var pgn))
                     pgn.parameters.Add(p);
+        }
+
+        private static void LoadStringIds(JObject root, Dictionary<int, string> stringIds)
+        {
+            if (root["stringIds"] is not JArray stringIdsNode) return;
+
+            foreach (var item in stringIdsNode.Children<JObject>())
+            {
+                var id = item["id"]!.Value<int>();
+                stringIds[id] = item["name"]?.Value<string>() ?? "";
+            }
         }
 
         private static void LoadDevices(JObject root, Dictionary<int, DeviceTemplate> devices)

@@ -23,9 +23,15 @@ namespace OmniProtocol
         public static List<OmniPgnParameter> Parameters { get; } = new();
         public static Dictionary<int, OmniCommand> Commands { get; } = new();
 
+        // Id строки протокола PGN61/62 (см. StringTransferEntry.cs) -> локализационный ключ
+        // с человекочитаемым назначением (IMEI, пароль модема и т.п.). Числа "зашиты" общей
+        // таблицей параметров модем<->пульт (см. StringId enum в
+        // C:\source\...\StringTransfer.h - "keep the numbering identical in the modem's copy").
+        public static Dictionary<int, string> StringIds { get; } = new();
+
         public void SeedStaticData()
         {
-            OmniDataLoader.Load(Pgns, Parameters, Commands, Devices);
+            OmniDataLoader.Load(Pgns, Parameters, Commands, Devices, StringIds);
         }
     }
 }

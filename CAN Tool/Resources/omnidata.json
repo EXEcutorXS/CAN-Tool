@@ -267,6 +267,15 @@
       "multiPack": true
     },
     {
+      "id": 61,
+      "name": "t_string_transfer_control",
+      "multiPack": true
+    },
+    {
+      "id": 62,
+      "name": "t_string_transfer_data"
+    },
+    {
       "id": 99,
       "name": "t_debug_pack"
     },
@@ -286,6 +295,26 @@
     {
       "id": 106,
       "name": "t_buffer_data_transmitting"
+    },
+    {
+      "id": 107,
+      "name": "t_external_memory_control"
+    },
+    {
+      "id": 108,
+      "name": "t_external_buffer_data_transmitting"
+    },
+    {
+      "id": 109,
+      "name": "t_external_memory_stream_read"
+    },
+    {
+      "id": 110,
+      "name": "t_memory_control_gen3"
+    },
+    {
+      "id": 111,
+      "name": "t_buffer_data_transmitting_gen3"
     }
   ],
   "commands": [
@@ -3638,5 +3667,26 @@
       "id": 255,
       "devType": "None"
     }
+  ],
+  "stringIds": [
+    { "id": 1, "name": "t_strid_imei" },
+    { "id": 2, "name": "t_strid_pin" },
+    { "id": 3, "name": "t_strid_admin_phone" },
+    { "id": 4, "name": "t_strid_trusted_phone1" },
+    { "id": 5, "name": "t_strid_trusted_phone2" },
+    { "id": 6, "name": "t_strid_trusted_phone3" },
+    { "id": 7, "name": "t_strid_trusted_phone4" },
+    { "id": 8, "name": "t_strid_internet_check_url" },
+    { "id": 9, "name": "t_strid_mqtt_broker" },
+    { "id": 10, "name": "t_strid_modem_login" },
+    { "id": 11, "name": "t_strid_modem_password" },
+    { "id": 12, "name": "t_strid_last_rec_sms_text" },
+    { "id": 13, "name": "t_strid_last_rec_sms_num" },
+    { "id": 14, "name": "t_strid_last_sent_sms_text" },
+    { "id": 15, "name": "t_strid_last_sent_sms_num" },
+    { "id": 16, "name": "t_strid_operator_name" },
+    { "id": 17, "name": "t_strid_operator_code" },
+    { "id": 18, "name": "t_strid_ip_v4" },
+    { "id": 19, "name": "t_strid_connection_link" }
   ]
 }

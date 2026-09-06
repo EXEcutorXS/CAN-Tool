@@ -113,6 +113,7 @@
                                     </Button.Content>
                                 </Button>
                                 <CheckBox IsChecked="{Binding OmniInstance.SelectedConnectedDevice.SecondMessages}" Content="{DynamicResource t_keep_connection}" />
+                                <Button Content="{DynamicResource b_string_transfers}" Margin="10" Click="StringTransfersButton_Click" />
                             </StackPanel>
                         </Grid>
                         <TextBlock DockPanel.Dock="Right" MaxHeight="200" Margin="10" Text="{Binding Path=CustomMessage.VerboseInfo, Mode=OneWay}" />

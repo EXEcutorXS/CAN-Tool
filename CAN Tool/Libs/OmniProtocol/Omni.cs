@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -91,6 +92,20 @@ public partial class Omni : ObservableObject
     [ObservableProperty] private DeviceViewModel selectedConnectedDevice;
 
     public UpdatableList<OmniMessage> Messages { get; } = new();
+
+    // Строки, собираемые из протокола PGN61/62 (см. DecodeStringTransferAnnounce/
+    // DecodeStringTransferData ниже) - одна запись на пару (отправитель, StringId), живёт,
+    // пока не очищена вручную (см. ClearStringTransfers), обновляется по мере прихода новых
+    // пакетов PGN62. Ключ - не публичный API, только для поиска существующей записи.
+    public ObservableCollection<StringTransferEntry> StringTransfers { get; } = new();
+    private readonly Dictionary<(int type, int address, int stringId), StringTransferEntry> stringTransferIndex = new();
+
+    [RelayCommand]
+    void ClearStringTransfers()
+    {
+        StringTransfers.Clear();
+        stringTransferIndex.Clear();
+    }
 
     private readonly CanAdapter canAdapter;
 
@@ -540,10 +555,14 @@ public partial class Omni : ObservableObject
             case 24:
                 {
                     // Данные зон Timberline - шлёт только MBC-2, реальный пульт этот PGN не
-                    // отправляет никогда (см. ConfirmMbc2Identity). Ловит в т.ч. старые MBC-2,
-                    // которые ещё репортуют версию 126.x.x.x (тип "зашит" в неё жёстко и до
-                    // разделения на 125/126 совпадал с пультом).
-                    senderDevice.ConfirmMbc2Identity();
+                    // отправляет никогда. Ловит в т.ч. старые MBC-2, которые ещё репортуют
+                    // версию 126.x.x.x (тип "зашит" в неё жёстко и до разделения на 125/126
+                    // совпадал с пультом) - на шине сейчас может быть сразу и настоящий пульт, и
+                    // такой MBC-2 под одним и тем же Id.Type. senderDevice переприсваивается,
+                    // т.к. подтверждение личности заменяет весь объект в ConnectedDevices
+                    // (PanelDeviceViewModel -> HcuDeviceViewModel, см. ConfirmMbc2Identity ниже) -
+                    // остальная обработка этого сообщения должна идти уже в новый объект.
+                    senderDevice = ConfirmMbc2Identity(senderDevice);
 
                     if ((m.Data[0] & 15) != 15) senderDevice.TimberlineParams.Zones[0].FanStage = m.Data[0] & 15;
                     if (((m.Data[0] >> 4) & 15) != 15) senderDevice.TimberlineParams.Zones[1].FanStage = (m.Data[0] >> 4) & 15;
@@ -655,16 +674,28 @@ public partial class Omni : ObservableObject
                     var mp = senderDevice.ModemParams;
                     switch (m.Data[0])
                     {
-                        case 0: // регистрация/роуминг + CSQ, каждые 5 сек
+                        case 0: // регистрация/роуминг/интернет/mqtt + CSQ + тип сети, каждые 5 сек
                             if ((m.Data[1] & 3) < 2) mp.Registered = (m.Data[1] & 1) != 0;
                             if (((m.Data[1] >> 2) & 3) < 2) mp.Roaming = ((m.Data[1] >> 2) & 1) != 0;
+                            if (((m.Data[1] >> 4) & 3) < 2) mp.InternetConnected = ((m.Data[1] >> 4) & 1) != 0;
+                            if (((m.Data[1] >> 6) & 3) < 2) mp.MqttConnected = ((m.Data[1] >> 6) & 1) != 0;
                             mp.Csq = m.Data[2] == 0xFF ? -1 : m.Data[2];
+                            mp.NetworkAcT = m.Data[3] == 0xFF ? -1 : m.Data[3];
                             break;
                         case 1: // флаги настроек, раз в 30-60 сек
                             if ((m.Data[1] & 3) < 2) mp.OnlySmsMode = (m.Data[1] & 1) != 0;
                             if (((m.Data[1] >> 2) & 3) < 2) mp.FaultReport = ((m.Data[1] >> 2) & 1) != 0;
                             if (((m.Data[1] >> 4) & 3) < 2) mp.CmdAck = ((m.Data[1] >> 4) & 1) != 0;
                             if (((m.Data[1] >> 6) & 3) < 2) mp.TempUnitF = ((m.Data[1] >> 6) & 1) != 0;
+                            // Force2gOnly (D[2]) / AllowRoaming (D[3]) - плоские байты вне
+                            // 2-битной схемы D[1] (там больше нет свободных пар бит), см.
+                            // DataActualizator::sendSettings()/ModemSettings::SendByteSetting:
+                            // 0xFF значит "без изменений".
+                            if (m.Data[2] != 0xFF) mp.Force2gOnly = m.Data[2] != 0;
+                            if (m.Data[3] != 0xFF) mp.AllowRoaming = m.Data[3] != 0;
+                            break;
+                        case 4: // статус авторегистрации (см. Modem::AutoRegisterStatus), по изменению
+                            mp.AutoRegStatus = m.Data[1];
                             break;
                         case 2: // код оператора, раз в 30-60 сек
                             mp.OperatorCode = m.Data[1] == 0xFF
@@ -686,6 +717,14 @@ public partial class Omni : ObservableObject
                     }
                     break;
                 }
+
+            case 61: // Передача строк - управление (D[0]=1 анонс, D[0]=2 запрос - см. StringTransfer.h)
+                DecodeStringTransferAnnounce(m);
+                break;
+
+            case 62: // Передача строк - пакет данных (5 байт на кадр)
+                DecodeStringTransferData(senderDevice, m);
+                break;
 
             case 100:
                 {
@@ -755,6 +794,43 @@ public partial class Omni : ObservableObject
 
         Messages.TryToAdd(m);
 
+    }
+
+    // Сейчас на шине может одновременно быть настоящий пульт (PanelDeviceViewModel, Id.Type==126)
+    // и старый MBC-2, который тоже репортует версию 126.x.x.x (тип "зашит" в неё жёстко и до
+    // разделения на 125/126 совпадал с пультом) - на разных адресах, оба неотличимы по одной
+    // только версии. Единственный надёжный признак - PGN24 (данные зон Timberline), которые
+    // шлёт исключительно MBC-2 (см. case 24 выше). У пульта и MBC-2 разные ViewModel-классы
+    // (PanelDeviceViewModel/HcuDeviceViewModel) и, соответственно, разные View в OmniModeView.xaml
+    // (Pu28MemoryControl/HcuOmniControl) - простой подменой отображаемого имени/картинки тут не
+    // обойтись, нужно физически заменить объект в ConnectedDevices на HcuDeviceViewModel с тем
+    // же Id, перенеся уже известные версии, чтобы не мигать "0.0.0.0" сразу после подмены.
+    // Не-PanelDeviceViewModel (уже HcuDeviceViewModel, или что угодно ещё) пропускается без
+    // изменений - дёшево звать на каждый PGN24.
+    private const int Mbc2DeviceType = 125; // см. DeviceViewModel.VulnerableMbcDeviceType
+
+    private DeviceViewModel ConfirmMbc2Identity(DeviceViewModel senderDevice)
+    {
+        if (senderDevice is not PanelDeviceViewModel panel) return senderDevice;
+
+        var index = ConnectedDevices.IndexOf(panel);
+        if (index < 0) return senderDevice; // уже убрано с шины (например, отключилось)
+
+        var hcu = new HcuDeviceViewModel(new DeviceId(panel.Id.Type, panel.Id.Address))
+        {
+            Firmware = new BindingList<int>(panel.Firmware.ToList()),
+            BootFirmware = new BindingList<int>(panel.BootFirmware.ToList()),
+            Serial = new BindingList<int>(panel.Serial.ToList()),
+            ProductionDate = panel.ProductionDate,
+        };
+        if (Devices.TryGetValue(Mbc2DeviceType, out var mbc2Template))
+            hcu.DeviceReference = mbc2Template;
+
+        ConnectedDevices[index] = hcu;
+        if (ReferenceEquals(SelectedConnectedDevice, panel))
+            SelectedConnectedDevice = hcu;
+
+        return hcu;
     }
 
     // Общий разбор ответов протокола фрагментов прошивки - формат байт (тег/длина/CRC/статус)
@@ -829,27 +905,152 @@ public partial class Omni : ObservableObject
     private void DecodePu28ImageVersions(Pu28DeviceViewModel target, OmniMessage m)
     {
         if (target == null) return;
+        if (m.Data[0] is < 14 or > 17) return;
 
-        if (m.Data[0] == 14)
+        // BindingList<int> не реализует INotifyCollectionChanged - привязка
+        // "{Binding OwnImageVersion, Converter=...}" в Pu28MemoryControl.xaml обновляется
+        // только когда меняется САМО свойство (генерируемый [ObservableProperty] сеттер шлёт
+        // PropertyChanged), а не когда мутируют элементы уже существующего списка через
+        // индексатор - поэтому присваиваем новый BindingList целиком, а не правим старый на
+        // месте (иначе UI не перерисовывался до смены вкладки, которая пересоздаёт биндинг).
+        var version = new BindingList<int> { m.Data[1], m.Data[2], m.Data[3], m.Data[4] };
+
+        switch (m.Data[0])
         {
-            target.OwnImageVersion[0] = m.Data[1];
-            target.OwnImageVersion[1] = m.Data[2];
-            target.OwnImageVersion[2] = m.Data[3];
-            target.OwnImageVersion[3] = m.Data[4];
+            case 14: target.OwnImageVersion = version; break;
+            case 15: target.Slot0ImageVersion = version; break;
+            case 16: target.Slot1ImageVersion = version; break;
+            case 17: target.Slot2ImageVersion = version; break;
+        }
+    }
+
+    // Находит существующую запись сборки строки по (отправитель, StringId) или создаёт новую -
+    // отправитель для обоих субпакетов PGN61/62 это TransmitterId сообщения (тот, кто реально
+    // передаёт байты строки: либо сразу пушит её - см. StringTransfer.h::sendString, либо
+    // отвечает на чужой запрос), а не инициатор запроса.
+    private StringTransferEntry GetOrCreateStringEntry(OmniMessage m, int stringId)
+    {
+        var key = (m.TransmitterId.Type, m.TransmitterId.Address, stringId);
+        if (stringTransferIndex.TryGetValue(key, out var entry)) return entry;
+
+        entry = new StringTransferEntry(
+            new DeviceId(m.TransmitterId.Type, m.TransmitterId.Address),
+            new DeviceId(m.ReceiverId.Type, m.ReceiverId.Address),
+            stringId);
+        stringTransferIndex[key] = entry;
+        StringTransfers.Add(entry);
+        return entry;
+    }
+
+    // PGN61 D[0]=1 "анонс" (см. StringTransfer.h): D[2-3]=StringId (LE), D[4-5]=длина в байтах
+    // (LE), D[6]=кодировка. Заново обнуляет буфер сборки - анонс всегда предшествует свежей
+    // передаче. D[0]=2 "запрос" не несёт данных строки - пропускаем, показывать нечего.
+    private void DecodeStringTransferAnnounce(OmniMessage m)
+    {
+        if (m.Data[0] != 1) return;
+
+        var stringId = m.Data[2] | (m.Data[3] << 8);
+        var length = m.Data[4] | (m.Data[5] << 8);
+
+        var entry = GetOrCreateStringEntry(m, stringId);
+        entry.Encoding = (StringEncoding_t)m.Data[6];
+        entry.DeclaredLength = length;
+        entry.Buffer = new byte[length];
+        entry.Text = "";
+    }
+
+    // PGN62 "данные" (см. StringTransfer.h): D[0-1]=StringId (LE), D[2]=номер пакета,
+    // D[3-7]=5 байт данных (абсолютное смещение = номер_пакета*5+n). Отправитель (см.
+    // StringTransfer.cpp::handler(), uint8_t d[5]={0xFF,...}) забивает байты последнего пакета
+    // сверх реальной длины строки значением 0xFF - их нельзя копировать в буфер, иначе Text
+    // получит от 0 до 4 лишних символов "?" в зависимости от остатка длины по модулю 5 (именно
+    // так этот баг и проявлялся). Если анонс не был виден (подключились посреди передачи) -
+    // длина неизвестна, буфер расширяется по факту пришедших пакетов как раньше.
+    private void DecodeStringTransferData(DeviceViewModel senderDevice, OmniMessage m)
+    {
+        var stringId = m.Data[0] | (m.Data[1] << 8);
+        var offset = m.Data[2] * 5;
+
+        var entry = GetOrCreateStringEntry(m, stringId);
+        if (entry.DeclaredLength >= 0)
+        {
+            var copyLen = Math.Clamp(entry.DeclaredLength - offset, 0, 5);
+            if (copyLen > 0) Array.Copy(m.Data, 3, entry.Buffer, offset, copyLen);
+        }
+        else
+        {
+            if (entry.Buffer.Length < offset + 5)
+                Array.Resize(ref entry.Buffer, offset + 5);
+            Array.Copy(m.Data, 3, entry.Buffer, offset, 5);
         }
 
-        if (m.Data[0] is >= 15 and <= 17)
+        entry.Text = DecodeStringBytes(entry.Buffer, entry.Encoding, entry.DeclaredLength);
+
+        // Id 1-19 - общая таблица параметров модем<->пульт (см. StringId enum в
+        // StringTransfer.h), осмысленна только когда её реально шлёт модем (Id.Type==121) -
+        // раскладываем по конкретным полям ModemViewModel, чтобы страница модема показывала их
+        // напрямую, а не только в общем окне "Строки".
+        if (senderDevice.Id.Type == 121)
+            ApplyModemString(senderDevice.ModemParams, stringId, entry.Text);
+    }
+
+    // См. StringId enum в C:\source\...\User\Can\StringTransfer.h - держать номера синхронно.
+    // Только то, что реально показывают экраны ПУ28 (ModemInfo.cpp/ModemInternetInfo.cpp) - PIN
+    // и телефоны (id 2-7) настраиваются по SMS, на этих экранах не отображаются, поэтому здесь
+    // не разложены (видны как есть в общем окне "Строки").
+    private static void ApplyModemString(ModemViewModel mp, int stringId, string text)
+    {
+        switch (stringId)
         {
-            var slotVersion = m.Data[0] switch
+            case 1: mp.Imei = text; break;
+            case 8: mp.InternetCheckUrl = text; break;
+            case 9: mp.MqttBroker = text; break;
+            case 10: mp.MqttLogin = text; break;
+            case 11: mp.MqttPassword = text; break;
+            case 12: mp.LastSmsText = text; break;
+            case 13: mp.LastSmsNum = text; break;
+            case 16: mp.OperatorName = text; break;
+            case 19: mp.ConnectionLink = text; break;
+        }
+    }
+
+    // length>=0 (анонс был виден) - ровно столько байт реальные, остальное в data - паддинг
+    // 0xFF последнего пакета (см. DecodeStringTransferData), декодировать не нужно. length<0
+    // (анонс пропущен, точный размер неизвестен) - подстраховкой ищем нуль-терминатор, на
+    // случай если он всё же есть в хвосте; для UTF-16 терминатор - пара нулевых байт по чётному
+    // смещению (ASCII-символы в UTF-16LE сами содержат нулевой старший байт).
+    private static string DecodeStringBytes(byte[] data, StringEncoding_t encoding, int length)
+    {
+        if (length < 0)
+        {
+            if (encoding == StringEncoding_t.Utf16)
             {
-                15 => target.Slot0ImageVersion,
-                16 => target.Slot1ImageVersion,
-                _ => target.Slot2ImageVersion
+                length = data.Length;
+                for (var i = 0; i + 1 < data.Length; i += 2)
+                    if (data[i] == 0 && data[i + 1] == 0) { length = i; break; }
+            }
+            else
+            {
+                var zeroAt = Array.IndexOf(data, (byte)0);
+                length = zeroAt >= 0 ? zeroAt : data.Length;
+            }
+        }
+        length = Math.Min(length, data.Length);
+        if (length <= 0) return "";
+
+        try
+        {
+            return encoding switch
+            {
+                StringEncoding_t.Utf8 => Encoding.UTF8.GetString(data, 0, length),
+                StringEncoding_t.Utf16 => Encoding.Unicode.GetString(data, 0, length),
+                StringEncoding_t.Win1251 => Encoding.GetEncoding(1251).GetString(data, 0, length),
+                _ => Encoding.ASCII.GetString(data, 0, length),
             };
-            slotVersion[0] = m.Data[1];
-            slotVersion[1] = m.Data[2];
-            slotVersion[2] = m.Data[3];
-            slotVersion[3] = m.Data[4];
+        }
+        catch
+        {
+            return BitConverter.ToString(data, 0, length);
         }
     }
 
