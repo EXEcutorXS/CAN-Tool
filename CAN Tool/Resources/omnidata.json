@@ -3631,8 +3631,8 @@
     },
     {
       "id": 126,
-      "devType": "Hcu",
-      "imageName": "hcu"
+      "devType": "Panel",
+      "imageName": "Panel"
     },
     {
       "id": 255,

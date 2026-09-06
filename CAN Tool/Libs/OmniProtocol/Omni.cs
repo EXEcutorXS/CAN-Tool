@@ -539,6 +539,12 @@ public partial class Omni : ObservableObject
                 }
             case 24:
                 {
+                    // Данные зон Timberline - шлёт только MBC-2, реальный пульт этот PGN не
+                    // отправляет никогда (см. ConfirmMbc2Identity). Ловит в т.ч. старые MBC-2,
+                    // которые ещё репортуют версию 126.x.x.x (тип "зашит" в неё жёстко и до
+                    // разделения на 125/126 совпадал с пультом).
+                    senderDevice.ConfirmMbc2Identity();
+
                     if ((m.Data[0] & 15) != 15) senderDevice.TimberlineParams.Zones[0].FanStage = m.Data[0] & 15;
                     if (((m.Data[0] >> 4) & 15) != 15) senderDevice.TimberlineParams.Zones[1].FanStage = (m.Data[0] >> 4) & 15;
                     if ((m.Data[1] & 15) != 15) senderDevice.TimberlineParams.Zones[2].FanStage = m.Data[1] & 15;
@@ -698,10 +704,15 @@ public partial class Omni : ObservableObject
                 break;
             case 110: //3-е поколение протокола прошивки (PGN110/111) - формат ответов идентичен 105
                 DecodeFragmentProtocolResponse(senderDevice as BootloaderDeviceViewModel, m);
+                // Субпакеты 14-17 (версии сохранённого ПО) шлёт ПУ28 и будучи в загрузчике
+                // (BootloaderDeviceViewModel), и в обычном рабочем режиме как пульт
+                // (PanelDeviceViewModel) - оба наследуются от общего Pu28DeviceViewModel.
+                DecodePu28ImageVersions(senderDevice as Pu28DeviceViewModel, m);
                 break;
-            case 107: //External flash (memory dump)
+            case 107: //External flash (memory dump) - обслуживается и загрузчиком, и пультом
+                // в обычном режиме (оба - Pu28DeviceViewModel, см. Pu28DeviceViewModel.cs)
                 {
-                    var fw = senderDevice as BootloaderDeviceViewModel;
+                    var fw = senderDevice as Pu28DeviceViewModel;
                     if (fw == null) break;
                     if (m.Data[0] == 1)
                     {
@@ -736,7 +747,7 @@ public partial class Omni : ObservableObject
                 }
             case 109: //Streamed raw data from external flash bulk read (PGN107 case16)
                 {
-                    var fw = senderDevice as BootloaderDeviceViewModel;
+                    var fw = senderDevice as Pu28DeviceViewModel;
                     fw?.AppendExtReadData(m.Data);
                     break;
                 }
@@ -808,6 +819,37 @@ public partial class Omni : ObservableObject
                                + m.Data[4] * 0x100U + m.Data[5];
             Debug.WriteLine($"Verify response: ok={fw.verifyResultOk}, CRC=0x{fw.verifyResultCrc:X08}");
             fw.flagVerifyDone = true;
+        }
+    }
+
+    // Субпакеты 14-17 PGN110: периодическая трансляция версий ПО (собственный образ + 3
+    // OTA-слота внешней flash-памяти) - шлёт и загрузчик ПУ28, и его основная программа
+    // (пульт), см. Pu28DeviceViewModel. D[1..4] = версия в том же порядке, что у
+    // Firmware/BootFirmware; D[5..7] - резерв.
+    private void DecodePu28ImageVersions(Pu28DeviceViewModel target, OmniMessage m)
+    {
+        if (target == null) return;
+
+        if (m.Data[0] == 14)
+        {
+            target.OwnImageVersion[0] = m.Data[1];
+            target.OwnImageVersion[1] = m.Data[2];
+            target.OwnImageVersion[2] = m.Data[3];
+            target.OwnImageVersion[3] = m.Data[4];
+        }
+
+        if (m.Data[0] is >= 15 and <= 17)
+        {
+            var slotVersion = m.Data[0] switch
+            {
+                15 => target.Slot0ImageVersion,
+                16 => target.Slot1ImageVersion,
+                _ => target.Slot2ImageVersion
+            };
+            slotVersion[0] = m.Data[1];
+            slotVersion[1] = m.Data[2];
+            slotVersion[2] = m.Data[3];
+            slotVersion[3] = m.Data[4];
         }
     }
 

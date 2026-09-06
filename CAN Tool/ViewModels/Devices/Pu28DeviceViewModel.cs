@@ -3,17 +3,31 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using static CAN_Tool.Libs.Helper;
 
 namespace OmniProtocol
 {
-    // ПУ28: BootFirmware[2]==3 (см. IsPu28 в основном файле) - в дополнение к обычной прошивке
-    // MCU (Gen1/Gen2/Gen3 выше) умеет управлять внешней flash-микросхемой (PGN107/108/109):
-    // стирание/дамп памяти целиком и запись прошивок в слоты для раздачи по локальной шине.
-    public partial class BootloaderDeviceViewModel
+    // ПУ28: умеет управлять внешней flash-микросхемой (PGN107/108/109) - стирание/дамп памяти
+    // целиком и запись прошивок в слоты для раздачи по локальной шине - а также транслирует
+    // версии сохранённого ПО (PGN110/14-17, см. OwnImageVersion/Slot0-2ImageVersion ниже).
+    // Общий базовый класс для
+    // двух физических режимов одного и того же устройства: BootloaderDeviceViewModel (сидит в
+    // загрузчике под Id.Type==123) и PanelDeviceViewModel (работает штатно как пульт под
+    // Id.Type==126) - это разные объекты на шине (разный Id.Type), но обрабатывают одни и те же
+    // команды памяти каждый под своим собственным адресом (Id.Type), поэтому вся адресация ниже
+    // идёт от Id.Type "этого" устройства, а не захардкожена на 123.
+    public partial class Pu28DeviceViewModel : DeviceViewModel
     {
+        public Pu28DeviceViewModel(DeviceId id) : base(id) { }
+
+        // BootloaderDeviceViewModel переопределяет это реальной проверкой байтов версии
+        // (не любой загрузчик - ПУ28), а для PanelDeviceViewModel тип 126 уже однозначно
+        // означает ПУ28 (см. omnidata.json), поэтому там достаточно значения по умолчанию.
+        public virtual bool IsPu28 => true;
+
         // ── Флаги для внешней flash-микросхемы (PGN 107/108/109, дамп памяти) ──
         public bool flagExtSetAdrDone = false;
         public bool flagExtDataGetDone = false;
@@ -67,18 +81,21 @@ namespace OmniProtocol
             LogWriteLine($"Dump hex is loaded, contains {dumpFragments.Count} fragments.");
         }
 
+        // Стирание/дамп/чтение всей микросхемы всегда идут на "себя" (адрес этого же объекта на
+        // шине) - в отличие от загрузки прошивки в слот (см. UploadToSlot ниже), тут нет сценария
+        // "выполнить операцию у другого устройства".
         private async System.Threading.Tasks.Task EraseExtFlash()
         {
             OmniMessage msg = new();
             msg.Pgn = 107;
-            msg.ReceiverId.Type = 123;
+            msg.ReceiverId.Type = Id.Type;
             msg.Data[0] = 14;
             msg.Data[1] = 0; //Стереть всю память
             Transmit(msg.ToCanMessage());
             flagExtEraseDone = false;
         }
 
-        private async System.Threading.Tasks.Task StartExtFlashing(byte deviceType = 123)
+        private async System.Threading.Tasks.Task StartExtFlashing(byte deviceType)
         {
             OmniMessage msg = new();
             msg.Pgn = 107;
@@ -87,7 +104,7 @@ namespace OmniProtocol
             Transmit(msg.ToCanMessage());
         }
 
-        private bool CheckExtTransmittedData(int len, uint crc, byte deviceType = 123)
+        private bool CheckExtTransmittedData(int len, uint crc, byte deviceType)
         {
             OmniMessage msg = new()
             {
@@ -120,7 +137,7 @@ namespace OmniProtocol
             return false;
         }
 
-        private async System.Threading.Tasks.Task SetExtFragmentAdr(CodeFragment f, byte deviceType = 123)
+        private async System.Threading.Tasks.Task SetExtFragmentAdr(CodeFragment f, byte deviceType)
         {
             OmniMessage msg = new()
             {
@@ -151,7 +168,7 @@ namespace OmniProtocol
             }
         }
 
-        private async void WriteExtFragmentToRam(CodeFragment f, byte deviceType = 123)
+        private async void WriteExtFragmentToRam(CodeFragment f, byte deviceType)
         {
             OmniMessage msg = new()
             {
@@ -195,7 +212,7 @@ namespace OmniProtocol
             }
         }
 
-        private async System.Threading.Tasks.Task FlashExtFragment(CodeFragment f, byte deviceType = 123)
+        private async System.Threading.Tasks.Task FlashExtFragment(CodeFragment f, byte deviceType)
         {
             WriteExtFragmentToRam(f, deviceType);
             for (var i = 0; i < 4; i++)
@@ -259,10 +276,11 @@ namespace OmniProtocol
                 if (!await EraseExtMemory()) return;
                 Bus.CurrentTask.Capture("Programming");
 
+                var deviceType = (byte)Id.Type;
                 var cnt = 0;
                 foreach (var f in fragmentsArg)
                 {
-                    FlashExtFragment(f);
+                    FlashExtFragment(f, deviceType);
                     Bus.CurrentTask.UpdatePercent(cnt++ * 100 / fragmentsArg.Count);
                     if (Bus.CurrentTask.Cts.IsCancellationRequested) return;
                 }
@@ -303,13 +321,12 @@ namespace OmniProtocol
         [ObservableProperty] private string slotHexFilePath = "";
         [ObservableProperty] private string slotTargetAddressHex = "0x008000";
         [ObservableProperty] private string slotVersionText = "1.0.0.0";
-        // PGN107/108 (slot upload) is now served by both the bootloader (always type 123) and
-        // PU28-Timberline's main program (type 126) - which one actually answers depends on
-        // whether the device is currently sitting in its bootloader or running normally. Rather
-        // than restrict this to "this" (the bootloader page's own device), UploadToSlot() below
-        // reuses the app's existing "selected device" concept (Bus.SelectedConnectedDevice, the
-        // same one Parameters/Presets already key off) - upload goes to whichever device is
-        // currently selected there, bootloader or panel.
+        // PGN107/108 (slot upload) обслуживается и загрузчиком (Id.Type==123), и основной
+        // программой ПУ28 (Id.Type==126, PanelDeviceViewModel) - в зависимости от того, в каком
+        // физическом режиме сейчас устройство. Поэтому UploadToSlot() ниже не ограничивается
+        // "своим" устройством (this), а переиспользует общий выбор в списке подключённых
+        // устройств (Bus.SelectedConnectedDevice, тот же, что уже используют Parameters/Presets) -
+        // загрузка идёт в то устройство, что сейчас выбрано там, будь то загрузчик или пульт.
         [ObservableProperty] private string slotStatusText = "";
 
         [RelayCommand]
@@ -351,7 +368,7 @@ namespace OmniProtocol
         // D[1]=3: erase `blocks` sectors of 0x10000 starting at `addr`. The reply (D[0]=15) is
         // already decoded into the same flagExtEraseDone flag EraseExtFlash's reply (D[0]=7)
         // uses - see Omni.cs case 107 - so no new flag is needed here.
-        private void EraseExtRegion(uint addr, byte blocks, byte deviceType = 123)
+        private void EraseExtRegion(uint addr, byte blocks, byte deviceType)
         {
             OmniMessage msg = new()
             {
@@ -391,7 +408,7 @@ namespace OmniProtocol
             return crc;
         }
 
-        private async void UploadFirmwareToSlot(int slot, string hexFilePath, uint targetDeviceAddress, byte[] version, byte deviceType = 123)
+        private async void UploadFirmwareToSlot(int slot, string hexFilePath, uint targetDeviceAddress, byte[] version, byte deviceType)
         {
             try
             {
@@ -531,16 +548,30 @@ namespace OmniProtocol
 
         #endregion
 
-        // Устанавливает адрес и запрашивает у загрузчика чтение len байт (PGN107 case16),
-        // получает их через поток кадров PGN109 и сверяет по CRC (case17).
+        #region Own/slot image versions (PGN110 subpackets 14-17, periodic broadcast)
+
+        // ПУ28 периодически транслирует версии собственного образа ПО и трёх OTA-слотов
+        // внешней flash-памяти (Omni.cs case 110 -> DecodePu28ImageVersions, Data[0] 14/15/16/17 -
+        // см. протокол). Кодирование версии как у Firmware/BootFirmware: 255.255.255.255 - нет
+        // ПО (пустой слот), 0.0.0.0 - несовпадение контрольной суммы.
+        [ObservableProperty] private BindingList<int> ownImageVersion = new() { 0, 0, 0, 0 };
+        [ObservableProperty] private BindingList<int> slot0ImageVersion = new() { 0, 0, 0, 0 };
+        [ObservableProperty] private BindingList<int> slot1ImageVersion = new() { 0, 0, 0, 0 };
+        [ObservableProperty] private BindingList<int> slot2ImageVersion = new() { 0, 0, 0, 0 };
+
+        #endregion
+
+        // Устанавливает адрес и запрашивает у устройства (this, а не жёстко 123) чтение len байт
+        // (PGN107 case16), получает их через поток кадров PGN109 и сверяет по CRC (case17).
         private bool ReadExtChunk(uint addr, int len, out byte[] data)
         {
             data = null;
+            var deviceType = (byte)Id.Type;
 
             OmniMessage setMsg = new()
             {
                 Pgn = 107,
-                ReceiverId = new(123, 0),
+                ReceiverId = new(deviceType, 0),
                 Data =
                 {
                     [0] = 0,
@@ -571,7 +602,7 @@ namespace OmniProtocol
             OmniMessage readMsg = new()
             {
                 Pgn = 107,
-                ReceiverId = new(123, 0),
+                ReceiverId = new(deviceType, 0),
                 Data =
                 {
                     [0] = 16,

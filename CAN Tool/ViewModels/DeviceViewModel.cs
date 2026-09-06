@@ -42,9 +42,21 @@ namespace OmniProtocol
         [ObservableProperty] private DeviceId id;
         [ObservableProperty] private bool manualMode;
         [ObservableProperty] private bool secondMessages;
-        public DeviceTemplate DeviceReference { get; }
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(Name))]
+        [NotifyPropertyChangedFor(nameof(Img))]
+        private DeviceTemplate deviceReference;
 
         public string Name => ToString();
+
+        // Тип, за который реально стоит считать устройство - обычно совпадает с Id.Type (тип
+        // "зашит" в первую цифру версии прошивки жёстко), но иногда это неоднозначно: см.
+        // ConfirmMbc2Identity ниже. DeviceReference.Id может быть переопределён без изменения
+        // Id.Type (который завязан на реальный CAN-адрес и менять его нельзя) - поэтому именно
+        // он, а не Id.Type, источник истины для всего, что должно знать РЕАЛЬНЫЙ тип изделия
+        // (список прошивок с сервера, сверка версии перед прошивкой и т.п.).
+        public int EffectiveType => DeviceReference?.Id ?? Id.Type;
 
         public ImageSource Img
         {
@@ -68,10 +80,10 @@ namespace OmniProtocol
         [ObservableProperty] public BindingList<int> bootFirmware = new() { 0, 0, 0, 0 };
 
         // ── Прошивка с сервера (multihot.online, см. Libs/OnlineFirmwareService.cs) ──
-        // Тип, по которому запрашивается список версий: обычно это Id.Type устройства, но на
-        // странице загрузчика (BootloaderDeviceViewModel) Id.Type всегда 123 - там
+        // Тип, по которому запрашивается список версий: обычно это EffectiveType устройства, но
+        // на странице загрузчика (BootloaderDeviceViewModel) Id.Type всегда 123 - там
         // переопределяется на исходный тип устройства (PendingBootloaderOriginType).
-        public virtual int FirmwareQueryType => Id.Type;
+        public virtual int FirmwareQueryType => EffectiveType;
 
         // Псевдо-версия в начале списка - выбрана по умолчанию. Означает "источник - локальный
         // hex-файл, не сервер": и ComboBox всегда показывает этот вариант, и AutoUpdateFirmware
@@ -526,7 +538,7 @@ namespace OmniProtocol
                 return false;
             }
 
-            PendingBootloaderOriginType = Id.Type;
+            PendingBootloaderOriginType = EffectiveType;
             PendingBootloaderOriginFirmware = new BindingList<int>(Firmware.ToList());
 
             OmniMessage msg = new();
@@ -557,6 +569,31 @@ namespace OmniProtocol
         private const int VulnerableMbcDeviceType = 125;
         private const int VulnerableMbcMinBuild = 5;
         private const int VulnerableMbcMaxBuild = 16;
+
+        // Раньше MBC-2 тоже жил под типом 126 ("Устройство управления"/пульт, см. d_125/d_126 в
+        // lang.xaml) - сейчас под 126 только пульты, а MBC-2 переехал на свой отдельный 125. Но
+        // старые MBC-2, выпущенные до этого разделения, до сих пор репортуют версию 126.x.x.x -
+        // и по одной только версии их от настоящего пульта не отличить, тип "зашит" в неё жёстко
+        // и совпадает у обоих. Отличить можно только по факту: PGN24 (данные зон Timberline -
+        // ступень вентилятора/PWM) шлёт исключительно MBC-2, пульт его не отправляет никогда
+        // (см. case 24 в Omni.cs).
+        private const int AmbiguousLegacyMbcVersionType = 126;
+
+        // Вызывается из Omni.cs при разборе PGN24 - как только видим этот PGN от устройства с
+        // Id.Type==126, значит на самом деле это старый MBC-2, а не пульт. Правим отображаемое
+        // имя/картинку (DeviceReference, см. EffectiveType) и тип, по которому качаются прошивки
+        // с сервера (FirmwareQueryType/ValidateFirmwareFileName используют EffectiveType) - без
+        // этого автообновление предложило бы прошивку пульта вместо MBC-2. Id.Type трогать
+        // нельзя - это реальный CAN-адрес устройства, по которому идёт вся остальная связь.
+        // Дёшево вызывать на каждый PGN24 - после первого раза EffectiveType уже 125, и метод
+        // сразу выходит по первой проверке.
+        public void ConfirmMbc2Identity()
+        {
+            if (Id.Type != AmbiguousLegacyMbcVersionType || EffectiveType == VulnerableMbcDeviceType) return;
+            if (!Omni.Devices.TryGetValue(VulnerableMbcDeviceType, out var mbc2Template)) return;
+            DeviceReference = mbc2Template;
+            _ = RefreshAvailableServerFirmwaresAsync();
+        }
 
         // excludeDevice: the device actually being switched to bootloader is not itself a risk
         // (its own "enter bootloader" command is addressed to its own type, never to 126), and
@@ -826,7 +863,11 @@ namespace OmniProtocol
             var curVersion = CurrentKnownVersion;
             if (!IsKnownVersion(curVersion)) return true; // версия устройства пока неизвестна
 
-            if (curVersion[0] == hexVersion[0] && curVersion[1] == hexVersion[1]) return true;
+            // Тип сверяем по EffectiveType, а не по curVersion[0] напрямую - у переклассифи-
+            // цированного legacy MBC-2 (см. ConfirmMbc2Identity) curVersion[0] всё ещё честно
+            // репортует 126 (это версия, которую реально прислало устройство), а ожидать нужно
+            // файл прошивки MBC-2 (125.x.x.x).
+            if (EffectiveType == hexVersion[0] && curVersion[1] == hexVersion[1]) return true;
 
             var curStr = string.Join(".", curVersion);
             var hexStr = string.Join(".", hexVersion);
@@ -904,6 +945,7 @@ namespace OmniProtocol
                 DeviceType_t.PressureSensor               => new PressureSensorDeviceViewModel(id),
                 DeviceType_t.BootLoader                   => new BootloaderDeviceViewModel(id),
                 DeviceType_t.Modem                        => new ModemDeviceViewModel(id),
+                DeviceType_t.Panel                        => new PanelDeviceViewModel(id),
                 _                                         => new DeviceViewModel(id),
             };
         }

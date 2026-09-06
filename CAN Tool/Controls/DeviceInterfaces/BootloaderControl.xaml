@@ -47,40 +47,9 @@
             <Button Content="{DynamicResource b_verify_crc}" Margin="10" Command="{Binding VerifyFirmwareCommand}" />
         </WrapPanel>
 
-        <!-- ПУ28 (BootFirmware[2]==3): управление внешней flash-микросхемой -->
-        <StackPanel DockPanel.Dock="Top" Visibility="{Binding IsPu28, Converter={StaticResource BoolToVisibileConverter}}">
-            <Separator Margin="10,0,10,0" />
-            <WrapPanel Margin="10">
-                <Button Content="{DynamicResource b_erase_memory}" Margin="10" Command="{Binding EraseMemoryCommand}" />
-                <Button Content="{DynamicResource b_load_dump_hex}" Margin="10" Command="{Binding LoadDumpHexCommand}" />
-                <Button Content="{DynamicResource b_write_dump}" Margin="10" Command="{Binding WriteDumpToMemoryCommand}" />
-                <StackPanel Orientation="Horizontal" Margin="10" VerticalAlignment="Center">
-                    <TextBlock Text="{DynamicResource t_dump_read_start}" VerticalAlignment="Center" Margin="0,0,5,0" />
-                    <TextBox Text="{Binding DumpReadStartHex}" Width="80" VerticalAlignment="Center" />
-                    <TextBlock Text="{DynamicResource t_dump_read_length}" VerticalAlignment="Center" Margin="10,0,5,0" />
-                    <TextBox Text="{Binding DumpReadLengthKb}" Width="80" VerticalAlignment="Center" />
-                    <CheckBox Content="{DynamicResource t_legacy_adapter_mode}" IsChecked="{Binding LegacyAdapterMode}" VerticalAlignment="Center" Margin="10,0,0,0" />
-                </StackPanel>
-                <Button Content="{DynamicResource b_read_dump}" Margin="10" Command="{Binding ReadDumpCommand}" />
-            </WrapPanel>
-            <Separator Margin="10,0,10,0" />
-            <WrapPanel Margin="10">
-                <TextBlock Text="Slot:" VerticalAlignment="Center" Margin="10,0,5,0" />
-                <ComboBox Width="50" SelectedIndex="{Binding SlotIndex}" VerticalAlignment="Center">
-                    <ComboBoxItem Content="0" />
-                    <ComboBoxItem Content="1" />
-                    <ComboBoxItem Content="2" />
-                </ComboBox>
-                <Button Content="Browse hex..." Margin="10" Command="{Binding BrowseSlotHexCommand}" />
-                <TextBlock Text="{Binding SlotHexFilePath}" VerticalAlignment="Center" Margin="0,0,10,0" MaxWidth="200" TextTrimming="CharacterEllipsis" />
-                <TextBlock Text="Target addr:" VerticalAlignment="Center" Margin="10,0,5,0" />
-                <TextBox Text="{Binding SlotTargetAddressHex}" Width="90" VerticalAlignment="Center" />
-                <TextBlock Text="Version:" VerticalAlignment="Center" Margin="10,0,5,0" />
-                <TextBox Text="{Binding SlotVersionText}" Width="90" VerticalAlignment="Center" />
-                <Button Content="Upload to slot" Margin="10" Command="{Binding UploadToSlotCommand}" />
-                <TextBlock Text="{Binding SlotStatusText}" VerticalAlignment="Center" Margin="10,0,0,0" />
-            </WrapPanel>
-        </StackPanel>
+        <!-- ПУ28 (BootFirmware[2]==3): управление внешней flash-микросхемой - общий контрол,
+             см. Pu28MemoryControl.xaml (используется и на странице пульта, PanelControl.xaml) -->
+        <local:Pu28MemoryControl DockPanel.Dock="Top" Visibility="{Binding IsPu28, Converter={StaticResource BoolToVisibileConverter}}" />
 
         <TextBox x:Name="logField" DockPanel.Dock="Top" Text="{Binding Log,Mode=OneWay}" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="20" IsReadOnly="True" FontFamily="Courier New" />
     </DockPanel>

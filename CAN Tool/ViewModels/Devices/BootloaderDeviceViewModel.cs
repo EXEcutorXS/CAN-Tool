@@ -34,9 +34,10 @@ namespace OmniProtocol
     //
     // Код разложен по partial-файлам один в один со старыми #region из бывшего
     // FirmwarePageViewModel: .Gen1.cs (PGN100/101, сборка ≤4), .Gen2.cs (PGN105/106, всё
-    // остальное), .Gen3.cs (PGN110/111, сборка ≥13), .Pu28.cs (внешняя flash, PGN107-109,
-    // видна только когда IsPu28).
-    public partial class BootloaderDeviceViewModel : DeviceViewModel
+    // остальное), .Gen3.cs (PGN110/111, сборка ≥13). Управление внешней flash-микросхемой
+    // (PGN107-109, видно только когда IsPu28) вынесено в общий базовый класс
+    // Pu28DeviceViewModel - те же команды нужны и пульту в обычном режиме (PanelDeviceViewModel).
+    public partial class BootloaderDeviceViewModel : Pu28DeviceViewModel
     {
         public BootloaderDeviceViewModel(DeviceId id) : base(id) { }
 
@@ -52,7 +53,7 @@ namespace OmniProtocol
         private const byte Gen1MaxBuild = 4;
 
         public int Generation => BootFirmware[3] <= Gen1MaxBuild ? 1 : BootFirmware[3] >= Gen3MinBootBuild ? 3 : 2;
-        public bool IsPu28 => BootFirmware[0] == 123 && BootFirmware[2] == 3;
+        public override bool IsPu28 => BootFirmware[0] == 123 && BootFirmware[2] == 3;
 
         // Единая точка входа для DeviceViewModel.RunAutoUpdate - выбирает нужный протокол по
         // фактическому поколению загрузчика и прошивает.

@@ -65,6 +65,7 @@ b_read_dump	Read Dump	Считать дамп	Dump lesen
 t_dump_read_start	Start (hex)	Начало (hex)	Start (hex)
 t_dump_read_length	Length (KB)	Длина (КБ)	Länge (KB)
 t_legacy_adapter_mode	Old adapter (slow, safe)	Старый адаптер (медленно, надёжно)	Alter Adapter (langsam, sicher)
+t_own_image	Own image	Собственный образ	Eigenes Image
 b_cancel	Cancel	Отмена	Abbrechen
 b_expert	Expert	Эксперт	Experte
 b_list_mode	Mode	Реж	Modus
