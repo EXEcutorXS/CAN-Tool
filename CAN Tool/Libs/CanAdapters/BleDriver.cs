@@ -20,8 +20,13 @@ namespace CAN_Tool.Libs.CanAdapters
         private static readonly Guid RxCharUuid = Guid.Parse("D973F2E2-B19E-11E2-9E96-0800200C9A66");
 
         private const int PacketLength = 20;
-        private const byte MsgCanTx = 1;
-        private const byte MsgCanRx = 2;
+
+        // Type codes 1-19 are reserved by the app's own BLE protocol (bluetooth.h in both
+        // PU28-Timberline and PU28-BOOT-CAN - the bootloader now speaks the app's protocol
+        // for TYPE_MEMORY/TYPE_FRAG_*/TYPE_REBOOT too, not just this bridge), so the CAN
+        // bridge - bootloader-only, no app counterpart - lives past that range.
+        private const byte MsgCanTx = 20;
+        private const byte MsgCanRx = 21;
 
         // Advertised by Make_Connection() in PU28-BOOT-CAN's User/Ble/sample_service.c.
         private const string DeviceNamePrefix = "Autoterm PU";
@@ -222,6 +227,7 @@ namespace CAN_Tool.Libs.CanAdapters
             var dlc = (byte)Math.Min(message.Dlc, 8);
             p[7] = dlc;
             for (var i = 0; i < 8; i++) p[8 + i] = i < dlc ? message.Data[i] : (byte)0;
+            p[19] = Crc8Of(p, 19); // TYPE_CAN_TX isn't in the firmware's CRC8_EXEMPT set - see main.c
 
             var writer = new DataWriter();
             writer.WriteBytes(p);
@@ -270,6 +276,23 @@ namespace CAN_Tool.Libs.CanAdapters
             };
 
             MessageReceived?.Invoke(this, new GotCanMessageEventArgs { receivedMessage = message });
+        }
+
+        // CRC-8 (poly 0x07, init 0x00, MSB-first) of bytes[0..len). Matches the firmware's
+        // crc8Of() (main.c) and the phone app's (app.js) bit-for-bit - added 2026-09-08 as a
+        // protocol-wide packet integrity gate; the bootloader drops anything that fails this
+        // check (except TYPE_MEMORY_DATA/TYPE_FRAG_DATA/TYPE_FRAG_DATA_ACK, which use byte 19
+        // for their own data - not applicable to TYPE_CAN_TX).
+        private static byte Crc8Of(byte[] data, int len)
+        {
+            byte crc = 0;
+            for (var i = 0; i < len; i++)
+            {
+                crc ^= data[i];
+                for (var b = 0; b < 8; b++)
+                    crc = (crc & 0x80) != 0 ? (byte)((crc << 1) ^ 0x07) : (byte)(crc << 1);
+            }
+            return crc;
         }
     }
 }
