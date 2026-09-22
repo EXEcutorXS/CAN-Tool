@@ -1100,6 +1100,7 @@ t_modem_operator_code	Operator code	Код оператора	Betreibercode
 t_modem_temp_unit	Temperature unit	Единица температуры	Temperatureinheit
 t_modem_lac	LAC	LAC	LAC
 t_modem_cell_id	Cell ID	Cell ID	Cell ID
+t_modem_temp	Modem temp.	Темп. модема	Modem-Temp.
 t_modem_internet	Internet / MQTT	Интернет / MQTT	Internet / MQTT
 t_modem_internet_connected	Internet connected	Интернет подключен	Internet verbunden
 t_modem_mqtt_connected	MQTT connected	MQTT подключен	MQTT verbunden

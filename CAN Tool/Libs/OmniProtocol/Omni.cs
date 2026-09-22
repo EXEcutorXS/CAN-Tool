@@ -674,13 +674,16 @@ public partial class Omni : ObservableObject
                     var mp = senderDevice.ModemParams;
                     switch (m.Data[0])
                     {
-                        case 0: // регистрация/роуминг/интернет/mqtt + CSQ + тип сети, каждые 5 сек
+                        case 0: // регистрация/роуминг/интернет/mqtt + CSQ + тип сети + темп. модема, каждые 5 сек
                             if ((m.Data[1] & 3) < 2) mp.Registered = (m.Data[1] & 1) != 0;
                             if (((m.Data[1] >> 2) & 3) < 2) mp.Roaming = ((m.Data[1] >> 2) & 1) != 0;
                             if (((m.Data[1] >> 4) & 3) < 2) mp.InternetConnected = ((m.Data[1] >> 4) & 1) != 0;
                             if (((m.Data[1] >> 6) & 3) < 2) mp.MqttConnected = ((m.Data[1] >> 6) & 1) != 0;
                             mp.Csq = m.Data[2] == 0xFF ? -1 : m.Data[2];
                             mp.NetworkAcT = m.Data[3] == 0xFF ? -1 : m.Data[3];
+                            // D[4]: датчик на A1 модема, смещение +75, 0xFF = не подключён
+                            // (см. Library/Ntc и work.cpp::canBroadcast на стороне модема).
+                            mp.ModemTemp = m.Data[4] == 0xFF ? (int?)null : m.Data[4] - 75;
                             break;
                         case 1: // флаги настроек, раз в 30-60 сек
                             if ((m.Data[1] & 3) < 2) mp.OnlySmsMode = (m.Data[1] & 1) != 0;
@@ -697,10 +700,19 @@ public partial class Omni : ObservableObject
                         case 4: // статус авторегистрации (см. Modem::AutoRegisterStatus), по изменению
                             mp.AutoRegStatus = m.Data[1];
                             break;
-                        case 2: // код оператора, раз в 30-60 сек
-                            mp.OperatorCode = m.Data[1] == 0xFF
-                                ? ""
-                                : new string(new[] { (char)m.Data[1], (char)m.Data[2], (char)m.Data[3], (char)m.Data[4], (char)m.Data[5] });
+                        case 2: // код оператора: MCC/MNC как 2 Uint16 big-endian + число цифр
+                                // MNC (2 или 3), раз в 10 сек - см. work.cpp::canBroadcast на
+                                // стороне модема (был 5-байтовый ASCII, поменялось вместе с
+                                // messages.cpp на самом ПУ28: ASCII не соответствовал духу
+                                // остального протокола, LAC/CellID рядом уже бинарные).
+                            {
+                                int mcc = (m.Data[1] << 8) | m.Data[2];
+                                int mnc = (m.Data[3] << 8) | m.Data[4];
+                                int mncDigits = (m.Data[5] == 2 || m.Data[5] == 3) ? m.Data[5] : 2;
+                                mp.OperatorCode = (mcc == 0 && mnc == 0)
+                                    ? ""
+                                    : $"{mcc:D3}{mnc.ToString().PadLeft(mncDigits, '0')}";
+                            }
                             break;
                         case 3: // LAC + Cell ID, раз в 30-60 сек
                             if (m.Data[1] == 0xFF && m.Data[2] == 0xFF)

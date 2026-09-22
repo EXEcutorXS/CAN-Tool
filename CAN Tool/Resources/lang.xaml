@@ -1100,6 +1100,7 @@
 <v:String x:Key="t_modem_temp_unit">Temperature unit</v:String>
 <v:String x:Key="t_modem_lac">LAC</v:String>
 <v:String x:Key="t_modem_cell_id">Cell ID</v:String>
+<v:String x:Key="t_modem_temp">Modem temp.</v:String>
 <v:String x:Key="t_modem_internet">Internet / MQTT</v:String>
 <v:String x:Key="t_modem_internet_connected">Internet connected</v:String>
 <v:String x:Key="t_modem_mqtt_connected">MQTT connected</v:String>

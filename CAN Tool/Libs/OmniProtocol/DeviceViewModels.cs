@@ -111,6 +111,14 @@ namespace OmniProtocol
         [ObservableProperty] public int lac = -1;           // -1 = нет данных
         [ObservableProperty] public long cellId = -1;        // -1 = нет данных
 
+        // PGN60 sub0, D[4] - датчик температуры на A1 модема (см. Library/Ntc в прошивке
+        // модема). Значение уже раскодировано из проводного смещения +75 - тот же формат,
+        // что floorTemperature/engineTemperature и остальные температуры в этом протоколе
+        // (D[4]==0xFF => датчик не подключён). Nullable, не -1 - температура сама по себе
+        // законно бывает отрицательной, а остальные "нет данных"-поля этого класса (Csq/Lac/
+        // CellId/NetworkAcT) все неотрицательны в норме, так что -1 там безопасен, а тут нет.
+        [ObservableProperty] public int? modemTemp;
+
         // ── PGN60 sub0/sub4 (см. ModemInternetInfo.cpp) ──────────────────
         [ObservableProperty] public bool internetConnected;
         [ObservableProperty] public bool mqttConnected;

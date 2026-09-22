@@ -55,6 +55,7 @@
                             <RowDefinition Height="Auto" /><RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" /><RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" /><RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource t_modem_registered}" Margin="0,4,20,4" />
@@ -84,8 +85,13 @@
                         <TextBlock Grid.Row="8" Grid.Column="0" Text="{DynamicResource t_modem_cell_id}" Margin="0,4,20,4" />
                         <TextBlock Grid.Row="8" Grid.Column="1" Margin="0,4,20,4" Text="{Binding ModemParams.CellId}" />
 
-                        <TextBlock Grid.Row="9" Grid.Column="0" Text="{DynamicResource t_modem_temp_unit}" Margin="0,4,20,4" />
-                        <TextBlock Grid.Row="9" Grid.Column="1" Margin="0,4,20,4" Text="{Binding ModemParams.TempUnitF}" />
+                        <!-- PGN60 sub0 D[4] - датчик на A1 модема (Library/Ntc), null = не подключён -
+                             StringFormat просто не подставляется для null, так что строка пустая. -->
+                        <TextBlock Grid.Row="9" Grid.Column="0" Text="{DynamicResource t_modem_temp}" Margin="0,4,20,4" />
+                        <TextBlock Grid.Row="9" Grid.Column="1" Margin="0,4,20,4" Text="{Binding ModemParams.ModemTemp, StringFormat={}{0}°C}" />
+
+                        <TextBlock Grid.Row="10" Grid.Column="0" Text="{DynamicResource t_modem_temp_unit}" Margin="0,4,20,4" />
+                        <TextBlock Grid.Row="10" Grid.Column="1" Margin="0,4,20,4" Text="{Binding ModemParams.TempUnitF}" />
                     </Grid>
                 </StackPanel>
 
