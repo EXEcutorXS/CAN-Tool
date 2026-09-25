@@ -34,6 +34,9 @@ namespace CAN_Tool.ViewModels
         [ObservableProperty] private List<SolidColorBrush> brushes = new();
         [ObservableProperty] public bool autoRedraw = true;
 
+        // Итог обновления omnidata.json из Google Sheets; показывается в статус-баре 5 секунд после старта.
+        [ObservableProperty] private string omniDataUpdateStatus = "";
+
         [ObservableProperty] private WorkMode_t mode;
 
         public ManualPageViewModel ManualPage { set; get; }
@@ -577,7 +580,13 @@ namespace CAN_Tool.ViewModels
 
             // Try to refresh omnidata.json from Google Sheets before loading static data.
             // Uses a built-in timeout; silently falls back to the local file on any failure.
-            CAN_Tool.Libs.GoogleSheetsUpdater.TryUpdateAsync().GetAwaiter().GetResult();
+            OmniDataUpdateStatus = CAN_Tool.Libs.GoogleSheetsUpdater.TryUpdateAsync().GetAwaiter().GetResult();
+            if (OmniDataUpdateStatus.Length > 0)
+            {
+                var statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+                statusTimer.Tick += (s, e) => { OmniDataUpdateStatus = ""; statusTimer.Stop(); };
+                statusTimer.Start();
+            }
 
             OmniInstance = new Omni(CanAdapter);
 

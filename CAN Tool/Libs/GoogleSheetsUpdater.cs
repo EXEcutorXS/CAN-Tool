@@ -89,20 +89,21 @@ namespace CAN_Tool.Libs
             ("stringIds",  "stringIds",      "1225550681"),
         };
 
-        private const int TimeoutSeconds = 5;
+        private const int TimeoutSeconds = 10;
 
         // ── Public API ────────────────────────────────────────────────────────
 
         /// <summary>
         /// Tries to download fresh data from Google Sheets and patch omnidata.json.
-        /// Returns without throwing on any failure — the app continues with the local file.
+        /// Never throws — on any failure the app continues with the local file.
+        /// Returns a short human-readable status line for the UI ("" when the updater is not configured).
         /// </summary>
-        public static async Task TryUpdateAsync()
+        public static async Task<string> TryUpdateAsync()
         {
             if (PublishedId.StartsWith("TODO"))
             {
                 Debug.WriteLine("[GoogleSheetsUpdater] Published spreadsheet id is not configured — skipping update.");
-                return;
+                return "";
             }
 
             var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "omnidata.json");
@@ -113,50 +114,82 @@ namespace CAN_Tool.Libs
                 using var http = new HttpClient();
 
                 // Load current local JSON (we'll patch it)
-                var localJson = File.Exists(localPath)
-                    ? JObject.Parse(await File.ReadAllTextAsync(localPath, cts.Token))
-                    : new JObject();
+                var localJson = new JObject();
+                if (File.Exists(localPath))
+                {
+                    try { localJson = JObject.Parse(await File.ReadAllTextAsync(localPath, cts.Token).ConfigureAwait(false)); }
+                    catch (JsonException) { Debug.WriteLine("[GoogleSheetsUpdater] Local omnidata.json is empty/corrupt — rebuilding from sheets."); }
+                }
 
-                bool anyChange = false;
+                int totalRows = 0;
+                var failedSheets = new List<string>();
 
-                foreach (var (sheetName, jsonKey, gid) in Sheets)
+                // Tabs are fetched in parallel: ~1 s each, sequentially they would not fit the timeout.
+                var downloads = Sheets.Select(async sheet =>
                 {
                     try
                     {
                         var csvUrl = $"https://docs.google.com/spreadsheets/d/e/{PublishedId}" +
-                                     $"/pub?gid={Uri.EscapeDataString(gid)}&single=true&output=csv";
+                                     $"/pub?gid={Uri.EscapeDataString(sheet.gid)}&single=true&output=csv";
+                        return (sheet, csv: (string?)await http.GetStringAsync(csvUrl, cts.Token).ConfigureAwait(false), error: (string?)null);
+                    }
+                    catch (Exception ex)
+                    {
+                        return (sheet, csv: (string?)null, error: (string?)ex.Message);
+                    }
+                }).ToList();
+                var results = await Task.WhenAll(downloads).ConfigureAwait(false);
 
-                        var csv = await http.GetStringAsync(csvUrl, cts.Token);
+                foreach (var (sheet, csv, error) in results)
+                {
+                    var (sheetName, jsonKey, _) = sheet;
+                    try
+                    {
+                        if (csv == null) throw new InvalidOperationException(error);
                         var parsed = CsvToJToken(csv, jsonKey);
 
                         if (parsed != null)
                         {
                             localJson[jsonKey] = parsed;
-                            anyChange = true;
-                            var count = parsed is JContainer jc ? jc.Count : 0;
-                            Debug.WriteLine($"[GoogleSheetsUpdater] '{sheetName}' → {count} entries merged.");
+                            var rows = ParseCsvRows(csv).Count;
+                            totalRows += rows;
+                            Debug.WriteLine($"[GoogleSheetsUpdater] '{sheetName}' → {rows} rows merged.");
                         }
                     }
                     catch (Exception ex)
                     {
+                        failedSheets.Add(sheetName);
                         Debug.WriteLine($"[GoogleSheetsUpdater] Sheet '{sheetName}' failed: {ex.Message}");
                     }
                 }
 
-                if (anyChange)
-                {
-                    var output = localJson.ToString(Formatting.Indented);
-                    await File.WriteAllTextAsync(localPath, output, cts.Token);
-                    Debug.WriteLine("[GoogleSheetsUpdater] omnidata.json updated successfully.");
-                }
+                if (failedSheets.Count == Sheets.Length)
+                    return "Omniprotocol: Google Sheets недоступен, используется локальный файл";
+
+                // Never write a file the loader can't use (e.g. rebuilt from empty + a failed tab).
+                if (!Sheets.All(s => localJson.ContainsKey(s.jsonKey)))
+                    return $"Omniprotocol: не удалось загрузить {string.Join(", ", failedSheets)}, данные не обновлены";
+
+                // Temp file + move: a timeout, crash or kill mid-write can't leave omnidata.json truncated.
+                var output = localJson.ToString(Formatting.Indented);
+                var tmpPath = localPath + ".tmp";
+                await File.WriteAllTextAsync(tmpPath, output, CancellationToken.None).ConfigureAwait(false);
+                File.Move(tmpPath, localPath, overwrite: true);
+                Debug.WriteLine("[GoogleSheetsUpdater] omnidata.json updated successfully.");
+
+                return failedSheets.Count == 0
+                    ? $"Omniprotocol: обновлено из Google Sheets, считано {totalRows} строк"
+                    : $"Omniprotocol: считано {totalRows} строк, не загружены: {string.Join(", ", failedSheets)}";
             }
             catch (OperationCanceledException)
             {
                 Debug.WriteLine("[GoogleSheetsUpdater] Timed out — using local omnidata.json.");
+                return "Omniprotocol: таймаут, используется локальный файл";
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[GoogleSheetsUpdater] Update failed: {ex.Message} — using local omnidata.json.");
+                return $"Omniprotocol: ошибка обновления ({ex.Message}), используется локальный файл";
             }
         }
 

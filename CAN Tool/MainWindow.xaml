@@ -19,6 +19,9 @@
             </StatusBarItem>
             <ProgressBar Width="300" Value="{Binding OmniInstance.CurrentTask.PercentComplete}" Height="30" Margin="5 0 5 0" Visibility="{Binding OmniInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></ProgressBar>
             <StatusBarItem HorizontalAlignment="Left">
+                <TextBlock FontSize="20" Foreground="{DynamicResource MaterialDesignBodyLight}" Text="{Binding OmniDataUpdateStatus}" Margin="10"></TextBlock>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Left">
                 <Button Content="{DynamicResource b_cancel}" Command="{Binding CancelOperationCommand}" Margin="5" Visibility="{Binding OmniInstance.CurrentTask.Occupied,Converter={StaticResource BoolToVisibileConverter}}"></Button>
             </StatusBarItem>
 
