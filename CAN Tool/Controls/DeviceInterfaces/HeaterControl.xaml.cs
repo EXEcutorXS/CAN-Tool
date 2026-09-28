@@ -120,6 +120,7 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
+            overrideStatesByte |= 3 << 4;
             byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(newFrequency>>8), (byte)(newFrequency & 0xFF), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
@@ -143,6 +144,7 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
+            overrideStatesByte |= 3 << 4;
             byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)newPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
@@ -163,6 +165,7 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
+            overrideStatesByte |= 3 << 4;
             byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)newRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
@@ -189,6 +192,7 @@ namespace CAN_Tool.CustomControls
             if (!Vm.OverrideState.BlowerOverriden) overrideByte2 |= 1;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
+            overrideStatesByte |= 3 << 4;
             byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100>>8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
@@ -206,6 +210,7 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
+            overrideStatesByte |= 3 << 4;
             byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
@@ -224,11 +229,89 @@ namespace CAN_Tool.CustomControls
             overrideByte2 |= 3;
             overrideStatesByte |= 3;
             overrideStatesByte |= 3 << 2;
+            overrideStatesByte |= 3 << 4;
             byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
             OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
             Vm.Transmit(msg.ToCanMessage());
 
         }
+
+        private void PumpOverrideClick(object sender, RoutedEventArgs e)
+        {
+            byte overrideByte1 = 0;
+            byte overrideByte2 = 0;
+            byte overrideStatesByte = 0;
+            overrideByte1 |= 3;
+            overrideByte1 |= 3 << 2;
+            overrideByte1 |= 3 << 4;
+            if (!Vm.OverrideState.PumpOverriden) overrideByte1 |= 1 << 6;
+            overrideByte2 |= 3;
+            if (Vm.OverrideState.PumpOverridenState) overrideStatesByte |= 1;
+            overrideStatesByte |= 3 << 2; // реле - без изменений
+            overrideStatesByte |= 3 << 4; // резерв
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
+            Vm.Transmit(msg.ToCanMessage());
+        }
+
+        private void SetPumpOverridenState(bool on)
+        {
+            if (Vm == null || !Vm.OverrideState.PumpOverriden) return;
+            byte overrideByte1 = 3;
+            overrideByte1 |= 3 << 2;
+            overrideByte1 |= 3 << 4;
+            overrideByte1 |= 3 << 6;
+            byte overrideByte2 = 3;
+            byte overrideStatesByte = 0;
+            if (on) overrideStatesByte |= 1;
+            overrideStatesByte |= 3 << 2; // реле - без изменений
+            overrideStatesByte |= 3 << 4; // резерв
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
+            Vm.Transmit(msg.ToCanMessage());
+        }
+
+        private void PumpOnClick(object sender, RoutedEventArgs e) => SetPumpOverridenState(true);
+
+        private void PumpOffClick(object sender, RoutedEventArgs e) => SetPumpOverridenState(false);
+
+        private void RelayOverrideClick(object sender, RoutedEventArgs e)
+        {
+            byte overrideByte1 = 0;
+            byte overrideByte2 = 0;
+            byte overrideStatesByte = 0;
+            overrideByte1 |= 3;
+            if (!Vm.OverrideState.RelayOverriden) overrideByte1 |= 1 << 2;
+            overrideByte1 |= 3 << 4;
+            overrideByte1 |= 3 << 6;
+            overrideByte2 |= 3;
+            overrideStatesByte |= 3; // помпа - без изменений
+            if (Vm.OverrideState.RelayOverridenState) overrideStatesByte |= 1 << 2;
+            overrideStatesByte |= 3 << 4; // резерв
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
+            Vm.Transmit(msg.ToCanMessage());
+        }
+
+        private void SetRelayOverridenState(bool on)
+        {
+            if (Vm == null || !Vm.OverrideState.RelayOverriden) return;
+            byte overrideByte1 = 3;
+            overrideByte1 |= 3 << 2;
+            overrideByte1 |= 3 << 4;
+            overrideByte1 |= 3 << 6;
+            byte overrideByte2 = 3;
+            byte overrideStatesByte = 3; // помпа - без изменений
+            if (on) overrideStatesByte |= 1 << 2;
+            overrideStatesByte |= 3 << 4; // резерв
+            byte[] data = { overrideByte1, overrideByte2, overrideStatesByte, (byte)Vm.OverrideState.BlowerOverridenRevs, (byte)Vm.OverrideState.GlowPlugOverridenPower, (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100 >> 8), (byte)(Vm.OverrideState.FuelPumpOverridenFrequencyX100), 0xFF };
+            OmniMessage msg = new() { Pgn = 47, ReceiverId = Vm.Id, Data = data };
+            Vm.Transmit(msg.ToCanMessage());
+        }
+
+        private void RelayOnClick(object sender, RoutedEventArgs e) => SetRelayOverridenState(true);
+
+        private void RelayOffClick(object sender, RoutedEventArgs e) => SetRelayOverridenState(false);
 
         private void ReduceOverridenRevsButtonClick(object sender, RoutedEventArgs e)
         {

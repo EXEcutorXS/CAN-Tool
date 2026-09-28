@@ -19,6 +19,7 @@
     <c:ModemToVisibleConverter x:Key="OnlyForModem" />
     <c:StateToBorderBrushConverter x:Key="BoolToBrush" />
     <c:BoolToOpacity x:Key="BoolToOpacity" />
+    <c:BoolToOnOffConverter x:Key="BoolToOnOff" />
     <c:FarenheitConverter x:Key="ToFarenheit" />
     <c:TimeSpanConverter x:Key="ToTimeSpan" />
     <c:HexStringToIntConverter x:Key="HexConverter" />

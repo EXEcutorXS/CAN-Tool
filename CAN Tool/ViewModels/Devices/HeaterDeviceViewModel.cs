@@ -64,7 +64,7 @@ namespace OmniProtocol
             if (OverrideState.PumpOverriden)     overrideByte1 |= 1 << 6;
             if (OverrideState.BlowerOverriden)   overrideByte2 |= 1;
             if (OverrideState.PumpOverridenState)  overrideStatesByte |= 1;
-            if (OverrideState.RelayOverridenState) overrideStatesByte |= 4;
+            if (OverrideState.RelayOverridenState) overrideStatesByte |= 1 << 2;
             byte[] data = {
                 overrideByte1, overrideByte2, overrideStatesByte,
                 (byte)OverrideState.BlowerOverridenRevs,

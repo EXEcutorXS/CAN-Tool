@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Linq;
 using System.ComponentModel;
 using RVC;
+using static CAN_Tool.Libs.Helper;
 
 
 namespace CAN_Tool.ViewModels.Converters
@@ -173,6 +174,18 @@ namespace CAN_Tool.ViewModels.Converters
         {
             return ((Visibility)value == Visibility.Visible);
         }
+    }
+
+    // Показывает текущее (полученное от устройства) вкл/выкл значение переопределяемого
+    // булевого исполнительного устройства (помпа/реле) - см. HeaterControl.xaml, столбец между
+    // кнопками "Выкл"/"Вкл".
+    public class BoolToOnOffConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+            value is bool b && b ? GetString("t_on") : GetString("t_off");
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+            throw new NotImplementedException();
     }
 
     public class IntToVisibleConverter : IValueConverter
