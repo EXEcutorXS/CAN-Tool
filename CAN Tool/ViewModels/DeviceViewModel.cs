@@ -690,6 +690,9 @@ namespace OmniProtocol
                 _ = bootDev.RequestBootLoaderVersion();
                 Thread.Sleep(500);
 
+                // Hex выбран на объекте исходного устройства, а прошивает новый объект-загрузчик;
+                // Gen1 перечитывает файл по пути (см. UpdateFirmwareOld), поэтому передаём путь.
+                bootDev.lastHexFilePath = lastHexFilePath;
                 bootDev.FlashFragments(fragments);
 
                 // Возврат в основную программу

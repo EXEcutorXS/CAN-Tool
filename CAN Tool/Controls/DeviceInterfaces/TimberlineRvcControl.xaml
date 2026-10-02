@@ -169,6 +169,10 @@
                 <TextBox Margin="2" VerticalAlignment="Center" MinWidth="120" FontSize="13"
                          Text="{Binding OccupiedAddressesText, UpdateSourceTrigger=LostFocus}"
                          ToolTip="{DynamicResource t_sim_tooltip}"/>
+                <CheckBox Margin="6 0 2 0" VerticalAlignment="Center" FontSize="13"
+                          IsChecked="{Binding GarminStyleClaim}"
+                          Content="{DynamicResource c_garmin_style}"
+                          ToolTip="{DynamicResource t_garmin_style_tt}"/>
                 <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
                 <!-- Multipack -->
                 <TextBlock Margin="4 0" VerticalAlignment="Center" FontSize="11"

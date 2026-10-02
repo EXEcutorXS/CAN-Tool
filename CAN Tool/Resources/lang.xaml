@@ -1332,6 +1332,8 @@
 <v:String x:Key="b_claim_addr">Claim</v:String>
 <v:String x:Key="t_sim_label">Sim:</v:String>
 <v:String x:Key="t_sim_tooltip">Comma-separated SA list the simulator will defend</v:String>
+<v:String x:Key="c_garmin_style">Garmin style</v:String>
+<v:String x:Key="t_garmin_style_tt">Send ADDRESS_CLAIM as DGN 0xEEFF (J1939 broadcast, as Garmin does) instead of 0xEE00</v:String>
 <v:String x:Key="t_mode_label">Mode:</v:String>
 <v:String x:Key="t_fan_manual_label">Fan manual:</v:String>
 <v:String x:Key="t_daytime_setpoint_tt">Daytime setpoint</v:String>

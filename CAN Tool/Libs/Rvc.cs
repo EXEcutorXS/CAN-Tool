@@ -337,7 +337,7 @@ namespace RVC
 
         public string PrintParameters()
         {
-            if (Dgn == 0xEE00)
+            if (Dgn == 0xEE00 || Dgn == 0xEEFF)
             {
                 int mfrCode = ((Data[3] << 3) | (Data[2] >> 5)) & 0x7FF;
                 bool selfConfig = (Data[7] & 0x80) != 0;

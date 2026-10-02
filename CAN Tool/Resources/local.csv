@@ -1332,6 +1332,8 @@ b_req_addr	Req addr	Зап. адрес	Addr. anfragen
 b_claim_addr	Claim	Клейм	Anfordern
 t_sim_label	Sim:	Сим:	Sim:
 t_sim_tooltip	Comma-separated SA list the simulator will defend	SA через запятую для защиты симулятором	SA-Liste (kommagetrennt) für Simulator-Schutz
+c_garmin_style	Garmin style	Garmin style	Garmin style
+t_garmin_style_tt	Send ADDRESS_CLAIM as DGN 0xEEFF (J1939 broadcast, as Garmin does) instead of 0xEE00	Слать ADDRESS_CLAIM как DGN 0xEEFF (широковещательный J1939, как Garmin) вместо 0xEE00	ADDRESS_CLAIM als DGN 0xEEFF (J1939-Broadcast, wie Garmin) statt 0xEE00 senden
 t_mode_label	Mode:	Режим:	Modus:
 t_fan_manual_label	Fan manual:	Вент. вручную:	Lüfter manuell:
 t_daytime_setpoint_tt	Daytime setpoint	Уставка дня	Tagessollwert

@@ -170,8 +170,8 @@
 
                             <ProgressBar Grid.Column="3" Height="25" MouseWheel="FuelPumpMouseWheel"></ProgressBar>
                             <TextBlock Grid.Column="3" Text="{Binding OverrideState.FuelPumpOverridenFrequencyX100,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" d:Text="150" IsEnabled="False" Margin="5"></TextBlock>
-                            <Button Grid.Column="2" Margin="5">-</Button>
-                            <Button Grid.Column="4" Margin="5">+</Button>
+                            <Button Grid.Column="2" Margin="5" Click="ReduceFuelPumpButtonClick">-</Button>
+                            <Button Grid.Column="4" Margin="5" Click="IncreaseFuelPumpButtonClick">+</Button>
 
                         </Grid>
                         <Grid Width="300" Margin="5" Grid.Row="2" Grid.Column="0">
@@ -187,8 +187,8 @@
                             <ProgressBar Grid.Column="3" Height="25" MouseWheel="GlowPlugMouseWheel"></ProgressBar>
                             <TextBlock Grid.Column="3" Text="{Binding OverrideState.GlowPlugOverridenPower,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" d:Text="100" IsEnabled="False" Margin="5"></TextBlock>
 
-                            <Button Grid.Column="2" Margin="5">-</Button>
-                            <Button Grid.Column="4" Margin="5">+</Button>
+                            <Button Grid.Column="2" Margin="5" Click="ReduceGlowPlugButtonClick">-</Button>
+                            <Button Grid.Column="4" Margin="5" Click="IncreaseGlowPlugButtonClick">+</Button>
 
                         </Grid>
                         <Grid Width="320" Margin="5" Grid.Row="0" Grid.Column="1">

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -72,17 +73,15 @@ namespace OmniProtocol
             Transmit(msg.ToCanMessage());
         }
 
-        private void UpdateFirmwareOld(List<CodeFragment> _)
+        private void UpdateFirmwareOld(List<CodeFragment> frags)
         {
-            if (string.IsNullOrEmpty(lastHexFilePath))
-            {
-                MessageBox.Show(GetString("t_load_hex_first"));
-                return;
-            }
-
             // Re-parse hex including all 0xFF bytes so the bootloader's
             // sequential write pointer stays aligned with flash addresses.
-            var rawFragments = ParseHexFileRaw(lastHexFilePath, FragmentSize);
+            // Если реального hex-файла нет (прошивка скачана с сервера как плоский .bin - его
+            // фрагменты уже сплошные, без пропусков), берём переданные фрагменты как есть.
+            var rawFragments = !string.IsNullOrEmpty(lastHexFilePath) && File.Exists(lastHexFilePath)
+                ? ParseHexFileRaw(lastHexFilePath, FragmentSize)
+                : frags;
             if (rawFragments.Count == 0)
             {
                 MessageBox.Show(GetString("t_load_hex_first"));
@@ -98,6 +97,11 @@ namespace OmniProtocol
 
             Bus.CurrentTask.OnDone();
             Bus.CurrentTask.Capture("Programming...");
+
+            // Старый загрузчик пишет строго последовательно, указатель сам не сбрасывается ни
+            // стиранием, ни повторным запуском прошивки - без этого вызова любая попытка после
+            // первой (или после неполной) пишет со смещением от конца предыдущей.
+            initAnddressOld();
 
             int cnt = 0;
             foreach (var f in rawFragments)

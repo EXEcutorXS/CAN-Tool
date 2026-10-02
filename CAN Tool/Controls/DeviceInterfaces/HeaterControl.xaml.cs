@@ -105,9 +105,25 @@ namespace CAN_Tool.CustomControls
         private void FuelPumpMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (Vm == null || !Vm.OverrideState.FuelPumpOverriden) return;
-            int newFrequency = Vm.OverrideState.FuelPumpOverridenFrequencyX100;
-            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 100 : 10;
-            newFrequency += Math.Sign(e.Delta) * k;
+            SetFuelPumpOverrideVal(Vm.OverrideState.FuelPumpOverridenFrequencyX100 + Math.Sign(e.Delta) * FuelPumpStep());
+        }
+
+        private static int FuelPumpStep() => Keyboard.IsKeyDown(Key.LeftShift) ? 100 : 10;
+
+        private void ReduceFuelPumpButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (Vm == null) return;
+            SetFuelPumpOverrideVal(Vm.OverrideState.FuelPumpOverridenFrequencyX100 - FuelPumpStep());
+        }
+
+        private void IncreaseFuelPumpButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (Vm == null) return;
+            SetFuelPumpOverrideVal(Vm.OverrideState.FuelPumpOverridenFrequencyX100 + FuelPumpStep());
+        }
+
+        private void SetFuelPumpOverrideVal(int newFrequency)
+        {
             if (newFrequency < 0) newFrequency = 0;
             if (newFrequency > 1000) newFrequency = 1000;
             byte overrideByte1 = 0;
@@ -129,9 +145,25 @@ namespace CAN_Tool.CustomControls
         private void GlowPlugMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (Vm == null || !Vm.OverrideState.GlowPlugOverriden) return;
-            int newPower = Vm.OverrideState.GlowPlugOverridenPower;
-            int k = Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
-            newPower += Math.Sign(e.Delta) * k;
+            SetGlowPlugOverrideVal(Vm.OverrideState.GlowPlugOverridenPower + Math.Sign(e.Delta) * GlowPlugStep());
+        }
+
+        private static int GlowPlugStep() => Keyboard.IsKeyDown(Key.LeftShift) ? 10 : 1;
+
+        private void ReduceGlowPlugButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (Vm == null) return;
+            SetGlowPlugOverrideVal(Vm.OverrideState.GlowPlugOverridenPower - GlowPlugStep());
+        }
+
+        private void IncreaseGlowPlugButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (Vm == null) return;
+            SetGlowPlugOverrideVal(Vm.OverrideState.GlowPlugOverridenPower + GlowPlugStep());
+        }
+
+        private void SetGlowPlugOverrideVal(int newPower)
+        {
             if (newPower < 0) newPower = 0;
             if (newPower > 100) newPower = 100;
             byte overrideByte1 = 0;

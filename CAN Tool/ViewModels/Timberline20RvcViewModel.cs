@@ -341,7 +341,8 @@ namespace CAN_Tool.ViewModels
                     break;
 
                 case 0xEE00:
-                    AddToClaimLog($"[{DateTime.Now:HH:mm:ss.fff}] ← CLAIM SA={msg.SourceAdress} byte7=0x{D[7]:X2}");
+                case 0xEEFF:
+                    AddToClaimLog($"[{DateTime.Now:HH:mm:ss.fff}] ← CLAIM {msg.Dgn:X4} SA={msg.SourceAdress} byte7=0x{D[7]:X2}");
                     if (D[7] == 0x80) // dynamic address capable = our HCU
                     {
                         if (occupiedAddresses.Contains(msg.SourceAdress))
@@ -717,7 +718,7 @@ namespace CAN_Tool.ViewModels
         public void ClaimSourceAddress()
         {
             RvcMessage msg = new();
-            msg.Dgn = 0xEE00;
+            msg.Dgn = ClaimDgn;
             msg.SourceAdress = SaToRequest;
             msg.Priority = 6;
             msg.Data[0] = 0;//No serial
@@ -744,6 +745,11 @@ namespace CAN_Tool.ViewModels
 
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
+
+        private bool garminStyleClaim = false;
+        // Garmin sends ADDRESS_CLAIM as 0xEEFF (J1939 PDU1 with DA=global) instead of RV-C 0xEE00
+        public bool GarminStyleClaim { get => garminStyleClaim; set => SetProperty(ref garminStyleClaim, value); }
+        private int ClaimDgn => GarminStyleClaim ? 0xEEFF : 0xEE00;
 
         private string claimLog = "";
         public string ClaimLog { get => claimLog; private set => SetProperty(ref claimLog, value); }
@@ -772,7 +778,7 @@ namespace CAN_Tool.ViewModels
         private void RespondWithAddressClaim(int address)
         {
             RvcMessage claim = new();
-            claim.Dgn = 0xEE00;
+            claim.Dgn = ClaimDgn;
             claim.SourceAdress = (byte)address;
             claim.Priority = 6;
             claim.Data[0] = 0xFF; claim.Data[1] = 0xFF;
@@ -780,7 +786,7 @@ namespace CAN_Tool.ViewModels
             claim.Data[4] = 0;    claim.Data[5] = 0; claim.Data[6] = 0;
             claim.Data[7] = 0x00; // Static (byte7=0), always beats HCU's dynamic (byte7=0x80)
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = claim.ToCanMessage() });
-            AddToClaimLog($"[{DateTime.Now:HH:mm:ss.fff}] → CLAIM SA={address} (simulator, static, wins)");
+            AddToClaimLog($"[{DateTime.Now:HH:mm:ss.fff}] → CLAIM {ClaimDgn:X4} SA={address} (simulator, static, wins)");
         }
 
         public void RequestPropPacket(byte packetCode)
