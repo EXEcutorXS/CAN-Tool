@@ -625,6 +625,16 @@ public partial class Omni : ObservableObject
                 }
 
                 break;
+            case 44:
+                senderDevice.ExtensionBoard.UpdateLoads(m.Data[0] * 256 + m.Data[1], m.Data[2] * 256 + m.Data[3], m.Data[4] * 256 + m.Data[5]);
+                break;
+
+            case 45:
+                senderDevice.ExtensionBoard.UpdateTemperatures(
+                    (short)(m.Data[0] * 256 + m.Data[1]), (short)(m.Data[2] * 256 + m.Data[3]),
+                    (short)(m.Data[4] * 256 + m.Data[5]), (short)(m.Data[6] * 256 + m.Data[7]));
+                break;
+
             case 47:
                 if ((m.Data[0] & 3) < 2) senderDevice.OverrideState.FuelPumpOverriden = (m.Data[0] & 3) > 0;
                 if (((m.Data[0] >> 2) & 3) < 2) senderDevice.OverrideState.RelayOverriden = ((m.Data[0] >> 2) & 3) > 0;

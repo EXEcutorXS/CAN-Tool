@@ -1,0 +1,41 @@
+<UserControl x:Class="CAN_Tool.CustomControls.ExtensionBoardControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="clr-namespace:CAN_Tool.CustomControls" xmlns:op="clr-namespace:OmniProtocol" mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800" d:DataContext="{d:DesignInstance Type=op:ExtensionBoardDeviceViewModel}">
+    <DockPanel>
+        <local:DeviceHeaderControl DockPanel.Dock="Top" />
+        <StackPanel Margin="10">
+            <TextBlock Text="Температуры" Style="{DynamicResource MaterialDesignHeadline6TextBlock}" Margin="5 0 0 5" />
+            <ItemsControl ItemsSource="{Binding ExtensionBoard.Temperatures}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="1" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type op:ExtensionBoardTemperature}">
+                        <StackPanel Margin="5">
+                            <TextBlock Text="{Binding Number, StringFormat=Датчик {0}}" HorizontalAlignment="Center" />
+                            <TextBlock Text="{Binding Value, StringFormat={}{0:F1} °C, TargetNullValue=—, FallbackValue=—}" Style="{DynamicResource MaterialDesignHeadline4TextBlock}" HorizontalAlignment="Center" d:Text="23.5 °C" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Text="Нагрузки" Style="{DynamicResource MaterialDesignHeadline6TextBlock}" Margin="5 20 0 5" />
+            <ItemsControl ItemsSource="{Binding ExtensionBoard.Loads}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type op:ExtensionBoardLoadChannel}">
+                        <Grid Height="50">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Number, StringFormat=Нагрузка {0}}" Style="{DynamicResource MaterialDesignHeadline6TextBlock}" VerticalAlignment="Center" Margin="5" />
+                            <ProgressBar Grid.Column="1" Margin="10" Minimum="0" Maximum="100" Height="30" Value="{Binding ActualPercent, Mode=OneWay}" />
+                            <Slider Grid.Column="1" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Height="30" Margin="0 14 0 5" Value="{Binding CommandedPercent, Mode=TwoWay}" />
+                            <TextBlock Grid.Column="1" Text="{Binding ActualPercent, StringFormat={}{0:F1} %, Mode=OneWay}" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" d:Text="50 %" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

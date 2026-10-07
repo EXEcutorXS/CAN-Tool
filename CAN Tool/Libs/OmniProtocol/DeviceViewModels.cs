@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using static CAN_Tool.Libs.Helper;
 
@@ -48,6 +52,123 @@ namespace OmniProtocol
         [ObservableProperty] public int pwmLevel1;
         [ObservableProperty] public int pwmLevel2;
         [ObservableProperty] public int pwmLevel3;
+    }
+
+    public partial class ExtensionBoardLoadChannel : ObservableObject
+    {
+        private readonly ExtensionBoardViewModel owner;
+
+        public ExtensionBoardLoadChannel(ExtensionBoardViewModel owner, int number)
+        {
+            this.owner = owner;
+            Number = number;
+        }
+
+        public int Number { get; }
+
+        // Фактическая мощность из PGN 44, %
+        [ObservableProperty] private double actualPercent;
+
+        // Заданная слайдером мощность (уходит в PGN 43), %
+        [ObservableProperty] private double commandedPercent;
+
+        partial void OnCommandedPercentChanged(double value) => owner.OnUserCommand();
+    }
+
+    public partial class ExtensionBoardTemperature : ObservableObject
+    {
+        public ExtensionBoardTemperature(int number) => Number = number;
+
+        public int Number { get; }
+
+        // °C, null — датчик не подключён
+        [ObservableProperty] private double? value;
+    }
+
+    public partial class ExtensionBoardViewModel : ObservableObject
+    {
+        // Прошивка платы расширения возвращает -127.0 °C (в 0.1 °C), если датчик не подключён
+        private const int NoSensorRaw = -1270;
+        private const int SendIntervalMs = 100;
+        private const int UserEditHoldMs = 1500;
+
+        // PGN 43 задаёт сразу три канала, поэтому слайдер одной нагрузки обязан отправлять
+        // и текущие значения остальных; этот флаг отличает обновление из PGN 44 от действий пользователя.
+        [ThreadStatic] private static bool syncingFromDevice;
+
+        private readonly object sync = new();
+        private long lastSentTick;
+        private long lastUserTick;
+        private bool sendScheduled;
+
+        public ExtensionBoardViewModel()
+        {
+            for (var i = 1; i <= 3; i++) Loads.Add(new ExtensionBoardLoadChannel(this, i));
+            for (var i = 1; i <= 4; i++) Temperatures.Add(new ExtensionBoardTemperature(i));
+        }
+
+        public List<ExtensionBoardLoadChannel> Loads { get; } = new();
+        public List<ExtensionBoardTemperature> Temperatures { get; } = new();
+
+        // Значения каналов 1..3 в промилле (0..1000), как их ожидает PGN 43
+        public event Action<int[]> LoadCommandRequested;
+
+        internal void OnUserCommand()
+        {
+            if (syncingFromDevice) return;
+
+            long wait;
+            lock (sync)
+            {
+                lastUserTick = Environment.TickCount64;
+                if (sendScheduled) return;
+                wait = SendIntervalMs - (lastUserTick - lastSentTick);
+                if (wait > 0) sendScheduled = true;
+            }
+
+            if (wait <= 0)
+            {
+                SendNow();
+                return;
+            }
+
+            Task.Delay((int)wait).ContinueWith(_ =>
+            {
+                lock (sync) sendScheduled = false;
+                SendNow();
+            });
+        }
+
+        private void SendNow()
+        {
+            lock (sync) lastSentTick = Environment.TickCount64;
+            var promille = Loads.Select(l => (int)Math.Round(l.CommandedPercent * 10)).ToArray();
+            LoadCommandRequested?.Invoke(promille);
+        }
+
+        public void UpdateLoads(int promille1, int promille2, int promille3)
+        {
+            var userBusy = Environment.TickCount64 - Interlocked.Read(ref lastUserTick) < UserEditHoldMs;
+            var values = new[] { promille1, promille2, promille3 };
+
+            syncingFromDevice = true;
+            try
+            {
+                for (var i = 0; i < Loads.Count; i++)
+                {
+                    Loads[i].ActualPercent = values[i] / 10.0;
+                    if (!userBusy) Loads[i].CommandedPercent = values[i] / 10.0;
+                }
+            }
+            finally { syncingFromDevice = false; }
+        }
+
+        public void UpdateTemperatures(short raw1, short raw2, short raw3, short raw4)
+        {
+            var values = new[] { raw1, raw2, raw3, raw4 };
+            for (var i = 0; i < Temperatures.Count; i++)
+                Temperatures[i].Value = values[i] == NoSensorRaw ? null : values[i] / 10.0;
+        }
     }
 
     public partial class ACInverterViewModel : ObservableObject

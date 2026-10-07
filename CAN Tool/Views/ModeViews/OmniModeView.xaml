@@ -54,6 +54,9 @@
                         <DataTemplate DataType="{x:Type op:GenericLoadTrippleDeviceViewModel}">
                             <cc:GenericLoadTrippleControl />
                         </DataTemplate>
+                        <DataTemplate DataType="{x:Type op:ExtensionBoardDeviceViewModel}">
+                            <cc:ExtensionBoardControl />
+                        </DataTemplate>
                         <DataTemplate DataType="{x:Type op:AcInverterDeviceViewModel}">
                             <cc:AcInverterControl />
                         </DataTemplate>

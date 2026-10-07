@@ -203,6 +203,7 @@ namespace OmniProtocol
         public virtual ACInverterViewModel ACInverterParams { get; } = new();
         public virtual ModemViewModel ModemParams { get; } = new();
         public virtual GenericLoadTrippleViewModel GenericLoadTripple { get; } = new();
+        public virtual ExtensionBoardViewModel ExtensionBoard { get; } = new();
         public virtual OverrideStateClass OverrideState { get; } = new();
 
         public partial class OverrideStateClass : ObservableObject
@@ -931,6 +932,7 @@ namespace OmniProtocol
                 DeviceType_t.AcInverter                   => new AcInverterDeviceViewModel(id),
                 DeviceType_t.AcPanel                      => new AcPanelDeviceViewModel(id),
                 DeviceType_t.GenericLoadTripple            => new GenericLoadTrippleDeviceViewModel(id),
+                DeviceType_t.ExtensionBoard               => new ExtensionBoardDeviceViewModel(id),
                 DeviceType_t.PressureSensor               => new PressureSensorDeviceViewModel(id),
                 DeviceType_t.BootLoader                   => new BootloaderDeviceViewModel(id),
                 DeviceType_t.Modem                        => new ModemDeviceViewModel(id),
