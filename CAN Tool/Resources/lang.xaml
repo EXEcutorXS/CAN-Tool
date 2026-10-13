@@ -1327,6 +1327,8 @@
 <v:String x:Key="t_inst_label">Inst:</v:String>
 <v:String x:Key="t_sub_label">Sub:</v:String>
 <v:String x:Key="b_request_dgn">Request</v:String>
+<v:String x:Key="c_global_request">Global</v:String>
+<v:String x:Key="t_global_request_tt">Send the request to the global address 0xFF (DGN 0xEAFF) instead of SA</v:String>
 <v:String x:Key="t_sa_label">SA:</v:String>
 <v:String x:Key="b_req_addr">Req addr</v:String>
 <v:String x:Key="b_claim_addr">Claim</v:String>

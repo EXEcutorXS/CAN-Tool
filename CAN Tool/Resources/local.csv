@@ -1327,6 +1327,8 @@ t_dgn_hex_tooltip	DGN in hex	DGN в шестнадцатеричном виде	
 t_inst_label	Inst:	Инст:	Inst:
 t_sub_label	Sub:	Под:	Sub:
 b_request_dgn	Request	Запрос	Anfragen
+c_global_request	Global	Global	Global
+t_global_request_tt	Send the request to the global address 0xFF (DGN 0xEAFF) instead of SA	Отправить запрос на глобальный адрес 0xFF (DGN 0xEAFF) вместо SA	Anfrage an die globale Adresse 0xFF (DGN 0xEAFF) statt an SA senden
 t_sa_label	SA:	SA:	SA:
 b_req_addr	Req addr	Зап. адрес	Addr. anfragen
 b_claim_addr	Claim	Клейм	Anfordern

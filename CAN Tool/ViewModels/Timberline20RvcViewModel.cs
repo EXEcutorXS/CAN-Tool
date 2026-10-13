@@ -357,14 +357,18 @@ namespace CAN_Tool.ViewModels
                     MultipackInitiated = true;
                     for (int i = 0; i < 256; i++)
                         packReceivedFlags[i] = false;
-                        MultipackLength = D[1] + D[2] * 256;
-                        MultipackPacketCount = D[3];
-                        MultipackPacketDgn = D[5] + D[6] * 0x100 + D[7] * 0x10000;
+                    multipackZeroBased = false;
+                    MultipackLength = D[1] + D[2] * 256;
+                    MultipackPacketCount = D[3];
+                    MultipackPacketDgn = D[5] + D[6] * 0x100 + D[7] * 0x10000;
                     break;
                 case 0xEBFF:
-                    packReceivedFlags[D[0]] = true;
+                    // RV-C numbers packets from 1, HCU firmware before 126.1.1.5 numbered them from 0
+                    if (D[0] == 0) multipackZeroBased = true;
+                    int packIndex = multipackZeroBased ? D[0] : D[0] - 1;
+                    packReceivedFlags[packIndex] = true;
                     for (int i = 0; i < 7; i++)
-                        multipackArray[D[0] * 7+i] = D[1+i];
+                        multipackArray[packIndex * 7 + i] = D[1 + i];
                     if (packReceivedFlags.Take(MultipackPacketCount).All(x => x))
                     {
                         string str = Encoding.ASCII.GetString(multipackArray, 0, MultipackLength);
@@ -802,7 +806,7 @@ namespace CAN_Tool.ViewModels
         public void RequestDgn()
         {
             RvcMessage msg = new();
-            msg.Dgn = 0xEA00+SaToRequest;
+            msg.Dgn = 0xEA00 + (GlobalDgnRequest ? 0xFF : SaToRequest);
             msg.Priority = 6;
             msg.Data[0] = (byte)(DgnToRequest&0xFF);
             msg.Data[1] = (byte)(DgnToRequest>>8 & 0xFF);
@@ -952,6 +956,9 @@ namespace CAN_Tool.ViewModels
         private byte saToRequest = 101;
         public byte SaToRequest { set => SetProperty(ref saToRequest, value); get => saToRequest; }
 
+        private bool globalDgnRequest = false;
+        public bool GlobalDgnRequest { set => SetProperty(ref globalDgnRequest, value); get => globalDgnRequest; }
+
         private int dgnToRequest = 0xFEEB;
         public int DgnToRequest { set => SetProperty(ref dgnToRequest, value); get => dgnToRequest; }
 
@@ -979,6 +986,8 @@ namespace CAN_Tool.ViewModels
         private byte[] multipackArray = new byte[1792];
 
         private bool[] packReceivedFlags = new bool[256];
+
+        private bool multipackZeroBased = false;
 
         public string EngineDurationString
         {

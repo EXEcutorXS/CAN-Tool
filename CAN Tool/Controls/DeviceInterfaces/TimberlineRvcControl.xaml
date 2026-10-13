@@ -139,6 +139,10 @@
                 <TextBlock Margin="4 0 2 0" VerticalAlignment="Center" FontSize="13" Text="{DynamicResource t_sub_label}"/>
                 <TextBox Margin="2" VerticalAlignment="Center" Width="28" TextAlignment="Center" FontSize="13"
                          Text="{Binding SubInstanceToRequest}" d:Text="1"/>
+                <CheckBox Margin="6 0 2 0" VerticalAlignment="Center" FontSize="13"
+                          IsChecked="{Binding GlobalDgnRequest}"
+                          Content="{DynamicResource c_global_request}"
+                          ToolTip="{DynamicResource t_global_request_tt}"/>
                 <Button Margin="4 2" Padding="6 2" VerticalAlignment="Center" Click="DgnRequestClick" Content="{DynamicResource b_request_dgn}"/>
                 <Rectangle Width="1" Fill="{DynamicResource MaterialDesignBodyLight}" Margin="8 3" VerticalAlignment="Stretch"/>
                 <!-- Proprietary packet request (0xB0) -->
