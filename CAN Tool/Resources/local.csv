@@ -502,7 +502,7 @@ par_588	Zone 5 name	Название зоны 5	Zone 5 Name
 par_589	Heater ECO mode	Эко режим нагревателя	Heizgerät-ECO-Modus
 par_590	UART protocol(0-DWIN/PU36,1-RS485/Modbus)	Режим работы UART(0-DWIN/PU36,1-RS485/Modbus)	UART-Protokoll(0-DWIN/PU36,1-RS485/Modbus)
 par_591	Modbus address	Адрес на шине RS485(для Modbus)	Modbus-Adresse
-par_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C	RVC_DEVICE_INSTANCE
+par_592	Sleep mode LCD brightness at night	Яркость экрана в режиме сна ночью	Bildschirmhelligkeit im Ruhemodus nachtspar_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C	RVC_DEVICE_INSTANCE
 par_601	RVC_SOURCE_ADDRESS	Адрес устройства (SA) на RV-C шине	RVC_SOURCE_ADDRESS
 			
 bb_1	Start counter	счетчик запусков	Startanzahl

@@ -502,7 +502,7 @@
 <v:String x:Key="par_589">Heater ECO mode</v:String>
 <v:String x:Key="par_590">UART protocol(0-DWIN/PU36,1-RS485/Modbus)</v:String>
 <v:String x:Key="par_591">Modbus address</v:String>
-<v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
+<v:String x:Key="par_592">Sleep mode LCD brightness at night</v:String><v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
 <v:String x:Key="par_601">RVC_SOURCE_ADDRESS</v:String>
 
 <v:String x:Key="bb_1">Start counter</v:String>
