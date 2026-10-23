@@ -377,6 +377,7 @@ par_146	Power limitation for heater 4	Ограничение мощности д
 par_147	Power limitation for heater 5	Ограничение мощности для подогревателя №5	Leistungsbegrenzung Heizgerät 5
 par_148	Power limitation for heater 6	Ограничение мощности для подогревателя №6	Leistungsbegrenzung Heizgerät 6
 par_149	Power limitation for heater 7	Ограничение мощности для подогревателя №7	Leistungsbegrenzung Heizgerät 7
+par_150	Daily time correction	Дневная коррекция часов	Tägliche Zeitkorrektur
 			
 par_400	RV_LOAD_MODE_0	Режим работы доп. нагрузки 0	RV_LOAD_MODE_0
 par_401	RV_LOAD_MODE_1	Режим работы доп. нагрузки 1	RV_LOAD_MODE_1
@@ -415,6 +416,10 @@ par_430	PAR_RV_TANK_SENSOR_CH1_MODE	Режим работы 1 канала  да
 par_431	PAR_RV_TANK_SENSOR_CH1_MODE	Режим работы 2 канала  датчика бака	PAR_RV_TANK_SENSOR_CH1_MODE
 par_432	PAR_RV_TANK_SENSOR_CH1_MODE	Режим работы 3 канала  датчика бака	PAR_RV_TANK_SENSOR_CH1_MODE
 par_433	PAR_RV_TANK_SENSOR_CH1_MODE	Режим работы 4 канала  датчика бака	PAR_RV_TANK_SENSOR_CH1_MODE
+par_434	RV tank sensor CH1 resistance scale: 0-0..190,1-240-33,2-short circuit,3-open circuit	Шкала сопротивлений 1 канала датчиков 0-0..190,1-240-33,2-на замыкание,3-на разрыв	RV-Tanksensor Kanal 1 Widerstandsskala: 0-0..190,1-240-33,2-Kurzschluss,3-Unterbrechung
+par_435	RV tank sensor CH2 resistance scale: 0-0..190,1-240-33,2-short circuit,3-open circuit	Шкала сопротивлений 2 канала датчиков 0-0..190,1-240-33,2-на замыкание,3-на разрыв	RV-Tanksensor Kanal 2 Widerstandsskala: 0-0..190,1-240-33,2-Kurzschluss,3-Unterbrechung
+par_436	RV tank sensor CH3 resistance scale: 0-0..190,1-240-33,2-short circuit,3-open circuit	Шкала сопротивлений 3 канала датчиков 0-0..190,1-240-33,2-на замыкание,3-на разрыв	RV-Tanksensor Kanal 3 Widerstandsskala: 0-0..190,1-240-33,2-Kurzschluss,3-Unterbrechung
+par_437	RV tank sensor CH4 resistance scale: 0-0..190,1-240-33,2-short circuit,3-open circuit	Шкала сопротивлений 4 канала датчиков 0-0..190,1-240-33,2-на замыкание,3-на разрыв	RV-Tanksensor Kanal 4 Widerstandsskala: 0-0..190,1-240-33,2-Kurzschluss,3-Unterbrechung
 par_501	DISPLAY_ZONE1_DAY_T	Уставка дневной температуры зоны 1, С	DISPLAY_ZONE1_DAY_T
 par_502	DISPLAY_ZONE2_DAY_T	Уставка дневной температуры зоны 2, С	DISPLAY_ZONE2_DAY_T
 par_503	DISPLAY_ZONE3_DAY_T	Уставка дневной температуры зоны 3, С	DISPLAY_ZONE3_DAY_T
@@ -503,7 +508,12 @@ par_589	Heater ECO mode	Эко режим нагревателя	Heizgerät-ECO-
 par_590	UART protocol(0-DWIN/PU36,1-RS485/Modbus)	Режим работы UART(0-DWIN/PU36,1-RS485/Modbus)	UART-Protokoll(0-DWIN/PU36,1-RS485/Modbus)
 par_591	Modbus address	Адрес на шине RS485(для Modbus)	Modbus-Adresse
 par_592	Sleep mode LCD brightness at night	Яркость экрана в режиме сна ночью	Bildschirmhelligkeit im Ruhemodus nachtspar_600	RVC_DEVICE_INSTANCE	номер устройства на шине CAN RV-C	RVC_DEVICE_INSTANCE
+par_593	Dynamic SA assignment on RV-C bus	Динамическое определение адреса на RV-C шине	Dynamische SA-Vergabe am RV-C-Bus
+par_594	PU36 display theme (0-bright,1-dark)	Тема экрана (0-светлая,1-тёмная)	PU36-Anzeigedesign (0-hell,1-dunkel)
+par_595	Theme autoselect: dark for night, bright for day	Автосмена темы: тёмная ночью, светлая днём	Automatische Designwahl: dunkel nachts, hell tagsüber
+par_600	Device instance number on CAN RV-C bus	Номер устройства на шине CAN RVC	Geräte-Instanznummer am CAN-RV-C-Bus
 par_601	RVC_SOURCE_ADDRESS	Адрес устройства (SA) на RV-C шине	RVC_SOURCE_ADDRESS
+par_602	RV-C claiming start address	Стартовый адрес для поиска SA	Startadresse für RV-C-Adressvergabe
 			
 bb_1	Start counter	счетчик запусков	Startanzahl
 bb_2	Vent counter	счетчик запусков на вентиляции	Belüftungsstarts

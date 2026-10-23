@@ -377,6 +377,7 @@
 <v:String x:Key="par_147">Power limitation for heater 5</v:String>
 <v:String x:Key="par_148">Power limitation for heater 6</v:String>
 <v:String x:Key="par_149">Power limitation for heater 7</v:String>
+<v:String x:Key="par_150">Daily time correction</v:String>
 
 <v:String x:Key="par_400">RV_LOAD_MODE_0</v:String>
 <v:String x:Key="par_401">RV_LOAD_MODE_1</v:String>
@@ -415,6 +416,10 @@
 <v:String x:Key="par_431">PAR_RV_TANK_SENSOR_CH1_MODE</v:String>
 <v:String x:Key="par_432">PAR_RV_TANK_SENSOR_CH1_MODE</v:String>
 <v:String x:Key="par_433">PAR_RV_TANK_SENSOR_CH1_MODE</v:String>
+<v:String x:Key="par_434">RV tank sensor CH1 resistance scale: 0-0..190,1-240-33,2-short circuit,3-open circuit</v:String>
+<v:String x:Key="par_435">RV tank sensor CH2 resistance scale: 0-0..190,1-240-33,2-short circuit,3-open circuit</v:String>
+<v:String x:Key="par_436">RV tank sensor CH3 resistance scale: 0-0..190,1-240-33,2-short circuit,3-open circuit</v:String>
+<v:String x:Key="par_437">RV tank sensor CH4 resistance scale: 0-0..190,1-240-33,2-short circuit,3-open circuit</v:String>
 <v:String x:Key="par_501">DISPLAY_ZONE1_DAY_T</v:String>
 <v:String x:Key="par_502">DISPLAY_ZONE2_DAY_T</v:String>
 <v:String x:Key="par_503">DISPLAY_ZONE3_DAY_T</v:String>
@@ -502,8 +507,13 @@
 <v:String x:Key="par_589">Heater ECO mode</v:String>
 <v:String x:Key="par_590">UART protocol(0-DWIN/PU36,1-RS485/Modbus)</v:String>
 <v:String x:Key="par_591">Modbus address</v:String>
-<v:String x:Key="par_592">Sleep mode LCD brightness at night</v:String><v:String x:Key="par_600">RVC_DEVICE_INSTANCE</v:String>
+
+<v:String x:Key="par_593">Dynamic SA assignment on RV-C bus</v:String>
+<v:String x:Key="par_594">PU36 display theme (0-bright,1-dark)</v:String>
+<v:String x:Key="par_595">Theme autoselect: dark for night, bright for day</v:String>
+<v:String x:Key="par_600">Device instance number on CAN RV-C bus</v:String>
 <v:String x:Key="par_601">RVC_SOURCE_ADDRESS</v:String>
+<v:String x:Key="par_602">RV-C claiming start address</v:String>
 
 <v:String x:Key="bb_1">Start counter</v:String>
 <v:String x:Key="bb_2">Vent counter</v:String>
