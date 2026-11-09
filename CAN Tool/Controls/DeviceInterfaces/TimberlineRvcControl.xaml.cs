@@ -204,6 +204,25 @@ namespace CAN_Tool.CustomControls
             vm?.SetTime(DateTime.Now);
         }
 
+        // Окно настроек MBC-2 по RV-C (проприетарный пакет 0xC0/0xC1). Одно на контрол, закрывается вместе с главным окном.
+        private RvcSettingsWindow settingsWindow;
+
+        private void SettingsClick(object sender, RoutedEventArgs e)
+        {
+            if (vm == null) return;
+            if (settingsWindow == null)
+            {
+                settingsWindow = new RvcSettingsWindow
+                {
+                    Owner = Window.GetWindow(this),
+                    DataContext = vm
+                };
+                settingsWindow.Closed += (_, _) => settingsWindow = null;
+            }
+            settingsWindow.Show();
+            settingsWindow.Activate();
+        }
+
 
         private void DgnRequestClick(object sender, RoutedEventArgs e)
         {

@@ -1359,4 +1359,29 @@
 <v:String x:Key="t_run_water_pump_tt">Run just water pump</v:String>
 <v:String x:Key="t_run_ventilation_tt">Run ventilation</v:String>
 <v:String x:Key="t_port_not_open">Port is not open</v:String>
+<v:String x:Key="b_rvc_settings">Settings (RV-C)</v:String>
+<v:String x:Key="t_rvc_settings_title">MBC-2 settings over RV-C</v:String>
+<v:String x:Key="b_rvc_save_flash">Save to flash</v:String>
+<v:String x:Key="b_rvc_read_one">Read</v:String>
+<v:String x:Key="b_rvc_write_one">Write</v:String>
+<v:String x:Key="b_rvc_cancel">Cancel</v:String>
+<v:String x:Key="t_rvc_settings_param_no">Parameter No.</v:String>
+<v:String x:Key="t_rvc_settings_read_all_tt">Read all parameters from the device</v:String>
+<v:String x:Key="t_rvc_settings_write_all_tt">Write all parameters from the table to the device and save them to flash</v:String>
+<v:String x:Key="t_rvc_settings_save_flash_tt">Save the current device parameters to flash</v:String>
+<v:String x:Key="t_rvc_settings_erase_tt">Erase the settings sector: all parameters return to defaults</v:String>
+<v:String x:Key="t_rvc_settings_no_answer">No answer from device SA {0}. Check the address and that the device has claimed it.</v:String>
+<v:String x:Key="t_rvc_settings_reading">Reading parameters...</v:String>
+<v:String x:Key="t_rvc_settings_read_done">Parameters read: {0}</v:String>
+<v:String x:Key="t_rvc_settings_cancelled">Cancelled</v:String>
+<v:String x:Key="t_rvc_settings_read_first">Read the parameters first</v:String>
+<v:String x:Key="t_rvc_settings_writing">Writing parameters...</v:String>
+<v:String x:Key="t_rvc_settings_write_done">Parameters written: {0}, saved to flash. Corrected by the device: {1}</v:String>
+<v:String x:Key="t_rvc_settings_saved">Saved to flash</v:String>
+<v:String x:Key="t_rvc_settings_erase_confirm">Erase the settings sector? All parameters will be reset to defaults.</v:String>
+<v:String x:Key="t_rvc_settings_erased">Settings erased, defaults loaded. Read the parameters again.</v:String>
+<v:String x:Key="t_rvc_settings_unknown">Parameter {0} is not supported by the device</v:String>
+<v:String x:Key="t_rvc_settings_single_read">Parameter {0} = {1}</v:String>
+<v:String x:Key="t_rvc_settings_single_written">Parameter {0} written: {1} (saved to flash after 3 min or by "Save to flash")</v:String>
+<v:String x:Key="t_rvc_settings_single_corrected">Parameter {0}: requested {1}, the device set {2}</v:String>
 </ResourceDictionary>

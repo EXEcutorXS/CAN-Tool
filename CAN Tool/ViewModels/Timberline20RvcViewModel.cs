@@ -80,7 +80,7 @@ namespace CAN_Tool.ViewModels
     }
 
 
-    public class Timberline20RvcViewModel : ObservableObject
+    public partial class Timberline20RvcViewModel : ObservableObject
     {
         private DispatcherTimer timer;
 
@@ -126,6 +126,9 @@ namespace CAN_Tool.ViewModels
         public void ProcessMesage(RvcMessage msg)
         {
             var D = msg.Data;
+
+            // Ответ на команду настроек (0xC1) - см. Timberline20RvcViewModel.Settings.cs
+            if (ProcessSettingsAnswer(msg)) return;
 
             // Proprietary DGN: low byte of DGN encodes the device SA
             if (msg.Dgn == (uint)(0xEF00 + SaToRequest) || msg.Dgn == (uint)(0x1EF00 + SaToRequest))//new Style and old style prop messages

@@ -35,6 +35,7 @@
             <Button Margin="3" Opacity="{Binding AuxPumpOverride[1].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump2ButtonClick" Content="{DynamicResource b_aux_pump2}"/>
             <Button Margin="3" Opacity="{Binding AuxPumpOverride[2].Value,Converter={StaticResource BoolToOpacity}}" Click="AuxPump3ButtonClick" Content="{DynamicResource b_aux_pump3}"/>
             <Button Margin="3" Click="SyncTimeClick" Content="{DynamicResource b_sync_time}"/>
+            <Button Margin="3" Click="SettingsClick" Content="{DynamicResource b_rvc_settings}"/>
         </StackPanel>
 
             <WrapPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="10">

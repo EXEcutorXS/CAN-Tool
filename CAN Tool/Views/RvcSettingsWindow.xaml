@@ -1,0 +1,51 @@
+<Window x:Class="CAN_Tool.CustomControls.RvcSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:CAN_Tool.ViewModels"
+        mc:Ignorable="d"
+        Title="{DynamicResource t_rvc_settings_title}" Height="650" Width="900"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        d:DataContext="{d:DesignInstance Type=vm:Timberline20RvcViewModel}">
+    <DockPanel>
+        <!-- Все параметры: чтение, запись с сохранением, сохранение во flash, стирание сектора -->
+        <WrapPanel DockPanel.Dock="Top" Margin="10" IsEnabled="{Binding SettingsIdle}">
+            <Button Margin="5" Content="{DynamicResource b_read}" Command="{Binding ReadAllSettingsCommand}" ToolTip="{DynamicResource t_rvc_settings_read_all_tt}" />
+            <Button Margin="5" Content="{DynamicResource b_save}" Command="{Binding WriteAllSettingsCommand}" ToolTip="{DynamicResource t_rvc_settings_write_all_tt}" />
+            <Button Margin="5" Content="{DynamicResource b_rvc_save_flash}" Command="{Binding SaveSettingsToFlashCommand}" ToolTip="{DynamicResource t_rvc_settings_save_flash_tt}" />
+            <Button Margin="5" Content="{DynamicResource b_reset}" Command="{Binding EraseSettingsCommand}" ToolTip="{DynamicResource t_rvc_settings_erase_tt}" />
+            <TextBlock Margin="20 5 5 5" VerticalAlignment="Center" Text="{Binding SaToRequest, StringFormat='SA {0}'}" />
+        </WrapPanel>
+
+        <!-- Один параметр по номеру -->
+        <WrapPanel DockPanel.Dock="Top" Margin="10 0 10 5" IsEnabled="{Binding SettingsIdle}">
+            <TextBlock Margin="5" VerticalAlignment="Center" Text="{DynamicResource t_rvc_settings_param_no}" />
+            <TextBox Margin="5" Width="70" VerticalAlignment="Center" Text="{Binding SingleParameterId, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Margin="5" VerticalAlignment="Center" Text="{DynamicResource t_value}" />
+            <TextBox Margin="5" Width="110" VerticalAlignment="Center" Text="{Binding SingleParameterValue, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Margin="5" Content="{DynamicResource b_rvc_read_one}" Command="{Binding ReadSingleSettingCommand}" />
+            <Button Margin="5" Content="{DynamicResource b_rvc_write_one}" Command="{Binding WriteSingleSettingCommand}" />
+            <TextBlock Margin="10 5" VerticalAlignment="Center" Text="{Binding SingleParameterName}" TextTrimming="CharacterEllipsis" MaxWidth="320" />
+        </WrapPanel>
+
+        <!-- Состояние операции -->
+        <DockPanel DockPanel.Dock="Bottom" Margin="10">
+            <Button DockPanel.Dock="Right" Margin="5 0 0 0" Content="{DynamicResource b_rvc_cancel}" Command="{Binding CancelSettingsCommand}" IsEnabled="{Binding SettingsBusy}" />
+            <ProgressBar DockPanel.Dock="Bottom" Height="6" Margin="0 5 0 0" Value="{Binding SettingsProgress}" Maximum="100" />
+            <TextBlock VerticalAlignment="Center" Text="{Binding SettingsStatus}" TextWrapping="Wrap" />
+        </DockPanel>
+
+        <DataGrid Margin="10 0" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                  AlternatingRowBackground="{DynamicResource MaterialDesignCardBackground}"
+                  ItemsSource="{Binding SettingsParameters, Mode=OneWay}" IsEnabled="{Binding SettingsIdle}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=Id}" Header="ID" IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding Path=Value}" Header="{DynamicResource t_value}" />
+                <DataGridTextColumn Binding="{Binding Path=Name}" Header="{DynamicResource t_description}" IsReadOnly="True" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

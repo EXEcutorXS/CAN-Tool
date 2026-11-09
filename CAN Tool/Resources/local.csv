@@ -1359,3 +1359,28 @@ t_stop_device_tt	Stop Device	Остановить устройство	Gerät st
 t_run_water_pump_tt	Run just water pump	Запустить только помпу	Nur Wasserpumpe starten
 t_run_ventilation_tt	Run ventilation	Запустить вентиляцию	Belüftung starten
 t_port_not_open	Port is not open	Порт не открыт	Port ist nicht geöffnet
+b_rvc_settings	Settings (RV-C)	Настройки (RV-C)	Einstellungen (RV-C)
+t_rvc_settings_title	MBC-2 settings over RV-C	Настройки MBC-2 по RV-C	MBC-2-Einstellungen über RV-C
+b_rvc_save_flash	Save to flash	Сохранить во flash	Im Flash speichern
+b_rvc_read_one	Read	Прочитать	Lesen
+b_rvc_write_one	Write	Записать	Schreiben
+b_rvc_cancel	Cancel	Отмена	Abbrechen
+t_rvc_settings_param_no	Parameter No.	Параметр №	Parameter Nr.
+t_rvc_settings_read_all_tt	Read all parameters from the device	Прочитать все параметры из устройства	Alle Parameter vom Gerät lesen
+t_rvc_settings_write_all_tt	Write all parameters from the table to the device and save them to flash	Записать в устройство все параметры из таблицы и сохранить во flash	Alle Parameter aus der Tabelle ins Gerät schreiben und im Flash speichern
+t_rvc_settings_save_flash_tt	Save the current device parameters to flash	Записать текущие параметры устройства во flash	Aktuelle Geräteparameter im Flash speichern
+t_rvc_settings_erase_tt	Erase the settings sector: all parameters return to defaults	Стереть сектор настроек: все параметры вернутся к значениям по умолчанию	Einstellungssektor löschen: alle Parameter kehren zu den Standardwerten zurück
+t_rvc_settings_no_answer	No answer from device SA {0}. Check the address and that the device has claimed it.	Нет ответа от устройства SA {0}. Проверьте адрес и то, что устройство его заняло.	Keine Antwort vom Gerät SA {0}. Adresse prüfen und ob das Gerät sie belegt hat.
+t_rvc_settings_reading	Reading parameters...	Чтение параметров...	Parameter werden gelesen...
+t_rvc_settings_read_done	Parameters read: {0}	Прочитано параметров: {0}	Gelesene Parameter: {0}
+t_rvc_settings_cancelled	Cancelled	Отменено	Abgebrochen
+t_rvc_settings_read_first	Read the parameters first	Сначала прочитайте параметры	Zuerst die Parameter lesen
+t_rvc_settings_writing	Writing parameters...	Запись параметров...	Parameter werden geschrieben...
+t_rvc_settings_write_done	Parameters written: {0}, saved to flash. Corrected by the device: {1}	Записано параметров: {0}, сохранено во flash. Исправлено устройством: {1}	Geschriebene Parameter: {0}, im Flash gespeichert. Vom Gerät korrigiert: {1}
+t_rvc_settings_saved	Saved to flash	Сохранено во flash	Im Flash gespeichert
+t_rvc_settings_erase_confirm	Erase the settings sector? All parameters will be reset to defaults.	Стереть сектор настроек? Все параметры вернутся к значениям по умолчанию.	Einstellungssektor löschen? Alle Parameter werden auf Standardwerte zurückgesetzt.
+t_rvc_settings_erased	Settings erased, defaults loaded. Read the parameters again.	Настройки стёрты, загружены значения по умолчанию. Прочитайте параметры заново.	Einstellungen gelöscht, Standardwerte geladen. Parameter erneut lesen.
+t_rvc_settings_unknown	Parameter {0} is not supported by the device	Параметр {0} не поддерживается устройством	Parameter {0} wird vom Gerät nicht unterstützt
+t_rvc_settings_single_read	Parameter {0} = {1}	Параметр {0} = {1}	Parameter {0} = {1}
+t_rvc_settings_single_written	Parameter {0} written: {1} (saved to flash after 3 min or by "Save to flash")	Параметр {0} записан: {1} (во flash — через 3 мин или кнопкой «Сохранить во flash»)	Parameter {0} geschrieben: {1} (im Flash nach 3 Min. oder mit "Im Flash speichern")
+t_rvc_settings_single_corrected	Parameter {0}: requested {1}, the device set {2}	Параметр {0}: запрошено {1}, устройство установило {2}	Parameter {0}: angefordert {1}, Gerät hat {2} gesetzt
