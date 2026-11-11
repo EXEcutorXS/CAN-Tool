@@ -1158,6 +1158,8 @@ c_70	Executive devices on/off	Включение/Выключение устро
 			
 t_device	Device	Устройство	Gerät
 t_12 volts	12 Volts	12 вольт	12 Volt
+t_24_volts	24 Volts	24 вольт	24 Volt
+t_universal_voltage	Universal voltage	Универсальное напряжение	Universalspannung
 t_24 volts	24 Volts	24 вольта	24 Volt
 t_firmware	Firmware	Версия ПО	Firmware
 t_modification	Modification	Модификация ПО	Software-Modifikation
@@ -1245,7 +1247,7 @@ t_blower_state	Blower state	Состояние НВ	Gebläsestatus
 t_not_used	Not used	Не используется	Nicht verwendet
 t_no_firmware_data	No firmware data	Нет данных о ПО	Keine Firmware-Daten
 t_date_time	Date/Time	Дата/Время	Datum/Zeit
-t_day_night_backlight	Day/Night + Backlight	День/Ночь Подсветка	Tag/Nacht + Hintergrundbeleuchtung
+t_day_night_backlight	Day/Night	День/Ночь	Tag/Nacht
 t_hold_shift	You can use mouse wheel, hold shift to change faster	Можно использовать колесо мыши, удерживайте shift для выстрого изменения	Mausrad verwendbar, Shift für schnellere Änderung
 			
 u_s	s	с	s

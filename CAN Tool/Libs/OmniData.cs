@@ -123,7 +123,7 @@ namespace OmniProtocol
 
 
             Commands[0].Parameters.Add(new() { StartByte = 2, BitLength = 8, GetMeaning = i => (GetString("t_device") + ": " + GetString($"d_{i}") + ";"), AnswerOnly = true }); ;
-            Commands[0].Parameters.Add(new() { StartByte = 3, BitLength = 8, Meanings = { { 0, "t_12 volts" }, { 1, "t_24_volts" } }, AnswerOnly = true });
+            Commands[0].Parameters.Add(new() { StartByte = 3, BitLength = 8, Meanings = { { 0, "t_universal_voltage" }, { 1, "t_12 volts" }, { 2, "t_24_volts" } }, AnswerOnly = true });
             Commands[0].Parameters.Add(new() { StartByte = 4, BitLength = 8, Name = "t_firmware", AnswerOnly = true });
             Commands[0].Parameters.Add(new() { StartByte = 5, BitLength = 8, Name = "t_modification", AnswerOnly = true });
 
@@ -443,9 +443,6 @@ namespace OmniProtocol
             Parameters.Add(new() { Pgn = 41, Name = "t_day_start_minute", BitLength = 8, StartByte = 1, UnitT = UnitType_t.Minute });
             Parameters.Add(new() { Pgn = 41, Name = "t_night_start_hour", BitLength = 8, StartByte = 2, UnitT = UnitType_t.Hour });
             Parameters.Add(new() { Pgn = 41, Name = "t_hight_start_minute", BitLength = 8, StartByte = 3, UnitT = UnitType_t.Minute });
-            Parameters.Add(new() { Pgn = 41, Name = "t_daytime_backlight", BitLength = 8, StartByte = 4, UnitT = UnitType_t.Percent });
-            Parameters.Add(new() { Pgn = 41, Name = "t_nighttime_backlight", BitLength = 8, StartByte = 5, UnitT = UnitType_t.Percent });
-            Parameters.Add(new() { Pgn = 41, Name = "t_display_sleep_time", BitLength = 16, StartByte = 6, UnitT = UnitType_t.Second });
 
             Parameters.Add(new() { Pgn = 42, Name = "t_pump_heater_btn", BitLength = 8, StartByte = 0, Meanings = DefMeaningsOnOff });
             Parameters.Add(new() { Pgn = 42, Name = "t_pump_1_btn", BitLength = 8, StartByte = 1, Meanings = DefMeaningsOnOff });

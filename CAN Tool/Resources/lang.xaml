@@ -1158,6 +1158,8 @@
 
 <v:String x:Key="t_device">Device</v:String>
 <v:String x:Key="t_12 volts">12 Volts</v:String>
+<v:String x:Key="t_24_volts">24 Volts</v:String>
+<v:String x:Key="t_universal_voltage">Universal voltage</v:String>
 <v:String x:Key="t_24 volts">24 Volts</v:String>
 <v:String x:Key="t_firmware">Firmware</v:String>
 <v:String x:Key="t_modification">Modification</v:String>
@@ -1245,7 +1247,7 @@
 <v:String x:Key="t_not_used">Not used</v:String>
 <v:String x:Key="t_no_firmware_data">No firmware data</v:String>
 <v:String x:Key="t_date_time">Date/Time</v:String>
-<v:String x:Key="t_day_night_backlight">Day/Night + Backlight</v:String>
+<v:String x:Key="t_day_night_backlight">Day/Night</v:String>
 <v:String x:Key="t_hold_shift">You can use mouse wheel, hold shift to change faster</v:String>
 
 <v:String x:Key="u_s">s</v:String>
