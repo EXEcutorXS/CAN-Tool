@@ -548,6 +548,207 @@ namespace OmniProtocol
 
         #endregion
 
+        #region Custom start-screen logo (one 64 KB block of the external flash)
+
+        // Mirrors MEMORY_LOGO_* in PU28-Timberline's User/Memory/memory.h - keep in sync. The block sits
+        // right before the panel backup area (which itself sits right before the three slots):
+        //   backup meta = SlotsStart - 0x50000, logo block = backup meta - 0x10000 (= 0x5F0000).
+        // Layout: 16-byte header at the block start, raw RGB565 pixels (little-endian, in the display's
+        // scan order: column by column from the right-most column, each column top to bottom - see
+        // LoadLogoPixels) from +0x100. The header is written LAST - the panel re-validates (and redraws) the logo when that
+        // commit arrives. Erasing the block removes the custom logo (the built-in one is shown again).
+        // Header: 'L','G' | width LE16 | height LE16 | CRC16/ARC of the pixel bytes LE16 | format (0 = RGB565) | 7 x 0xFF.
+        private const uint LogoBlockAddr = SlotsStart - 0x50000 - 0x10000;
+        private const int LogoDataOffset = 0x100;
+        private const int LogoWidth = 190;   // exactly the size of the built-in logos
+        private const int LogoHeight = 34;
+
+        [ObservableProperty] private string logoBmpPath = "";
+        [ObservableProperty] private string logoStatusText = "";
+
+        // BMP -> RGB565 little-endian bytes. Transparent/semi-transparent pixels (32-bit BMP with alpha)
+        // are composited over black, the colour of the main screen's background behind the logo.
+        // Returns null (and tells the user why via errorText) if the picture can't be used.
+        private static byte[] LoadLogoPixels(string path, out string errorText)
+        {
+            errorText = "";
+            try
+            {
+                var decoder = System.Windows.Media.Imaging.BitmapDecoder.Create(new Uri(path),
+                    System.Windows.Media.Imaging.BitmapCreateOptions.None,
+                    System.Windows.Media.Imaging.BitmapCacheOption.OnLoad);
+                var frame = decoder.Frames[0];
+                if (frame.PixelWidth != LogoWidth || frame.PixelHeight != LogoHeight)
+                {
+                    errorText = $"The logo must be exactly {LogoWidth}x{LogoHeight} pixels, this file is {frame.PixelWidth}x{frame.PixelHeight}.";
+                    return null;
+                }
+                var converted = new System.Windows.Media.Imaging.FormatConvertedBitmap(frame,
+                    System.Windows.Media.PixelFormats.Bgra32, null, 0);
+                var bgra = new byte[LogoWidth * LogoHeight * 4];
+                converted.CopyPixels(bgra, LogoWidth * 4, 0);
+
+                // The panel's display is mounted rotated (ST7789 MADCTL, see Display::setAddrWindow), so it
+                // takes pixels in COLUMN-major order, starting from the picture's right-most column, each
+                // column top to bottom - the same order tools/bmp_to_groups.py's read_bmp_rgb565() produces
+                // for the built-in logos. The panel just streams the stored bytes to the display, so the
+                // transposition happens here: stream index = col * height + row, source x = width - 1 - col.
+                var rgb565 = new byte[LogoWidth * LogoHeight * 2];
+                var n = 0;
+                for (var col = 0; col < LogoWidth; col++)
+                {
+                    for (var row = 0; row < LogoHeight; row++)
+                    {
+                        var i = row * LogoWidth + (LogoWidth - 1 - col);
+                        int a = bgra[i * 4 + 3];
+                        int b = bgra[i * 4 + 0] * a / 255;
+                        int g = bgra[i * 4 + 1] * a / 255;
+                        int r = bgra[i * 4 + 2] * a / 255;
+                        var c = (ushort)(((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
+                        rgb565[n++] = (byte)c;
+                        rgb565[n++] = (byte)(c >> 8);
+                    }
+                }
+                return rgb565;
+            }
+            catch (Exception ex)
+            {
+                errorText = "Can't read the BMP: " + ex.Message;
+                return null;
+            }
+        }
+
+        [RelayCommand]
+        private void BrowseLogoBmp()
+        {
+            OpenFileDialog dialog = new() { Filter = "BMP files|*.bmp" };
+            if (!(bool)dialog.ShowDialog()) return;
+            LogoBmpPath = dialog.FileName;
+            // Validate right away so a wrong size is reported before the user starts an upload.
+            LogoStatusText = LoadLogoPixels(LogoBmpPath, out var error) == null
+                ? error
+                : $"{LogoWidth}x{LogoHeight}, ready to upload.";
+        }
+
+        private bool EraseLogoBlock(byte deviceType)
+        {
+            var erased = false;
+            for (var i = 0; i < 4 && !erased; i++)
+            {
+                flagExtEraseDone = false;
+                EraseExtRegion(LogoBlockAddr, 1, deviceType);
+                erased = WaitForFlag(ref flagExtEraseDone, 10000);
+            }
+            if (!erased)
+                Bus.CurrentTask.OnFail(GetString("t_cant_erase_memory"));
+            return erased;
+        }
+
+        private async void UploadLogo(byte[] pixels, byte deviceType)
+        {
+            try
+            {
+                if (!Bus.CurrentTask.Capture("Erasing logo block")) return;
+                LogWriteLine("Erasing the custom logo block...");
+                if (!EraseLogoBlock(deviceType)) return;
+
+                Bus.CurrentTask.Capture("Uploading logo...");
+                var fragmentCount = (pixels.Length + ExtFragmentSize - 1) / ExtFragmentSize;
+                for (var n = 0; n < fragmentCount; n++)
+                {
+                    var offset = n * ExtFragmentSize;
+                    var chunkLen = Math.Min(ExtFragmentSize, pixels.Length - offset);
+
+                    // A chunk that is all 0xFF is what the erase already left there - skip it.
+                    var allErased = true;
+                    for (var i = 0; i < chunkLen && allErased; i++)
+                        if (pixels[offset + i] != 0xFF) allErased = false;
+
+                    if (!allErased)
+                    {
+                        // Full ExtFragmentSize allocation: WriteExtFragmentToRam reads in 8-byte groups
+                        // rounded up from Length (see UploadFirmwareToSlot).
+                        var f = new CodeFragment(ExtFragmentSize) { StartAddress = LogoBlockAddr + LogoDataOffset + (uint)offset, Length = chunkLen };
+                        Array.Copy(pixels, offset, f.Data, 0, chunkLen);
+                        FlashExtFragment(f, deviceType);
+                    }
+                    Bus.CurrentTask.UpdatePercent(n * 100 / fragmentCount);
+                    if (Bus.CurrentTask.Cts.IsCancellationRequested) return;
+                }
+
+                LogWriteLine("Writing the logo header...");
+                var crc16 = Crc16Arc(pixels, pixels.Length);
+                var header = new byte[16];
+                Array.Fill(header, (byte)0xFF);
+                header[0] = (byte)'L'; header[1] = (byte)'G';
+                header[2] = (byte)LogoWidth; header[3] = (byte)(LogoWidth >> 8);
+                header[4] = (byte)LogoHeight; header[5] = (byte)(LogoHeight >> 8);
+                header[6] = (byte)crc16; header[7] = (byte)(crc16 >> 8);
+                header[8] = 0; //RGB565
+                var headerFragment = new CodeFragment(ExtFragmentSize) { StartAddress = LogoBlockAddr, Length = header.Length };
+                Array.Copy(header, headerFragment.Data, header.Length);
+                FlashExtFragment(headerFragment, deviceType);
+
+                RunOnUi(() => LogoStatusText = $"Logo uploaded ({pixels.Length} bytes, CRC 0x{crc16:X4}).");
+                LogWriteLine($"Custom logo uploaded: {pixels.Length} bytes, CRC16 0x{crc16:X4}.");
+                Bus.CurrentTask.OnDone();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        // Uploads to the device selected in the connected-devices list (panel or bootloader), same as
+        // UploadToSlot - the PGN107/108 flash protocol is served by both.
+        [RelayCommand]
+        private void UploadLogo()
+        {
+            if (string.IsNullOrEmpty(LogoBmpPath))
+            {
+                MessageBox.Show("Choose a BMP file first.");
+                return;
+            }
+            var targetDevice = Bus.SelectedConnectedDevice;
+            if (targetDevice == null)
+            {
+                MessageBox.Show("Select a target device (bootloader or panel) in the device list first.");
+                return;
+            }
+            var pixels = LoadLogoPixels(LogoBmpPath, out var error);
+            if (pixels == null)
+            {
+                LogoStatusText = error;
+                MessageBox.Show(error);
+                return;
+            }
+            var deviceType = (byte)targetDevice.Id.Type;
+            System.Threading.Tasks.Task.Run(() => UploadLogo(pixels, deviceType));
+        }
+
+        // Erases the logo block - the panel goes back to its built-in logo.
+        [RelayCommand]
+        private void RemoveLogo()
+        {
+            var targetDevice = Bus.SelectedConnectedDevice;
+            if (targetDevice == null)
+            {
+                MessageBox.Show("Select a target device (bootloader or panel) in the device list first.");
+                return;
+            }
+            var deviceType = (byte)targetDevice.Id.Type;
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                if (!Bus.CurrentTask.Capture("Removing logo")) return;
+                if (!EraseLogoBlock(deviceType)) return;
+                RunOnUi(() => LogoStatusText = "Custom logo removed, the built-in one is used.");
+                LogWriteLine("Custom logo removed.");
+                Bus.CurrentTask.OnDone();
+            });
+        }
+
+        #endregion
+
         #region Own/slot image versions (PGN110 subpackets 14-17, periodic broadcast)
 
         // ПУ28 периодически транслирует версии собственного образа ПО и трёх OTA-слотов
