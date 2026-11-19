@@ -378,6 +378,7 @@ par_147	Power limitation for heater 5	Ограничение мощности д
 par_148	Power limitation for heater 6	Ограничение мощности для подогревателя №6	Leistungsbegrenzung Heizgerät 6
 par_149	Power limitation for heater 7	Ограничение мощности для подогревателя №7	Leistungsbegrenzung Heizgerät 7
 par_150	Daily time correction	Дневная коррекция часов	Tägliche Zeitkorrektur
+par_151	Storage mode zone temp setpoint	Температура зон в режиме хранения	Zonentemperatur im Lagermodus
 			
 par_400	RV_LOAD_MODE_0	Режим работы доп. нагрузки 0	RV_LOAD_MODE_0
 par_401	RV_LOAD_MODE_1	Режим работы доп. нагрузки 1	RV_LOAD_MODE_1
@@ -514,6 +515,9 @@ par_595	Theme autoselect: dark for night, bright for day	Автосмена те
 par_600	Device instance number on CAN RV-C bus	Номер устройства на шине CAN RVC	Geräte-Instanznummer am CAN-RV-C-Bus
 par_601	RVC_SOURCE_ADDRESS	Адрес устройства (SA) на RV-C шине	RVC_SOURCE_ADDRESS
 par_602	RV-C claiming start address	Стартовый адрес для поиска SA	Startadresse für RV-C-Adressvergabe
+par_603	Periodic prop packs broadcast	Передача проприетарных пакетов периодически по таймеру	Periodische Übertragung proprietärer Pakete
+par_604	Prop RV-C message format 0-0xEF00+SA,1-0x1EF00+SA	Формат проприетарных пакетов 0-0xEF00+SA,1-0x1EF00+SA	Format proprietärer RV-C-Nachrichten 0-0xEF00+SA,1-0x1EF00+SA
+par_605	Prop RV-C messages destination	Получатель проприетарных сообщений	Empfänger proprietärer RV-C-Nachrichten
 			
 bb_1	Start counter	счетчик запусков	Startanzahl
 bb_2	Vent counter	счетчик запусков на вентиляции	Belüftungsstarts

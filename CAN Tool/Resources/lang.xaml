@@ -378,6 +378,7 @@
 <v:String x:Key="par_148">Power limitation for heater 6</v:String>
 <v:String x:Key="par_149">Power limitation for heater 7</v:String>
 <v:String x:Key="par_150">Daily time correction</v:String>
+<v:String x:Key="par_151">Storage mode zone temp setpoint</v:String>
 
 <v:String x:Key="par_400">RV_LOAD_MODE_0</v:String>
 <v:String x:Key="par_401">RV_LOAD_MODE_1</v:String>
@@ -514,6 +515,9 @@
 <v:String x:Key="par_600">Device instance number on CAN RV-C bus</v:String>
 <v:String x:Key="par_601">RVC_SOURCE_ADDRESS</v:String>
 <v:String x:Key="par_602">RV-C claiming start address</v:String>
+<v:String x:Key="par_603">Periodic prop packs broadcast</v:String>
+<v:String x:Key="par_604">Prop RV-C message format 0-0xEF00+SA,1-0x1EF00+SA</v:String>
+<v:String x:Key="par_605">Prop RV-C messages destination</v:String>
 
 <v:String x:Key="bb_1">Start counter</v:String>
 <v:String x:Key="bb_2">Vent counter</v:String>
