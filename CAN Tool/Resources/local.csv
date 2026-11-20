@@ -1329,6 +1329,7 @@ b_pump2	Pump 2	Помпа 2	Pumpe 2
 b_aux_pump1	AUX pump 1	Доп. помпа 1	Zusatzpumpe 1
 b_aux_pump2	AUX pump 2	Доп. помпа 2	Zusatzpumpe 2
 b_aux_pump3	AUX pump 3	Доп. помпа 3	Zusatzpumpe 3
+b_eco	ECO	ЭКО	ECO
 b_sync_time	Sync time	Синхр. время	Zeit sync.
 t_day_start_at	Day start at:	Начало дня:	Tagesbeginn:
 t_night_start_at	Night start at:	Начало ночи:	Nachtbeginn:

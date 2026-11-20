@@ -1329,6 +1329,7 @@
 <v:String x:Key="b_aux_pump1">AUX pump 1</v:String>
 <v:String x:Key="b_aux_pump2">AUX pump 2</v:String>
 <v:String x:Key="b_aux_pump3">AUX pump 3</v:String>
+<v:String x:Key="b_eco">ECO</v:String>
 <v:String x:Key="b_sync_time">Sync time</v:String>
 <v:String x:Key="t_day_start_at">Day start at:</v:String>
 <v:String x:Key="t_night_start_at">Night start at:</v:String>

@@ -11,8 +11,8 @@ using static CAN_Tool.Libs.Helper;
 namespace CAN_Tool.ViewModels
 {
     // Настройки MBC-2 по RV-C: проприетарный пакет 0xC0 (аналог PGN 7 внутренней шины).
-    //   запрос (DGN 0xEF00 + SA устройства): D0 = 0xC0, D1 = команда, D2..D3 = номер параметра, D4..D7 = сырое значение (старший байт первым)
-    //   ответ:                               D0 = 0xC1, D1 = команда, D2..D3 = номер, D4..D7 = значение
+    //   запрос (DGN 0xEF00 + SA устройства): D0 = 0xC0, D1 = команда, D2..D3 = номер параметра, D4..D7 = сырое значение (little-endian, младший байт первым)
+    //   ответ:                               D0 = 0xC1, D1 = команда, D2..D3 = номер, D4..D7 = значение (little-endian)
     // Команды: 0 - стереть сектор настроек, 1 - записать параметр в ОЗУ, 2 - записать все параметры во flash, 3 - прочитать параметр.
     // Ответ приходит на 0xEF00/0x1EF00 + свой SA или + SA запросившего (зависит от параметров MBC-2 604/605) - принимаем любой
     // проприетарный DGN от SA устройства.
@@ -69,8 +69,8 @@ namespace CAN_Tool.ViewModels
             if (D[0] != PropSettingsAnswer) return false;
 
             var command = D[1];
-            var number = (ushort)((D[2] << 8) | D[3]);
-            var value = ((uint)D[4] << 24) | ((uint)D[5] << 16) | ((uint)D[6] << 8) | D[7];
+            var number = (ushort)(D[2] | (D[3] << 8));
+            var value = (uint)(D[4] | (D[5] << 8) | (D[6] << 16) | ((uint)D[7] << 24));
             var pending = pendingAnswer;
             if (pending != null && command == pendingCommand && (number == pendingNumber || command == CmdErase || command == CmdSaveFlash))
                 pending.TrySetResult(value);
@@ -84,12 +84,12 @@ namespace CAN_Tool.ViewModels
             msg.Priority = 6;
             msg.Data[0] = PropSettings;
             msg.Data[1] = command;
-            msg.Data[2] = (byte)(number >> 8);
-            msg.Data[3] = (byte)number;
-            msg.Data[4] = (byte)(value >> 24);
-            msg.Data[5] = (byte)(value >> 16);
-            msg.Data[6] = (byte)(value >> 8);
-            msg.Data[7] = (byte)value;
+            msg.Data[2] = (byte)number;
+            msg.Data[3] = (byte)(number >> 8);
+            msg.Data[4] = (byte)value;
+            msg.Data[5] = (byte)(value >> 8);
+            msg.Data[6] = (byte)(value >> 16);
+            msg.Data[7] = (byte)(value >> 24);
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 

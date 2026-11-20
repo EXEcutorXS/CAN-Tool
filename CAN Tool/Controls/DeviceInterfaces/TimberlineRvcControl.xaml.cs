@@ -204,6 +204,11 @@ namespace CAN_Tool.CustomControls
             vm?.SetTime(DateTime.Now);
         }
 
+        private void EcoButtonClick(object sender, RoutedEventArgs e)
+        {
+            vm?.ToggleEco();
+        }
+
         // Окно настроек MBC-2 по RV-C (проприетарный пакет 0xC0/0xC1). Одно на контрол, закрывается вместе с главным окном.
         private RvcSettingsWindow settingsWindow;
 

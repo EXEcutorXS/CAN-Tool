@@ -192,6 +192,7 @@ namespace CAN_Tool.ViewModels
                             if (EnginePreheatDuration < 10)   EnginePreheatDuration = 10;
                             if (EnginePreheatDuration > 1450) EnginePreheatDuration = 1450;
                         }
+                        if ((D[6] & 3) != 3) EcoMode = (D[6] & 3) == 1;   // байт 6, биты 0-1: кнопка ЭКО (11b - нет данных, старая прошивка HCU)
                         break;
                     case 0xA9:
                         if ((D[1] & 3) != 3) DomesticWater = (D[1] & 3) != 0;
@@ -675,6 +676,18 @@ namespace CAN_Tool.ViewModels
             NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
         }
 
+        // Кнопка ЭКО: проприетарный 0xA7, байт 6 биты 0-1 (00b - выкл, 01b - вкл), остальные байты FFh - не менять
+        public void ToggleEco()
+        {
+            RvcMessage msg = new();
+            msg.Dgn = (int)(0xEF00 + SaToRequest);
+            msg.Priority = 6;
+            msg.Data[0] = 0xA7;
+            msg.Data[6] = (byte)(0xFC | (EcoMode ? 0 : 1));
+
+            NeedToTransmit?.Invoke(this, new NeedToTransmitEventArgs() { msgToTransmit = msg.ToCanMessage() });
+        }
+
 
         public void SetDayStart(int hours, int minutes)
         {
@@ -873,6 +886,9 @@ namespace CAN_Tool.ViewModels
 
         private bool elementEnabled;
         public bool ElementEnabled { set => SetProperty(ref elementEnabled, value); get => elementEnabled; }
+
+        private bool ecoMode;
+        public bool EcoMode { set => SetProperty(ref ecoMode, value); get => ecoMode; }
 
         private bool underfloorHeatingEnabled;
         public bool UnderfloorHeatingEnabled { set => SetProperty(ref underfloorHeatingEnabled, value); get => underfloorHeatingEnabled; }
